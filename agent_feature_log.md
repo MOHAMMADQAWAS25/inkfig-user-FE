@@ -11,6 +11,15 @@ This file is the repository's running implementation history for agent-assisted 
 
 ## Entries
 
+### 2026-09-28 - Establish the React and Vite frontend foundation
+
+- Added a strict TypeScript React application built with Vite, React Router page routing, and Lucide React icons.
+- Added shared API request handling with separate user/main API base URLs, an authentication context, protected routes, permission helpers, and Arabic/English localization with automatic RTL/LTR document direction.
+- Added a responsive application shell, mobile drawer, login foundation, dashboard placeholder, and shared Shadow-inspired CSS tokens for dark surfaces, subtle borders, orange actions, compact controls, and restrained status colors.
+- Documented the frontend folder boundaries and prohibited unapproved UI/state libraries.
+- Verification: 2 Node tests passed and the TypeScript/Vite production build passed. Automated checks cover responsive and RTL CSS markers; live browser visual inspection was unavailable in this session and remains required when feature UI is implemented.
+- Migration required: No.
+
 ### 2026-09-28 - Document the InkFig product vision
 
 - Added `README.md` with the project's university context, art-community purpose, planned discovery and interaction features, AI-assisted image search, teacher event moderation workflow, and access-control direction.

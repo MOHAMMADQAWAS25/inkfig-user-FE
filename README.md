@@ -36,3 +36,14 @@ The platform will support multiple ways of presenting and discovering artwork. T
 ## Project status
 
 This document records the initial product direction, not a complete specification. Detailed requirements, artwork presentation modes, algorithms, roles, permissions, and additional workflows will be defined as the project develops.
+
+## Development
+
+The web application uses React, strict TypeScript, Vite, React Router, Lucide React, and shared CSS. Its organization and frontend constraints are documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+```powershell
+npm install
+npm run dev
+```
+
+Use `npm test` for source-level foundation checks and `npm run build` for the strict TypeScript production build.
