@@ -92,3 +92,67 @@ No special deployment steps.
 ### Notes
 
 Historical entries retain their original format; the required structured format applies from this entry onward.
+
+## 2026-09-29 - Align local folders with renamed repositories
+
+### Request
+
+Rename the local repository folders to match the new InkFig GitHub repository names.
+
+### Changes
+
+- Renamed the local folder from `delivery-user-FE` to `inkfig-user-FE`.
+- Updated `origin` from the legacy redirected repository URL to the canonical `inkfig-user-FE` GitHub URL.
+- Removed only the empty old folder remnant left by the Windows move operation.
+- Intentionally left application code, configuration values, dependencies, and runtime behavior unchanged.
+
+### Repositories
+
+- `inkfig-main-system`: renamed its local folder and updated its canonical `origin` URL.
+- `inkfig-user-system`: renamed its local folder and updated its canonical `origin` URL.
+- `inkfig-user-FE`: renamed its local folder and updated its canonical `origin` URL.
+
+### Files
+
+- `AGENT_FEATURE_LOG.md`: recorded the local folder and remote URL alignment.
+- No application files changed.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions, roles, authorization checks, or access scopes changed.
+- Backend authorization behavior is unchanged.
+
+### Frontend
+
+- No routes, navigation, forms, tables, dialogs, filters, responsive behavior, localization, loading states, empty states, or error handling changed.
+
+### Verification
+
+- `[passed] git status --short --branch` - repository remained clean after the move.
+- `[passed] git remote get-url origin` - canonical InkFig remote URL is configured.
+- `[passed] git ls-remote --exit-code origin refs/heads/main` - renamed GitHub repository is reachable.
+- `[passed] workspace directory inspection` - only the three new repository folder names remain.
+- `[not run] application tests and builds` - no application files changed.
+
+### Deployment
+
+- Update local scripts or external deployment jobs that still reference the old `delivery-user-FE` folder or repository URL.
+- No migrations must run before deployment.
+
+### Git
+
+- Branch: `main`
+- Commit: `3e8bfdd`
+- Push: `successful`
+
+### Notes
+
+The old GitHub URL redirected successfully, but the canonical URL is now configured directly.
