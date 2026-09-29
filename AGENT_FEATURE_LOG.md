@@ -156,3 +156,79 @@ No migration required.
 ### Notes
 
 The old GitHub URL redirected successfully, but the canonical URL is now configured directly.
+## 2026-09-29 - Deploy the frontend from GitHub Actions
+
+### Request
+
+Automatically test, build, and deploy the frontend to Cloudflare whenever changes are pushed to the `main` branch, alongside the existing backend deployment workflows.
+
+### Changes
+
+- Added a GitHub Actions workflow triggered by pushes to `main` and manual dispatches.
+- Added deterministic dependency installation, frontend tests, strict TypeScript/Vite build, Cloudflare Worker deployment, and a production URL health check.
+- Built the frontend with the production user and main API base URLs.
+- Added Wrangler static-assets configuration for the existing `inkfig-user-fe` Worker.
+- Enabled single-page-application fallback so React Router paths resolve to `index.html`.
+- Serialized production deployments to prevent overlapping Worker updates.
+- Documented the required Cloudflare account ID and scoped API-token secrets.
+- Left application routes, UI behavior, authentication state, localization, and backend contracts unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added automatic Cloudflare Worker deployment.
+- `inkfig-user-system`: already contains its AWS deployment workflow; no changes in this ticket.
+- `inkfig-main-system`: already contains its AWS deployment workflow; no changes in this ticket.
+
+### Files
+
+- `.github/workflows/deploy.yml`: tests, builds, deploys, and health-checks the production frontend.
+- `wrangler.jsonc`: configures the `inkfig-user-fe` Worker static assets and SPA fallback.
+- `README.md`: documents production API URLs and Cloudflare GitHub secrets.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The workflow receives read-only repository contents and GitHub deployment-write permission.
+- Cloudflare access is limited by the scope of `CLOUDFLARE_API_TOKEN`; it should grant only the Workers edit access required for the InkFig account.
+- No application permissions, roles, or backend authorization changed.
+
+### Frontend
+
+- Builds with `VITE_USER_API_BASE_URL=https://user-api.inkfig-hu.com/api/v1`.
+- Builds with `VITE_MAIN_API_BASE_URL=https://main-api.inkfig-hu.com/api/v1`.
+- Deploys `dist/` to the existing `inkfig-user-fe` Worker on every push to `main`.
+- Preserves all existing routes, navigation, responsive behavior, localization, loading states, empty states, and error handling.
+
+### Verification
+
+- `[passed] npm test` — 2 tests passed.
+- `[passed] npm run build` — strict TypeScript and Vite production build succeeded.
+- `[passed] Python YAML parse of .github/workflows/deploy.yml`
+- `[passed] npx --yes wrangler@4 deploy --dry-run` — 4 static asset files accepted.
+- `[passed] git diff --check`
+- `[not run] GitHub Actions production deployment` — requires Cloudflare secrets in the GitHub production environment.
+
+### Deployment
+
+- Configure the GitHub `production` environment with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+- Keep `inkfig-hu.com` associated with the existing `inkfig-user-fe` Worker.
+- After setup, every push to `main` deploys the production frontend automatically.
+- No migration is required.
+
+### Git
+
+- Branch: `main`
+- Commit: `f02331f`
+- Push: `successful`
+
+### Notes
+
+The initial workflow run will fail at Cloudflare authentication until both required secrets are configured. Cloudflare Worker static assets and SPA fallback follow the current Wrangler configuration model.
