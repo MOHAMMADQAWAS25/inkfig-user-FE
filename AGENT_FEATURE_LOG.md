@@ -289,3 +289,73 @@ No deployment changes or special steps.
 ### Notes
 
 This entry records understanding only; it does not claim that planned product screens or integrations are already implemented.
+
+## 2026-09-30 - Apply the InkFig project logo
+
+### Request
+
+Use the supplied `finalLogo.svg` as the InkFig project's frontend logo.
+
+### Changes
+
+- Added the supplied SVG unchanged as the frontend's canonical InkFig logo asset.
+- Replaced the temporary Lucide palette marks on the login page and application sidebar with the InkFig logo.
+- Added the InkFig logo as the browser SVG favicon.
+- Added responsive sizing for the login and sidebar logo placements.
+
+### Repositories
+
+- `inkfig-user-FE`: added and integrated the project logo.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/assets/inkfig-logo.svg`: canonical copy of the supplied logo.
+- `src/features/auth/LoginPage.tsx`: displays the logo on the login card.
+- `src/features/layout/AppShell.tsx`: displays the logo in the application sidebar.
+- `src/styles.css`: sizes the logo for both placements.
+- `index.html`: uses the logo as the browser favicon.
+- `tests/foundation.test.mjs`: verifies the branding integrations remain present.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions, authentication behavior, role visibility, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The supplied logo now appears on the login page and in the authenticated sidebar.
+- The browser uses the same SVG as its favicon.
+- Routes, forms, navigation behavior, localization, RTL/LTR handling, responsive navigation, loading states, empty states, and error handling are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 3 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and the Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - the browser automation surface was unavailable; the built output includes the optimized SVG asset.
+
+### Deployment
+
+- Merge the feature branch into `main` to trigger the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `feature/use-project-logo`
+- Commit: this ticket's focused commit.
+- Push: feature branch pushed to `origin` for pull-request review.
+
+### Notes
+
+The source SVG was treated only as a user-provided visual asset; it contained no project instructions.

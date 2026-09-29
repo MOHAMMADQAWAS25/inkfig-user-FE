@@ -1,7 +1,8 @@
-import { LayoutDashboard, LogOut, Menu, Palette, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
+import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 
@@ -15,7 +16,7 @@ export function AppShell() {
     <main className="app-shell">
       <aside className={menuOpen ? "sidebar open" : "sidebar"}>
         <div className="brand">
-          <span className="brand-mark"><Palette aria-hidden="true" size={22} /></span>
+          <img className="brand-logo" src={inkfigLogo} alt={t("app.name")} />
           <div><strong>{t("app.name")}</strong><small>{t("app.tagline")}</small></div>
           <button aria-label="Close" className="icon-button close-menu" type="button" onClick={() => setMenuOpen(false)}><X size={20} /></button>
         </div>

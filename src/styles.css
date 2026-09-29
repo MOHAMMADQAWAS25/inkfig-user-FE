@@ -27,7 +27,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px 18px; }
 .brand > div { min-width: 0; display: grid; }
 .brand small { overflow: hidden; color: var(--muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
-.brand-mark { display: inline-grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border: 1px solid #74411f; border-radius: var(--radius); background: #29190e; color: var(--primary); }
+.brand-logo { width: 52px; height: 40px; flex: 0 0 auto; object-fit: contain; }
 .nav-list { display: grid; gap: 5px; }
 .nav-list a, .sidebar-footer button { display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 9px 11px; border: 0; border-radius: 6px; color: var(--muted); text-decoration: none; background: transparent; cursor: pointer; }
 .nav-list a.active { background: #2b1b10; color: var(--primary); }
@@ -46,6 +46,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .empty-state { display: grid; min-height: 260px; margin-top: 24px; padding: 28px; place-items: center; align-content: center; gap: 10px; border: 1px dashed var(--border); border-radius: var(--radius); color: var(--muted); text-align: center; }
 .auth-layout { display: grid; min-height: 100vh; padding: 20px; place-items: center; }
 .auth-card { width: min(420px, 100%); padding: 28px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.auth-logo { display: block; width: min(210px, 62%); height: auto; margin-inline: auto; }
 .auth-card h1 { margin: 12px 0 6px; }
 .muted-text { color: var(--muted); }
 .form-stack { display: grid; gap: 15px; margin-top: 24px; }
