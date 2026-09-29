@@ -1,6 +1,6 @@
-import { Palette } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
+import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "./AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 
@@ -15,7 +15,7 @@ export function LoginPage() {
   return (
     <main className="auth-layout">
       <section className="auth-card" aria-labelledby="login-title">
-        <div className="brand-mark" aria-hidden="true"><Palette size={24} /></div>
+        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <p className="eyebrow">{t("app.name")}</p>
         <h1 id="login-title">{t("auth.welcome")}</h1>
         <p className="muted-text">{t("app.tagline")}</p>
