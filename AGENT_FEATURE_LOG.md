@@ -359,3 +359,69 @@ No migration required.
 ### Notes
 
 The source SVG was treated only as a user-provided visual asset; it contained no project instructions.
+
+## 2026-09-30 - Derive the website theme from the InkFig logo
+
+### Request
+
+Design the website colors and theme around the official InkFig logo palette.
+
+### Changes
+
+- Replaced the unrelated orange and neutral theme tokens with the logo's deep olive, leaf green, light olive, warm cream, and fig burgundy colors.
+- Added semantic brand tokens so future screens can reuse the approved palette consistently.
+- Updated page, sidebar, topbar, navigation, status, empty-state, form, button, focus, and hover treatments to use the new palette.
+- Added restrained olive and fig background glows to the login experience without changing its content or behavior.
+- Added source-level checks for the canonical logo-derived theme colors.
+
+### Repositories
+
+- `inkfig-user-FE`: implemented the logo-derived visual theme.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: defines and applies the logo-derived theme.
+- `tests/foundation.test.mjs`: verifies the canonical brand colors remain present.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions, authentication behavior, role visibility, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The existing login, navigation shell, dashboard, forms, buttons, badges, and empty states now use the InkFig logo palette.
+- Routes, content, localization, RTL/LTR behavior, responsive navigation, authentication state, and error handling are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 3 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Merge the feature branch into `main` to trigger the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `feature/logo-derived-theme`
+- Commit: this ticket's focused commit.
+- Push: feature branch pushed to `origin` for pull-request review.
+
+### Notes
+
+The palette is derived directly from the canonical SVG values: deep olive `#39431c`, leaf green `#617d2b`, light olives `#a9b65f` and `#c5c970`, warm cream `#eee7bd`, and fig burgundy `#982824`.
