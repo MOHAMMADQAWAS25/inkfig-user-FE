@@ -18,7 +18,11 @@ test("uses the approved frontend dependencies", () => {
 });
 
 test("defines shared visual tokens and responsive RTL behavior", () => {
-  assert.match(styles, /--primary:/);
+  assert.match(styles, /--brand-leaf:\s*#617d2b/);
+  assert.match(styles, /--brand-deep:\s*#39431c/);
+  assert.match(styles, /--brand-cream:\s*#eee7bd/);
+  assert.match(styles, /--brand-fig:\s*#982824/);
+  assert.match(styles, /--primary:\s*#a9b65f/);
   assert.match(styles, /--radius:\s*8px/);
   assert.match(styles, /\[dir="rtl"\]/);
   assert.match(styles, /@media \(max-width: 760px\)/);
