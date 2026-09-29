@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "./AuthContext";
@@ -30,6 +30,7 @@ export function LoginPage() {
           </label>
           <button className="primary-button" disabled type="submit">{t("auth.signIn")}</button>
         </form>
+        <p className="auth-switch">{t("auth.noAccount")} <Link to={`/${language}/signup`}>{t("auth.signUp")}</Link></p>
         <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>
           {language === "ar" ? "English" : "العربية"}
         </button>

@@ -34,9 +34,9 @@ body {
     var(--bg);
   color: var(--text);
 }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .app-shell { display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 18px 14px; border-inline-end: 1px solid var(--border); background: linear-gradient(180deg, #1b2314, var(--surface)); }
@@ -71,20 +71,33 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
     radial-gradient(circle at 20% 20%, rgb(169 182 95 / 0.13), transparent 28rem),
     radial-gradient(circle at 85% 82%, rgb(152 40 36 / 0.12), transparent 26rem);
 }
+.auth-layout-scroll { padding-block: 36px; }
 .auth-card { width: min(420px, 100%); padding: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: linear-gradient(145deg, rgb(32 40 25 / 0.98), rgb(23 29 17 / 0.98)); box-shadow: 0 24px 70px rgb(0 0 0 / 0.34), inset 0 1px 0 rgb(238 231 189 / 0.05); }
 .auth-logo { display: block; width: min(210px, 62%); height: auto; margin-inline: auto; }
+.signup-card { width: min(560px, 100%); }
 .auth-card h1 { margin: 12px 0 6px; }
 .muted-text { color: var(--muted); }
 .form-stack { display: grid; gap: 15px; margin-top: 24px; }
 .form-stack label { display: grid; gap: 7px; color: var(--muted); font-size: 0.86rem; }
-.form-stack input { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; background: rgb(16 20 12 / 0.85); color: var(--text); }
-.form-stack input:hover { border-color: var(--brand-leaf); }
-.form-stack input:focus { border-color: var(--primary); }
+.form-stack input, .form-stack select { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; background: rgb(16 20 12 / 0.85); color: var(--text); }
+.form-stack input:hover, .form-stack select:hover { border-color: var(--brand-leaf); }
+.form-stack input:focus, .form-stack select:focus { border-color: var(--primary); }
+.form-stack small { color: var(--muted); line-height: 1.45; }
 .primary-button { min-height: 44px; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: var(--primary-ink); font-weight: 750; cursor: pointer; }
 .primary-button:hover:not(:disabled) { background: var(--primary-hover); }
 .primary-button:disabled { cursor: not-allowed; opacity: 0.55; }
 .text-button { margin-top: 18px; padding: 6px 0; border: 0; background: transparent; color: var(--primary); cursor: pointer; }
 .text-button:hover { color: var(--primary-hover); }
+.auth-actions { display: grid; gap: 10px; margin-top: 24px; }
+.button-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; text-decoration: none; }
+.secondary-button { min-height: 44px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-raised); color: var(--text); }
+.secondary-button:hover { border-color: var(--border-strong); }
+.auth-switch { margin: 20px 0 0; color: var(--muted); font-size: 0.9rem; }
+.auth-switch a { color: var(--primary); }
+.form-message { margin: 0; padding: 10px 12px; border-radius: 6px; font-size: 0.88rem; }
+.error-message { border: 1px solid var(--brand-fig); background: rgb(152 40 36 / 0.16); color: var(--brand-fig-soft); }
+.success-panel { display: grid; gap: 14px; margin-top: 24px; padding: 16px; border: 1px solid var(--border-strong); border-radius: 6px; background: rgb(97 125 43 / 0.2); color: var(--brand-cream); }
+.success-panel p { margin: 0; }
 .icon-button { display: inline-grid; width: 40px; height: 40px; padding: 0; place-items: center; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--brand-cream); cursor: pointer; }
 .icon-button:hover { border-color: var(--border-strong); background: var(--surface-raised); }
 .menu-button, .close-menu, .sidebar-backdrop { display: none; }

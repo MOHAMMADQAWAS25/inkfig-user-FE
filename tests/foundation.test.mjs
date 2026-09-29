@@ -7,6 +7,9 @@ const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const loginPage = readFileSync(new URL("../src/features/auth/LoginPage.tsx", import.meta.url), "utf8");
 const appShell = readFileSync(new URL("../src/features/layout/AppShell.tsx", import.meta.url), "utf8");
+const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
+const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
+const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -15,6 +18,16 @@ test("uses the approved frontend dependencies", () => {
   for (const forbidden of ["@mui/material", "bootstrap", "redux", "styled-components", "tailwindcss"]) {
     assert.equal(packageJson.dependencies[forbidden], undefined);
   }
+});
+
+test("provides localized welcome and signup routes with every required field", () => {
+  assert.match(router, /\/:language\/welcome/);
+  assert.match(router, /\/:language\/signup/);
+  for (const field of ["email", "full_name", "phone_number", "gender", "date_of_birth", "password", "password_confirmation"]) {
+    assert.match(signup, new RegExp(`name=["']${field}["']`));
+  }
+  assert.match(signup, /students\\\.hebron\\\.edu/);
+  assert.match(registrationApi, /\/auth\/signup/);
 });
 
 test("defines shared visual tokens and responsive RTL behavior", () => {

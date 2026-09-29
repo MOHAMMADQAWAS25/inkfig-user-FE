@@ -48,6 +48,14 @@ npm run dev
 
 Use `npm test` for source-level foundation checks and `npm run build` for the strict TypeScript production build.
 
+## Account entry
+
+Unauthenticated visitors start at `/:language/welcome`, where they can choose
+sign in or sign up. The localized `/:language/signup` form sends all required
+profile and credential fields to `POST /api/v1/auth/signup`. The frontend mirrors
+the Hebron email and password-confirmation checks for immediate feedback, while
+the user backend remains authoritative.
+
 ## Automatic Cloudflare deployment
 
 Every push to `main` runs the frontend tests and production build, then deploys the static Vite output to the existing `inkfig-user-fe` Cloudflare Worker. The production build uses:
