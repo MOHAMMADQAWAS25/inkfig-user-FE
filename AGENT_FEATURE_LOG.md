@@ -711,3 +711,70 @@ No migration required.
 ### Notes
 
 All new visual colors are tints or direct values from the official InkFig olive, cream, and fig palette.
+
+## 2026-09-30 - Require ten-digit signup phone numbers
+
+### Request
+
+Keep the required Hebron email formats and require the signup phone number to contain exactly 10 digits.
+
+### Changes
+
+- Added immediate exact 10-digit phone validation before the signup API request.
+- Restricted the phone control to numeric input with matching minimum/maximum lengths and HTML pattern validation.
+- Added localized Arabic and English phone hints and validation errors.
+- Preserved the existing student/staff email validation, authentication-card styling, themes, responsive layout, and signup workflow.
+
+### Repositories
+
+- `inkfig-user-FE`: mirrors and explains the 10-digit phone contract.
+- `inkfig-user-system`: enforces the same rule authoritatively.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/SignupPage.tsx`: validates and constrains the phone input.
+- `src/i18n/resources.ts`: localizes phone guidance and validation feedback.
+- `tests/foundation.test.mjs`: verifies the exact 10-digit client rule remains present.
+
+### API
+
+- `POST /api/v1/auth/signup`: the existing `phone_number` request field must contain exactly 10 digits; no field names or response fields changed.
+
+### Database
+
+No migration required. Database persistence changes are not needed for this frontend validation update.
+
+### Permissions and scope
+
+- Signup remains public and grants no permission or role.
+- The frontend check is convenience only; the user backend revalidates the phone and organization email rules.
+- No role visibility or data scope changed.
+
+### Frontend
+
+- The signup phone field now uses numeric input, exactly 10 characters, a 10-digit pattern, localized guidance, and an explicit pre-request error.
+- Routes, navigation, themes, RTL/LTR behavior, loading, success, duplicate-email, and general error states are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 6 tests passed.
+- `[passed] npm run build` - strict TypeScript and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live production signup` - deployment occurs through the main-branch workflows after push.
+
+### Deployment
+
+- Deploy `inkfig-user-system` first, then deploy this frontend.
+- Push to `main` triggers the existing Cloudflare deployment workflow.
+- No environment-variable or Cloudflare configuration change is required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+Phone validation confirms format and digit count only; it does not verify ownership of the number.

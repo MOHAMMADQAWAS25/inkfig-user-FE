@@ -30,6 +30,7 @@ test("provides localized welcome and signup routes with every required field", (
     assert.match(signup, new RegExp(`name=["']${field}["']`));
   }
   assert.match(signup, /students\\\.hebron\\\.edu/);
+  assert.match(signup, /PHONE_NUMBER = \/\^\[0-9\]\{10\}\$\//);
   assert.match(registrationApi, /\/auth\/signup/);
 });
 

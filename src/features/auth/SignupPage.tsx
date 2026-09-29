@@ -12,6 +12,7 @@ import type { Gender, RegistrationRequest } from "./registrationApi";
 
 const STUDENT_EMAIL = /^\d{8}@students\.hebron\.edu$/i;
 const STAFF_EMAIL = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@hebron\.edu$/i;
+const PHONE_NUMBER = /^[0-9]{10}$/;
 
 const initialForm: RegistrationRequest = {
   email: "",
@@ -45,6 +46,10 @@ export function SignupPage() {
     const email = form.email.trim().toLowerCase();
     if (!STUDENT_EMAIL.test(email) && !STAFF_EMAIL.test(email)) {
       setError(t("auth.invalidHebronEmail"));
+      return;
+    }
+    if (!PHONE_NUMBER.test(form.phone_number)) {
+      setError(t("auth.invalidPhoneNumber"));
       return;
     }
     if (form.password !== form.password_confirmation) {
@@ -97,7 +102,8 @@ export function SignupPage() {
             </label>
             <label>
               <span>{t("auth.phoneNumber")}</span>
-              <input required autoComplete="tel" dir="ltr" name="phone_number" type="tel" pattern="\+?[0-9 -]{7,18}" value={form.phone_number} onChange={(event) => updateField("phone_number", event.target.value)} />
+              <input required autoComplete="tel" dir="ltr" inputMode="numeric" maxLength={10} minLength={10} name="phone_number" pattern="[0-9]{10}" type="tel" value={form.phone_number} onChange={(event) => updateField("phone_number", event.target.value)} />
+              <small>{t("auth.phoneHint")}</small>
             </label>
             <label>
               <span>{t("auth.gender")}</span>
