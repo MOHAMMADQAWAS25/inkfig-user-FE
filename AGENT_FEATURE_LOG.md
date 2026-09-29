@@ -501,3 +501,79 @@ Give first-time visitors clear login and signup choices and provide a required r
 ### Notes
 
 The branch was rebased onto the latest `origin/main`; conflicts in login, shared CSS, foundation tests, and the append-only feature log were resolved by preserving the canonical logo, logo-derived theme, and signup behavior.
+
+## 2026-09-30 - Add logo-derived light and dark themes
+
+### Request
+
+Add light and dark themes whose colors are derived from the official InkFig logo.
+
+### Changes
+
+- Added a theme provider that selects the saved preference, falls back to the operating-system color-scheme preference, updates the root document theme, and persists manual changes.
+- Added an accessible sun/moon theme toggle to every public authentication screen and the authenticated application header.
+- Split the existing logo-derived design tokens into coordinated light and dark palettes using cream, deep olive, leaf green, light olive, and fig burgundy.
+- Converted backgrounds, surfaces, navigation states, forms, status panels, errors, focus treatments, and shadows to semantic theme tokens.
+- Added source-level regression coverage for both palettes, provider wiring, persistence, OS preference detection, and localized toggle labels.
+
+### Repositories
+
+- `inkfig-user-FE`: added the application theme system and theme-aware styling.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/theme/ThemeProvider.tsx`: owns theme selection, persistence, and document state.
+- `src/theme/ThemeToggle.tsx`: provides the accessible localized theme control.
+- `src/app/AppProviders.tsx`: installs the theme provider for all routes.
+- `src/features/auth/AuthLandingPage.tsx`: exposes the theme toggle on the welcome screen.
+- `src/features/auth/LoginPage.tsx`: exposes the theme toggle on login.
+- `src/features/auth/SignupPage.tsx`: exposes the theme toggle on signup.
+- `src/features/layout/AppShell.tsx`: exposes the theme toggle in the authenticated header.
+- `src/i18n/resources.ts`: localizes light/dark theme actions in Arabic and English.
+- `src/styles.css`: defines and applies the logo-derived light and dark theme tokens.
+- `tests/foundation.test.mjs`: verifies theme integration and canonical colors.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The first visit follows the operating-system light/dark preference unless a saved InkFig preference exists.
+- Theme changes persist locally under `inkfig.theme` and apply across public and authenticated routes.
+- Both themes use colors derived from the official logo; fig burgundy remains reserved for restrained accents and errors.
+- Routes, forms, API behavior, localization direction, navigation, loading states, success states, and error handling are otherwise unchanged.
+
+### Verification
+
+- `[passed] npm test` - 5 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - the in-app browser surface was unavailable in this environment.
+
+### Deployment
+
+- Merge the feature branch into `main` to trigger the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `feature/light-dark-logo-themes`
+- Commit: this ticket's focused commit.
+- Push: feature branch pushed to `origin` for pull-request review.
+
+### Notes
+
+The theme keeps the existing semantic token architecture so future screens inherit both palettes without page-specific color duplication.

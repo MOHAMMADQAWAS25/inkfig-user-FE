@@ -10,6 +10,9 @@ const appShell = readFileSync(new URL("../src/features/layout/AppShell.tsx", imp
 const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
+const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.meta.url), "utf8");
+const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
+const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -47,4 +50,18 @@ test("uses the InkFig logo for application branding", () => {
   assert.match(appShell, /inkfig-logo\.svg/);
   assert.match(styles, /\.auth-logo/);
   assert.match(styles, /\.brand-logo/);
+});
+
+test("provides persistent logo-derived light and dark themes", () => {
+  assert.match(styles, /:root\[data-theme="dark"\]/);
+  assert.match(styles, /--bg:\s*#f7f3d9/);
+  assert.match(styles, /--bg:\s*#10140c/);
+  assert.match(styles, /--brand-leaf:\s*#617d2b/);
+  assert.match(styles, /--brand-cream:\s*#eee7bd/);
+  assert.match(styles, /--brand-fig:\s*#982824/);
+  assert.match(appProviders, /ThemeProvider/);
+  assert.match(themeProvider, /inkfig\.theme/);
+  assert.match(themeProvider, /prefers-color-scheme: dark/);
+  assert.match(themeToggle, /theme\.useLight/);
+  assert.match(themeToggle, /theme\.useDark/);
 });

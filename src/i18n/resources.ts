@@ -35,6 +35,8 @@ const en = {
   "nav.menu": "Menu",
   "nav.primary": "Primary navigation",
   "status.foundation": "Foundation ready",
+  "theme.useDark": "Use dark theme",
+  "theme.useLight": "Use light theme",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -74,6 +76,8 @@ const ar: Record<TranslationKey, string> = {
   "nav.menu": "القائمة",
   "nav.primary": "التنقل الرئيسي",
   "status.foundation": "الأساس جاهز",
+  "theme.useDark": "استخدام الوضع الداكن",
+  "theme.useLight": "استخدام الوضع الفاتح",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

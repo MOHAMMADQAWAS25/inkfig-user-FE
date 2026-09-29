@@ -4,6 +4,7 @@ import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 
 export function AuthLandingPage() {
   const { session } = useAuth();
@@ -15,6 +16,7 @@ export function AuthLandingPage() {
 
   return (
     <main className="auth-layout">
+      <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card auth-choice-card" aria-labelledby="auth-choice-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <p className="eyebrow">{t("app.name")}</p>
