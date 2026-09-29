@@ -232,3 +232,60 @@ No migration required.
 ### Notes
 
 The initial workflow run will fail at Cloudflare authentication until both required secrets are configured. Cloudflare Worker static assets and SPA fallback follow the current Wrangler configuration model.
+## 2026-09-29 - Review and map the current project foundation
+
+### Request
+
+Read the InkFig repositories and establish an accurate understanding of the product, service boundaries, implementation status, and deployment model before future feature work.
+
+### Changes
+
+- Reviewed the product documentation, architecture rules, routing, providers, session scaffold, localization, permission helpers, HTTP client, shared styling, tests, and deployment workflow.
+- Confirmed the frontend is a React 19 and strict TypeScript Vite application with Arabic-first localized routes, RTL/LTR handling, a responsive shell, and separate user/main API base URLs.
+- Confirmed the current login is intentionally inactive and the dashboard is a foundation placeholder; production feature screens and live backend integration are not yet implemented.
+- Intentionally left application behavior and configuration unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: reviewed and documented the current frontend baseline.
+- `inkfig-user-system`: reviewed alongside the client to verify identity-service ownership.
+- `inkfig-main-system`: reviewed alongside the client to verify business-service ownership.
+
+### Files
+
+- `AGENT_FEATURE_LOG.md`: recorded the project-understanding pass.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No permissions, role visibility, authorization behavior, or access scopes changed.
+
+### Frontend
+
+No runtime frontend changes.
+
+### Verification
+
+- `[passed] repository source, architecture, configuration, tests, and deployment files reviewed`
+- `[passed] git diff --check`
+- `[not run] application tests and builds` - documentation-only change.
+
+### Deployment
+
+No deployment changes or special steps.
+
+### Git
+
+- Branch: `main`
+- Commit and push: performed after verification.
+
+### Notes
+
+This entry records understanding only; it does not claim that planned product screens or integrations are already implemented.
