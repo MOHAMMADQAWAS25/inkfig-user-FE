@@ -577,3 +577,69 @@ No migration required.
 ### Notes
 
 The theme keeps the existing semantic token architecture so future screens inherit both palettes without page-specific color duplication.
+
+## 2026-09-30 - Use dark authentication cards in the light theme
+
+### Request
+
+Keep the light-theme page background unchanged while making the login and signup forms use the dark-theme form colors.
+
+### Changes
+
+- Changed the light theme's authentication-card background and shadow to match the dark theme.
+- Scoped the complete dark surface palette to authentication cards so text, inputs, borders, buttons, success panels, and error messages retain appropriate contrast.
+- Applied the shared card treatment to the welcome, login, and signup screens without changing their content or behavior.
+- Added a regression test for the dark authentication-card background, text, and input colors.
+
+### Repositories
+
+- `inkfig-user-FE`: adjusted authentication-card styling and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: keeps the light page background and applies dark-theme styling within authentication cards.
+- `tests/foundation.test.mjs`: verifies authentication cards remain dark in the light theme.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The light theme retains its warm cream page background.
+- Welcome, login, and signup cards now use the same dark form surface and control colors as the dark theme.
+- Theme persistence, theme switching, routes, forms, API behavior, localization, RTL/LTR behavior, loading states, success states, and error handling are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 6 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - the in-app browser surface was unavailable in this environment.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The dark palette is scoped to `.auth-card`, so the surrounding light-theme background and non-authenticated page chrome remain light.
