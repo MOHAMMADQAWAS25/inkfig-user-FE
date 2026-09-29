@@ -73,3 +73,10 @@ test("harmonizes light authentication cards while preserving dark cards", () => 
   assert.match(styles, /\.auth-card::before[\s\S]*var\(--brand-fig\)/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-card\s*\{[\s\S]*--text:\s*#f7f2d8/);
 });
+test("softens only the light-theme login card from the dark palette", () => {
+  assert.ok(loginPage.includes('className="auth-card login-card"'));
+  assert.ok(styles.includes("rgb(57 67 28 / 0.78)"));
+  assert.ok(styles.includes("--input-background: rgb(16 20 12 / 0.46)"));
+  assert.ok(styles.includes(':root[data-theme="dark"] .login-card'));
+  assert.ok(styles.includes("background: var(--card-background)"));
+});

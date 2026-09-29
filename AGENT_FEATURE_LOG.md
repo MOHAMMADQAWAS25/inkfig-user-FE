@@ -778,3 +778,73 @@ No migration required. Database persistence changes are not needed for this fron
 ### Notes
 
 Phone validation confirms format and digit count only; it does not verify ownership of the number.
+
+## 2026-09-30 - Soften the light-theme login card
+
+### Request
+
+Keep the login form rectangle visually consistent with the dark-theme card while adapting it for the light theme through softer color and opacity.
+
+### Changes
+
+- Scoped a dedicated login-card treatment to the login page without changing the welcome or signup cards.
+- Gave the light-theme login card a translucent deep-olive gradient based on the dark palette instead of copying the dark colors exactly.
+- Added softened olive and fig shadows, a subtle translucent border, a light inset highlight, and backdrop blur.
+- Coordinated the card's cream text, muted copy, semi-transparent fields, borders, and button colors for readable contrast.
+- Explicitly restored the existing card background and shadow in dark mode so its appearance remains unchanged.
+- Added regression coverage for the login-only class, translucent light palette, control background, and dark-theme override.
+
+### Repositories
+
+- inkfig-user-FE: adjusted the light-theme login card and its source-level tests.
+- inkfig-user-system: no changes required.
+- inkfig-main-system: no changes required.
+
+### Files
+
+- src/features/auth/LoginPage.tsx: identifies the login card for page-specific styling.
+- src/styles.css: defines the softened light login card and preserves the dark version.
+- tests/foundation.test.mjs: verifies the scoped light and dark card behavior.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- In light mode, only the login form rectangle now resembles a faded, translucent version of the dark card.
+- In dark mode, the login card retains the existing dark-theme treatment.
+- Welcome and signup cards, page backgrounds, routes, form behavior, localization, RTL/LTR behavior, responsive behavior, and theme persistence are unchanged.
+
+### Verification
+
+- [passed] npm test - 7 tests passed.
+- [passed] npm run build - strict TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [failed] initial npm test - the newly written test contained stripped regular-expression escapes; it was replaced with stable exact source checks and then passed.
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+Opacity is applied to background, border, shadow, and input colors rather than the whole card, so text and controls remain crisp and accessible.

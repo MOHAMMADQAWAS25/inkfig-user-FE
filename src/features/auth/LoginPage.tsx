@@ -16,7 +16,7 @@ export function LoginPage() {
   return (
     <main className="auth-layout">
       <div className="auth-theme-control"><ThemeToggle /></div>
-      <section className="auth-card" aria-labelledby="login-title">
+      <section className="auth-card login-card" aria-labelledby="login-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <p className="eyebrow">{t("app.name")}</p>
         <h1 id="login-title">{t("auth.welcome")}</h1>

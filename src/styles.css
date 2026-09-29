@@ -143,6 +143,25 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --error-background: rgb(152 40 36 / 0.1);
 }
 .auth-card::before { position: absolute; inset-block-start: 0; inset-inline: 0; height: 4px; background: linear-gradient(90deg, var(--brand-deep), var(--brand-leaf) 46%, var(--brand-fig)); content: ""; }
+.login-card {
+  border-color: rgb(57 67 28 / 0.52);
+  background: linear-gradient(145deg, rgb(57 67 28 / 0.78), rgb(32 40 25 / 0.68));
+  box-shadow: 0 26px 68px rgb(57 67 28 / 0.2), 0 8px 24px rgb(152 40 36 / 0.07), inset 0 1px 0 rgb(238 231 189 / 0.18);
+  color: #f7f2d8;
+  backdrop-filter: blur(14px);
+  --surface: rgb(23 29 17 / 0.76);
+  --surface-raised: rgb(32 40 25 / 0.82);
+  --border: rgb(169 182 95 / 0.48);
+  --border-strong: #a9b65f;
+  --text: #f7f2d8;
+  --muted: #ddd9b7;
+  --primary: #c5c970;
+  --primary-hover: #d8dba0;
+  --primary-ink: #20270f;
+  --input-background: rgb(16 20 12 / 0.46);
+  --status-background: rgb(169 182 95 / 0.16);
+  --error-background: rgb(152 40 36 / 0.2);
+}
 :root[data-theme="dark"] .auth-card {
   color: #f7f2d8;
   --surface: #171d11;
@@ -157,6 +176,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --input-background: rgb(16 20 12 / 0.85);
   --status-background: rgb(97 125 43 / 0.2);
   --error-background: rgb(152 40 36 / 0.16);
+}
+:root[data-theme="dark"] .login-card {
+  border-color: var(--border);
+  background: var(--card-background);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: none;
 }
 .auth-logo { display: block; width: min(210px, 62%); height: auto; margin-inline: auto; }
 .signup-card { width: min(560px, 100%); }
