@@ -47,3 +47,17 @@ npm run dev
 ```
 
 Use `npm test` for source-level foundation checks and `npm run build` for the strict TypeScript production build.
+
+## Automatic Cloudflare deployment
+
+Every push to `main` runs the frontend tests and production build, then deploys the static Vite output to the existing `inkfig-user-fe` Cloudflare Worker. The production build uses:
+
+- `VITE_USER_API_BASE_URL=https://user-api.inkfig-hu.com/api/v1`
+- `VITE_MAIN_API_BASE_URL=https://main-api.inkfig-hu.com/api/v1`
+
+Create a protected GitHub environment named `production` and add these repository or environment secrets:
+
+- `CLOUDFLARE_API_TOKEN`: a scoped token with Workers Scripts edit permission for the InkFig account.
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account identifier that owns `inkfig-user-fe`.
+
+The Wrangler configuration deploys `dist/` as static assets and falls back to `index.html` for React Router routes. Keep the existing `inkfig-hu.com` custom-domain association attached to the `inkfig-user-fe` Worker.
