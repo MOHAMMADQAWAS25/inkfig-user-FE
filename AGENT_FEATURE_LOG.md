@@ -425,3 +425,79 @@ No migration required.
 ### Notes
 
 The palette is derived directly from the canonical SVG values: deep olive `#39431c`, leaf green `#617d2b`, light olives `#a9b65f` and `#c5c970`, warm cream `#eee7bd`, and fig burgundy `#982824`.
+
+## 2026-09-30 - Add the first-visit signup experience
+
+### Request
+
+Give first-time visitors clear login and signup choices and provide a required registration form for Hebron University accounts.
+
+### Changes
+
+- Added a localized welcome screen with sign-in and sign-up choices.
+- Added a controlled signup form for email, full name, phone, gender, birth date, password, and password confirmation.
+- Added immediate university-email and password-confirmation checks while keeping the backend authoritative.
+- Added API loading, duplicate-email, generic-error, and success states.
+- Integrated the newly merged canonical InkFig logo into both new public screens while resolving the rebase conflicts without removing the other agent's branding work.
+- Intentionally left the existing inactive login submission, authenticated shell, permissions, and dashboard unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added public entry/signup routes, form, API contract, localization, styling, and tests.
+- `inkfig-user-system`: implements the matching backend API and database migration in its own repository.
+
+### Files
+
+- `src/features/auth/AuthLandingPage.tsx`: presents login/signup choices.
+- `src/features/auth/SignupPage.tsx`: implements the complete required signup form and UI states.
+- `src/features/auth/registrationApi.ts`: defines and calls the registration API contract.
+- `src/app/AppRouter.tsx`: adds welcome/signup routes and sends unknown first visits to welcome.
+- `src/features/auth/LoginPage.tsx`: links existing users to signup and preserves canonical branding.
+- `src/i18n/resources.ts`: adds Arabic and English registration strings.
+- `src/styles.css`: adds responsive form, status, and action styles while preserving logo styles.
+- `tests/foundation.test.mjs`: verifies routes, fields, API path, email pattern, and existing branding.
+
+### API
+
+- `POST /api/v1/auth/signup`: sends required profile and credential fields to the user backend and consumes the created profile response; handles `409` as duplicate email and other failures as temporary registration errors.
+
+### Database
+
+- Migration: `20260930_001_create_user_profiles.sql` in `inkfig-user-system`.
+- No migration exists in this frontend repository.
+
+### Permissions and scope
+
+- Welcome and signup routes are public to unauthenticated visitors.
+- No role or permission is granted by the client.
+- Hebron email validation and account creation are revalidated and enforced by the backend.
+
+### Frontend
+
+- Added `/:language/welcome` and `/:language/signup`; existing `/:language/login` now links to signup.
+- Added required accessible controls, mobile-safe layout, RTL/LTR support, Arabic/English localization, submit loading state, success panel, and error messages.
+- Unknown routes now open `/ar/welcome`; authenticated visitors to public auth screens continue to the dashboard.
+
+### Verification
+
+- `[passed] npm test` - 4 tests passed after rebasing and preserving the project-logo changes.
+- `[passed] npm run build` - strict TypeScript and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - automated tests and production build passed; interactive browser inspection remains optional follow-up.
+- `[not run] live production registration` - requires backend migration/deployment after merge.
+
+### Deployment
+
+- Deploy `inkfig-user-system` first or together with this frontend so `/api/v1/auth/signup` is available.
+- Merge to `main` to trigger the existing Cloudflare frontend workflow.
+- No new frontend environment variables or Cloudflare configuration are required.
+
+### Git
+
+- Branch: `feature/user-signup`
+- Commit: `51b71f7`
+- Push: `successful`
+
+### Notes
+
+The branch was rebased onto the latest `origin/main`; conflicts in login, shared CSS, foundation tests, and the append-only feature log were resolved by preserving the canonical logo, logo-derived theme, and signup behavior.
