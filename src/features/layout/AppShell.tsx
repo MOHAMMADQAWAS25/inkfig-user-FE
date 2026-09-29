@@ -5,6 +5,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,6 +34,7 @@ export function AppShell() {
         <header className="topbar">
           <button aria-label={t("nav.menu")} className="icon-button menu-button" type="button" onClick={() => setMenuOpen(true)}><Menu size={21} /></button>
           <strong>{t("dashboard.title")}</strong>
+          <ThemeToggle />
           <button className="language-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>
             {language === "ar" ? "English" : "العربية"}
           </button>

@@ -5,6 +5,7 @@ import { Link, Navigate } from "react-router-dom";
 import { ApiError } from "../../api/httpClient";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "./AuthContext";
 import { registerUser } from "./registrationApi";
 import type { Gender, RegistrationRequest } from "./registrationApi";
@@ -69,6 +70,7 @@ export function SignupPage() {
 
   return (
     <main className="auth-layout auth-layout-scroll">
+      <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card signup-card" aria-labelledby="signup-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <p className="eyebrow">{t("app.name")}</p>
