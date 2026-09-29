@@ -643,3 +643,71 @@ No migration required.
 ### Notes
 
 The dark palette is scoped to `.auth-card`, so the surrounding light-theme background and non-authenticated page chrome remain light.
+
+## 2026-09-30 - Harmonize light-theme authentication cards
+
+### Request
+
+Make the light-theme login and signup cards compatible with the page background using a creative, attractive color treatment.
+
+### Changes
+
+- Replaced the dark light-theme card with a warm cream-to-pale-olive gradient derived from the InkFig logo.
+- Added a restrained deep-olive, leaf-green, and fig-burgundy accent line across the top of each authentication card.
+- Added layered olive and fig shadows to separate the card from the cream background without creating a harsh dark block.
+- Restored coordinated light-theme text, input, border, button, success, and error colors inside authentication cards.
+- Preserved the original dark card palette when dark theme is active.
+- Updated regression coverage for the harmonious light card and retained dark-theme override.
+
+### Repositories
+
+- `inkfig-user-FE`: redesigned authentication-card styling and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: defines the refined light authentication-card treatment and dark-theme override.
+- `tests/foundation.test.mjs`: verifies both card palettes and the logo-colored accent.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Welcome, login, and signup cards now blend naturally with the light cream background while retaining clear visual hierarchy and readable form controls.
+- Dark-theme cards keep their existing dark surface and high-contrast colors.
+- Theme persistence, theme switching, routes, forms, API behavior, localization, RTL/LTR behavior, responsive behavior, loading states, success states, and error handling are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 6 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - the in-app browser surface was unavailable in this environment.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+All new visual colors are tints or direct values from the official InkFig olive, cream, and fig palette.

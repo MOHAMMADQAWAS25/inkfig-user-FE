@@ -27,8 +27,8 @@
   --topbar-background: rgb(247 243 217 / 0.9);
   --auth-leaf-glow: rgb(169 182 95 / 0.22);
   --auth-fig-glow: rgb(152 40 36 / 0.1);
-  --card-background: linear-gradient(145deg, rgb(32 40 25 / 0.98), rgb(23 29 17 / 0.98));
-  --card-shadow: 0 24px 70px rgb(57 67 28 / 0.24), inset 0 1px 0 rgb(238 231 189 / 0.05);
+  --card-background: linear-gradient(145deg, rgb(255 253 240 / 0.98), rgb(232 231 196 / 0.96));
+  --card-shadow: 0 30px 80px rgb(57 67 28 / 0.16), 0 8px 24px rgb(152 40 36 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.8);
   --input-background: rgb(255 253 240 / 0.9);
   --status-background: rgb(97 125 43 / 0.12);
   --empty-background: rgb(97 125 43 / 0.04);
@@ -119,17 +119,35 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
 .auth-layout-scroll { padding-block: 36px; }
 .auth-card {
+  position: relative;
+  overflow: hidden;
   width: min(420px, 100%);
   padding: 32px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--card-background);
   box-shadow: var(--card-shadow);
+  color: #283014;
+  --surface: #fffdf0;
+  --surface-raised: #eee7bd;
+  --border: #a9b65f;
+  --border-strong: #617d2b;
+  --text: #283014;
+  --muted: #667044;
+  --primary: #617d2b;
+  --primary-hover: #39431c;
+  --primary-ink: #fffdf0;
+  --brand-fig-soft: #982824;
+  --input-background: rgb(255 253 240 / 0.86);
+  --status-background: rgb(97 125 43 / 0.12);
+  --error-background: rgb(152 40 36 / 0.1);
+}
+.auth-card::before { position: absolute; inset-block-start: 0; inset-inline: 0; height: 4px; background: linear-gradient(90deg, var(--brand-deep), var(--brand-leaf) 46%, var(--brand-fig)); content: ""; }
+:root[data-theme="dark"] .auth-card {
   color: #f7f2d8;
   --surface: #171d11;
   --surface-raised: #202819;
   --border: #3b4828;
-  --border-strong: #617d2b;
   --text: #f7f2d8;
   --muted: #b7b59a;
   --primary: #a9b65f;

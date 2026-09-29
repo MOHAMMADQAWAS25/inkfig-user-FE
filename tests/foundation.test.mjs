@@ -66,8 +66,9 @@ test("provides persistent logo-derived light and dark themes", () => {
   assert.match(themeToggle, /theme\.useDark/);
 });
 
-test("keeps authentication cards dark in the light theme", () => {
-  assert.match(styles, /--card-background:\s*linear-gradient\(145deg, rgb\(32 40 25/);
-  assert.match(styles, /\.auth-card\s*\{[\s\S]*--text:\s*#f7f2d8/);
-  assert.match(styles, /\.auth-card\s*\{[\s\S]*--input-background:\s*rgb\(16 20 12/);
+test("harmonizes light authentication cards while preserving dark cards", () => {
+  assert.match(styles, /--card-background:\s*linear-gradient\(145deg, rgb\(255 253 240/);
+  assert.match(styles, /\.auth-card\s*\{[\s\S]*--text:\s*#283014/);
+  assert.match(styles, /\.auth-card::before[\s\S]*var\(--brand-fig\)/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.auth-card\s*\{[\s\S]*--text:\s*#f7f2d8/);
 });
