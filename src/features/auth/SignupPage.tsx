@@ -75,7 +75,7 @@ export function SignupPage() {
   }
 
   return (
-    <main className="auth-layout auth-layout-scroll">
+    <main className="auth-layout auth-layout-scroll auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card signup-card" aria-labelledby="signup-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />

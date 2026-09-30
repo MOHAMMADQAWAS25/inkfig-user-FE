@@ -123,3 +123,10 @@ test("softens only the light-theme login card from the dark palette", () => {
   assert.ok(styles.includes(':root[data-theme="dark"] .login-card'));
   assert.ok(styles.includes("background: var(--card-background)"));
 });
+
+test("uses the supplied responsive background on login and signup", () => {
+  assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
+  assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
+  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background\.png[\s\S]*background-size:\s*cover/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background/);
+});

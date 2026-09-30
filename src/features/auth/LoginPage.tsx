@@ -45,7 +45,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="auth-layout">
+    <main className="auth-layout auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card login-card" aria-labelledby="login-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />

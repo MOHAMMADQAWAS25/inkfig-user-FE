@@ -1199,3 +1199,73 @@ Add a login-page path that sends a verification code, verifies the code, and let
 ### Notes
 
 Refreshing the browser during code verification or password entry intentionally clears the in-memory reset token; the user can request a new code and restart safely.
+
+## 2026-09-30 - Add authentication background artwork
+
+### Request
+
+Use the supplied high-resolution artwork as the background on the sign-in and sign-up pages.
+
+### Changes
+
+- Added the supplied 1536-by-1024 PNG as a source-controlled frontend asset without reducing its resolution.
+- Applied the artwork only to the login and signup layouts with centered, non-repeating `cover` rendering for responsive screens.
+- Added separate light- and dark-theme overlays to preserve form readability while allowing the artwork to remain visible.
+- Added regression coverage for both page hooks, responsive image sizing, and the dark-theme treatment.
+
+### Repositories
+
+- `inkfig-user-FE`: added the image asset, page styling hooks, responsive background styling, and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/assets/auth-background.png`: stores the supplied background artwork at its original resolution.
+- `src/features/auth/LoginPage.tsx`: enables the artwork on the sign-in layout.
+- `src/features/auth/SignupPage.tsx`: enables the artwork on the sign-up layout.
+- `src/styles.css`: defines responsive image positioning and theme-specific readability overlays.
+- `tests/foundation.test.mjs`: verifies the background integration.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Sign-in and sign-up now share the supplied full-screen background artwork.
+- The original image resolution is preserved, while `background-size: cover` adapts it across viewport sizes.
+- Light and dark themes retain distinct overlays and readable authentication cards.
+- Other routes, forms, localization, RTL/LTR behavior, and authentication workflows are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 11 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[failed] initial sandboxed npm run build` - Windows sandbox denied esbuild access above the workspace; the identical build passed with the required filesystem permission.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The artwork remains a PNG to preserve the exact supplied image quality.
