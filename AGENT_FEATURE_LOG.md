@@ -1342,3 +1342,76 @@ No migration required.
 ### Notes
 
 The desktop composition intentionally uses the physical left side because the headline is embedded in the raster artwork and does not move in RTL mode.
+
+## 2026-09-30 - Add theme-specific authentication backgrounds
+
+### Request
+
+Use the supplied light artwork in light mode, the supplied dark artwork in dark mode, and keep sign-in and sign-up forms on the physical right in both Arabic and English.
+
+### Changes
+
+- Replaced the shared authentication artwork with separate original-resolution light and dark PNG assets.
+- Assigned the light asset to the default theme and the dark asset only to the dark-theme override.
+- Replaced direction-aware end alignment with physical right alignment using an automatic left margin and zero right margin.
+- Retained centered forms on screens up to 1050 pixels so mobile content remains usable.
+- Updated regression coverage for both asset assignments and direction-independent right positioning.
+- Removed the superseded single background asset after both theme-specific replacements were installed.
+
+### Repositories
+
+- `inkfig-user-FE`: added theme-specific images and updated authentication styling and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/assets/auth-background-light.png`: stores the supplied 1671-by-941 light-theme artwork.
+- `src/assets/auth-background-dark.png`: stores the supplied 1671-by-941 dark-theme artwork.
+- `src/assets/auth-background.png`: removed because it was superseded by the two theme-specific assets.
+- `src/styles.css`: maps each image to its theme and physically aligns desktop forms to the right.
+- `tests/foundation.test.mjs`: verifies theme mapping and physical-right alignment.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Sign-in and sign-up use the light artwork in light mode and dark artwork in dark mode.
+- Desktop forms stay on the physical right in both LTR English and RTL Arabic modes.
+- Narrow screens continue centering the forms for readability.
+- Authentication behavior, validation, routing, and localization remain unchanged.
+
+### Verification
+
+- `[passed] source image inspection` - both supplied assets are 1671 by 941 pixels.
+- `[passed] npm test` - 12 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded with both image assets emitted.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The desktop positioning deliberately uses physical `margin-left` and `margin-right` values so RTL direction cannot move the form away from the requested right side.

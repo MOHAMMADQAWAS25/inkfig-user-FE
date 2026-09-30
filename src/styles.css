@@ -120,10 +120,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .auth-photo-background {
   position: relative;
   padding-inline: clamp(24px, 6vw, 112px);
-  place-items: center end;
+  place-items: center stretch;
   background-image:
     linear-gradient(90deg, rgb(247 243 217 / 0.06) 42%, rgb(57 67 28 / 0.2)),
-    url("./assets/auth-background.png");
+    url("./assets/auth-background-light.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -131,7 +131,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .auth-photo-background {
   background-image:
     linear-gradient(90deg, rgb(16 20 12 / 0.24) 38%, rgb(16 20 12 / 0.7)),
-    url("./assets/auth-background.png");
+    url("./assets/auth-background-dark.png");
 }
 .auth-scene-logo {
   position: absolute;
@@ -142,7 +142,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   transform: translateX(-50%);
   filter: drop-shadow(0 8px 18px rgb(16 20 12 / 0.24));
 }
-.auth-photo-background .auth-card { z-index: 1; }
+.auth-photo-background .auth-card { z-index: 1; margin-left: auto; margin-right: 0; }
 .auth-photo-background .auth-card .auth-logo { display: none; }
 .auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
 .auth-layout-scroll { padding-block: 36px; }
@@ -259,6 +259,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 1050px) {
   .auth-photo-background { padding-inline: 20px; place-items: center; }
   .auth-scene-logo { display: none; }
+  .auth-photo-background .auth-card { margin-inline: auto; }
   .auth-photo-background .auth-card .auth-logo { display: block; }
 }
 

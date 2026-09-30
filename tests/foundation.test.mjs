@@ -129,8 +129,9 @@ test("uses the supplied responsive background on login and signup", () => {
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
   assert.ok(loginPage.includes('className="auth-scene-logo"'));
   assert.ok(signup.includes('className="auth-scene-logo"'));
-  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background\.png[\s\S]*background-size:\s*cover/);
-  assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background/);
+  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*cover/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background\s*\{[\s\S]*auth-background-dark\.png/);
+  assert.match(styles, /\.auth-photo-background \.auth-card \{[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
   assert.match(styles, /\.auth-scene-logo\s*\{/);
   assert.match(styles, /@media \(max-width: 1050px\)[\s\S]*\.auth-scene-logo \{ display: none/);
 });
