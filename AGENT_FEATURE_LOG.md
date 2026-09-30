@@ -2187,3 +2187,75 @@ No migration required.
 ### Notes
 
 None
+
+## 2026-10-01 - Add the public artwork home page
+
+### Request
+
+Make the root InkFig experience a professional public landing page that displays user artworks to registered users and visitors, using a distinct logo-colored background without drawings.
+
+### Changes
+
+- Added a public, localized gallery home page with brand header, hero, discovery filters, responsive masonry-style artwork cards, artist/type metadata, and visible like counts.
+- Routes the bare site and unknown URLs to the Arabic public home rather than the authentication welcome screen.
+- Shows sign-in/signup actions to visitors and a dashboard action to authenticated users.
+- Added a generated abstract canvas background using the InkFig cream, olive, and burgundy palette with no drawings or decorative subjects.
+- Uses non-interactive showcase cards until work, type, preference, and like APIs are specified; no fake backend behavior was introduced.
+- Existing authentication routes, protected dashboard, permissions, and backend authorization were intentionally unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added the public home experience, artwork presentation, localization, background asset, routing, and tests.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: implements the public gallery and visitor/authenticated navigation states.
+- `src/assets/gallery-ivory-background.png`: abstract logo-palette canvas background without drawings.
+- `src/app/AppRouter.tsx`: makes `/:language` public and redirects unknown first visits to `/ar`.
+- `src/i18n/resources.ts`: adds Arabic and English home-page strings.
+- `src/styles.css`: adds responsive Gallery Ivory layout, cards, filters, dark-mode treatment, and mobile behavior.
+- `tests/foundation.test.mjs`: verifies public routing, gallery structure, responsiveness, asset use, and localization.
+
+### API
+
+No API changes. Artwork cards currently use local showcase data because work-feed APIs have not yet been defined.
+
+### Database
+
+No migration required. Work types, posts, preferences, and likes remain for later backend/database tickets.
+
+### Permissions and scope
+
+- The public home and displayed showcase content require no authentication.
+- Visitors receive browse-only presentation; no like mutation is exposed.
+- Authenticated users can navigate to their protected dashboard.
+- Future upload and like permissions must be validated by the backend.
+
+### Frontend
+
+- `/:language` is the public home route and the default site experience.
+- The header adapts to visitor or authenticated session state.
+- The gallery uses three responsive masonry columns, reducing to two and then one on smaller screens.
+- Arabic/English, RTL/LTR, dark mode, mobile navigation, reduced motion, and semantic labels are supported.
+
+### Verification
+
+- `[passed] npm test` - 19 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - browser-control tooling was unavailable in this session.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, secret, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+The generated workspace asset used the built-in image-generation workflow with a texture-only prompt and explicit prohibition on drawings, objects, text, logos, or scenery. Replace showcase data with the real preference feed after its API and work-type model are agreed.

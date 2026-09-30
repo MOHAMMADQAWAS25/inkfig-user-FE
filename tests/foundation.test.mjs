@@ -20,6 +20,7 @@ const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
 const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.url), "utf8");
+const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -172,6 +173,17 @@ test("uses the supplied responsive background on login and signup", () => {
   assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-inline:\s*auto/);
   assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
   assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);
+});
+
+test("serves a public localized artwork gallery as the default experience", () => {
+  assert.match(router, /path="\/:language" element=\{<HomePage \/>\}/);
+  assert.match(router, /Navigate replace to="\/ar"/);
+  assert.match(homePage, /className="artwork-grid"/);
+  assert.match(homePage, /gallery-primary-link/);
+  assert.match(homePage, /session \?/);
+  assert.match(styles, /gallery-ivory-background\.png/);
+  assert.match(styles, /\.artwork-grid \{ columns: 3 300px/);
+  assert.match(resources, /"home\.collectionTitle"/);
 });
 
 test("provides polished authentication controls and reset-page motion", () => {

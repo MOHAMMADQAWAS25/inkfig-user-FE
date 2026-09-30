@@ -8,10 +8,12 @@ import { RequireAuth } from "../features/auth/RequireAuth";
 import { SignupPage } from "../features/auth/SignupPage";
 import { VerifyEmailPage } from "../features/auth/VerifyEmailPage";
 import { PasswordResetPage } from "../features/auth/PasswordResetPage";
+import { HomePage } from "../features/home/HomePage";
 
 export function AppRouter() {
   return (
     <Routes>
+      <Route path="/:language" element={<HomePage />} />
       <Route path="/:language/welcome" element={<AuthLandingPage />} />
       <Route path="/:language/login" element={<LoginPage />} />
       <Route path="/:language/signup" element={<SignupPage />} />
@@ -19,11 +21,10 @@ export function AppRouter() {
       <Route path="/:language/reset-password" element={<PasswordResetPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
-          <Route path="/:language" element={<Navigate replace to="dashboard" />} />
           <Route path="/:language/dashboard" element={<DashboardPage />} />
         </Route>
       </Route>
-      <Route path="*" element={<Navigate replace to="/ar/welcome" />} />
+      <Route path="*" element={<Navigate replace to="/ar" />} />
     </Routes>
   );
 }
