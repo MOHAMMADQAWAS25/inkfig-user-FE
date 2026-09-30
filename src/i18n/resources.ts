@@ -59,7 +59,7 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
-  "app.name": "إنكفِغ",
+  "app.name": "InkFig",
   "app.tagline": "مجتمع الفنون في جامعة الخليل",
   "auth.email": "البريد الإلكتروني",
   "auth.fullName": "الاسم الكامل",
@@ -73,7 +73,7 @@ const ar: Record<TranslationKey, string> = {
   "auth.confirmPassword": "تأكيد كلمة المرور",
   "auth.signIn": "تسجيل الدخول",
   "auth.signUp": "إنشاء حساب",
-  "auth.getStarted": "انضم إلى مجتمع إنكفِغ",
+  "auth.getStarted": "انضم إلى مجتمع InkFig",
   "auth.createAccount": "إنشاء الحساب",
   "auth.creatingAccount": "جارٍ إنشاء الحساب…",
   "auth.hebronOnly": "التسجيل متاح لأعضاء جامعة الخليل.",

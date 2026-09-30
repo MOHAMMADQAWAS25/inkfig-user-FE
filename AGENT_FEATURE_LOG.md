@@ -993,3 +993,67 @@ Stop relying on Supabase Auth and use the InkFig user backend for login, JWT ses
 ### Notes
 
 The current session storage follows the existing local-storage architecture. Moving the refresh token to a backend-set HttpOnly cookie is recommended as a future browser-hardening improvement.
+
+## 2026-09-30 - Keep the InkFig brand name untranslated
+
+### Request
+
+Display the project name exactly as `InkFig` in both Arabic and English modes instead of translating or transliterating it.
+
+### Changes
+
+- Replaced the Arabic transliteration of the standalone application name with the canonical `InkFig` spelling.
+- Kept `InkFig` unchanged inside the otherwise translated Arabic welcome phrase.
+- Added regression coverage requiring both locale resources to use the exact capitalization and prohibiting the prior Arabic transliteration.
+
+### Repositories
+
+- `inkfig-user-FE`: corrected brand-name localization and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/i18n/resources.ts`: uses the canonical `InkFig` name in both locales.
+- `tests/foundation.test.mjs`: verifies the brand remains untranslated in all locale resources.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Arabic and English modes now display the brand as `InkFig` everywhere the shared application-name translation is used.
+- Surrounding Arabic and English interface copy remains localized.
+- Routes, forms, themes, responsive behavior, RTL/LTR behavior, authentication flows, loading states, and errors are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 10 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The canonical brand spelling is case-sensitive: `InkFig`.

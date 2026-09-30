@@ -15,6 +15,7 @@ const verifyEmailPage = readFileSync(new URL("../src/features/auth/VerifyEmailPa
 const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.meta.url), "utf8");
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
+const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -70,6 +71,12 @@ test("uses the InkFig logo for application branding", () => {
   assert.match(appShell, /inkfig-logo\.svg/);
   assert.match(styles, /\.auth-logo/);
   assert.match(styles, /\.brand-logo/);
+});
+
+test("keeps the InkFig brand name untranslated in every locale", () => {
+  assert.equal([...resources.matchAll(/"app\.name": "InkFig"/g)].length, 2);
+  assert.match(resources, /"auth\.getStarted": "انضم إلى مجتمع InkFig"/);
+  assert.doesNotMatch(resources, /إنكفِغ/);
 });
 
 test("provides persistent logo-derived light and dark themes", () => {
