@@ -1127,3 +1127,75 @@ No migration required.
 ### Notes
 
 The translation value was correct; the visible capitalization defect came solely from CSS `text-transform: uppercase`.
+
+## 2026-09-30 - Add the forgot-password recovery flow
+
+### Request
+
+Add a login-page path that sends a verification code, verifies the code, and lets the user reset their password.
+
+### Changes
+
+- Added a localized three-stage recovery page for email, six-digit code, and new-password entry.
+- Added a login-page forgot-password link and a public localized route.
+- Keeps the opaque reset token only in component memory and validates matching passwords before submission.
+- Added loading, success, invalid-code, expired-code, excessive-attempt, delivery-failure, and expired-session states.
+- Existing login, signup, verification, dashboard, theme, and navigation behavior was intentionally left unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added the password-reset interface and backend client.
+- `inkfig-user-system`: provides the password-reset API and database migration; its changes are recorded in that repository.
+
+### Files
+
+- `src/features/auth/PasswordResetPage.tsx`: implements the staged responsive recovery experience.
+- `src/features/auth/passwordResetApi.ts`: calls the three reset endpoints.
+- `src/features/auth/LoginPage.tsx`: adds the forgot-password link.
+- `src/app/AppRouter.tsx`: adds `/:language/reset-password`.
+- `src/i18n/resources.ts`: adds English and Arabic recovery text.
+- `src/styles.css`: styles the recovery link with RTL support.
+- `tests/foundation.test.mjs`: verifies route, API paths, code format, and password confirmation.
+
+### API
+
+- `POST /api/v1/auth/password-reset/request`: sends the normalized email and consumes the neutral response.
+- `POST /api/v1/auth/password-reset/verify`: sends email and six-digit code and holds the returned reset token in memory.
+- `POST /api/v1/auth/password-reset/confirm`: sends email, reset token, new password, and confirmation.
+
+### Database
+
+- Migration: `20260930_004_add_password_reset.sql` in `inkfig-user-system`.
+- The backend migration must run before this frontend is deployed; this repository has no database changes.
+
+### Permissions and scope
+
+- The recovery route is public and grants no application permissions.
+- The frontend does not determine account eligibility or authorize the reset; all authorization and validation are enforced by the backend.
+
+### Frontend
+
+- Adds `/:language/reset-password`, reachable from the login form.
+- Uses existing shared authentication card, inputs, buttons, logo, theme, responsive layout, and RTL/LTR behavior.
+- Supports Arabic and English and provides loading, success, and error feedback for every stage.
+
+### Verification
+
+- `[passed] npm test` - 11 tests passed after rebasing the latest brand-name checks.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-system` and migration 004 first, then deploy `inkfig-user-FE` using its existing Cloudflare workflow.
+- No frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+Refreshing the browser during code verification or password entry intentionally clears the in-memory reset token; the user can request a new code and restart safely.

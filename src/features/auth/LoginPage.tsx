@@ -61,6 +61,7 @@ export function LoginPage() {
             <span>{t("auth.password")}</span>
             <input required autoComplete="current-password" dir="ltr" minLength={8} name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
           </label>
+          <Link className="forgot-password-link" to={`/${language}/reset-password`}>{t("auth.forgotPassword")}</Link>
           {error && <p className="form-message error-message" role="alert">{error}</p>}
           <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.signingIn") : t("auth.signIn")}</button>
         </form>

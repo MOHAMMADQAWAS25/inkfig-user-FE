@@ -206,6 +206,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .secondary-button:hover { border-color: var(--border-strong); }
 .auth-switch { margin: 20px 0 0; color: var(--muted); font-size: 0.9rem; }
 .auth-switch a { color: var(--primary); }
+.forgot-password-link { justify-self: end; margin-top: -6px; color: var(--primary); font-size: 0.86rem; }
+[dir="rtl"] .forgot-password-link { justify-self: start; }
 .form-message { margin: 0; padding: 10px 12px; border-radius: 6px; font-size: 0.88rem; }
 .error-message { border: 1px solid var(--brand-fig); background: var(--error-background); color: var(--brand-fig-soft); }
 .success-panel { display: grid; gap: 14px; margin-top: 24px; padding: 16px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--status-background); color: var(--text); }

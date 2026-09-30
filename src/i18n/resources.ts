@@ -54,6 +54,21 @@ const en = {
   "auth.resendIn": "Resend available in",
   "auth.resendFailed": "The code could not be resent. Please try again.",
   "auth.verificationSuccess": "Your email is verified and your account is ready.",
+  "auth.forgotPassword": "Forgot your password?",
+  "auth.resetPassword": "Reset password",
+  "auth.resetInstructions": "Enter your university email and we will send you a 6-digit reset code.",
+  "auth.sendResetCode": "Send reset code",
+  "auth.sendingResetCode": "Sending code...",
+  "auth.resetRequestFailed": "The reset code could not be sent. Please try again.",
+  "auth.resetCodeSent": "If an eligible account exists, a 6-digit code has been sent. It expires in 10 minutes.",
+  "auth.invalidResetCode": "The reset code is incorrect or unavailable.",
+  "auth.resetCodeExpired": "This reset code has expired. Request a new code.",
+  "auth.requestNewCode": "Request a new code",
+  "auth.chooseNewPassword": "Choose a new password with at least 8 characters.",
+  "auth.resettingPassword": "Resetting password...",
+  "auth.resetSessionExpired": "This password-reset session is invalid or expired. Request a new code.",
+  "auth.resetComplete": "Your password has been changed. You can now sign in.",
+  "auth.backToLogin": "Back to sign in",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -112,6 +127,21 @@ const ar: Record<TranslationKey, string> = {
   "auth.resendIn": "يمكن إعادة الإرسال بعد",
   "auth.resendFailed": "تعذر إعادة إرسال الرمز. حاول مرة أخرى.",
   "auth.verificationSuccess": "تم تأكيد بريدك الإلكتروني وأصبح حسابك جاهزًا.",
+  "auth.forgotPassword": "هل نسيت كلمة المرور؟",
+  "auth.resetPassword": "إعادة تعيين كلمة المرور",
+  "auth.resetInstructions": "أدخل بريدك الجامعي وسنرسل إليك رمزاً مكوناً من 6 أرقام.",
+  "auth.sendResetCode": "إرسال رمز الاستعادة",
+  "auth.sendingResetCode": "جارٍ إرسال الرمز...",
+  "auth.resetRequestFailed": "تعذر إرسال رمز الاستعادة. حاول مرة أخرى.",
+  "auth.resetCodeSent": "إذا كان الحساب مؤهلاً، فقد أرسلنا رمزاً من 6 أرقام. تنتهي صلاحيته خلال 10 دقائق.",
+  "auth.invalidResetCode": "رمز الاستعادة غير صحيح أو غير متاح.",
+  "auth.resetCodeExpired": "انتهت صلاحية رمز الاستعادة. اطلب رمزاً جديداً.",
+  "auth.requestNewCode": "طلب رمز جديد",
+  "auth.chooseNewPassword": "اختر كلمة مرور جديدة تتكون من 8 أحرف على الأقل.",
+  "auth.resettingPassword": "جارٍ تغيير كلمة المرور...",
+  "auth.resetSessionExpired": "جلسة استعادة كلمة المرور غير صالحة أو منتهية. اطلب رمزاً جديداً.",
+  "auth.resetComplete": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول.",
+  "auth.backToLogin": "العودة إلى تسجيل الدخول",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

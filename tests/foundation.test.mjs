@@ -12,6 +12,8 @@ const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url)
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
 const verifyEmailPage = readFileSync(new URL("../src/features/auth/VerifyEmailPage.tsx", import.meta.url), "utf8");
+const passwordResetPage = readFileSync(new URL("../src/features/auth/PasswordResetPage.tsx", import.meta.url), "utf8");
+const passwordResetApi = readFileSync(new URL("../src/features/auth/passwordResetApi.ts", import.meta.url), "utf8");
 const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.meta.url), "utf8");
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
@@ -41,6 +43,17 @@ test("logs in and logs out through the InkFig backend", () => {
   assert.match(loginPage, /loginUser/);
   assert.match(loginPage, /setSession/);
   assert.doesNotMatch(loginPage, /disabled type="submit"/);
+});
+
+test("resets passwords through a three-stage email-code flow", () => {
+  assert.match(loginPage, /reset-password/);
+  assert.match(router, /\/:language\/reset-password/);
+  assert.match(passwordResetApi, /\/auth\/password-reset\/request/);
+  assert.match(passwordResetApi, /\/auth\/password-reset\/verify/);
+  assert.match(passwordResetApi, /\/auth\/password-reset\/confirm/);
+  assert.match(passwordResetPage, /pattern="\[0-9\]\{6\}"/);
+  assert.match(passwordResetPage, /resetToken/);
+  assert.match(passwordResetPage, /password !== confirmation/);
 });
 
 test("provides localized welcome and signup routes with every required field", () => {
