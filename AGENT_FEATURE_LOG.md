@@ -2259,3 +2259,78 @@ No migration required. Work types, posts, preferences, and likes remain for late
 ### Notes
 
 The generated workspace asset used the built-in image-generation workflow with a texture-only prompt and explicit prohibition on drawings, objects, text, logos, or scenery. Replace showcase data with the real preference feed after its API and work-type model are agreed.
+
+## 2026-10-01 - Remove unrequested dashboard and welcome pages
+
+### Request
+
+Keep only the public home and previously requested authentication pages, removing the dashboard and obsolete welcome page.
+
+### Changes
+
+- Removed the dashboard route, page, application shell, sidebar navigation, and protected-route wrapper.
+- Removed the old welcome route and page because home is now the public entry point.
+- Removed dashboard/welcome navigation references and obsolete localization keys.
+- Authenticated visitors to login, signup, verification, or password reset now return to home.
+- Replaced the authenticated dashboard action on home with the user's name and a logout action.
+- Updated documentation and tests to reflect the intentionally limited route set.
+- Home, login, signup, email verification, and password reset behavior were otherwise unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: removed unrequested pages and their supporting frontend code.
+
+### Files
+
+- `src/app/AppRouter.tsx`: removes welcome, dashboard, shell, and guard routes.
+- `src/features/auth/AuthLandingPage.tsx`: deleted.
+- `src/features/auth/RequireAuth.tsx`: deleted.
+- `src/features/dashboard/DashboardPage.tsx`: deleted.
+- `src/features/layout/AppShell.tsx`: deleted.
+- `src/features/home/HomePage.tsx`: replaces the dashboard link with identity/logout controls.
+- `src/features/auth/LoginPage.tsx`, `SignupPage.tsx`, `VerifyEmailPage.tsx`, `PasswordResetPage.tsx`: redirect authenticated users home.
+- `src/i18n/resources.ts`: removes unused dashboard and shell strings.
+- `src/styles.css`: styles the authenticated home identity/logout state.
+- `README.md`, `tests/foundation.test.mjs`: document and verify the remaining pages.
+
+### API
+
+No API changes. Existing login and logout endpoints remain in use.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No backend permissions or roles changed.
+- Authentication remains backend-validated.
+- The public home remains accessible to visitors; authenticated session state only changes the home header controls.
+
+### Frontend
+
+- Remaining routes: `/:language`, `/:language/login`, `/:language/signup`, `/:language/verify-email`, and `/:language/reset-password`.
+- Removed routes: `/:language/welcome` and `/:language/dashboard`.
+- Unknown URLs continue redirecting to `/ar`.
+
+### Verification
+
+- `[passed] npm test` - 19 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] removed-reference scan` - no runtime dashboard/welcome/shell/guard references remain.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No migration or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+Role-aware pages can be introduced later only when their requirements are explicitly defined.

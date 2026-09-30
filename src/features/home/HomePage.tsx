@@ -16,7 +16,7 @@ const works = [
 ];
 
 export function HomePage() {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const { language, setLanguage, t } = useI18n();
 
   return (
@@ -32,7 +32,7 @@ export function HomePage() {
         <div className="gallery-header-actions">
           <button className="gallery-language" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>{language === "ar" ? "English" : "العربية"}</button>
           <ThemeToggle />
-          {session ? <Link className="gallery-primary-link" to={`/${language}/dashboard`}>{t("home.dashboard")}</Link> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
+          {session ? <><span className="gallery-user-name">{session.fullName}</span><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
         </div>
       </header>
 

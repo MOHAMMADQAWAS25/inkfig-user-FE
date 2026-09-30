@@ -39,7 +39,7 @@ export function PasswordResetPage() {
     return () => window.clearInterval(timer);
   }, [cooldown > 0]);
 
-  if (session !== null) return <Navigate replace to={`/${language}/dashboard`} />;
+  if (session !== null) return <Navigate replace to={`/${language}`} />;
 
   async function submitEmail(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

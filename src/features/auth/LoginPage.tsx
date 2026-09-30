@@ -19,7 +19,7 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (session !== null) {
-    return <Navigate replace to={`/${language}/dashboard`} />;
+    return <Navigate replace to={`/${language}`} />;
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {

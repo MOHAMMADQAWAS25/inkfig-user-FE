@@ -373,8 +373,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-nav a, .gallery-login-link { color: #39431c; font-size: 0.9rem; font-weight: 650; text-decoration: none; }
 .gallery-nav a:hover, .gallery-login-link:hover { color: #982824; }
 .gallery-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.gallery-user-name { max-width: 170px; overflow: hidden; color: #58613d; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
 .gallery-language { padding: 8px; border: 0; background: transparent; color: #617d2b; cursor: pointer; }
-.gallery-primary-link { display: inline-flex; min-height: 40px; align-items: center; padding: 8px 16px; border-radius: 999px; background: #39431c; color: #fffdf0; font-size: 0.86rem; font-weight: 750; text-decoration: none; transition: transform 180ms ease, background-color 180ms ease; }
+.gallery-primary-link { display: inline-flex; min-height: 40px; align-items: center; padding: 8px 16px; border: 0; border-radius: 999px; background: #39431c; color: #fffdf0; font-size: 0.86rem; font-weight: 750; text-decoration: none; cursor: pointer; transition: transform 180ms ease, background-color 180ms ease; }
 .gallery-primary-link:hover { background: #617d2b; transform: translateY(-1px); }
 .gallery-header .theme-toggle { width: 40px; height: 40px; background: rgb(255 253 240 / 0.72); }
 .gallery-hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr); align-items: end; gap: 60px; width: min(1240px, calc(100% - 40px)); min-height: 440px; margin-inline: auto; padding: 80px 24px 64px; }

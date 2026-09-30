@@ -37,7 +37,7 @@ export function VerifyEmailPage() {
     return () => window.clearInterval(timer);
   }, [cooldown > 0]);
 
-  if (session !== null) return <Navigate replace to={`/${language}/dashboard`} />;
+  if (session !== null) return <Navigate replace to={`/${language}`} />;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -50,8 +50,8 @@ Use `npm test` for source-level foundation checks and `npm run build` for the st
 
 ## Account entry
 
-Unauthenticated visitors start at `/:language/welcome`, where they can choose
-sign in or sign up. The localized `/:language/signup` form sends all required
+All visitors start at the public `/:language` artwork home page, where they can
+open sign in or sign up. The localized `/:language/signup` form sends all required
 profile and credential fields to `POST /api/v1/auth/signup`. The frontend mirrors
 the Hebron email and password-confirmation checks for immediate feedback, while
 the user backend remains authoritative.

@@ -7,7 +7,6 @@ const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const loginPage = readFileSync(new URL("../src/features/auth/LoginPage.tsx", import.meta.url), "utf8");
 const authenticationApi = readFileSync(new URL("../src/features/auth/authenticationApi.ts", import.meta.url), "utf8");
-const appShell = readFileSync(new URL("../src/features/layout/AppShell.tsx", import.meta.url), "utf8");
 const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
@@ -69,8 +68,7 @@ test("shows backend-enforced hourly code limits in both email flows", () => {
   assert.match(resources, /auth\.hourlyEmailLimit/);
 });
 
-test("provides localized welcome and signup routes with every required field", () => {
-  assert.match(router, /\/:language\/welcome/);
+test("provides localized signup with every required field", () => {
   assert.match(router, /\/:language\/signup/);
   for (const field of ["email", "full_name", "phone_number", "gender", "date_of_birth", "password", "password_confirmation"]) {
     assert.match(`${signup}\n${passwordField}\n${dateOfBirthField}`, new RegExp(`name=["']?${field}["']?`));
@@ -93,7 +91,7 @@ test("defines shared visual tokens and responsive RTL behavior", () => {
 
 test("uses the InkFig logo for application branding", () => {
   assert.match(indexHtml, /inkfig-logo\.svg/);
-  assert.match(appShell, /inkfig-logo\.svg/);
+  assert.match(homePage, /inkfig-logo\.svg/);
   assert.match(styles, /\.auth-logo/);
   assert.match(styles, /\.brand-logo/);
 });
@@ -181,6 +179,7 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(homePage, /className="artwork-grid"/);
   assert.match(homePage, /gallery-primary-link/);
   assert.match(homePage, /session \?/);
+  assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ columns: 3 300px/);
   assert.match(resources, /"home\.collectionTitle"/);

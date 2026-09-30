@@ -35,7 +35,7 @@ export function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (session !== null) {
-    return <Navigate replace to={`/${language}/dashboard`} />;
+    return <Navigate replace to={`/${language}`} />;
   }
 
   function updateField(field: keyof RegistrationRequest, value: string) {
