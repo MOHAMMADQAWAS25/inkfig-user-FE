@@ -1269,3 +1269,76 @@ No migration required.
 ### Notes
 
 The artwork remains a PNG to preserve the exact supplied image quality.
+
+## 2026-09-30 - Refresh authentication artwork and logo composition
+
+### Request
+
+Replace the sign-in and sign-up background with the newly supplied artwork and position the InkFig logo beautifully above the artwork's `INK YOUR WORLD` headline.
+
+### Changes
+
+- Replaced the previous authentication background with the supplied 1672-by-941 wide PNG at its original resolution.
+- Repositioned desktop authentication cards on the right so the artwork headline remains visible on the left.
+- Added a responsive scene logo above the artwork headline with proportional sizing and a restrained shadow.
+- Kept a single visible logo by hiding the card logo on wide screens and restoring it when the scene composition is hidden on narrower screens.
+- Refined light- and dark-theme overlays to preserve artwork detail and form contrast.
+- Extended regression coverage for the scene logo and responsive fallback.
+
+### Repositories
+
+- `inkfig-user-FE`: replaced the asset and updated authentication layout, styling, and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/assets/auth-background.png`: contains the new supplied artwork at its original resolution.
+- `src/features/auth/LoginPage.tsx`: adds the desktop scene logo to sign-in.
+- `src/features/auth/SignupPage.tsx`: adds the desktop scene logo to sign-up.
+- `src/styles.css`: positions the logo and cards and defines the responsive fallback and theme overlays.
+- `tests/foundation.test.mjs`: verifies the logo composition and responsive behavior.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Wide screens display the InkFig logo above the background's `INK YOUR WORLD` headline while the form sits on the right.
+- Screens up to 1050 pixels center the form and display the logo inside the card to prevent cropping or overlap.
+- Both theme modes keep the same responsive artwork with tailored overlays.
+- Authentication behavior, localization, RTL/LTR behavior, routes, and validation remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 12 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] source image inspection` - installed asset is 1672 by 941 pixels.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface was available to the computer-use session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The desktop composition intentionally uses the physical left side because the headline is embedded in the raster artwork and does not move in RTL mode.

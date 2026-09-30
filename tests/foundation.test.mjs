@@ -127,6 +127,10 @@ test("softens only the light-theme login card from the dark palette", () => {
 test("uses the supplied responsive background on login and signup", () => {
   assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
+  assert.ok(loginPage.includes('className="auth-scene-logo"'));
+  assert.ok(signup.includes('className="auth-scene-logo"'));
   assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background\.png[\s\S]*background-size:\s*cover/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background/);
+  assert.match(styles, /\.auth-scene-logo\s*\{/);
+  assert.match(styles, /@media \(max-width: 1050px\)[\s\S]*\.auth-scene-logo \{ display: none/);
 });

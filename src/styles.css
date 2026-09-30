@@ -118,8 +118,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     radial-gradient(circle at 85% 82%, var(--auth-fig-glow), transparent 26rem);
 }
 .auth-photo-background {
+  position: relative;
+  padding-inline: clamp(24px, 6vw, 112px);
+  place-items: center end;
   background-image:
-    linear-gradient(rgb(247 243 217 / 0.38), rgb(57 67 28 / 0.2)),
+    linear-gradient(90deg, rgb(247 243 217 / 0.06) 42%, rgb(57 67 28 / 0.2)),
     url("./assets/auth-background.png");
   background-position: center;
   background-repeat: no-repeat;
@@ -127,9 +130,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 :root[data-theme="dark"] .auth-photo-background {
   background-image:
-    linear-gradient(rgb(16 20 12 / 0.58), rgb(16 20 12 / 0.7)),
+    linear-gradient(90deg, rgb(16 20 12 / 0.24) 38%, rgb(16 20 12 / 0.7)),
     url("./assets/auth-background.png");
 }
+.auth-scene-logo {
+  position: absolute;
+  inset-block-start: clamp(64px, 15vh, 140px);
+  left: 30%;
+  width: clamp(150px, 16vw, 260px);
+  height: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 8px 18px rgb(16 20 12 / 0.24));
+}
+.auth-photo-background .auth-card { z-index: 1; }
+.auth-photo-background .auth-card .auth-logo { display: none; }
 .auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
 .auth-layout-scroll { padding-block: 36px; }
 .auth-card {
@@ -240,6 +254,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .topbar { padding-inline: 14px; }
   .page-content { padding: 20px 14px 84px; }
   .page-header { flex-direction: column; }
+}
+
+@media (max-width: 1050px) {
+  .auth-photo-background { padding-inline: 20px; place-items: center; }
+  .auth-scene-logo { display: none; }
+  .auth-photo-background .auth-card .auth-logo { display: block; }
 }
 
 @media (prefers-reduced-motion: reduce) {
