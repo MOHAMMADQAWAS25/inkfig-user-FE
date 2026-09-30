@@ -50,7 +50,6 @@ export function LoginPage() {
       <div className="auth-form-column login-form-column">
         <section className="auth-card login-card" aria-labelledby="login-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="login-title">{t("auth.welcome")}</h1>
         <p className="muted-text">{t("app.tagline")}</p>
         <form className="form-stack" onSubmit={submit}>

@@ -1767,3 +1767,71 @@ No migration required.
 ### Notes
 
 Scrollbar styling is card-scoped, so scrollbars elsewhere in the application are unaffected.
+
+## 2026-09-30 - Remove redundant authentication brand label
+
+### Request
+
+Remove the standalone `InkFig` word above the welcome/create-account heading in sign-in and sign-up for Arabic and English.
+
+### Changes
+
+- Removed the standalone localized brand paragraph from the login card.
+- Removed the standalone localized brand paragraph from the signup card.
+- Kept the centered InkFig logo and its accessible `InkFig` alternative text unchanged.
+- Updated localization regression coverage to prohibit the removed label on login/signup while retaining the canonical brand-label behavior on other authentication screens.
+
+### Repositories
+
+- `inkfig-user-FE`: removed the two redundant labels and updated tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/LoginPage.tsx`: removes the standalone word above the welcome heading.
+- `src/features/auth/SignupPage.tsx`: removes the standalone word above the create-account heading.
+- `tests/foundation.test.mjs`: verifies the text is absent from both cards.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Login now flows directly from the centered logo to the welcome heading.
+- Signup now flows directly from the centered logo to the create-account heading.
+- The result is identical in Arabic and English because the removed element used the shared locale key.
+- Backgrounds, card styling, scrollbars, language controls, fields, and workflows remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 15 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The brand remains visible through the logo; only the duplicated standalone text label was removed.

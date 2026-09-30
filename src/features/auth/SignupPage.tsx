@@ -80,7 +80,6 @@ export function SignupPage() {
       <div className="auth-form-column signup-form-column">
         <section className="auth-card signup-card" aria-labelledby="signup-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
 
