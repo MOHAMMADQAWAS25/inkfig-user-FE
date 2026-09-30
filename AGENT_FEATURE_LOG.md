@@ -2045,3 +2045,81 @@ No migration required.
 ### Notes
 
 Login and signup keep separate shareable URLs, while React Router navigation avoids a document reload and the mounted destination card supplies the transition.
+
+## 2026-09-30 - Polish authentication inputs and reset transition
+
+### Request
+
+Remove signup hints, align field sizes, modernize date and password controls, add placeholders, improve backgrounds, show phone conflicts, and animate the reset-password page.
+
+### Changes
+
+- Removed the visible email-format and ten-digit helper lines while retaining frontend and backend validation.
+- Added the requested phone and two-format university-email placeholders.
+- Added accessible show/hide buttons to login, signup, and reset password fields.
+- Replaced the plain date control presentation with a calendar-icon field that opens the native accessible picker.
+- Aligned signup labels and controls to consistent rows so full name matches neighboring fields.
+- Added a field-specific localized phone conflict message.
+- Added higher-detail light and dark authentication artwork generated from the existing compositions without replacing the originals.
+- Added the authentication background and RTL-aware entrance transition to password reset.
+- Existing routes, authentication behavior, validation rules, and responsive single-column fallback were intentionally unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: updated authentication components, styling, assets, localization, and tests.
+- `inkfig-user-system`: enforces phone uniqueness and records its backend work separately.
+
+### Files
+
+- `src/features/auth/PasswordField.tsx`: reusable accessible password visibility control.
+- `src/features/auth/DateOfBirthField.tsx`: modern native date-picker control.
+- `src/features/auth/LoginPage.tsx`: uses the visibility control.
+- `src/features/auth/SignupPage.tsx`: updates controls, placeholders, hints, and conflict handling.
+- `src/features/auth/PasswordResetPage.tsx`: adds transition/background and password controls.
+- `src/styles.css`: aligns inputs and styles icon-bearing fields and HD backgrounds.
+- `src/i18n/resources.ts`: adds English and Arabic accessibility/conflict strings.
+- `src/assets/auth-background-light-hd.png`, `src/assets/auth-background-dark-hd.png`: enhanced authentication backgrounds.
+- `tests/foundation.test.mjs`: covers the new controls, assets, placeholders, and reset motion.
+
+### API
+
+- Consumes the existing `POST /api/v1/auth/signup` 409 response and distinguishes phone conflicts from email conflicts.
+
+### Database
+
+- Migration: `20260930_006_add_unique_phone_number.sql` in `inkfig-user-system`.
+- No database changes in this repository.
+
+### Permissions and scope
+
+- Public login, signup, and password recovery permissions are unchanged.
+- Email and phone uniqueness are enforced by the backend/database, not trusted to the frontend.
+
+### Frontend
+
+- `/:language/login`: adds password visibility.
+- `/:language/signup`: adds aligned modern controls, placeholders, password visibility, and phone conflict feedback.
+- `/:language/reset-password`: adds the shared artwork, entrance transition, email placeholder, and password visibility.
+- Controls retain RTL/LTR, mobile responsiveness, keyboard labels, reduced-motion support, loading, and error states.
+
+### Verification
+
+- `[passed] npm test` - 18 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - browser-control tooling was unavailable.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after the user backend deployment succeeds.
+- No environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+The native date picker is retained beneath the custom presentation for browser accessibility and mobile date selection.

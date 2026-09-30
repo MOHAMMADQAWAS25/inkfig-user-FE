@@ -8,6 +8,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { ApiError } from "../../api/httpClient";
 import { loginUser } from "./authenticationApi";
+import { PasswordField } from "./PasswordField";
 
 export function LoginPage() {
   const { session, setSession } = useAuth();
@@ -57,10 +58,7 @@ export function LoginPage() {
             <span>{t("auth.email")}</span>
             <input required autoComplete="email" dir="ltr" name="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
           </label>
-          <label>
-            <span>{t("auth.password")}</span>
-            <input required autoComplete="current-password" dir="ltr" minLength={8} name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-          </label>
+          <PasswordField autoComplete="current-password" label={t("auth.password")} name="password" value={password} onChange={setPassword} />
           <Link className="forgot-password-link" to={`/${language}/reset-password`}>{t("auth.forgotPassword")}</Link>
           {error && <p className="form-message error-message" role="alert">{error}</p>}
           <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.signingIn") : t("auth.signIn")}</button>

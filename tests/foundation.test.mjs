@@ -13,6 +13,8 @@ const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", impor
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
 const verifyEmailPage = readFileSync(new URL("../src/features/auth/VerifyEmailPage.tsx", import.meta.url), "utf8");
 const passwordResetPage = readFileSync(new URL("../src/features/auth/PasswordResetPage.tsx", import.meta.url), "utf8");
+const passwordField = readFileSync(new URL("../src/features/auth/PasswordField.tsx", import.meta.url), "utf8");
+const dateOfBirthField = readFileSync(new URL("../src/features/auth/DateOfBirthField.tsx", import.meta.url), "utf8");
 const passwordResetApi = readFileSync(new URL("../src/features/auth/passwordResetApi.ts", import.meta.url), "utf8");
 const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.meta.url), "utf8");
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
@@ -70,7 +72,7 @@ test("provides localized welcome and signup routes with every required field", (
   assert.match(router, /\/:language\/welcome/);
   assert.match(router, /\/:language\/signup/);
   for (const field of ["email", "full_name", "phone_number", "gender", "date_of_birth", "password", "password_confirmation"]) {
-    assert.match(signup, new RegExp(`name=["']${field}["']`));
+    assert.match(`${signup}\n${passwordField}\n${dateOfBirthField}`, new RegExp(`name=["']?${field}["']?`));
   }
   assert.match(signup, /students\\\.hebron\\\.edu/);
   assert.match(signup, /PHONE_NUMBER = \/\^\[0-9\]\{10\}\$\//);
@@ -165,11 +167,21 @@ test("uses the supplied responsive background on login and signup", () => {
   assert.ok(signup.includes("auth-enter-from-end"));
   assert.doesNotMatch(loginPage, /auth-form-logo/);
   assert.doesNotMatch(signup, /auth-form-logo/);
-  assert.match(styles, /\.auth-photo-background::before\s*\{[\s\S]*auth-background-light\.png/);
-  assert.match(styles, /\.auth-photo-background::after\s*\{[\s\S]*auth-background-dark\.png/);
+  assert.match(styles, /\.auth-photo-background::before\s*\{[\s\S]*auth-background-light-hd\.png/);
+  assert.match(styles, /\.auth-photo-background::after\s*\{[\s\S]*auth-background-dark-hd\.png/);
   assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-inline:\s*auto/);
   assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
   assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);
+});
+
+test("provides polished authentication controls and reset-page motion", () => {
+  assert.match(passwordField, /EyeOff/);
+  assert.match(passwordField, /auth\.showPassword/);
+  assert.match(dateOfBirthField, /CalendarDays/);
+  assert.match(signup, /placeholder="05xxxxxxxx"/);
+  assert.doesNotMatch(signup, /auth\.emailHint|auth\.phoneHint/);
+  assert.match(passwordResetPage, /auth-photo-background/);
+  assert.match(passwordResetPage, /auth-enter-from-end/);
 });
 
 test("centers authentication forms with responsive signup columns and motion", () => {

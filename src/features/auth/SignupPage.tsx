@@ -7,6 +7,8 @@ import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "./AuthContext";
+import { DateOfBirthField } from "./DateOfBirthField";
+import { PasswordField } from "./PasswordField";
 import { registerUser } from "./registrationApi";
 import type { Gender, RegistrationRequest } from "./registrationApi";
 
@@ -69,7 +71,7 @@ export function SignupPage() {
       });
     } catch (requestError) {
       if (requestError instanceof ApiError && requestError.status === 409) {
-        setError(t("auth.emailExists"));
+        setError(requestError.message.toLowerCase().includes("phone") ? t("auth.phoneExists") : t("auth.emailExists"));
       } else if (requestError instanceof ApiError && requestError.status === 429) {
         setError(t("auth.hourlyEmailLimit"));
       } else {
@@ -92,8 +94,7 @@ export function SignupPage() {
           <form className="form-stack signup-form-grid" onSubmit={submit}>
             <label className="signup-email-field">
               <span>{t("auth.email")}</span>
-              <input required autoComplete="email" dir="ltr" name="email" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
-              <small>{t("auth.emailHint")}</small>
+              <input required autoComplete="email" dir="ltr" name="email" placeholder="12345678@students.hebron.edu / name@hebron.edu" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
             </label>
             <label>
               <span>{t("auth.fullName")}</span>
@@ -101,8 +102,7 @@ export function SignupPage() {
             </label>
             <label>
               <span>{t("auth.phoneNumber")}</span>
-              <input required autoComplete="tel" dir="ltr" inputMode="numeric" maxLength={10} minLength={10} name="phone_number" pattern="[0-9]{10}" type="tel" value={form.phone_number} onChange={(event) => updateField("phone_number", event.target.value)} />
-              <small>{t("auth.phoneHint")}</small>
+              <input required autoComplete="tel" dir="ltr" inputMode="numeric" maxLength={10} minLength={10} name="phone_number" pattern="[0-9]{10}" placeholder="05xxxxxxxx" type="tel" value={form.phone_number} onChange={(event) => updateField("phone_number", event.target.value)} />
             </label>
             <label>
               <span>{t("auth.gender")}</span>
@@ -111,18 +111,9 @@ export function SignupPage() {
                 <option value="male">{t("auth.genderMale")}</option>
               </select>
             </label>
-            <label>
-              <span>{t("auth.dateOfBirth")}</span>
-              <input required dir="ltr" max={new Date().toISOString().slice(0, 10)} name="date_of_birth" type="date" value={form.date_of_birth} onChange={(event) => updateField("date_of_birth", event.target.value)} />
-            </label>
-            <label>
-              <span>{t("auth.password")}</span>
-              <input required autoComplete="new-password" dir="ltr" minLength={8} maxLength={128} name="password" type="password" value={form.password} onChange={(event) => updateField("password", event.target.value)} />
-            </label>
-            <label>
-              <span>{t("auth.confirmPassword")}</span>
-              <input required autoComplete="new-password" dir="ltr" minLength={8} maxLength={128} name="password_confirmation" type="password" value={form.password_confirmation} onChange={(event) => updateField("password_confirmation", event.target.value)} />
-            </label>
+            <DateOfBirthField label={t("auth.dateOfBirth")} value={form.date_of_birth} onChange={(value) => updateField("date_of_birth", value)} />
+            <PasswordField autoComplete="new-password" label={t("auth.password")} name="password" value={form.password} onChange={(value) => updateField("password", value)} />
+            <PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={form.password_confirmation} onChange={(value) => updateField("password_confirmation", value)} />
             {error && <p className="form-message error-message" role="alert">{error}</p>}
             <button className="primary-button" disabled={isSubmitting} type="submit">
               {isSubmitting ? t("auth.creatingAccount") : t("auth.createAccount")}

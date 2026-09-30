@@ -12,6 +12,7 @@ import {
   requestPasswordReset,
   verifyPasswordResetCode,
 } from "./passwordResetApi";
+import { PasswordField } from "./PasswordField";
 
 type Stage = "email" | "code" | "password" | "complete";
 
@@ -108,9 +109,9 @@ export function PasswordResetPage() {
   }
 
   return (
-    <main className="auth-layout">
+    <main className="auth-layout auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
-      <section className="auth-card" aria-labelledby="reset-title">
+      <section className="auth-card login-card auth-enter-from-end" aria-labelledby="reset-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="reset-title">{t("auth.resetPassword")}</h1>
@@ -122,7 +123,7 @@ export function PasswordResetPage() {
         ) : stage === "email" ? (
           <form className="form-stack" onSubmit={submitEmail}>
             <p className="muted-text">{t("auth.resetInstructions")}</p>
-            <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
+            <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" placeholder="12345678@students.hebron.edu / name@hebron.edu" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
             {error && <p className="form-message error-message" role="alert">{error}</p>}
             <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.sendingResetCode") : t("auth.sendResetCode")}</button>
           </form>
@@ -140,8 +141,8 @@ export function PasswordResetPage() {
         ) : (
           <form className="form-stack" onSubmit={submitPassword}>
             <p className="muted-text">{t("auth.chooseNewPassword")}</p>
-            <label><span>{t("auth.password")}</span><input required autoComplete="new-password" dir="ltr" minLength={8} maxLength={128} type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-            <label><span>{t("auth.confirmPassword")}</span><input required autoComplete="new-password" dir="ltr" minLength={8} maxLength={128} type="password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></label>
+            <PasswordField autoComplete="new-password" label={t("auth.password")} name="password" value={password} onChange={setPassword} />
+            <PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={confirmation} onChange={setConfirmation} />
             {error && <p className="form-message error-message" role="alert">{error}</p>}
             <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.resettingPassword") : t("auth.resetPassword")}</button>
           </form>
