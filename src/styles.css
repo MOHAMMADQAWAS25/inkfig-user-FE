@@ -151,7 +151,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .login-form-column { width: min(440px, 100%); }
 .signup-form-column { width: min(580px, 100%); }
-.auth-form-column .auth-card { width: 100%; max-height: 100%; overflow-x: hidden; overflow-y: auto; scrollbar-gutter: stable; }
+.auth-form-column .auth-card {
+  width: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: var(--auth-scrollbar-thumb) var(--auth-scrollbar-track);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.auth-form-column .auth-card::-webkit-scrollbar { width: 10px; }
+.auth-form-column .auth-card::-webkit-scrollbar-track { border-radius: 999px; background: var(--auth-scrollbar-track); }
+.auth-form-column .auth-card::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: var(--auth-scrollbar-thumb); background-clip: padding-box; }
+.auth-form-column .auth-card::-webkit-scrollbar-thumb:hover { background: var(--auth-scrollbar-thumb-hover); background-clip: padding-box; }
 .auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
 .auth-theme-control .theme-toggle {
   border-color: rgb(57 67 28 / 0.52);
@@ -205,6 +217,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --input-background: rgb(16 20 12 / 0.46);
   --status-background: rgb(169 182 95 / 0.16);
   --error-background: rgb(152 40 36 / 0.2);
+  --auth-scrollbar-track: rgb(16 20 12 / 0.34);
+  --auth-scrollbar-thumb: #a9b65f;
+  --auth-scrollbar-thumb-hover: #c5c970;
 }
 :root[data-theme="dark"] .auth-card {
   color: #f7f2d8;
@@ -226,6 +241,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background: var(--card-background);
   box-shadow: inset 0 1px 0 rgb(238 231 189 / 0.05);
   backdrop-filter: none;
+  --auth-scrollbar-track: rgb(16 20 12 / 0.72);
+  --auth-scrollbar-thumb: #617d2b;
+  --auth-scrollbar-thumb-hover: #a9b65f;
 }
 .auth-logo { display: block; width: min(210px, 62%); height: auto; margin-inline: auto; }
 .signup-card { width: min(560px, 100%); }

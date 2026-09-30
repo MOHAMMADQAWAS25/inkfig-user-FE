@@ -1696,3 +1696,74 @@ No migration required.
 ### Notes
 
 Physical margins are used deliberately so the requested screen side is stable rather than being reversed automatically by writing direction.
+
+## 2026-09-30 - Add in-form logos and themed scrollbars
+
+### Request
+
+Place the logo at the top center inside sign-in and sign-up forms and make the form scrollbar compatible with the light and dark card palettes.
+
+### Changes
+
+- Restored the InkFig SVG import on login and signup and placed the logo as the first element inside each card.
+- Reused the existing responsive `auth-logo` dimensions and automatic inline margins for centered placement.
+- Added thin, stable-gutter scrollbar styling scoped only to authentication form cards.
+- Added rounded WebKit scrollbar tracks, thumbs, and hover states for Chromium/Safari alongside standards-based Firefox colors.
+- Defined light-card scrollbar colors using the pale leaf accent over the translucent dark-olive form surface.
+- Defined dark-card scrollbar colors using deep leaf green with a brighter olive hover state over a darker track.
+- Updated regression coverage for in-card placement, centering, theme variables, and browser scrollbar styling.
+
+### Repositories
+
+- `inkfig-user-FE`: added in-card logos, themed scrollbar styling, and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/LoginPage.tsx`: adds the centered logo inside the sign-in card.
+- `src/features/auth/SignupPage.tsx`: adds the centered logo inside the sign-up card.
+- `src/styles.css`: adds theme-compatible form scrollbar styling.
+- `tests/foundation.test.mjs`: verifies logo placement and scrollbar themes.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Both authentication cards display the InkFig logo centered at their top.
+- Form scrollbars now coordinate with the light and dark form colors across modern browser engines.
+- Page backgrounds, card placement, form-only scrolling, language-control placement, fields, and authentication behavior remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 15 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+Scrollbar styling is card-scoped, so scrollbars elsewhere in the application are unaffected.

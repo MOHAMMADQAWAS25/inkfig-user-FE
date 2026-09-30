@@ -137,13 +137,23 @@ test("places the language control opposite the reading origin without outer form
   assert.match(styles, /:root\[data-theme="dark"\] \.login-card, :root\[data-theme="dark"\] \.signup-card\s*\{[^}]*box-shadow:\s*inset/);
 });
 
+test("centers the logo inside both forms and themes their scrollbars", () => {
+  assert.match(loginPage, /<section className="auth-card login-card"[\s\S]*<img className="auth-logo"/);
+  assert.match(signup, /<section className="auth-card signup-card"[\s\S]*<img className="auth-logo"/);
+  assert.match(styles, /\.auth-logo \{[^}]*margin-inline:\s*auto/);
+  assert.match(styles, /scrollbar-color:\s*var\(--auth-scrollbar-thumb\) var\(--auth-scrollbar-track\)/);
+  assert.match(styles, /\.auth-form-column \.auth-card::\-webkit-scrollbar-thumb/);
+  assert.match(styles, /--auth-scrollbar-thumb:\s*#a9b65f/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.login-card,[\s\S]*--auth-scrollbar-thumb:\s*#617d2b/);
+});
+
 test("uses the supplied responsive background on login and signup", () => {
   assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
   assert.ok(loginPage.includes('className="auth-form-column login-form-column"'));
   assert.ok(signup.includes('className="auth-form-column signup-form-column"'));
-  assert.doesNotMatch(loginPage, /inkfig-logo\.svg|auth-form-logo/);
-  assert.doesNotMatch(signup, /inkfig-logo\.svg|auth-form-logo/);
+  assert.doesNotMatch(loginPage, /auth-form-logo/);
+  assert.doesNotMatch(signup, /auth-form-logo/);
   assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*100% 100%, cover/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background\s*\{[\s\S]*auth-background-dark\.png/);
   assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
