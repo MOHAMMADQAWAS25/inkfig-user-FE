@@ -246,6 +246,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   --auth-scrollbar-thumb-hover: #a9b65f;
 }
 .auth-logo { display: block; width: min(210px, 62%); height: auto; margin-inline: auto; }
+.login-card .auth-logo { width: min(180px, 54%); }
 .signup-card { width: min(560px, 100%); }
 .auth-card h1 { margin: 12px 0 6px; }
 .muted-text { color: var(--muted); }

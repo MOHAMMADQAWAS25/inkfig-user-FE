@@ -1835,3 +1835,69 @@ No migration required.
 ### Notes
 
 The brand remains visible through the logo; only the duplicated standalone text label was removed.
+
+## 2026-09-30 - Reduce the sign-in logo height
+
+### Request
+
+Slightly reduce only the sign-in logo until the compact login card no longer requires a scrollbar.
+
+### Changes
+
+- Added a login-specific logo size override that reduces its maximum width from 210 pixels to 180 pixels and its proportional width from 62% to 54%.
+- Preserved the original signup logo size.
+- Left the shared form scrollbar available for genuinely constrained viewport heights.
+- Added regression coverage for the login-specific logo size.
+
+### Repositories
+
+- `inkfig-user-FE`: adjusted the sign-in logo size and test coverage.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: adds the scoped login-logo dimensions.
+- `tests/foundation.test.mjs`: verifies the smaller sign-in logo remains intentional.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The sign-in logo is slightly smaller so the standard login card fits without vertical overflow.
+- Signup logo sizing, form styling, themed scrollbars, backgrounds, and workflows remain unchanged.
+- On unusually short viewports, the existing form-only overflow remains available to prevent clipped controls.
+
+### Verification
+
+- `[passed] npm test` - 15 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The change is scoped to `.login-card .auth-logo`, so other application and authentication logos are unaffected.

@@ -141,6 +141,7 @@ test("centers the logo inside both forms and themes their scrollbars", () => {
   assert.match(loginPage, /<section className="auth-card login-card"[\s\S]*<img className="auth-logo"/);
   assert.match(signup, /<section className="auth-card signup-card"[\s\S]*<img className="auth-logo"/);
   assert.match(styles, /\.auth-logo \{[^}]*margin-inline:\s*auto/);
+  assert.match(styles, /\.login-card \.auth-logo \{[^}]*width:\s*min\(180px, 54%\)/);
   assert.match(styles, /scrollbar-color:\s*var\(--auth-scrollbar-thumb\) var\(--auth-scrollbar-track\)/);
   assert.match(styles, /\.auth-form-column \.auth-card::\-webkit-scrollbar-thumb/);
   assert.match(styles, /--auth-scrollbar-thumb:\s*#a9b65f/);
