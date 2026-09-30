@@ -130,6 +130,13 @@ test("matches signup and authentication theme toggle to the login card", () => {
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-theme-control \.theme-toggle\s*\{[^}]*background:\s*var\(--card-background\)/);
 });
 
+test("places the language control opposite the reading origin without outer form shadows", () => {
+  assert.match(styles, /\.login-card > \.text-button, \.signup-card > \.text-button \{[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
+  assert.match(styles, /\[dir="rtl"\] \.login-card > \.text-button, \[dir="rtl"\] \.signup-card > \.text-button \{[^}]*margin-left:\s*0;[^}]*margin-right:\s*auto/);
+  assert.match(styles, /\.login-card, \.signup-card\s*\{[^}]*box-shadow:\s*inset/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.login-card, :root\[data-theme="dark"\] \.signup-card\s*\{[^}]*box-shadow:\s*inset/);
+});
+
 test("uses the supplied responsive background on login and signup", () => {
   assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));

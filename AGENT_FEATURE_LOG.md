@@ -1627,3 +1627,72 @@ No migration required.
 ### Notes
 
 The page-background declarations were intentionally left untouched to keep this ticket scoped only to form and authentication-toggle styling.
+
+## 2026-09-30 - Correct authentication language-control placement
+
+### Request
+
+Place the Arabic control at the bottom-right in English mode, place the English control at the bottom-left in Arabic mode, and remove outer shadows from sign-in and sign-up frames.
+
+### Changes
+
+- Added physical right alignment for the language control on English login and signup cards.
+- Added an explicit RTL override that physically aligns the language control left in Arabic mode.
+- Removed both outward drop-shadow layers from light-theme login and signup cards while retaining the subtle inset highlight.
+- Removed the dark-theme card's outward shared shadow and retained only its subtle inset highlight.
+- Added regression coverage for both language directions and both theme shadow treatments.
+- Intentionally left authentication backgrounds, form colors, fields, dimensions, and scrolling behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adjusted authentication card alignment and shadow styling and updated tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: physically positions language controls and removes outer card shadows.
+- `tests/foundation.test.mjs`: verifies English/Arabic placement and inset-only card shadows.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- English mode displays the Arabic control at the form's bottom-right.
+- Arabic mode displays the English control at the form's bottom-left.
+- Sign-in and sign-up cards no longer cast shadows outside their frames in light or dark mode.
+- Page backgrounds, card palette, fields, content, validation, routes, and form-only scrolling remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 14 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+Physical margins are used deliberately so the requested screen side is stable rather than being reversed automatically by writing direction.
