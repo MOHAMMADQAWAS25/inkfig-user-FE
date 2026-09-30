@@ -161,13 +161,24 @@ test("centers the logo inside both forms and themes their scrollbars", () => {
 test("uses the supplied responsive background on login and signup", () => {
   assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
-  assert.ok(loginPage.includes('className="auth-form-column login-form-column"'));
-  assert.ok(signup.includes('className="auth-form-column signup-form-column"'));
+  assert.ok(loginPage.includes("auth-enter-from-start"));
+  assert.ok(signup.includes("auth-enter-from-end"));
   assert.doesNotMatch(loginPage, /auth-form-logo/);
   assert.doesNotMatch(signup, /auth-form-logo/);
-  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*100% 100%, cover/);
-  assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background\s*\{[\s\S]*auth-background-dark\.png/);
-  assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
+  assert.match(styles, /\.auth-photo-background::before\s*\{[\s\S]*auth-background-light\.png/);
+  assert.match(styles, /\.auth-photo-background::after\s*\{[\s\S]*auth-background-dark\.png/);
+  assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-inline:\s*auto/);
   assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
   assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);
+});
+
+test("centers authentication forms with responsive signup columns and motion", () => {
+  assert.match(signup, /className="form-stack signup-form-grid"/);
+  assert.match(signup, /className="signup-email-field"/);
+  assert.match(styles, /\.signup-form-column \{ width: min\(820px, 100%\); \}/);
+  assert.match(styles, /\.signup-form-grid \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(styles, /@keyframes auth-card-enter/);
+  assert.match(styles, /transition: opacity 560ms ease/);
+  assert.match(styles, /@media \(max-width: 760px\)[\s\S]*\.signup-form-grid \{ grid-template-columns: 1fr; \}/);
+  assert.match(styles, /prefers-reduced-motion[\s\S]*animation-duration: 0\.01ms !important/);
 });

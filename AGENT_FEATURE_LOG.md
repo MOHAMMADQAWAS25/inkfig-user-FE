@@ -1974,3 +1974,74 @@ Explain when a user has requested five codes and prevent another registration or
 ### Notes
 
 The displayed countdown is a usability aid; refreshing the browser can clear it, but the backend lock remains effective and returns the limit again on the next request.
+
+## 2026-09-30 - Center and animate authentication forms
+
+### Request
+
+Center login and signup, arrange signup fields side by side in a rectangular card, animate login/signup navigation, and smooth the light/dark background change.
+
+### Changes
+
+- Centered login and signup cards at every desktop width instead of pinning them to the right.
+- Expanded signup to an 820px rectangular card with a balanced two-column field grid on desktop and one column on mobile.
+- Kept email, validation feedback, and the submit action full width for clear hierarchy.
+- Added opposite-direction, RTL-aware entrance transitions when React Router switches between login and signup without reloading the page.
+- Rebuilt the authentication background as light and dark pseudo-layers that crossfade during theme changes.
+- Added focused input lift, button hover/press feedback, and coordinated card/control color transitions.
+- Extended reduced-motion handling to disable animations for users who request it.
+- Existing form fields, validation, authentication requests, routes, backgrounds, language behavior, and responsive scrolling were intentionally left unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: updated authentication layout, motion, and regression coverage.
+
+### Files
+
+- `src/features/auth/LoginPage.tsx`: marks login for the start-side entrance transition.
+- `src/features/auth/SignupPage.tsx`: marks signup for the end-side transition and two-column grid.
+- `src/styles.css`: centers cards, defines responsive columns, crossfades themes, and adds accessible motion.
+- `tests/foundation.test.mjs`: verifies centering, grid behavior, animation, crossfade, mobile fallback, and reduced-motion support.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions, roles, authentication decisions, or data scopes changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- `/:language/login` remains a distinct route but switches within the SPA without a full page reload.
+- `/:language/signup` remains a distinct route and enters from the opposite side of login.
+- Signup uses two columns above 760px and one column at or below 760px.
+- Light/dark artwork crossfades over 560ms; card and control colors transition with it.
+- Animations reverse appropriately for RTL and are effectively disabled under `prefers-reduced-motion`.
+
+### Verification
+
+- `[passed] npm test` - 17 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - browser-control tooling was unavailable in this session.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, secret, or environment-variable change is required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+Login and signup keep separate shareable URLs, while React Router navigation avoids a document reload and the mounted destination card supplies the transition.

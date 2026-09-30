@@ -83,14 +83,14 @@ export function SignupPage() {
   return (
     <main className="auth-layout auth-layout-scroll auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
-      <div className="auth-form-column signup-form-column">
+      <div className="auth-form-column signup-form-column auth-enter-from-end">
         <section className="auth-card signup-card" aria-labelledby="signup-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
 
-          <form className="form-stack" onSubmit={submit}>
-            <label>
+          <form className="form-stack signup-form-grid" onSubmit={submit}>
+            <label className="signup-email-field">
               <span>{t("auth.email")}</span>
               <input required autoComplete="email" dir="ltr" name="email" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
               <small>{t("auth.emailHint")}</small>
