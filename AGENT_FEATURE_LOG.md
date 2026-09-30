@@ -1558,3 +1558,72 @@ No migration required.
 ### Notes
 
 `cover` fills the viewport and may crop a small amount at extreme aspect ratios; this restores the requested full-page appearance without background scrolling.
+
+## 2026-09-30 - Match signup styling to sign-in
+
+### Request
+
+Make every sign-up form color and field treatment exactly match sign-in, style the authentication theme icon like the sign-in form, and leave page backgrounds unchanged.
+
+### Changes
+
+- Applied the sign-in card's light-theme border, translucent olive gradient, shadow, text, muted text, field, button, status, and error tokens to signup through one shared selector.
+- Applied the same shared dark-theme card override to login and signup.
+- Styled the authentication theme-toggle button with the sign-in form surface, border, shadow, text color, and blur in light mode.
+- Matched the authentication theme-toggle button to the sign-in card's shared background, border, shadow, and text in dark mode.
+- Added regression coverage requiring signup and the authentication theme toggle to remain coupled to sign-in styling.
+- Intentionally did not modify either authentication page background image, sizing, position, attachment, overlay, or scrolling behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: unified authentication form and theme-toggle styling and updated tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: shares sign-in styling with signup and the authentication theme toggle.
+- `tests/foundation.test.mjs`: verifies the shared light/dark form and toggle treatment.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Sign-in and sign-up now have exactly the same visual palette for cards, text, fields, borders, buttons, and feedback states.
+- The light/dark icon on authentication pages visually matches the sign-in card surface in each theme.
+- Authentication page backgrounds and scrolling behavior are unchanged.
+- Form dimensions, content, validation, localization, RTL/LTR behavior, and submission workflows remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 13 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The page-background declarations were intentionally left untouched to keep this ticket scoped only to form and authentication-toggle styling.
