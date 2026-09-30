@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 
@@ -26,6 +26,17 @@ export function PasswordResetPage() {
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const [hourlyLimitReached, setHourlyLimitReached] = useState(false);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setInterval(
+      () => setCooldown((current) => Math.max(0, current - 1)),
+      1000,
+    );
+    return () => window.clearInterval(timer);
+  }, [cooldown > 0]);
 
   if (session !== null) return <Navigate replace to={`/${language}/dashboard`} />;
 
@@ -34,8 +45,25 @@ export function PasswordResetPage() {
     setError("");
     setIsSubmitting(true);
     try {
-      await requestPasswordReset(email.trim().toLowerCase());
+      const response = await requestPasswordReset(email.trim().toLowerCase());
+      setCooldown(response.resend_after_seconds);
+      setHourlyLimitReached(response.hourly_limit_reached);
       setStage("code");
+    } catch {
+      setError(t("auth.resetRequestFailed"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function resendCode() {
+    setError("");
+    setIsSubmitting(true);
+    try {
+      const response = await requestPasswordReset(email.trim().toLowerCase());
+      setCooldown(response.resend_after_seconds);
+      setHourlyLimitReached(response.hourly_limit_reached);
+      setCode("");
     } catch {
       setError(t("auth.resetRequestFailed"));
     } finally {
@@ -103,8 +131,11 @@ export function PasswordResetPage() {
             <p className="muted-text">{t("auth.resetCodeSent")}</p>
             <label><span>{t("auth.verificationCode")}</span><input className="verification-code-input" required autoComplete="one-time-code" dir="ltr" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} minLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))} /></label>
             {error && <p className="form-message error-message" role="alert">{error}</p>}
+            {hourlyLimitReached && !error && <p className="form-message error-message" role="status">{t("auth.hourlyEmailLimit")}</p>}
             <button className="primary-button" disabled={isSubmitting || code.length !== 6} type="submit">{isSubmitting ? t("auth.verifying") : t("auth.verify")}</button>
-            <button className="secondary-button" type="button" onClick={() => { setCode(""); setError(""); setStage("email"); }}>{t("auth.requestNewCode")}</button>
+            <button className="secondary-button" disabled={isSubmitting || cooldown > 0} type="button" onClick={resendCode}>
+              {cooldown > 0 ? `${t("auth.resendIn")} ${formatWait(cooldown)}` : t("auth.requestNewCode")}
+            </button>
           </form>
         ) : (
           <form className="form-stack" onSubmit={submitPassword}>
@@ -120,4 +151,10 @@ export function PasswordResetPage() {
       </section>
     </main>
   );
+}
+
+function formatWait(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.ceil(seconds / 60);
+  return `${minutes}m`;
 }

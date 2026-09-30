@@ -3,6 +3,8 @@ import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 interface PasswordResetRequestResponse {
   message: string;
   expires_in_seconds: number;
+  resend_after_seconds: number;
+  hourly_limit_reached: boolean;
 }
 
 interface PasswordResetVerifyResponse {

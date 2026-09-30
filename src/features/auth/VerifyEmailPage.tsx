@@ -12,6 +12,7 @@ import { resendVerification, verifyEmail } from "./registrationApi";
 interface VerificationLocationState {
   email?: string;
   resendAfterSeconds?: number;
+  hourlyLimitReached?: boolean;
 }
 
 export function VerifyEmailPage() {
@@ -22,6 +23,9 @@ export function VerifyEmailPage() {
   const [email, setEmail] = useState(state?.email ?? "");
   const [code, setCode] = useState("");
   const [cooldown, setCooldown] = useState(state?.resendAfterSeconds ?? 0);
+  const [hourlyLimitReached, setHourlyLimitReached] = useState(
+    state?.hourlyLimitReached ?? false,
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,9 +61,14 @@ export function VerifyEmailPage() {
     try {
       const response = await resendVerification(email.trim().toLowerCase());
       setCooldown(response.resend_after_seconds);
+      setHourlyLimitReached(response.hourly_limit_reached);
       setCode("");
-    } catch {
-      setError(t("auth.resendFailed"));
+    } catch (requestError) {
+      if (requestError instanceof ApiError && requestError.status === 429) {
+        setCooldown(3600);
+        setHourlyLimitReached(true);
+        setError(t("auth.hourlyEmailLimit"));
+      } else setError(t("auth.resendFailed"));
     } finally {
       setIsResending(false);
     }
@@ -83,9 +92,10 @@ export function VerifyEmailPage() {
             <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
             <label><span>{t("auth.verificationCode")}</span><input className="verification-code-input" required autoComplete="one-time-code" dir="ltr" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} minLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))} /></label>
             {error && <p className="form-message error-message" role="alert">{error}</p>}
+            {hourlyLimitReached && !error && <p className="form-message error-message" role="status">{t("auth.hourlyEmailLimit")}</p>}
             <button className="primary-button" disabled={isSubmitting || code.length !== 6} type="submit">{isSubmitting ? t("auth.verifying") : t("auth.verify")}</button>
             <button className="secondary-button" disabled={isResending || cooldown > 0 || !email} type="button" onClick={resend}>
-              {cooldown > 0 ? `${t("auth.resendIn")} ${cooldown}s` : t("auth.resendCode")}
+              {cooldown > 0 ? `${t("auth.resendIn")} ${formatWait(cooldown)}` : t("auth.resendCode")}
             </button>
           </form>
         )}
@@ -93,4 +103,10 @@ export function VerifyEmailPage() {
       </section>
     </main>
   );
+}
+
+function formatWait(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.ceil(seconds / 60);
+  return `${minutes}m`;
 }

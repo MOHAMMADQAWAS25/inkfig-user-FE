@@ -61,11 +61,17 @@ export function SignupPage() {
     try {
       const response = await registerUser({ ...form, email });
       navigate(`/${language}/verify-email`, {
-        state: { email: response.email, resendAfterSeconds: response.resend_after_seconds },
+        state: {
+          email: response.email,
+          resendAfterSeconds: response.resend_after_seconds,
+          hourlyLimitReached: response.hourly_limit_reached,
+        },
       });
     } catch (requestError) {
       if (requestError instanceof ApiError && requestError.status === 409) {
         setError(t("auth.emailExists"));
+      } else if (requestError instanceof ApiError && requestError.status === 429) {
+        setError(t("auth.hourlyEmailLimit"));
       } else {
         setError(t("auth.registrationFailed"));
       }

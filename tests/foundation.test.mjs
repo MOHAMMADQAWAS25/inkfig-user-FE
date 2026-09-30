@@ -54,6 +54,16 @@ test("resets passwords through a three-stage email-code flow", () => {
   assert.match(passwordResetPage, /pattern="\[0-9\]\{6\}"/);
   assert.match(passwordResetPage, /resetToken/);
   assert.match(passwordResetPage, /password !== confirmation/);
+  assert.match(passwordResetPage, /hourlyLimitReached/);
+  assert.match(passwordResetPage, /cooldown/);
+  assert.match(passwordResetApi, /hourly_limit_reached/);
+});
+
+test("shows backend-enforced hourly code limits in both email flows", () => {
+  assert.match(registrationApi, /hourly_limit_reached/);
+  assert.match(verifyEmailPage, /hourlyLimitReached/);
+  assert.match(verifyEmailPage, /formatWait/);
+  assert.match(resources, /auth\.hourlyEmailLimit/);
 });
 
 test("provides localized welcome and signup routes with every required field", () => {

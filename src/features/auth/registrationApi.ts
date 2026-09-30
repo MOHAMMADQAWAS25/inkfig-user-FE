@@ -17,10 +17,16 @@ export interface RegistrationResponse {
   verification_required: boolean;
   expires_in_seconds: number;
   resend_after_seconds: number;
+  hourly_limit_reached: boolean;
 }
 
 export interface VerificationResponse { email: string; verified: boolean; }
-export interface ResendResponse { email: string; expires_in_seconds: number; resend_after_seconds: number; }
+export interface ResendResponse {
+  email: string;
+  expires_in_seconds: number;
+  resend_after_seconds: number;
+  hourly_limit_reached: boolean;
+}
 
 export async function registerUser(body: RegistrationRequest): Promise<RegistrationResponse> {
   const result = await requestJson<RegistrationResponse>(

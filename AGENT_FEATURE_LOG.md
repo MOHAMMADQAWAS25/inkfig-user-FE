@@ -1901,3 +1901,76 @@ No migration required.
 ### Notes
 
 The change is scoped to `.login-card .auth-logo`, so other application and authentication logos are unaffected.
+
+## 2026-09-30 - Show the hourly email-code limit
+
+### Request
+
+Explain when a user has requested five codes and prevent another registration or password-reset code request for one hour.
+
+### Changes
+
+- Consumes backend resend delay and hourly-lock metadata in both email-code flows.
+- Shows a localized security message after the fifth code and disables resend during the one-hour countdown.
+- Password reset now resends directly from the code screen instead of returning to email entry.
+- Handles a backend 429 on registration by displaying the hourly-limit message.
+- Existing code verification, password selection, authentication visuals, background, themes, and responsive behavior were intentionally left unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added hourly-lock feedback and countdown behavior.
+- `inkfig-user-system`: authoritatively enforces the limit and persists its state.
+
+### Files
+
+- `src/features/auth/PasswordResetPage.tsx`: adds direct resend, countdown, and lock feedback.
+- `src/features/auth/VerifyEmailPage.tsx`: consumes lock state and formats longer countdowns.
+- `src/features/auth/SignupPage.tsx`: transfers initial lock metadata and handles 429.
+- `src/features/auth/passwordResetApi.ts`, `src/features/auth/registrationApi.ts`: add response fields.
+- `src/i18n/resources.ts`: adds English and Arabic hourly-limit text.
+- `tests/foundation.test.mjs`: verifies both flows expose the backend-enforced limit.
+
+### API
+
+- `POST /api/v1/auth/signup`: consumes `hourly_limit_reached` and `resend_after_seconds`.
+- `POST /api/v1/auth/resend-verification`: consumes the same limiter fields and handles 429.
+- `POST /api/v1/auth/password-reset/request`: consumes neutral limiter metadata for the reset countdown.
+
+### Database
+
+- Migration: `20260930_005_add_email_code_rate_limits.sql` in `inkfig-user-system`.
+- No database changes exist in this frontend repository.
+
+### Permissions and scope
+
+- Public registration and reset routes remain unauthenticated.
+- The frontend only displays backend decisions; it does not authorize sends or enforce the security limit.
+- Backend validation remains authoritative.
+
+### Frontend
+
+- Both code pages show that five codes were requested and another cannot be sent for one hour.
+- Resend buttons remain disabled while the server-provided countdown is active.
+- Countdown labels use seconds below one minute and rounded minutes for longer waits.
+- Loading, error, RTL/LTR, Arabic/English, and mobile behavior are preserved.
+
+### Verification
+
+- `[passed] npm test` - 16 tests passed after final synchronization.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded after final synchronization.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-system` and migration 005 first, then deploy `inkfig-user-FE`.
+- No frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+The displayed countdown is a usability aid; refreshing the browser can clear it, but the backend lock remains effective and returns the limit again on the next request.

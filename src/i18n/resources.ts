@@ -69,6 +69,7 @@ const en = {
   "auth.resetSessionExpired": "This password-reset session is invalid or expired. Request a new code.",
   "auth.resetComplete": "Your password has been changed. You can now sign in.",
   "auth.backToLogin": "Back to sign in",
+  "auth.hourlyEmailLimit": "You requested 5 codes. For your security, another code cannot be sent for one hour.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -142,6 +143,7 @@ const ar: Record<TranslationKey, string> = {
   "auth.resetSessionExpired": "جلسة استعادة كلمة المرور غير صالحة أو منتهية. اطلب رمزاً جديداً.",
   "auth.resetComplete": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول.",
   "auth.backToLogin": "العودة إلى تسجيل الدخول",
+  "auth.hourlyEmailLimit": "لقد طلبت 5 رموز. لحماية حسابك، لا يمكن إرسال رمز جديد لمدة ساعة واحدة.",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };
