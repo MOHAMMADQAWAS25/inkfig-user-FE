@@ -1415,3 +1415,75 @@ No migration required.
 ### Notes
 
 The desktop positioning deliberately uses physical `margin-left` and `margin-right` values so RTL direction cannot move the form away from the requested right side.
+
+## 2026-09-30 - Keep authentication artwork fixed behind scrollable forms
+
+### Request
+
+Move the InkFig logo above the sign-in and sign-up forms, show the full background image without page scrolling, and confine scrolling to the form.
+
+### Changes
+
+- Replaced the logo's artwork-overlay position with a dedicated logo row directly above each form card.
+- Added right-side form-column containers for login and signup while preserving physical-right placement in Arabic and English.
+- Locked photo-backed authentication pages to the viewport and disabled page-level overflow.
+- Changed both background layers to `contain` sizing so the complete source artwork is visible without cropping.
+- Fixed the background attachment and centered each non-repeating theme image.
+- Limited vertical overflow to the form card itself, keeping the logo and background stationary while long signup content scrolls.
+- Updated regression coverage for the new form columns, logo placement, full-image sizing, viewport lock, and form-only scrolling.
+
+### Repositories
+
+- `inkfig-user-FE`: updated login/signup markup, authentication styling, and regression tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/LoginPage.tsx`: groups the logo above the sign-in card.
+- `src/features/auth/SignupPage.tsx`: groups the logo above the sign-up card.
+- `src/styles.css`: fixes the full background to the viewport and confines overflow to form cards.
+- `tests/foundation.test.mjs`: verifies the layout and scrolling contract.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The InkFig logo appears immediately above the form instead of over the background artwork.
+- The light/dark artwork remains fixed, fully visible, centered, and free of page-level scrolling.
+- Long forms scroll inside their card while the logo and page background remain stationary.
+- The form column remains physically right-aligned on desktop in Arabic and English and centered on narrow screens.
+
+### Verification
+
+- `[passed] npm test` - 12 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The complete image is prioritized over filling every possible viewport dimension, so unusually shaped screens may show theme-colored letterboxing rather than crop the artwork.

@@ -127,11 +127,14 @@ test("softens only the light-theme login card from the dark palette", () => {
 test("uses the supplied responsive background on login and signup", () => {
   assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
-  assert.ok(loginPage.includes('className="auth-scene-logo"'));
-  assert.ok(signup.includes('className="auth-scene-logo"'));
-  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*cover/);
+  assert.ok(loginPage.includes('className="auth-form-column login-form-column"'));
+  assert.ok(signup.includes('className="auth-form-column signup-form-column"'));
+  assert.ok(loginPage.includes('className="auth-form-logo"'));
+  assert.ok(signup.includes('className="auth-form-logo"'));
+  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*100% 100%, contain/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background\s*\{[\s\S]*auth-background-dark\.png/);
-  assert.match(styles, /\.auth-photo-background \.auth-card \{[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
-  assert.match(styles, /\.auth-scene-logo\s*\{/);
-  assert.match(styles, /@media \(max-width: 1050px\)[\s\S]*\.auth-scene-logo \{ display: none/);
+  assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
+  assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
+  assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);
+  assert.match(styles, /\.auth-form-logo\s*\{/);
 });

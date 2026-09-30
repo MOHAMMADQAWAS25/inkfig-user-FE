@@ -47,9 +47,9 @@ export function LoginPage() {
   return (
     <main className="auth-layout auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
-      <img aria-hidden="true" className="auth-scene-logo" src={inkfigLogo} alt="" />
-      <section className="auth-card login-card" aria-labelledby="login-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
+      <div className="auth-form-column login-form-column">
+        <img className="auth-form-logo" src={inkfigLogo} alt={t("app.name")} />
+        <section className="auth-card login-card" aria-labelledby="login-title">
         <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="login-title">{t("auth.welcome")}</h1>
         <p className="muted-text">{t("app.tagline")}</p>
@@ -70,7 +70,8 @@ export function LoginPage() {
         <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>
           {language === "ar" ? "English" : "العربية"}
         </button>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

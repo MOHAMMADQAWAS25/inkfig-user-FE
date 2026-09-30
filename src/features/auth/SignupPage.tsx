@@ -77,9 +77,9 @@ export function SignupPage() {
   return (
     <main className="auth-layout auth-layout-scroll auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
-      <img aria-hidden="true" className="auth-scene-logo" src={inkfigLogo} alt="" />
-      <section className="auth-card signup-card" aria-labelledby="signup-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
+      <div className="auth-form-column signup-form-column">
+        <img className="auth-form-logo" src={inkfigLogo} alt={t("app.name")} />
+        <section className="auth-card signup-card" aria-labelledby="signup-title">
         <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
@@ -128,7 +128,8 @@ export function SignupPage() {
         <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>
           {language === "ar" ? "English" : "العربية"}
         </button>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
