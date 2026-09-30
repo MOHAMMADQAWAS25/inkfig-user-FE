@@ -94,7 +94,7 @@ export function SignupPage() {
           <form className="form-stack signup-form-grid" onSubmit={submit}>
             <label className="signup-email-field">
               <span>{t("auth.email")}</span>
-              <input required autoComplete="email" dir="ltr" name="email" placeholder="12345678@students.hebron.edu / name@hebron.edu" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
+              <input required autoComplete="email" dir="ltr" name="email" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
             </label>
             <label>
               <span>{t("auth.fullName")}</span>

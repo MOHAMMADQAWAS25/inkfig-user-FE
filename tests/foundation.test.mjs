@@ -182,6 +182,9 @@ test("provides polished authentication controls and reset-page motion", () => {
   assert.doesNotMatch(signup, /auth\.emailHint|auth\.phoneHint/);
   assert.match(passwordResetPage, /auth-photo-background/);
   assert.match(passwordResetPage, /auth-enter-from-end/);
+  assert.doesNotMatch(signup, /placeholder="[^"]*@(?:students\.)?hebron\.edu/);
+  assert.doesNotMatch(passwordResetPage, /placeholder="[^"]*@(?:students\.)?hebron\.edu/);
+  assert.match(styles, /\.login-form-column \{ width: min\(600px, 100%\); \}/);
 });
 
 test("centers authentication forms with responsive signup columns and motion", () => {

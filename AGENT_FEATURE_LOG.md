@@ -2123,3 +2123,67 @@ Remove signup hints, align field sizes, modernize date and password controls, ad
 ### Notes
 
 The native date picker is retained beneath the custom presentation for browser accessibility and mobile date selection.
+
+## 2026-10-01 - Simplify email fields and widen sign-in
+
+### Request
+
+Remove the email placeholders from signup and password reset, and make the sign-in form rectangular.
+
+### Changes
+
+- Removed the university-email placeholder from signup.
+- Removed the university-email placeholder from the password-reset email stage.
+- Expanded the centered sign-in form from 440px to a 600px desktop width for a wider rectangular presentation.
+- Preserved the existing full-width mobile behavior, email validation, field labels, transitions, backgrounds, and authentication workflows.
+
+### Repositories
+
+- `inkfig-user-FE`: updated authentication fields, sign-in sizing, and regression coverage.
+
+### Files
+
+- `src/features/auth/SignupPage.tsx`: removes the email placeholder.
+- `src/features/auth/PasswordResetPage.tsx`: removes the email placeholder.
+- `src/styles.css`: widens the sign-in form container.
+- `tests/foundation.test.mjs`: verifies both placeholder removals and the new width.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions, roles, authentication rules, or access scopes changed.
+- Backend authorization and validation remain authoritative.
+
+### Frontend
+
+- `/:language/signup` and `/:language/reset-password` retain labeled email fields without placeholder text.
+- `/:language/login` uses a centered 600px rectangle on larger screens and remains fluid on narrow screens.
+- RTL/LTR, mobile responsiveness, loading, error, theme, and reduced-motion behavior are unchanged.
+
+### Verification
+
+- `[passed] npm test` - 18 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No migration or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+None

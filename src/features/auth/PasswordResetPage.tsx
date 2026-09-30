@@ -123,7 +123,7 @@ export function PasswordResetPage() {
         ) : stage === "email" ? (
           <form className="form-stack" onSubmit={submitEmail}>
             <p className="muted-text">{t("auth.resetInstructions")}</p>
-            <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" placeholder="12345678@students.hebron.edu / name@hebron.edu" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
+            <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
             {error && <p className="form-message error-message" role="alert">{error}</p>}
             <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.sendingResetCode") : t("auth.sendResetCode")}</button>
           </form>
