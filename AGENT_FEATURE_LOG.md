@@ -848,3 +848,76 @@ No migration required.
 ### Notes
 
 Opacity is applied to background, border, shadow, and input colors rather than the whole card, so text and controls remain crisp and accessible.
+
+## 2026-09-30 - Add signup email verification screen
+
+### Request
+
+After signup, ask the user for the emailed verification code and allow the account to proceed only when the backend accepts it.
+
+### Changes
+
+- Signup now redirects to email verification instead of reporting immediate account creation.
+- Added a six-digit verification form with prefilled/editable email, one-time-code autocomplete, loading, success, invalid, expired, and attempt-limit states.
+- Added resend behavior with a backend-provided cooldown and replacement-code handling.
+- Preserved existing authentication visuals, responsive behavior, themes, and Hebron email/phone validation.
+
+### Repositories
+
+- `inkfig-user-FE`: added the verification route, API client operations, localized screen, styling, and regression coverage.
+- `inkfig-user-system`: added the authoritative verification APIs and account activation workflow.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/SignupPage.tsx`: redirects successful signup to verification with response metadata.
+- `src/features/auth/VerifyEmailPage.tsx`: implements code verification, resend cooldown, success, and errors.
+- `src/features/auth/registrationApi.ts`: adds verification and resend contracts and requests.
+- `src/app/AppRouter.tsx`: adds `/:language/verify-email`.
+- `src/i18n/resources.ts`: adds Arabic and English verification copy.
+- `src/styles.css`: adds compact six-digit code styling.
+- `tests/foundation.test.mjs`: verifies the route, endpoints, code constraint, and cooldown.
+
+### API
+
+- `POST /api/v1/auth/signup`: consumes the new pending-verification response fields.
+- `POST /api/v1/auth/verify-email`: sends `email` and six-digit `code` and handles success, invalid, expired, and attempt-limit responses.
+- `POST /api/v1/auth/resend-verification`: sends `email` and consumes the returned resend cooldown.
+
+### Database
+
+- Migration: `20260930_002_add_email_verification.sql` in `inkfig-user-system`; it must run before this frontend is exposed.
+
+### Permissions and scope
+
+- Verification pages are public and grant no role or permission.
+- The frontend mirrors format checks for usability; the user backend authoritatively enforces identity, code, expiry, attempts, and account activation.
+- No company, event, artwork, teacher, or administrative scope changed.
+
+### Frontend
+
+- Added localized route `/:language/verify-email` with responsive RTL/LTR layout, theme toggle, loading, error, success, resend-disabled, and cooldown states.
+- Email remains editable so refresh/direct navigation can recover without storing it in persistent browser storage.
+- Successful verification offers navigation to the existing localized login page.
+
+### Verification
+
+- `[passed] npm test` - 8 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser/API verification` - backend deployment and a real university mailbox are required.
+
+### Deployment
+
+- Deploy `inkfig-user-system` and its migration first, then deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No new frontend environment variables are required; the existing user API base URL is unchanged.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+The email is passed through transient router state and remains editable; it is not written to local storage or placed in the URL.

@@ -13,17 +13,14 @@ export interface RegistrationRequest {
 }
 
 export interface RegistrationResponse {
-  user: {
-    user_id: string;
-    email: string;
-    full_name: string;
-    phone_number: string;
-    gender: Gender;
-    date_of_birth: string;
-    is_active: boolean;
-    created_at: string;
-  };
+  email: string;
+  verification_required: boolean;
+  expires_in_seconds: number;
+  resend_after_seconds: number;
 }
+
+export interface VerificationResponse { email: string; verified: boolean; }
+export interface ResendResponse { email: string; expires_in_seconds: number; resend_after_seconds: number; }
 
 export async function registerUser(body: RegistrationRequest): Promise<RegistrationResponse> {
   const result = await requestJson<RegistrationResponse>(
@@ -32,5 +29,19 @@ export async function registerUser(body: RegistrationRequest): Promise<Registrat
     "/auth/signup",
     { body },
   );
+  return result.data;
+}
+
+export async function verifyEmail(email: string, code: string): Promise<VerificationResponse> {
+  const result = await requestJson<VerificationResponse>(userApiBaseUrl, "POST", "/auth/verify-email", {
+    body: { email, code },
+  });
+  return result.data;
+}
+
+export async function resendVerification(email: string): Promise<ResendResponse> {
+  const result = await requestJson<ResendResponse>(userApiBaseUrl, "POST", "/auth/resend-verification", {
+    body: { email },
+  });
   return result.data;
 }

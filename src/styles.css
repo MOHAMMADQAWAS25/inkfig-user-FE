@@ -192,6 +192,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .form-stack input, .form-stack select { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-background); color: var(--text); }
 .form-stack input:hover, .form-stack select:hover { border-color: var(--brand-leaf); }
 .form-stack input:focus, .form-stack select:focus { border-color: var(--primary); }
+.form-stack .verification-code-input { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.42em; text-align: center; }
 .form-stack small { color: var(--muted); line-height: 1.45; }
 .primary-button { min-height: 44px; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: var(--primary-ink); font-weight: 750; cursor: pointer; }
 .primary-button:hover:not(:disabled) { background: var(--primary-hover); }

@@ -39,6 +39,18 @@ const en = {
   "status.foundation": "Foundation ready",
   "theme.useDark": "Use dark theme",
   "theme.useLight": "Use light theme",
+  "auth.verifyEmail": "Verify your email",
+  "auth.codeSent": "Enter the 6-digit code sent to your university email. It expires in 10 minutes.",
+  "auth.verificationCode": "Verification code",
+  "auth.verify": "Verify email",
+  "auth.verifying": "Verifying...",
+  "auth.invalidCode": "The verification code is incorrect or unavailable.",
+  "auth.codeExpired": "This verification code has expired. Request a new code.",
+  "auth.tooManyAttempts": "Too many incorrect attempts. Request a new code.",
+  "auth.resendCode": "Resend code",
+  "auth.resendIn": "Resend available in",
+  "auth.resendFailed": "The code could not be resent. Please try again.",
+  "auth.verificationSuccess": "Your email is verified and your account is ready.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -82,6 +94,18 @@ const ar: Record<TranslationKey, string> = {
   "status.foundation": "الأساس جاهز",
   "theme.useDark": "استخدام الوضع الداكن",
   "theme.useLight": "استخدام الوضع الفاتح",
+  "auth.verifyEmail": "تأكيد البريد الإلكتروني",
+  "auth.codeSent": "أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الجامعي. تنتهي صلاحيته بعد 10 دقائق.",
+  "auth.verificationCode": "رمز التأكيد",
+  "auth.verify": "تأكيد البريد",
+  "auth.verifying": "جارٍ التأكيد...",
+  "auth.invalidCode": "رمز التأكيد غير صحيح أو غير متاح.",
+  "auth.codeExpired": "انتهت صلاحية رمز التأكيد. اطلب رمزًا جديدًا.",
+  "auth.tooManyAttempts": "عدد كبير من المحاولات الخاطئة. اطلب رمزًا جديدًا.",
+  "auth.resendCode": "إعادة إرسال الرمز",
+  "auth.resendIn": "يمكن إعادة الإرسال بعد",
+  "auth.resendFailed": "تعذر إعادة إرسال الرمز. حاول مرة أخرى.",
+  "auth.verificationSuccess": "تم تأكيد بريدك الإلكتروني وأصبح حسابك جاهزًا.",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

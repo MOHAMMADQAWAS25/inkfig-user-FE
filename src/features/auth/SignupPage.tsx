@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
@@ -26,10 +26,10 @@ const initialForm: RegistrationRequest = {
 
 export function SignupPage() {
   const { session } = useAuth();
+  const navigate = useNavigate();
   const { language, setLanguage, t } = useI18n();
   const [form, setForm] = useState<RegistrationRequest>(initialForm);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (session !== null) {
@@ -59,9 +59,10 @@ export function SignupPage() {
 
     setIsSubmitting(true);
     try {
-      await registerUser({ ...form, email });
-      setSuccess(true);
-      setForm(initialForm);
+      const response = await registerUser({ ...form, email });
+      navigate(`/${language}/verify-email`, {
+        state: { email: response.email, resendAfterSeconds: response.resend_after_seconds },
+      });
     } catch (requestError) {
       if (requestError instanceof ApiError && requestError.status === 409) {
         setError(t("auth.emailExists"));
@@ -82,14 +83,6 @@ export function SignupPage() {
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
 
-        {success ? (
-          <div className="success-panel" role="status">
-            <p>{t("auth.registrationSuccess")}</p>
-            <Link className="primary-button button-link" to={`/${language}/login`}>
-              {t("auth.continueToLogin")}
-            </Link>
-          </div>
-        ) : (
           <form className="form-stack" onSubmit={submit}>
             <label>
               <span>{t("auth.email")}</span>
@@ -129,7 +122,6 @@ export function SignupPage() {
               {isSubmitting ? t("auth.creatingAccount") : t("auth.createAccount")}
             </button>
           </form>
-        )}
 
         <p className="auth-switch">{t("auth.haveAccount")} <Link to={`/${language}/login`}>{t("auth.signIn")}</Link></p>
         <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>

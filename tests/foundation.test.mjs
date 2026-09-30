@@ -10,6 +10,7 @@ const appShell = readFileSync(new URL("../src/features/layout/AppShell.tsx", imp
 const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
+const verifyEmailPage = readFileSync(new URL("../src/features/auth/VerifyEmailPage.tsx", import.meta.url), "utf8");
 const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.meta.url), "utf8");
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
@@ -21,6 +22,15 @@ test("uses the approved frontend dependencies", () => {
   for (const forbidden of ["@mui/material", "bootstrap", "redux", "styled-components", "tailwindcss"]) {
     assert.equal(packageJson.dependencies[forbidden], undefined);
   }
+});
+
+test("requires a six-digit email verification code before login", () => {
+  assert.match(router, /\/:language\/verify-email/);
+  assert.match(registrationApi, /\/auth\/verify-email/);
+  assert.match(registrationApi, /\/auth\/resend-verification/);
+  assert.match(verifyEmailPage, /pattern="\[0-9\]\{6\}"/);
+  assert.match(verifyEmailPage, /one-time-code/);
+  assert.match(verifyEmailPage, /cooldown/);
 });
 
 test("provides localized welcome and signup routes with every required field", () => {
