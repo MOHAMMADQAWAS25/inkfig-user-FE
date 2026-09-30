@@ -6,6 +6,7 @@ const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.me
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const loginPage = readFileSync(new URL("../src/features/auth/LoginPage.tsx", import.meta.url), "utf8");
+const authenticationApi = readFileSync(new URL("../src/features/auth/authenticationApi.ts", import.meta.url), "utf8");
 const appShell = readFileSync(new URL("../src/features/layout/AppShell.tsx", import.meta.url), "utf8");
 const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
@@ -31,6 +32,14 @@ test("requires a six-digit email verification code before login", () => {
   assert.match(verifyEmailPage, /pattern="\[0-9\]\{6\}"/);
   assert.match(verifyEmailPage, /one-time-code/);
   assert.match(verifyEmailPage, /cooldown/);
+});
+
+test("logs in and logs out through the InkFig backend", () => {
+  assert.match(authenticationApi, /\/auth\/login/);
+  assert.match(authenticationApi, /\/auth\/logout/);
+  assert.match(loginPage, /loginUser/);
+  assert.match(loginPage, /setSession/);
+  assert.doesNotMatch(loginPage, /disabled type="submit"/);
 });
 
 test("provides localized welcome and signup routes with every required field", () => {

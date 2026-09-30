@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import type { AuthSession } from "../../shared/types";
+import { logoutUser } from "./authenticationApi";
 
 interface AuthContextValue {
   session: AuthSession | null;
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSessionState(nextSession);
       },
       signOut: () => {
+        if (session?.refreshToken) void logoutUser(session.refreshToken).catch(() => undefined);
         localStorage.removeItem(SESSION_KEY);
         setSessionState(null);
       },

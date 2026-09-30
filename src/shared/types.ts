@@ -11,6 +11,8 @@ export interface ApiErrorBody {
 
 export interface AuthSession {
   accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
   email: string;
   fullName: string;
   permissions: string[];

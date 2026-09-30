@@ -921,3 +921,75 @@ After signup, ask the user for the emailed verification code and allow the accou
 ### Notes
 
 The email is passed through transient router state and remains editable; it is not written to local storage or placed in the URL.
+
+## 2026-09-30 - Connect login to InkFig-owned authentication
+
+### Request
+
+Stop relying on Supabase Auth and use the InkFig user backend for login, JWT sessions, and logout.
+
+### Changes
+
+- Enabled the existing login form and connected it to the InkFig `/auth/login` endpoint.
+- Stores the returned InkFig access token, refresh token, expiry, and user summary in the existing authentication context.
+- Added loading, invalid-credential, and unverified-account feedback in Arabic and English.
+- Logout now asks the backend to revoke the refresh token and always clears the local session.
+- Preserved authentication-card visuals, routing, themes, RTL/LTR behavior, and responsive navigation.
+
+### Repositories
+
+- `inkfig-user-FE`: implements the InkFig login/logout client flow.
+- `inkfig-user-system`: owns password hashing, users, JWTs, refresh-token rotation, and revocation.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/authenticationApi.ts`: calls InkFig login and logout endpoints.
+- `src/features/auth/LoginPage.tsx`: submits credentials and creates the returned session.
+- `src/features/auth/AuthContext.tsx`: revokes the refresh token during logout.
+- `src/shared/types.ts`: adds refresh-token and expiry session fields.
+- `src/i18n/resources.ts`: adds Arabic and English authentication feedback.
+- `tests/foundation.test.mjs`: verifies login/logout backend integration.
+
+### API
+
+- `POST /api/v1/auth/login`: sends `email` and `password` and consumes the InkFig token/user response.
+- `POST /api/v1/auth/logout`: sends `refresh_token` for backend revocation.
+
+### Database
+
+- Migration: `20260930_003_move_authentication_to_inkfig.sql` in `inkfig-user-system`; it must run before this frontend is deployed.
+
+### Permissions and scope
+
+- Login and logout are public authentication operations.
+- The client does not grant permissions; it stores only permissions returned by the backend.
+- Future protected API authorization remains backend-enforced using InkFig JWT validation and database roles/scopes.
+
+### Frontend
+
+- Login now has controlled required email/password fields, submitting state, localized errors, and dashboard navigation after success.
+- Logout is resilient: local state is cleared even when remote revocation cannot be reached.
+- Existing welcome, signup, verification, theme, responsive, and localization behavior remains unchanged.
+
+### Verification
+
+- `[passed] npm test` - 9 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] production login` - backend migration/deployment must complete first.
+
+### Deployment
+
+- Deploy `inkfig-user-system` and migration 003 first, then deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No new frontend environment variables are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+The current session storage follows the existing local-storage architecture. Moving the refresh token to a backend-set HttpOnly cookie is recommended as a future browser-hardening improvement.
