@@ -2334,3 +2334,65 @@ No migration required.
 ### Notes
 
 Role-aware pages can be introduced later only when their requirements are explicitly defined.
+
+## 2026-10-01 - Make English the default language
+
+### Request
+
+Use English as the default language when visitors open InkFig without an explicit supported locale.
+
+### Changes
+
+- Changed the unknown/bare-path redirect from `/ar` to `/en`.
+- Changed localization fallback behavior to English unless the URL explicitly starts with `/ar`.
+- Preserved Arabic routes, the language switcher, RTL behavior, and all translated content.
+
+### Repositories
+
+- `inkfig-user-FE`: updated routing and localization defaults.
+
+### Files
+
+- `src/app/AppRouter.tsx`: redirects first visits and unknown paths to `/en`.
+- `src/i18n/I18nProvider.tsx`: uses English as the fallback locale.
+- `tests/foundation.test.mjs`: verifies the English routing and provider defaults.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, permissions, roles, or access scopes changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- `inkfig-hu.com` now resolves to `/en` by default.
+- Explicit `/ar` URLs continue rendering Arabic in RTL.
+- Explicit `/en` URLs render English in LTR.
+
+### Verification
+
+- `[passed] npm test` - 19 tests passed.
+- `[passed] npm run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No migration or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit
+- Push: `successful`
+
+### Notes
+
+None

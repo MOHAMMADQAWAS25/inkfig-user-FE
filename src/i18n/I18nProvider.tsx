@@ -48,5 +48,5 @@ export function useI18n(): I18nContextValue {
 }
 
 function getLanguage(pathname: string): Language {
-  return pathname.split("/").filter(Boolean)[0] === "en" ? "en" : "ar";
+  return pathname.split("/").filter(Boolean)[0] === "ar" ? "ar" : "en";
 }

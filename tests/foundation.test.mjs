@@ -19,6 +19,7 @@ const appProviders = readFileSync(new URL("../src/app/AppProviders.tsx", import.
 const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
 const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.url), "utf8");
+const i18nProvider = readFileSync(new URL("../src/i18n/I18nProvider.tsx", import.meta.url), "utf8");
 const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
@@ -175,7 +176,8 @@ test("uses the supplied responsive background on login and signup", () => {
 
 test("serves a public localized artwork gallery as the default experience", () => {
   assert.match(router, /path="\/:language" element=\{<HomePage \/>\}/);
-  assert.match(router, /Navigate replace to="\/ar"/);
+  assert.match(router, /Navigate replace to="\/en"/);
+  assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
   assert.match(homePage, /className="artwork-grid"/);
   assert.match(homePage, /gallery-primary-link/);
   assert.match(homePage, /session \?/);

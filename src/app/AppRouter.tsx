@@ -14,7 +14,7 @@ export function AppRouter() {
       <Route path="/:language/signup" element={<SignupPage />} />
       <Route path="/:language/verify-email" element={<VerifyEmailPage />} />
       <Route path="/:language/reset-password" element={<PasswordResetPage />} />
-      <Route path="*" element={<Navigate replace to="/ar" />} />
+      <Route path="*" element={<Navigate replace to="/en" />} />
     </Routes>
   );
 }
