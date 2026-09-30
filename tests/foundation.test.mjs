@@ -80,7 +80,6 @@ test("defines shared visual tokens and responsive RTL behavior", () => {
 
 test("uses the InkFig logo for application branding", () => {
   assert.match(indexHtml, /inkfig-logo\.svg/);
-  assert.match(loginPage, /inkfig-logo\.svg/);
   assert.match(appShell, /inkfig-logo\.svg/);
   assert.match(styles, /\.auth-logo/);
   assert.match(styles, /\.brand-logo/);
@@ -129,12 +128,11 @@ test("uses the supplied responsive background on login and signup", () => {
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
   assert.ok(loginPage.includes('className="auth-form-column login-form-column"'));
   assert.ok(signup.includes('className="auth-form-column signup-form-column"'));
-  assert.ok(loginPage.includes('className="auth-form-logo"'));
-  assert.ok(signup.includes('className="auth-form-logo"'));
-  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*100% 100%, contain/);
+  assert.doesNotMatch(loginPage, /inkfig-logo\.svg|auth-form-logo/);
+  assert.doesNotMatch(signup, /inkfig-logo\.svg|auth-form-logo/);
+  assert.match(styles, /\.auth-photo-background\s*\{[\s\S]*auth-background-light\.png[\s\S]*background-size:\s*100% 100%, cover/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-photo-background\s*\{[\s\S]*auth-background-dark\.png/);
   assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0/);
   assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
   assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);
-  assert.match(styles, /\.auth-form-logo\s*\{/);
 });

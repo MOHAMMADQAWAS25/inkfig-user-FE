@@ -131,7 +131,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     url("./assets/auth-background-light.png");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 100% 100%, contain;
+  background-size: 100% 100%, cover;
   background-attachment: fixed;
 }
 :root[data-theme="dark"] .auth-photo-background {
@@ -142,7 +142,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .auth-form-column {
   z-index: 1;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   max-height: calc(100svh - 40px);
   margin-left: auto;
   margin-right: 0;
@@ -151,7 +151,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .login-form-column { width: min(440px, 100%); }
 .signup-form-column { width: min(580px, 100%); }
-.auth-form-logo { display: block; width: min(210px, 58%); height: auto; margin: 0 auto 14px; filter: drop-shadow(0 8px 18px rgb(16 20 12 / 0.2)); }
 .auth-form-column .auth-card { width: 100%; max-height: 100%; overflow-x: hidden; overflow-y: auto; scrollbar-gutter: stable; }
 .auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
 .auth-layout-scroll { padding-block: 36px; }

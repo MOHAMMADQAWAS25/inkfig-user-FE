@@ -3,7 +3,6 @@ import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
-import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "./AuthContext";
@@ -78,7 +77,6 @@ export function SignupPage() {
     <main className="auth-layout auth-layout-scroll auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
       <div className="auth-form-column signup-form-column">
-        <img className="auth-form-logo" src={inkfigLogo} alt={t("app.name")} />
         <section className="auth-card signup-card" aria-labelledby="signup-title">
         <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="signup-title">{t("auth.createAccount")}</h1>

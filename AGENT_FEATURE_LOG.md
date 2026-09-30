@@ -1487,3 +1487,74 @@ No migration required.
 ### Notes
 
 The complete image is prioritized over filling every possible viewport dimension, so unusually shaped screens may show theme-colored letterboxing rather than crop the artwork.
+
+## 2026-09-30 - Restore full-page authentication backgrounds
+
+### Request
+
+Make the authentication pictures fill the page as before while remaining fixed, and remove the logos from sign-in and sign-up.
+
+### Changes
+
+- Restored `cover` sizing for both theme-specific background images so they fill the complete viewport without letterboxing.
+- Preserved fixed background attachment, viewport locking, and page-level overflow prevention.
+- Removed the logo elements and unused logo imports from login and signup.
+- Simplified each form column to a single scrollable card row after removing the logo row.
+- Updated regression coverage to require full-page cover rendering and prohibit authentication-page logos.
+
+### Repositories
+
+- `inkfig-user-FE`: corrected background sizing, removed authentication logos, and updated tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/LoginPage.tsx`: removes the sign-in logo.
+- `src/features/auth/SignupPage.tsx`: removes the sign-up logo.
+- `src/styles.css`: restores cover rendering and simplifies the logo-free form column.
+- `tests/foundation.test.mjs`: verifies cover sizing and absence of authentication-page logos.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Light and dark backgrounds once again fill the complete page using centered cover rendering.
+- The background and page remain fixed while overflow stays inside the form card.
+- Sign-in and sign-up no longer display the InkFig logo.
+- Desktop forms remain physically right-aligned in Arabic and English; narrow screens remain centered.
+
+### Verification
+
+- `[passed] npm test` - 12 tests passed after updating the obsolete logo expectation.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[failed] initial npm test` - the pre-existing branding test still required a login-page logo; the assertion was updated to match the requested removal and the suite then passed.
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+`cover` fills the viewport and may crop a small amount at extreme aspect ratios; this restores the requested full-page appearance without background scrolling.

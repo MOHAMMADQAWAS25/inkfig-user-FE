@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 
-import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "./AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
@@ -48,7 +47,6 @@ export function LoginPage() {
     <main className="auth-layout auth-photo-background">
       <div className="auth-theme-control"><ThemeToggle /></div>
       <div className="auth-form-column login-form-column">
-        <img className="auth-form-logo" src={inkfigLogo} alt={t("app.name")} />
         <section className="auth-card login-card" aria-labelledby="login-title">
         <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="login-title">{t("auth.welcome")}</h1>
