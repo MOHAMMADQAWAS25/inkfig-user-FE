@@ -79,7 +79,7 @@ export function SignupPage() {
       <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card signup-card" aria-labelledby="signup-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow">{t("app.name")}</p>
+        <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
 

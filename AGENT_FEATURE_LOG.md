@@ -1057,3 +1057,73 @@ No migration required.
 ### Notes
 
 The canonical brand spelling is case-sensitive: `InkFig`.
+
+## 2026-09-30 - Preserve InkFig capitalization on authentication pages
+
+### Request
+
+Make the visible brand label on sign-in and sign-up pages display exactly as `InkFig`.
+
+### Changes
+
+- Identified that the shared eyebrow style uppercased the already-correct `InkFig` translation at render time.
+- Added a brand-specific class that disables text transformation while retaining the existing eyebrow color and emphasis.
+- Applied the class to welcome, login, signup, and email-verification brand labels for consistent authentication branding.
+- Extended regression coverage to require the brand class and its case-preserving CSS rule.
+
+### Repositories
+
+- `inkfig-user-FE`: corrected rendered brand capitalization and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/auth/AuthLandingPage.tsx`: preserves canonical brand capitalization.
+- `src/features/auth/LoginPage.tsx`: preserves canonical brand capitalization.
+- `src/features/auth/SignupPage.tsx`: preserves canonical brand capitalization.
+- `src/features/auth/VerifyEmailPage.tsx`: preserves canonical brand capitalization.
+- `src/styles.css`: adds the scoped case-preserving brand rule.
+- `tests/foundation.test.mjs`: verifies authentication pages and CSS retain `InkFig` casing.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Authentication pages now render `InkFig` exactly, rather than visually transforming it to `INKFIG`.
+- Other eyebrow labels may continue using uppercase styling.
+- Localization, RTL/LTR behavior, themes, routes, forms, authentication flows, loading states, and errors are unchanged.
+
+### Verification
+
+- `[passed] deployed-bundle inspection` - production localization already contained `InkFig`; deployed CSS revealed the uppercase transformation.
+- `[passed] npm test` - 10 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, database, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The translation value was correct; the visible capitalization defect came solely from CSS `text-transform: uppercase`.

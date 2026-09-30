@@ -77,6 +77,10 @@ test("keeps the InkFig brand name untranslated in every locale", () => {
   assert.equal([...resources.matchAll(/"app\.name": "InkFig"/g)].length, 2);
   assert.match(resources, /"auth\.getStarted": "انضم إلى مجتمع InkFig"/);
   assert.doesNotMatch(resources, /إنكفِغ/);
+  for (const page of [loginPage, signup, verifyEmailPage]) {
+    assert.match(page, /className="eyebrow brand-name"/);
+  }
+  assert.match(styles, /\.brand-name\s*\{[^}]*text-transform:\s*none/);
 });
 
 test("provides persistent logo-derived light and dark themes", () => {

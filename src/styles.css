@@ -105,6 +105,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .page-header h1 { margin: 3px 0 7px; font-size: clamp(1.45rem, 3vw, 2rem); }
 .page-header p { margin: 0; color: var(--muted); }
 .eyebrow { margin: 0; color: var(--primary); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.brand-name { letter-spacing: 0.04em; text-transform: none; }
 .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text); background: var(--status-background); font-size: 0.78rem; white-space: nowrap; }
 .empty-state { display: grid; min-height: 260px; margin-top: 24px; padding: 28px; place-items: center; align-content: center; gap: 10px; border: 1px dashed var(--border-strong); border-radius: var(--radius); background: var(--empty-background); color: var(--muted); text-align: center; }
 .auth-layout {

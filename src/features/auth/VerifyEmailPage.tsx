@@ -70,7 +70,7 @@ export function VerifyEmailPage() {
       <div className="auth-theme-control"><ThemeToggle /></div>
       <section className="auth-card" aria-labelledby="verify-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow">{t("app.name")}</p>
+        <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="verify-title">{t("auth.verifyEmail")}</h1>
         <p className="muted-text">{t("auth.codeSent")}</p>
         {success ? (
