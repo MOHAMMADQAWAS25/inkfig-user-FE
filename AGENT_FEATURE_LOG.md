@@ -2396,3 +2396,77 @@ No migration required.
 ### Notes
 
 None
+## 2026-10-01 - Public artwork feed and upload interface
+
+### Request
+
+Connect the frontend to the new works backend so all visitors can see published user artwork and authenticated users can upload typed image works and interact through likes.
+
+### Changes
+
+- Replaced static home-page artwork data with the public backend feed, including loading, empty, and error states.
+- Added authenticated like/unlike controls with optimistic UI rollback on request failure; visitors can view counts but cannot interact.
+- Added a localized authenticated upload route and form for title, active work type, optional description, and supported image selection.
+- Uploads image files directly to the backend-issued Supabase signed URL and publishes metadata only after the upload succeeds.
+- Intentionally omitted hard-coded type filters because official system work types will be supplied later.
+
+### Repositories
+
+- `inkfig-user-FE`: added feed, upload, likes, localization, responsive styling, and tests.
+- `inkfig-main-system`: provides the API and database changes in a separate repository change.
+
+### Files
+
+- `src/features/works/worksApi.ts`: implements feed, type, signed upload, publish, and like requests.
+- `src/features/works/UploadWorkPage.tsx`: adds the authenticated artwork upload workflow.
+- `src/features/home/HomePage.tsx`: renders live public artwork and like controls.
+- `src/app/AppRouter.tsx`: adds `/:language/upload`.
+- `src/i18n/resources.ts`: adds English and Arabic work-flow strings.
+- `src/styles.css`: styles feed images, states, likes, and the responsive upload form.
+- `tests/foundation.test.mjs`: verifies works routes, endpoints, upload protocol, authentication guard, and file types.
+
+### API
+
+- `GET /api/v1/works`: loads the public published-artwork feed and passes the access token when available for viewer-like state.
+- `GET /api/v1/works/types`: loads active work types for the upload form.
+- `POST /api/v1/works/uploads`: submits work metadata and receives a signed Supabase upload URL.
+- `POST /api/v1/works/{work_id}/publish`: publishes the work after direct Storage upload succeeds.
+- `PUT /api/v1/works/{work_id}/like`: likes a work for the authenticated user.
+- `DELETE /api/v1/works/{work_id}/like`: removes the authenticated user's like.
+
+### Database
+
+- No migration required in this repository; `inkfig-main-system/migrations/20261001_001_create_works.sql` contains the required shared Supabase migration.
+
+### Permissions and scope
+
+- Everyone, including unregistered viewers, can view published artwork.
+- Only authenticated users see the upload action and can access the upload form or operate likes.
+- The frontend guard improves navigation, while ownership and authorization are validated by the backend.
+
+### Frontend
+
+- Added route `/:language/upload` with login redirection for unauthenticated visitors.
+- Added localized form, disabled/busy state, upload error handling, and a no-types state until official types are seeded.
+- Home cards use lazy-loaded real images, localized type names, artist names, like counts, and clear loading/empty/error states.
+- Existing English-default routing, RTL/LTR behavior, themes, responsive navigation, and authentication pages remain unchanged.
+
+### Verification
+
+- `[passed] npm test — 20 tests passed`
+- `[passed] npm run build — TypeScript checks and Vite production build completed`
+
+### Deployment
+
+- Deploy `inkfig-main-system` and run its migration before deploying `inkfig-user-FE`.
+- No new frontend environment variables are required; the existing main API URL is used.
+
+### Git
+
+- Branch: `main`
+- Commit: `bdb79e4`
+- Push: `successful`
+
+### Notes
+
+The upload form remains intentionally unavailable when no active work types exist. Add the official types through a later database migration before enabling real uploads for users.
