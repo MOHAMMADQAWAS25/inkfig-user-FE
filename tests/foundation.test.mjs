@@ -109,7 +109,7 @@ test("keeps the InkFig brand name untranslated in every locale", () => {
   assert.match(styles, /\.brand-name\s*\{[^}]*text-transform:\s*none/);
 });
 
-test("provides persistent logo-derived light and dark themes", () => {
+test("provides Palestine-time defaults and persistent manual themes", () => {
   assert.match(styles, /:root\[data-theme="dark"\]/);
   assert.match(styles, /--bg:\s*#f7f3d9/);
   assert.match(styles, /--bg:\s*#10140c/);
@@ -118,7 +118,12 @@ test("provides persistent logo-derived light and dark themes", () => {
   assert.match(styles, /--brand-fig:\s*#982824/);
   assert.match(appProviders, /ThemeProvider/);
   assert.match(themeProvider, /inkfig\.theme/);
-  assert.match(themeProvider, /prefers-color-scheme: dark/);
+  assert.match(themeProvider, /PALESTINE_TIME_ZONE = "Asia\/Hebron"/);
+  assert.match(themeProvider, /LIGHT_THEME_START_HOUR = 6/);
+  assert.match(themeProvider, /DARK_THEME_START_HOUR = 18/);
+  assert.match(themeProvider, /getPalestineTimeTheme/);
+  assert.match(themeProvider, /setInterval\(synchronizeWithPalestineTime, 60_000\)/);
+  assert.doesNotMatch(themeProvider, /prefers-color-scheme/);
   assert.match(themeToggle, /theme\.useLight/);
   assert.match(themeToggle, /theme\.useDark/);
 });

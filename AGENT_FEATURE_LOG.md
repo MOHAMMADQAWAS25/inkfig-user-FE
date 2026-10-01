@@ -2470,3 +2470,66 @@ Connect the frontend to the new works backend so all visitors can see published 
 ### Notes
 
 The upload form remains intentionally unavailable when no active work types exist. Add the official types through a later database migration before enabling real uploads for users.
+
+## 2026-10-01 - Select authentication artwork from Palestine local time
+
+### Request
+
+Use the matching light or dark full-screen artwork on sign-in, sign-up, and reset-password pages, defaulting the system theme according to the current time in Palestine while keeping the manual theme toggle.
+
+### Changes
+
+- Replaced the operating-system color-scheme default with a Palestine-time default using the IANA `Asia/Hebron` time zone, including its daylight-saving rules.
+- Uses light mode from 06:00 through 17:59 Palestine time and dark mode from 18:00 through 05:59.
+- Automatically rechecks Palestine time every minute while no manual preference exists, allowing an open authentication page to cross the day/night boundary.
+- Preserved the existing manual light/dark toggle and its saved `inkfig.theme` preference; a manual choice overrides automatic time selection.
+- Reused the existing paired HD artwork and crossfade, scoped to login, signup, and password-reset pages through their shared authentication background class.
+
+### Repositories
+
+- `inkfig-user-FE`: updated theme selection and regression coverage.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/theme/ThemeProvider.tsx`: selects and synchronizes the automatic theme using Palestine local time while preserving manual preferences.
+- `tests/foundation.test.mjs`: verifies the Palestine time zone, light/dark boundaries, periodic synchronization, and removal of the OS color-scheme default.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, or data-scope behavior changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Login, signup, and reset-password default to the daytime or nighttime artwork that matches Palestine local time.
+- The theme button immediately switches both the UI palette and artwork and saves the user's choice.
+- Other pages retain their existing backgrounds and continue to consume the shared theme normally.
+
+### Verification
+
+- `[passed] npm.cmd test` - 20 tests passed.
+- `[passed] npm.cmd run build` - TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[passed] Playwright visual inspection` - at 22:19 Palestine time login defaulted to the night artwork; the theme toggle switched to the daytime artwork; signup and reset-password exposed the shared theme control and authentication layout.
+- `[failed] initial npm invocation` - PowerShell execution policy blocked `npm.ps1`; verification was rerun with `npm.cmd`.
+- `[failed] initial sandboxed test/dev-server runs` - Node worker and esbuild process creation returned `EPERM`; the same commands passed outside the sandbox.
+
+### Deployment
+
+- Push `inkfig-user-FE` directly to `main` to trigger the existing Cloudflare deployment workflow.
+- No backend deployment, migration, secret, or environment-variable change is required.
+
+### Notes
+
+Automatic time selection applies only when the user has not saved a manual theme. Clearing the `inkfig.theme` browser storage value restores Palestine-time automatic behavior.
