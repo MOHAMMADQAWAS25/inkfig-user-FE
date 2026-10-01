@@ -21,6 +21,8 @@ const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.
 const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.url), "utf8");
 const i18nProvider = readFileSync(new URL("../src/i18n/I18nProvider.tsx", import.meta.url), "utf8");
 const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
+const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
+const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -185,6 +187,21 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ columns: 3 300px/);
   assert.match(resources, /"home\.collectionTitle"/);
+});
+
+test("loads public works and provides authenticated direct image uploads", () => {
+  assert.match(worksApi, /"GET", "\/works"/);
+  assert.match(worksApi, /"GET", "\/works\/types"/);
+  assert.match(worksApi, /"POST", "\/works\/uploads"/);
+  assert.match(worksApi, /method:"PUT"/);
+  assert.match(worksApi, /new FormData\(\)/);
+  assert.match(worksApi, /\/publish/);
+  assert.match(worksApi, /\/like/);
+  assert.match(router, /\/:language\/upload/);
+  assert.match(uploadWorkPage, /Navigate replace/);
+  assert.match(uploadWorkPage, /accept="image\/jpeg,image\/png,image\/webp,image\/gif"/);
+  assert.match(homePage, /getWorks/);
+  assert.match(homePage, /setWorkLike/);
 });
 
 test("provides polished authentication controls and reset-page motion", () => {

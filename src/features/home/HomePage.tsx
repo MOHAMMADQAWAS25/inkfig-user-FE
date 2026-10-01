@@ -1,23 +1,20 @@
 import { ArrowUpRight, Heart, Image, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
-
-const works = [
-  { id: 1, artist: "Lina Nasser", title: "Between the Hills", type: "Digital art", likes: 128, visual: "artwork-sunset" },
-  { id: 2, artist: "Yousef Amro", title: "Old City Rhythm", type: "Photography", likes: 94, visual: "artwork-city" },
-  { id: 3, artist: "Mira Qawasmi", title: "Roots", type: "Illustration", likes: 176, visual: "artwork-fig" },
-  { id: 4, artist: "Khaled Rajabi", title: "Blue Silence", type: "Painting", likes: 82, visual: "artwork-blue" },
-  { id: 5, artist: "Rana Jabari", title: "Threads of Home", type: "Mixed media", likes: 143, visual: "artwork-textile" },
-  { id: 6, artist: "Omar Tamimi", title: "Morning Study", type: "Sketch", likes: 67, visual: "artwork-sketch" },
-];
+import { getWorks, setWorkLike } from "../works/worksApi";
+import type { Work } from "../works/worksApi";
 
 export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, setLanguage, t } = useI18n();
+  const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
+  useEffect(()=>{setLoading(true);getWorks(session?.accessToken).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[session?.accessToken]);
+  async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(session.accessToken,work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
   return (
     <main className="gallery-home">
@@ -32,7 +29,7 @@ export function HomePage() {
         <div className="gallery-header-actions">
           <button className="gallery-language" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>{language === "ar" ? "English" : "العربية"}</button>
           <ThemeToggle />
-          {session ? <><span className="gallery-user-name">{session.fullName}</span><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
+          {session ? <><Link className="gallery-login-link" to={`/${language}/upload`}>{t("works.upload")}</Link><span className="gallery-user-name">{session.fullName}</span><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
         </div>
       </header>
 
@@ -51,20 +48,17 @@ export function HomePage() {
           <div><p>{t("home.collectionLabel")}</p><h2 id="gallery-feed-title">{t("home.collectionTitle")}</h2></div>
           <span>{t("home.viewerNote")}</span>
         </div>
-        <div className="gallery-filters" aria-label={t("home.filters")}>
-          {["all", "digital", "photography", "painting", "illustration"].map((filter, index) => <button className={index === 0 ? "active" : ""} key={filter} type="button">{t(`home.filter.${filter}` as Parameters<typeof t>[0])}</button>)}
-        </div>
-        <div className="artwork-grid">
+        {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:<div className="artwork-grid">
           {works.map((work) => (
-            <article className="artwork-card" key={work.id}>
-              <div className={`artwork-visual ${work.visual}`} role="img" aria-label={work.title}><span>{String(work.id).padStart(2, "0")}</span></div>
+            <article className="artwork-card" key={work.work_id}>
+              <img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" />
               <div className="artwork-details">
-                <div><p>{work.type}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist}</span></div>
-                <div className="artwork-likes" aria-label={`${work.likes} ${t("home.likes")}`}><Heart size={17} /> <span>{work.likes}</span></div>
+                <div><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist_name}</span></div>
+                <button className={`artwork-likes ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={17} fill={work.liked_by_me?"currentColor":"none"}/> <span>{work.like_count}</span></button>
               </div>
             </article>
           ))}
-        </div>
+        </div>}
       </section>
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
