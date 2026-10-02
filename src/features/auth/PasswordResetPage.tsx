@@ -5,6 +5,7 @@ import { Link, Navigate } from "react-router-dom";
 import { ApiError } from "../../api/httpClient";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
+import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "./AuthContext";
 import {
@@ -18,7 +19,7 @@ type Stage = "email" | "code" | "password" | "complete";
 
 export function PasswordResetPage() {
   const { session } = useAuth();
-  const { language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const [stage, setStage] = useState<Stage>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -110,10 +111,9 @@ export function PasswordResetPage() {
 
   return (
     <main className="auth-layout auth-photo-background">
-      <div className="auth-theme-control"><ThemeToggle /></div>
+      <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <section className="auth-card login-card auth-enter-from-end" aria-labelledby="reset-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow brand-name">{t("app.name")}</p>
         <h1 id="reset-title">{t("auth.resetPassword")}</h1>
         {stage === "complete" ? (
           <div className="success-panel" role="status">
@@ -148,7 +148,6 @@ export function PasswordResetPage() {
           </form>
         )}
         {stage !== "complete" && <p className="auth-switch"><Link to={`/${language}/login`}>{t("auth.backToLogin")}</Link></p>}
-        <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>{language === "ar" ? "English" : "العربية"}</button>
       </section>
     </main>
   );

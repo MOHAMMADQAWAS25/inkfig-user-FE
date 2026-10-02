@@ -244,3 +244,12 @@ test("keeps matching language and theme controls fixed at the physical top right
   assert.ok(styles.includes("top: 18px; right: 18px; bottom: auto; left: auto"));
   assert.ok(styles.includes(".auth-page-controls { display: flex; gap: 10px; direction: ltr; }"));
 });
+
+test("uses the fixed language and theme controls on signup and password reset", () => {
+  for (const page of [signup, passwordResetPage]) {
+    assert.ok(page.includes("auth-theme-control auth-page-controls"));
+    assert.ok(page.includes("<ThemeToggle /><LanguageToggle />"));
+    assert.doesNotMatch(page, /className="text-button"/);
+  }
+  assert.doesNotMatch(passwordResetPage, /className="eyebrow brand-name"/);
+});

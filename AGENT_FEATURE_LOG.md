@@ -2608,3 +2608,72 @@ No migration required.
 ### Notes
 
 Physical top/right positioning is intentional here; logical inline-end positioning would move the controls when the document switches to RTL.
+
+## 2026-10-02 - Extend fixed authentication controls to signup and password reset
+
+### Request
+
+Apply the sign-in page's fixed language and theme controls to signup and forgot-password, and remove the standalone InkFig word below the forgot-password logo.
+
+### Changes
+
+- Replaced the signup page's bottom text language switch with the shared icon language toggle beside the theme toggle.
+- Replaced the password-reset page's bottom text language switch with the same fixed control pair.
+- Kept both control pairs anchored at the physical top-right through language and theme changes by reusing the established authentication control group.
+- Removed the standalone InkFig brand-name line between the password-reset logo and heading while retaining the logo and accessible alt text.
+- Added regression coverage for both page integrations and the removed password-reset brand label.
+
+### Repositories
+
+- inkfig-user-FE: updated signup and password-reset presentation.
+- inkfig-user-system: no changes required.
+- inkfig-main-system: no changes required.
+
+### Files
+
+- src/features/auth/SignupPage.tsx: uses the fixed language/theme control pair and removes the old text language switch.
+- src/features/auth/PasswordResetPage.tsx: uses the fixed language/theme control pair and removes the redundant InkFig label and old text switch.
+- tests/foundation.test.mjs: verifies both control integrations and label removal.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, or data-scope behavior changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Signup and password reset now match sign-in with fixed language and theme icon buttons at the top-right.
+- Switching Arabic/English or light/dark mode does not move the controls.
+- Password reset no longer shows a separate InkFig word beneath the logo.
+- Form behavior, validation, routing, responsive layout, and background artwork are unchanged.
+
+### Verification
+
+- [passed] npm.cmd test - 22 tests passed.
+- [passed] npm.cmd run build - TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No backend deployment, migration, secret, or environment-variable change is required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+The shared controls reuse the existing sign-in implementation and styles; no new theme or localization behavior was introduced.
