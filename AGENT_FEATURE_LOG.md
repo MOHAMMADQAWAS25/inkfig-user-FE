@@ -2533,3 +2533,78 @@ No migration required.
 ### Notes
 
 Automatic time selection applies only when the user has not saved a manual theme. Clearing the `inkfig.theme` browser storage value restores Palestine-time automatic behavior.
+
+## 2026-10-02 - Fix sign-in language and theme controls at top right
+
+### Request
+
+Replace the sign-in page's text language switch with a button matching the theme control and keep both controls fixed at the top-right when either language or theme changes.
+
+### Changes
+
+- Added a reusable icon-only language toggle using the Lucide Languages icon and the existing localization provider.
+- Placed the language and theme toggles together in one sign-in control group.
+- Removed the old language text button from the bottom of the login card.
+- Changed authentication control positioning from direction-aware logical offsets to physical top and right offsets.
+- Forced stable left-to-right ordering inside the two-button group so switching between English and Arabic cannot swap or move the controls.
+- Reused the established theme-toggle visual treatment for the language button in both light and dark themes.
+- Added localized accessible labels and regression coverage for control wiring, styling, and positioning.
+
+### Repositories
+
+- inkfig-user-FE: added the sign-in language control and stable top-right control group.
+- inkfig-user-system: no changes required.
+- inkfig-main-system: no changes required.
+
+### Files
+
+- src/i18n/LanguageToggle.tsx: implements the localized icon language toggle.
+- src/features/auth/LoginPage.tsx: groups language and theme controls and removes the old text switch.
+- src/i18n/resources.ts: adds English and Arabic accessible action labels.
+- src/styles.css: fixes the control group to the physical top-right and preserves stable ordering.
+- tests/foundation.test.mjs: verifies integration and positional invariants.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, or data-scope behavior changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- The sign-in page now shows matching language and theme icon buttons at the top-right.
+- Switching Arabic/English changes content direction without moving or reordering the controls.
+- Switching light/dark theme changes their palette without changing their position.
+- Login submission, validation, routing, responsive layout, background artwork, and other pages are unchanged.
+
+### Verification
+
+- [passed] npm.cmd test - 21 tests passed.
+- [passed] npm.cmd run build - TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [failed] initial npm.cmd test - an existing selector assertion expected an ungrouped theme style; the language toggle now reuses the existing theme-toggle class and the full rerun passed.
+- [failed] initial npm.cmd run build - the LanguageToggle import was missing; it was added and the full rerun passed.
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No backend deployment, migration, secret, or environment-variable change is required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+Physical top/right positioning is intentional here; logical inline-end positioning would move the controls when the document switches to RTL.

@@ -198,7 +198,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .auth-form-column .auth-card::-webkit-scrollbar-track { border-radius: 999px; background: var(--auth-scrollbar-track); }
 .auth-form-column .auth-card::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: var(--auth-scrollbar-thumb); background-clip: padding-box; }
 .auth-form-column .auth-card::-webkit-scrollbar-thumb:hover { background: var(--auth-scrollbar-thumb-hover); background-clip: padding-box; }
-.auth-theme-control { position: fixed; inset-block-start: 18px; inset-inline-end: 18px; z-index: 5; }
+.auth-theme-control { position: fixed; top: 18px; right: 18px; bottom: auto; left: auto; z-index: 5; }
+.auth-page-controls { display: flex; gap: 10px; direction: ltr; }
 .auth-theme-control .theme-toggle {
   border-color: rgb(57 67 28 / 0.52);
   background: linear-gradient(145deg, rgb(57 67 28 / 0.78), rgb(32 40 25 / 0.68));

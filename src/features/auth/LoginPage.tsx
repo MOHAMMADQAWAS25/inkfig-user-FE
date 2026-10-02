@@ -5,6 +5,7 @@ import { Link, Navigate } from "react-router-dom";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "./AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
+import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { ApiError } from "../../api/httpClient";
 import { loginUser } from "./authenticationApi";
@@ -12,7 +13,7 @@ import { PasswordField } from "./PasswordField";
 
 export function LoginPage() {
   const { session, setSession } = useAuth();
-  const { language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +48,7 @@ export function LoginPage() {
 
   return (
     <main className="auth-layout auth-photo-background">
-      <div className="auth-theme-control"><ThemeToggle /></div>
+      <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <div className="auth-form-column login-form-column auth-enter-from-start">
         <section className="auth-card login-card" aria-labelledby="login-title">
         <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
@@ -64,9 +65,6 @@ export function LoginPage() {
           <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.signingIn") : t("auth.signIn")}</button>
         </form>
         <p className="auth-switch">{t("auth.noAccount")} <Link to={`/${language}/signup`}>{t("auth.signUp")}</Link></p>
-        <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>
-          {language === "ar" ? "English" : "العربية"}
-        </button>
         </section>
       </div>
     </main>

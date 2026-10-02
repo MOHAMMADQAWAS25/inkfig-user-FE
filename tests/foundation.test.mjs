@@ -20,6 +20,7 @@ const themeProvider = readFileSync(new URL("../src/theme/ThemeProvider.tsx", imp
 const themeToggle = readFileSync(new URL("../src/theme/ThemeToggle.tsx", import.meta.url), "utf8");
 const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.url), "utf8");
 const i18nProvider = readFileSync(new URL("../src/i18n/I18nProvider.tsx", import.meta.url), "utf8");
+const languageToggle = readFileSync(new URL("../src/i18n/LanguageToggle.tsx", import.meta.url), "utf8");
 const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
@@ -231,4 +232,15 @@ test("centers authentication forms with responsive signup columns and motion", (
   assert.match(styles, /transition: opacity 560ms ease/);
   assert.match(styles, /@media \(max-width: 760px\)[\s\S]*\.signup-form-grid \{ grid-template-columns: 1fr; \}/);
   assert.match(styles, /prefers-reduced-motion[\s\S]*animation-duration: 0\.01ms !important/);
+});
+test("keeps matching language and theme controls fixed at the physical top right on sign in", () => {
+  assert.ok(loginPage.includes("auth-theme-control auth-page-controls"));
+  assert.ok(loginPage.includes("<ThemeToggle /><LanguageToggle />"));
+  assert.doesNotMatch(loginPage, /className="text-button"/);
+  assert.ok(languageToggle.includes("Languages"));
+  assert.ok(languageToggle.includes("setLanguage(nextLanguage)"));
+  assert.ok(resources.includes('"language.useArabic"'));
+  assert.ok(resources.includes('"language.useEnglish"'));
+  assert.ok(styles.includes("top: 18px; right: 18px; bottom: auto; left: auto"));
+  assert.ok(styles.includes(".auth-page-controls { display: flex; gap: 10px; direction: ltr; }"));
 });
