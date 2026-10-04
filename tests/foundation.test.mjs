@@ -198,6 +198,8 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(styles, /\.artwork-grid \{ columns: 5 220px/);
   assert.match(styles, /\.artwork-pin-media/);
   assert.match(styles, /\.artwork-pin-like/);
+  assert.doesNotMatch(homePage, /<h3>\{work\.title\}<\/h3>/);
+  assert.match(homePage, /<span>\{work\.artist_name\}<\/span>/);
   assert.match(styles, /@media \(hover: none\)/);
   assert.match(resources, /"home\.collectionTitle"/);
 });

@@ -440,11 +440,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .artwork-image-button { display: block; width: 100%; padding: 0; overflow: hidden; border: 0; background: transparent; cursor: zoom-in; }
 .artwork-image-button .artwork-image { transition: transform 320ms ease; }
 .artwork-image-button:hover .artwork-image, .artwork-image-button:focus-visible .artwork-image { transform: scale(1.035); }
-.artwork-pin-like { position: absolute; z-index: 2; inset: 12px 12px auto auto; display: inline-flex; align-items: center; gap: 5px; min-height: 38px; padding: 8px 11px; border: 0; border-radius: 999px; background: #982824; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgb(0 0 0 / .22); opacity: 0; transform: translateY(-5px); transition: opacity 180ms ease,transform 180ms ease,background 180ms ease; }
+.artwork-pin-like { position: absolute; z-index: 2; inset: 12px 12px auto auto; display: inline-flex; align-items: center; gap: 5px; min-height: 38px; padding: 8px 11px; border: 0; border-radius: 999px; background: #982824; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgb(0 0 0 / .22); transition: background 180ms ease,transform 180ms ease; }
 [dir="rtl"] .artwork-pin-like { inset: 12px auto auto 12px; }
-.artwork-pin-media:hover .artwork-pin-like, .artwork-pin-media:focus-within .artwork-pin-like, .artwork-pin-like.liked { opacity: 1; transform: translateY(0); }
 .artwork-pin-like:hover { background: #7f211e; }
-.artwork-pin-like:disabled { cursor: default; opacity: 0; }
+.artwork-pin-like:disabled { cursor: default; opacity: 1; }
 .artwork-visual::before, .artwork-visual::after { position: absolute; border-radius: 46% 54% 62% 38%; content: ""; filter: blur(1px); transform: rotate(-18deg); }
 .artwork-visual::before { inset: 14% 12% 24% 18%; background: rgb(255 253 240 / 0.26); box-shadow: 34px 28px 0 rgb(57 67 28 / 0.2); }
 .artwork-visual::after { width: 42%; height: 36%; inset: auto 13% 10% auto; background: rgb(152 40 36 / 0.42); }
@@ -458,8 +457,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .artwork-sketch::before { inset: 18% 20%; border: 2px solid #39431c; border-radius: 50% 40% 58% 30%; background: transparent; box-shadow: 22px 18px 0 transparent; }
 .artwork-details { padding: 10px 7px 0; }
 .artwork-details p { margin: 5px 0 0; color: #982824; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
-.artwork-details h3 { margin: 0 0 4px; overflow: hidden; color: #39431c; font-size: .94rem; font-weight: 800; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
-.artwork-details > div > span { color: #667044; font-size: 0.76rem; }
+.artwork-details > div > span { display: block; overflow: hidden; color: #39431c; font-size: .86rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .artwork-likes { display: flex; align-items: center; gap: 5px; padding: 6px; border: 0; background: transparent; color: #982824; font-size: 0.82rem; cursor: pointer; }
 .artwork-likes:disabled { cursor: default; opacity: 0.72; }
 .gallery-state { margin: 54px 0; padding: 28px; border: 1px dashed rgb(57 67 28 / 0.3); border-radius: 14px; background: rgb(255 253 240 / 0.55); color: #58613d; text-align: center; }
@@ -568,7 +566,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .gallery-hero-title-accent { color: #a9b65f; }
 :root[data-theme="dark"] .gallery-hero-copy > p:not(.gallery-kicker), :root[data-theme="dark"] .gallery-section-heading > span { color: #b7b59a; }
 :root[data-theme="dark"] .artwork-card { background: transparent; }
-:root[data-theme="dark"] .artwork-details h3 { color: #f7f2d8; }
+:root[data-theme="dark"] .artwork-details > div > span { color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-filters button { border-color: #3b4828; background: rgb(23 29 17 / 0.86); color: #b7b59a; }
 :root[data-theme="dark"] .gallery-filters button.active, :root[data-theme="dark"] .gallery-filters button:hover { border-color: #a9b65f; background: #a9b65f; color: #20270f; }
 
