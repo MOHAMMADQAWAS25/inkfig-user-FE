@@ -3153,3 +3153,67 @@ No migration required.
 ### Notes
 
 The initial UI displays the latest 50 items in each collection; load-more controls can consume the existing cursor in a later ticket.
+
+## 2026-10-04 - Convert profile collections to navigation tabs
+
+### Request
+
+Present Posts and Likes as profile navigation instead of vertically stacked sections.
+
+### Changes
+
+- Replaced the stacked Posts and Likes collections with a tab-style profile navigation bar.
+- Displays only the selected collection and keeps each collection's item count in its navigation tab.
+- Added accessible tab roles, selected state, panel relationships, responsive equal-width mobile tabs, subtle panel transitions, dark theme, RTL behavior, and reduced-motion handling.
+- Kept profile loading, errors, empty states, artwork details, and like behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: changed the profile collection presentation to tabbed navigation.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: added active-tab state and accessible tab panels.
+- `src/i18n/resources.ts`: added the localized profile-navigation label.
+- `src/styles.css`: added responsive themed tab navigation and panel motion.
+- `tests/foundation.test.mjs`: verifies the tab navigation contract.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Profile access remains limited to authenticated users.
+- Backend ownership and liked-work scope remain authoritative and unchanged.
+
+### Frontend
+
+- Posts is selected by default.
+- Selecting Posts or Likes switches the visible collection without navigating away or reloading data.
+- Loading, error, empty, mobile, RTL/LTR, dark-theme, and reduced-motion states remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test — 26 tests passed`
+- `[passed] npm.cmd run build — TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, environment-variable, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `0723dce`
+- Push: `successful`
+
+### Notes
+
+Both collections are loaded together when the profile opens so switching tabs is immediate.
