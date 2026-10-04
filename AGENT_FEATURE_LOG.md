@@ -3693,3 +3693,66 @@ No migration required in this repository; user-system migration 007 is required.
 ### Notes
 
 Existing locally stored sessions without a role are discarded and require one new login.
+
+## 2026-10-05 - Color-code artwork type tags
+
+### Request
+
+Give every artwork type a distinct, highly polished tag color so categories are easy to distinguish.
+
+### Changes
+
+- Added a curated eight-color palette for the canonical artwork categories.
+- Upgraded tags with translucent gradients, coordinated borders and text, an accent marker, blur, and layered shadows.
+- Added deterministic fallback coloring for future work types so the same type always receives the same tone.
+- Kept the tag position, localized label, Pinterest card layout, uploader hover, and like count unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added professional category-specific tag styling.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: maps canonical and future work types to stable color tones.
+- `src/styles.css`: defines the polished tag system and eight accessible palettes.
+- `tests/foundation.test.mjs`: verifies tone selection and representative palette classes.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Tags remain public for guests and authenticated roles.
+- No authorization or data scope changed; backend authorization remains authoritative.
+
+### Frontend
+
+- Digital art uses violet, hand art terracotta, video crimson, audio teal, animation amber, games blue, interactive emerald, and VR/AR magenta.
+- English and Arabic labels, RTL/LTR placement, responsive behavior, and both themes are preserved.
+
+### Verification
+
+- `[passed] npm.cmd test - 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+- `[not run] browser visual inspection - browser-control runtime unavailable in this session`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `091c8ca`
+- Push: `successful`
+
+### Notes
+
+Future unknown types use a stable type-ID hash across the same curated palette rather than an arbitrary color.
