@@ -249,10 +249,16 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(profilePage, /getLikedWorks/);
   assert.match(profilePage, /profile\.posts/);
   assert.match(profilePage, /profile\.likes/);
+  assert.match(profilePage, /role="tablist"/);
+  assert.match(profilePage, /role="tab"/);
+  assert.match(profilePage, /aria-selected/);
+  assert.match(profilePage, /activeSection/);
+  assert.match(profilePage, /role="tabpanel"/);
   assert.match(profilePage, /ArtworkDetailModal/);
   assert.match(worksApi, /"\/works\/me"/);
   assert.match(worksApi, /"\/works\/likes"/);
   assert.match(styles, /\.profile-artwork-grid/);
+  assert.match(styles, /\.profile-tabs/);
   assert.equal([...resources.matchAll(/"profile\.likes"/g)].length, 2);
 });
 

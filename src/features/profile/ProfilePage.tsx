@@ -10,11 +10,10 @@ import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { getLikedWorks, getMyWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 
-function ProfileArtworkGrid({ empty, id, onSelect, title, works }: { empty:string; id:string; onSelect:(work:Work)=>void; title:string; works:Work[] }) {
-  return <section className="profile-collection" aria-labelledby={id}>
-    <div className="profile-section-title"><h2 id={id}>{title}</h2><span>{works.length}</span></div>
+function ProfileArtworkGrid({ empty, onSelect, works }: { empty:string; onSelect:(work:Work)=>void; works:Work[] }) {
+  return <div className="profile-collection">
     {works.length===0?<div className="profile-empty"><Image size={30}/><p>{empty}</p></div>:<div className="profile-artwork-grid">{works.map(work=><button className="profile-artwork" type="button" key={work.work_id} onClick={()=>onSelect(work)}><img src={work.image_url} alt={work.title} loading="lazy"/><span><strong>{work.title}</strong><small><Heart size={14} fill={work.liked_by_me?"currentColor":"none"}/>{work.like_count}</small></span></button>)}</div>}
-  </section>;
+  </div>;
 }
 
 export function ProfilePage() {
@@ -22,6 +21,7 @@ export function ProfilePage() {
   const {language,t}=useI18n();
   const [posts,setPosts]=useState<Work[]>([]);
   const [likes,setLikes]=useState<Work[]>([]);
+  const [activeSection,setActiveSection]=useState<"posts"|"likes">("posts");
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [loading,setLoading]=useState(true);
   const [failed,setFailed]=useState(false);
@@ -36,7 +36,11 @@ export function ProfilePage() {
   return <main className="profile-page">
     <header className="profile-header"><Link to={`/${language}`}><img src={inkfigLogo} alt={t("app.name")}/></Link><div><ThemeToggle/><Link className="gallery-login-link" to={`/${language}/upload`}><Upload size={16}/>{t("works.upload")}</Link><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></div></header>
     <section className="profile-intro"><div className="profile-avatar" aria-hidden="true">{session.fullName.trim().charAt(0).toUpperCase()}</div><div><p>{t("profile.label")}</p><h1>{session.fullName}</h1><span>{session.email}</span></div></section>
-    {loading?<p className="profile-state">{t("profile.loading")}</p>:failed?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<div className="profile-sections"><ProfileArtworkGrid id="profile-posts" title={t("profile.posts")} empty={t("profile.noPosts")} works={posts} onSelect={work=>setSelectedId(work.work_id)}/><ProfileArtworkGrid id="profile-likes" title={t("profile.likes")} empty={t("profile.noLikes")} works={likes} onSelect={work=>setSelectedId(work.work_id)}/></div>}
+    <nav className="profile-tabs" role="tablist" aria-label={t("profile.navigation")}>
+      <button id="profile-posts-tab" role="tab" type="button" aria-selected={activeSection==="posts"} aria-controls="profile-posts-panel" className={activeSection==="posts"?"active":""} onClick={()=>setActiveSection("posts")}>{t("profile.posts")}<span>{posts.length}</span></button>
+      <button id="profile-likes-tab" role="tab" type="button" aria-selected={activeSection==="likes"} aria-controls="profile-likes-panel" className={activeSection==="likes"?"active":""} onClick={()=>setActiveSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
+    </nav>
+    {loading?<p className="profile-state">{t("profile.loading")}</p>:failed?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<div className="profile-sections">{activeSection==="posts"?<div id="profile-posts-panel" role="tabpanel" aria-labelledby="profile-posts-tab"><ProfileArtworkGrid empty={t("profile.noPosts")} works={posts} onSelect={work=>setSelectedId(work.work_id)}/></div>:<div id="profile-likes-panel" role="tabpanel" aria-labelledby="profile-likes-tab"><ProfileArtworkGrid empty={t("profile.noLikes")} works={likes} onSelect={work=>setSelectedId(work.work_id)}/></div>}</div>}
     {selected&&<ArtworkDetailModal language={language} work={selected} canLike onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} t={t}/>}
   </main>;
 }
