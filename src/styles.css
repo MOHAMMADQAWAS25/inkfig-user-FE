@@ -383,7 +383,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr); align-items: end; gap: 60px; width: min(1240px, calc(100% - 40px)); min-height: 440px; margin-inline: auto; padding: 80px 24px 64px; }
 .gallery-hero-copy { max-width: 780px; }
 .gallery-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; color: #617d2b; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
-.gallery-hero h1 { max-width: 760px; margin: 0; color: #39431c; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.1rem, 7vw, 6.8rem); font-weight: 500; letter-spacing: -0.055em; line-height: 0.92; }
+.gallery-hero h1 { max-width: 760px; margin: 0; color: #39431c; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-size: clamp(4rem, 8.8vw, 8rem); font-weight: 900; letter-spacing: -0.045em; line-height: 0.76; text-transform: uppercase; }
+.gallery-hero-title { display: flex; flex-direction: column; align-items: flex-start; filter: drop-shadow(0 12px 22px rgb(57 67 28 / 0.08)); }
+.gallery-hero-title span { display: block; }
+.gallery-hero-title-outline { color: transparent; -webkit-text-stroke: 2px #982824; }
+.gallery-hero-title-accent { color: #779439; }
+[dir="rtl"] .gallery-hero-title { align-items: flex-start; font-family: Tahoma, Arial, sans-serif; font-size: clamp(3.5rem, 8vw, 7rem); letter-spacing: -0.035em; line-height: 0.84; text-transform: none; }
 .gallery-hero-copy > p:not(.gallery-kicker) { max-width: 650px; margin: 28px 0; color: #58613d; font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.75; }
 .gallery-explore { display: inline-flex; align-items: center; gap: 9px; padding-bottom: 6px; border-bottom: 2px solid #982824; color: #39431c; font-weight: 800; text-decoration: none; }
 .gallery-explore svg { transition: transform 180ms ease; }
@@ -517,6 +522,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .gallery-header .theme-toggle { border-color: #3b4828; background: rgb(16 20 12 / 0.84); color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-header .theme-toggle:hover { border-color: #617d2b; background: rgb(23 29 17 / 0.94); }
 :root[data-theme="dark"] .gallery-nav a, :root[data-theme="dark"] .gallery-login-link, :root[data-theme="dark"] .gallery-hero h1, :root[data-theme="dark"] .gallery-section-heading h2 { color: #f7f2d8; }
+:root[data-theme="dark"] .gallery-hero-title-outline { color: transparent; -webkit-text-stroke-color: #a9b65f; }
+:root[data-theme="dark"] .gallery-hero-title-accent { color: #a9b65f; }
 :root[data-theme="dark"] .gallery-hero-copy > p:not(.gallery-kicker), :root[data-theme="dark"] .gallery-section-heading > span { color: #b7b59a; }
 :root[data-theme="dark"] .artwork-card { border-color: #3b4828; background: rgb(23 29 17 / 0.94); }
 :root[data-theme="dark"] .artwork-details h3 { color: #f7f2d8; }

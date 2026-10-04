@@ -324,3 +324,13 @@ test("uses the fixed language and theme controls on signup and password reset", 
   }
   assert.doesNotMatch(passwordResetPage, /className="eyebrow brand-name"/);
 });
+
+test("features the Ink your world hero lockup", () => {
+  assert.match(homePage, /className="gallery-hero-title"/);
+  assert.match(homePage, /home\.titleInk/);
+  assert.match(homePage, /home\.titleYour/);
+  assert.match(homePage, /home\.titleWorld/);
+  assert.match(resources, /"home\.title": "Ink your world"/);
+  assert.match(styles, /\.gallery-hero-title-outline[^}]*-webkit-text-stroke:\s*2px #982824/);
+  assert.match(styles, /\.gallery-hero-title-accent\s*\{[^}]*color:\s*#779439/);
+});

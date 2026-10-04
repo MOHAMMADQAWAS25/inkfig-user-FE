@@ -3217,3 +3217,72 @@ No migration required.
 ### Notes
 
 Both collections are loaded together when the profile opens so switching tabs is immediate.
+## 2026-10-04 - Feature the Ink your world homepage hero
+
+### Request
+
+Replace the homepage phrase "Art lives where ideas are shared" with "Ink your world" and give it a catchy, noticeable presentation suited to the InkFig theme.
+
+### Changes
+
+- Replaced the previous homepage headline with a three-line "INK / YOUR / WORLD" typographic lockup.
+- Styled the first line as a strong solid wordmark, the middle line with a burgundy outline, and the final line in InkFig olive for a clear visual rhythm tied to the brand palette.
+- Added a subtle shadow, condensed display typography, fluid sizing, mobile scaling, and coordinated light/dark-theme colors.
+- Added a natural three-line Arabic adaptation while preserving a localized accessible headline for assistive technology.
+- Added regression coverage for the new headline structure, localization, and signature colors.
+
+### Repositories
+
+- inkfig-user-FE: updated the localized homepage hero and regression coverage.
+- inkfig-main-system: no changes required.
+- inkfig-user-system: no changes required.
+
+### Files
+
+- src/features/home/HomePage.tsx: renders the accessible three-line hero lockup.
+- src/i18n/resources.ts: replaces the old headline and adds English and Arabic line translations.
+- src/styles.css: adds responsive brand-themed typography for light, dark, LTR, and RTL modes.
+- tests/foundation.test.mjs: verifies the hero structure, copy, and visual tokens.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, ownership, or data scope changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The homepage now opens with a bold, stacked "INK YOUR WORLD" statement.
+- English uses the requested phrase; Arabic uses the localized "ارسم عالمك بالحبر" treatment.
+- The lockup scales fluidly across desktop and mobile and adapts to both themes.
+- Gallery content, navigation, category filters, artwork interactions, uploads, and profile behavior are unchanged.
+
+### Verification
+
+- [passed] npm.cmd test - 27 tests passed.
+- [passed] npm.cmd run build - strict TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No backend deployment, migration, environment-variable, or deployment-order change is required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+The outlined middle line deliberately uses the logo's burgundy accent while the final line uses the established gallery olive, making the message distinctive without introducing off-brand colors.

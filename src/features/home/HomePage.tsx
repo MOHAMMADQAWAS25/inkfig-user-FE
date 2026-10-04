@@ -51,7 +51,11 @@ export function HomePage() {
       <section className="gallery-hero" id="about">
         <div className="gallery-hero-copy">
           <p className="gallery-kicker"><Sparkles size={16} /> {t("home.kicker")}</p>
-          <h1>{t("home.title")}</h1>
+          <h1 className="gallery-hero-title" aria-label={t("home.title")}>
+            <span>{t("home.titleInk")}</span>
+            <span className="gallery-hero-title-outline">{t("home.titleYour")}</span>
+            <span className="gallery-hero-title-accent">{t("home.titleWorld")}</span>
+          </h1>
           <p>{t("home.description")}</p>
           <a className="gallery-explore" href="#discover">{t("home.explore")} <ArrowUpRight size={18} /></a>
         </div>
