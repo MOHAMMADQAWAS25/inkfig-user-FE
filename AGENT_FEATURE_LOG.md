@@ -2956,3 +2956,63 @@ Add an optional link field to work uploads and safely expose the link on publish
 ### Notes
 
 Live availability is not guaranteed by syntactic validation; destination sites can become unavailable at any time.
+## 2026-10-04 - Support multiple artwork links
+
+### Request
+
+Allow multiple safe optional links on each uploaded work.
+
+### Changes
+
+- Added dynamic add/remove controls for up to 10 links with optional labels.
+- Rejects incomplete, non-HTTP/HTTPS, duplicate, or excessive links before upload.
+- Renders all published links safely in new tabs with `noopener noreferrer` and responsive styling.
+
+### Repositories
+
+- `inkfig-user-FE`: multi-link form, request mapping, feed rendering, localization, styling, and tests.
+- `inkfig-main-system`: paired persistence and migration.
+
+### Files
+
+- `src/features/works/UploadWorkPage.tsx`: dynamic link rows.
+- `src/features/works/worksApi.ts`: validates and sends link arrays.
+- `src/features/home/HomePage.tsx`: renders ordered links.
+- `src/i18n/resources.ts`, `src/styles.css`, `tests/foundation.test.mjs`: localized responsive UI and coverage.
+
+### API
+
+- `POST /api/v1/works/uploads`: sends up to 10 `{url,label}` links.
+- `GET /api/v1/works`: consumes the ordered `links` array.
+
+### Database
+
+- No frontend migration; paired backend migration is `20261004_003_create_work_links.sql`.
+
+### Permissions and scope
+
+- Upload remains authenticated; published links are public; backend validation is authoritative.
+
+### Frontend
+
+- Users can add/remove up to 10 labeled links; mobile rows stack responsively and links open safely.
+
+### Verification
+
+- `[passed] npm.cmd test — 24 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy backend first, then frontend. No environment changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `e22cfcd`
+- Push: `successful`
+
+### Notes
+
+No live destination health check is performed because availability is transient and arbitrary server requests require dedicated SSRF defenses.
