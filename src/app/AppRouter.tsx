@@ -5,6 +5,7 @@ import { SignupPage } from "../features/auth/SignupPage";
 import { VerifyEmailPage } from "../features/auth/VerifyEmailPage";
 import { PasswordResetPage } from "../features/auth/PasswordResetPage";
 import { HomePage } from "../features/home/HomePage";
+import { ProfilePage } from "../features/profile/ProfilePage";
 import { UploadWorkPage } from "../features/works/UploadWorkPage";
 
 export function AppRouter() {
@@ -16,6 +17,7 @@ export function AppRouter() {
       <Route path="/:language/verify-email" element={<VerifyEmailPage />} />
       <Route path="/:language/reset-password" element={<PasswordResetPage />} />
       <Route path="/:language/upload" element={<UploadWorkPage />} />
+      <Route path="/:language/profile" element={<ProfilePage />} />
       <Route path="*" element={<Navigate replace to="/en" />} />
     </Routes>
   );

@@ -25,6 +25,7 @@ const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", impor
 const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDetailModal.tsx", import.meta.url), "utf8");
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
+const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -238,6 +239,21 @@ test("opens an accessible artwork detail modal with complete public metadata", (
   assert.match(artworkDetailModal, /event\.key === "Escape"/);
   assert.match(styles, /\.artwork-modal-backdrop/);
   assert.match(styles, /@media \(max-width: 780px\)/);
+});
+
+test("provides an authenticated profile with posts and likes collections", () => {
+  assert.match(router, /\/:language\/profile/);
+  assert.match(homePage, /\$\{language\}\/profile/);
+  assert.match(profilePage, /Navigate replace/);
+  assert.match(profilePage, /getMyWorks/);
+  assert.match(profilePage, /getLikedWorks/);
+  assert.match(profilePage, /profile\.posts/);
+  assert.match(profilePage, /profile\.likes/);
+  assert.match(profilePage, /ArtworkDetailModal/);
+  assert.match(worksApi, /"\/works\/me"/);
+  assert.match(worksApi, /"\/works\/likes"/);
+  assert.match(styles, /\.profile-artwork-grid/);
+  assert.equal([...resources.matchAll(/"profile\.likes"/g)].length, 2);
 });
 
 test("filters the homepage by all canonical artwork categories", () => {

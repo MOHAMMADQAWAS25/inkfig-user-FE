@@ -127,6 +127,13 @@ const en = {
   "works.emptyFile": "The selected image is empty or unavailable. Download it to your device and choose it again.",
   "works.fileTooLarge": "The selected image must be 10 MB or smaller.",
   "works.unsupportedFile": "Choose a JPEG, PNG, WebP, or GIF image.",
+  "profile.label": "Your InkFig profile",
+  "profile.posts": "Posts",
+  "profile.likes": "Likes",
+  "profile.noPosts": "You have not published any works yet.",
+  "profile.noLikes": "Works you like will appear here.",
+  "profile.loading": "Loading your profile…",
+  "profile.loadFailed": "Your profile could not be loaded right now.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -258,6 +265,13 @@ const ar: Record<TranslationKey, string> = {
   "works.emptyFile": "الصورة المحددة فارغة أو غير متاحة. نزّلها على جهازك ثم اخترها مرة أخرى.",
   "works.fileTooLarge": "يجب ألا يتجاوز حجم الصورة المحددة 10 ميجابايت.",
   "works.unsupportedFile": "اختر صورة بصيغة JPEG أو PNG أو WebP أو GIF.",
+  "profile.label": "ملفك الشخصي في InkFig",
+  "profile.posts": "المنشورات",
+  "profile.likes": "الإعجابات",
+  "profile.noPosts": "لم تنشر أي أعمال بعد.",
+  "profile.noLikes": "ستظهر هنا الأعمال التي أعجبتك.",
+  "profile.loading": "جارٍ تحميل ملفك الشخصي…",
+  "profile.loadFailed": "تعذر تحميل ملفك الشخصي حالياً.",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

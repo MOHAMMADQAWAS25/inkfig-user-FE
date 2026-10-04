@@ -28,6 +28,8 @@ export async function getWorks(token?: string, typeCode?: string): Promise<Work[
   const query = typeCode ? `?type_code=${encodeURIComponent(typeCode)}` : "";
   return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`, {token})).data.items;
 }
+export async function getMyWorks(token: string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me",{token})).data.items; }
+export async function getLikedWorks(token: string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes",{token})).data.items; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
 export async function uploadWork(token: string, input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
