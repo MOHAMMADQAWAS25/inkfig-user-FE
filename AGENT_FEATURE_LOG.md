@@ -3498,3 +3498,65 @@ No migration required.
 ### Notes
 
 This ticket changes only card presentation; data pagination and loading behavior were intentionally left unchanged.
+
+## 2026-10-05 - Simplify homepage pin metadata
+
+### Request
+
+Show only the uploader, artwork type, and like count on homepage pins and remove the artwork name.
+
+### Changes
+
+- Removed the artwork title from homepage pin metadata.
+- Kept the uploader name and localized artwork type below each image.
+- Kept the like count visible over the image for authenticated users and guests.
+- Left the complete artwork title, description, date, links, and likes available in the detail popup.
+
+### Repositories
+
+- `inkfig-user-FE`: simplified homepage pin content.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: removed the title from pins while retaining uploader, type, and likes.
+- `src/styles.css`: adjusted compact uploader styling and made like counts persistently visible.
+- `tests/foundation.test.mjs`: verifies the requested metadata contract.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Guests can view like counts but cannot change likes.
+- Authenticated like actions remain backend-authorized.
+
+### Frontend
+
+- Homepage pins show the image, uploader, type, and like count only.
+- Search, filters, popup details, profile layout, loading, errors, localization, themes, and responsive behavior are unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test — 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `830fbcd`
+- Push: `successful`
+
+### Notes
+
+None.
