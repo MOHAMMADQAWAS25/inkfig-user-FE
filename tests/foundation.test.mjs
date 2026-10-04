@@ -204,6 +204,8 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(worksApi, /file\.size <= 0/);
   assert.match(worksApi, /MAX_WORK_FILE_SIZE/);
   assert.match(worksApi, /WORK_IMAGE_TYPES/);
+  assert.match(worksApi, /url\.protocol === "http:" \|\| url\.protocol === "https:"/);
+  assert.match(worksApi, /external_url:input\.externalUrl\.trim\(\) \|\| null/);
   assert.match(worksApi, /\/publish/);
   assert.match(worksApi, /\/like/);
   assert.match(router, /\/:language\/upload/);
@@ -212,6 +214,10 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(uploadWorkPage, /handleFileChange/);
   assert.match(uploadWorkPage, /works\.emptyFile/);
   assert.match(uploadWorkPage, /event\.target\.value=""/);
+  assert.match(uploadWorkPage, /type="url"/);
+  assert.match(uploadWorkPage, /works\.linkOptional/);
+  assert.match(homePage, /work\.external_url/);
+  assert.match(homePage, /noopener noreferrer/);
   assert.match(homePage, /getWorks/);
   assert.match(homePage, /setWorkLike/);
 });

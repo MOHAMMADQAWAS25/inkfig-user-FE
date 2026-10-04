@@ -429,6 +429,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .upload-card > a { color: #617d2b; font-weight: 700; }
 .upload-card h1 { margin-bottom: 8px; color: #39431c; font-family: Georgia,serif; font-size: 2.5rem; }
 .upload-card textarea { min-height: 110px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; resize: vertical; }
+.artwork-external-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--brand-leaf); font-size: .8rem; font-weight: 700; text-decoration: none; }
+.artwork-external-link:hover { text-decoration: underline; }
 .gallery-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 34px clamp(24px, 6vw, 90px); border-top: 1px solid rgb(57 67 28 / 0.18); background: rgb(57 67 28 / 0.94); color: #eee7bd; }
 .gallery-footer img { width: 94px; filter: brightness(1.65); }
 .gallery-footer p { margin: 0; font-size: 0.85rem; }

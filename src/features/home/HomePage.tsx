@@ -1,4 +1,4 @@
-import { ArrowUpRight, Heart, Image, Sparkles } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Heart, Image, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -71,7 +71,7 @@ export function HomePage() {
             <article className="artwork-card" key={work.work_id}>
               <img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" />
               <div className="artwork-details">
-                <div><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist_name}</span></div>
+                <div><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist_name}</span>{work.external_url&&<a className="artwork-external-link" href={work.external_url} target="_blank" rel="noopener noreferrer">{t("works.openLink")} <ExternalLink size={14}/></a>}</div>
                 <button className={`artwork-likes ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={17} fill={work.liked_by_me?"currentColor":"none"}/> <span>{work.like_count}</span></button>
               </div>
             </article>
