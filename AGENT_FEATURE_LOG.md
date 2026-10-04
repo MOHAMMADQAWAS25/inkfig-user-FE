@@ -3623,3 +3623,73 @@ No migration required.
 ### Notes
 
 Touch devices show uploader names persistently because they do not provide a dependable hover interaction.
+## 2026-10-05 - Add role-aware frontend access
+
+### Request
+
+Make the frontend follow InkFig roles and permissions and provide role/account controls for administrators.
+
+### Changes
+
+- Stores role and permissions in token-free session metadata.
+- Guards upload and profile routes by permission.
+- Prevents unauthorized like actions.
+- Added a responsive user-administration page for role and account-status changes.
+- Frontend checks improve navigation only; backend remains authoritative.
+
+### Repositories
+
+- `inkfig-user-FE`: added role-aware navigation, guards, and administration.
+- `inkfig-user-system`: supplies sessions and administration APIs.
+- `inkfig-main-system`: enforces work permissions.
+
+### Files
+
+- `src/features/admin/AdminUsersPage.tsx`: administration table and controls.
+- `src/features/admin/administrationApi.ts`: account-management requests.
+- `src/shared/types.ts`, auth context/API/login: preserve role and permissions.
+- Upload, profile, and home features apply permission checks.
+- `src/styles.css`: responsive administration layout.
+
+### API
+
+- Consumes `GET /api/v1/admin/users`.
+- Consumes `PATCH /api/v1/admin/users/{user_id}/role`.
+- Consumes `PATCH /api/v1/admin/users/{user_id}/status`.
+
+### Database
+
+No migration required in this repository; user-system migration 007 is required.
+
+### Permissions and scope
+
+- users.read guards the administration route.
+- works.upload guards upload; profile.read_own guards profile; works.like guards likes.
+- Backend validates every operation and role hierarchy.
+
+### Frontend
+
+- Added `/:language/admin/users`.
+- Includes loading/error handling, responsive rows, role selection, ban/activate controls, and self-management prevention.
+- Public homepage remains available to everyone.
+
+### Verification
+
+- `[passed] npm.cmd test - 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy after both backends and migration 007.
+- No frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `9b255d3`
+- Push: `successful`
+
+### Notes
+
+Existing locally stored sessions without a role are discarded and require one new login.
