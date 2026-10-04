@@ -33,6 +33,7 @@ export function LoginPage() {
         email: response.email,
         fullName: response.full_name,
         permissions: response.permissions,
+        role: response.role,
         userId: response.user_id,
       });
     } catch (requestError) {

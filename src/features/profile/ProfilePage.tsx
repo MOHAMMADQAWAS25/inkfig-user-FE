@@ -9,6 +9,7 @@ import { useAuth } from "../auth/AuthContext";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { getLikedWorks, getMyWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
+import { hasPermission } from "../../lib/permissions";
 
 function ProfileArtworkGrid({ empty, onSelect, works }: { empty:string; onSelect:(work:Work)=>void; works:Work[] }) {
   return <div className="profile-collection">
@@ -29,6 +30,7 @@ export function ProfilePage() {
 
   useEffect(()=>{if(!session)return;setLoading(true);setFailed(false);Promise.all([getMyWorks(),getLikedWorks()]).then(([own,liked])=>{setPosts(own);setLikes(liked);}).catch(()=>setFailed(true)).finally(()=>setLoading(false));},[session]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
+  if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
 
   async function toggleLike(work:Work){const next=!work.liked_by_me;const update=(item:Work)=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item;setPosts(current=>current.map(update));setLikes(current=>next?current.map(update):current.filter(item=>item.work_id!==work.work_id));try{await setWorkLike(work.work_id,next);}catch{setPosts(current=>current.map(item=>item.work_id===work.work_id?work:item));if(!next)setLikes(current=>[work,...current.filter(item=>item.work_id!==work.work_id)]);}}
 

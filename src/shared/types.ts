@@ -14,4 +14,5 @@ export interface AuthSession {
   fullName: string;
   permissions: string[];
   userId: string;
+  role: "viewer" | "user" | "supervisor" | "admin" | "system_administrator";
 }

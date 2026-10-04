@@ -10,6 +10,7 @@ import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
+import { hasPermission } from "../../lib/permissions";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -33,7 +34,7 @@ export function HomePage() {
   const normalizedSearch=searchQuery.trim().toLocaleLowerCase(language);
   const visibleWorks=normalizedSearch ? works.filter(work=>[work.title,work.artist_name,work.description,language==="ar"?work.type_name_ar:work.type_name_en].some(value=>value?.toLocaleLowerCase(language).includes(normalizedSearch))) : works;
   useEffect(()=>{setLoading(true);setFeedError(false);getWorks(activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session]);
-  async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
+  async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
   return (
     <main className="gallery-home">

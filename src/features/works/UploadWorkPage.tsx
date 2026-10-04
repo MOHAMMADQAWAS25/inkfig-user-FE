@@ -6,12 +6,14 @@ import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { getWorkTypes, isValidWorkUrl, uploadWork, validateWorkFile } from "./worksApi";
 import type { WorkType } from "./worksApi";
+import { hasPermission } from "../../lib/permissions";
 
 export function UploadWorkPage() {
  const {session}=useAuth(); const {language,t}=useI18n(); const navigate=useNavigate();
  const [types,setTypes]=useState<WorkType[]>([]); const [file,setFile]=useState<File|null>(null); const [typeId,setTypeId]=useState(""); const [title,setTitle]=useState(""); const [description,setDescription]=useState(""); const [links,setLinks]=useState([{label:"",url:""}]); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
  useEffect(()=>{getWorkTypes().then(setTypes).catch(()=>setError(t("works.loadFailed")));},[t]);
  if(!session) return <Navigate replace to={`/${language}/login`} />;
+ if(!hasPermission(session.permissions,"works.upload")) return <Navigate replace to={`/${language}`} />;
  function fileErrorMessage(selectedFile:File){const issue=validateWorkFile(selectedFile);if(issue==="empty")return t("works.emptyFile");if(issue==="too-large")return t("works.fileTooLarge");if(issue==="unsupported")return t("works.unsupportedFile");return null;}
  function handleFileChange(event:ChangeEvent<HTMLInputElement>){const selected=event.target.files?.[0]??null;if(!selected){setFile(null);return;}const message=fileErrorMessage(selected);if(message){setFile(null);setError(message);event.target.value="";return;}setFile(selected);setError("");}
  function updateLink(index:number,field:"label"|"url",value:string){setLinks(current=>current.map((link,i)=>i===index?{...link,[field]:value}:link));}

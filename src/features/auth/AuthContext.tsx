@@ -52,8 +52,8 @@ function loadSession(): AuthSession | null {
   if (!value) return null;
   try {
     const stored = JSON.parse(value) as AuthSession;
-    if (!stored.email || !stored.fullName || !stored.userId || !Array.isArray(stored.permissions)) throw new Error("Invalid session");
-    const session: AuthSession = { email: stored.email, fullName: stored.fullName, permissions: stored.permissions, userId: stored.userId };
+    if (!stored.email || !stored.fullName || !stored.userId || !stored.role || !Array.isArray(stored.permissions)) throw new Error("Invalid session");
+    const session: AuthSession = { email: stored.email, fullName: stored.fullName, permissions: stored.permissions, role: stored.role, userId: stored.userId };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     return session;
   } catch {

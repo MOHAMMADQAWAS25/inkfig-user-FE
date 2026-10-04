@@ -605,3 +605,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 @media (max-width: 340px) { .artwork-grid { columns: 1; } }
 @media (hover: none) { .artwork-pin-like { opacity: 1; transform: none; } .artwork-pin-uploader { opacity: 1; transform: none; } }
+.admin-page { min-height: 100vh; padding: 32px; background: var(--color-bg); }
+.admin-card { width: min(1050px,100%); margin: auto; padding: 28px; border: 1px solid var(--color-border); border-radius: 20px; background: var(--color-surface); }
+.admin-user-list { display: grid; gap: 10px; margin-top: 24px; }
+.admin-user-row { display: grid; grid-template-columns: minmax(220px,1fr) 220px 100px; gap: 12px; align-items: center; padding: 14px; border: 1px solid var(--color-border); border-radius: 14px; }
+.admin-user-row div { display: grid; min-width: 0; }.admin-user-row span { overflow: hidden; color: var(--color-muted); text-overflow: ellipsis; }
+@media (max-width: 680px) { .admin-page { padding: 16px; }.admin-user-row { grid-template-columns: 1fr; } }

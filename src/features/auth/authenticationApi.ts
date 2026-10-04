@@ -6,6 +6,7 @@ export interface AuthenticationResponse {
   email: string;
   full_name: string;
   permissions: string[];
+  role: "viewer" | "user" | "supervisor" | "admin" | "system_administrator";
 }
 
 export async function loginUser(email: string, password: string): Promise<AuthenticationResponse> {
