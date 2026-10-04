@@ -9,11 +9,23 @@ import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 
+const workCategories = [
+  { code: "digital-art", label: "home.filter.digitalArt" },
+  { code: "hand-art", label: "home.filter.handArt" },
+  { code: "video", label: "home.filter.video" },
+  { code: "audio", label: "home.filter.audio" },
+  { code: "animation", label: "home.filter.animation" },
+  { code: "games", label: "home.filter.games" },
+  { code: "interactive", label: "home.filter.interactive" },
+  { code: "vr-ar", label: "home.filter.vrAr" },
+] as const;
+
 export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, setLanguage, t } = useI18n();
+  const [activeCategory, setActiveCategory] = useState("all");
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
-  useEffect(()=>{setLoading(true);getWorks(session?.accessToken).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[session?.accessToken]);
+  useEffect(()=>{setLoading(true);setFeedError(false);getWorks(session?.accessToken,activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session?.accessToken]);
   async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(session.accessToken,work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
   return (
@@ -47,6 +59,12 @@ export function HomePage() {
         <div className="gallery-section-heading">
           <div><p>{t("home.collectionLabel")}</p><h2 id="gallery-feed-title">{t("home.collectionTitle")}</h2></div>
           <span>{t("home.viewerNote")}</span>
+        </div>
+        <div className="gallery-filters" role="group" aria-label={t("home.filters")}>
+          <button className={activeCategory === "all" ? "active" : ""} type="button" aria-pressed={activeCategory === "all"} onClick={() => setActiveCategory("all")}>{t("home.filter.all")}</button>
+          {workCategories.map((category) => (
+            <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
+          ))}
         </div>
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:<div className="artwork-grid">
           {works.map((work) => (

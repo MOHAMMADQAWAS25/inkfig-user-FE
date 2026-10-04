@@ -196,7 +196,7 @@ test("serves a public localized artwork gallery as the default experience", () =
 });
 
 test("loads public works and provides authenticated direct image uploads", () => {
-  assert.match(worksApi, /"GET", "\/works"/);
+  assert.match(worksApi, /"GET", `\/works\$\{query\}`/);
   assert.match(worksApi, /"GET", "\/works\/types"/);
   assert.match(worksApi, /"POST", "\/works\/uploads"/);
   assert.match(worksApi, /method:"PUT"/);
@@ -208,6 +208,20 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(uploadWorkPage, /accept="image\/jpeg,image\/png,image\/webp,image\/gif"/);
   assert.match(homePage, /getWorks/);
   assert.match(homePage, /setWorkLike/);
+});
+
+test("filters the homepage by all canonical artwork categories", () => {
+  for (const code of ["digital-art", "hand-art", "video", "audio", "animation", "games", "interactive", "vr-ar"]) {
+    assert.ok(homePage.includes(`code: "${code}"`));
+  }
+  assert.match(homePage, /className="gallery-filters"/);
+  assert.match(homePage, /aria-pressed/);
+  assert.match(homePage, /setActiveCategory/);
+  assert.match(worksApi, /type_code=\$\{encodeURIComponent\(typeCode\)\}/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.gallery-filters button/);
+  for (const key of ["digitalArt", "handArt", "video", "audio", "animation", "games", "interactive", "vrAr"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"home\\.filter\\.${key}"`, "g"))].length, 2);
+  }
 });
 
 test("provides polished authentication controls and reset-page motion", () => {

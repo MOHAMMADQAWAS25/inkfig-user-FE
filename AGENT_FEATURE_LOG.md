@@ -2677,3 +2677,82 @@ No migration required.
 ### Notes
 
 The shared controls reuse the existing sign-in implementation and styles; no new theme or localization behavior was introduced.
+
+## 2026-10-04 - Add homepage artwork-category filters
+
+### Request
+
+Create Digital Art, Hand Art, Video, Audio, Animation, Games, Interactive, and VR/AR categories and place them on the homepage as navigation filters.
+
+### Changes
+
+- Added a canonical eight-category configuration with stable backend codes.
+- Added an accessible filter group below the homepage collection heading, including an All Works option.
+- Added active-state styling, `aria-pressed` state, and horizontal overflow for narrow screens.
+- Reloads the public feed from the backend whenever the selected category changes.
+- Added English and Arabic labels for all requested categories and removed obsolete placeholder categories.
+- Added dark-theme filter styling consistent with the existing gallery palette.
+- Extended the works client with an encoded optional `type_code` query parameter.
+- Added regression coverage for every canonical category, localized keys, accessibility state, API query construction, and dark styling.
+
+### Repositories
+
+- `inkfig-user-FE`: adds the localized functional homepage filter.
+- `inkfig-main-system`: seeds the categories and authoritatively filters published works.
+- `inkfig-user-system`: no changes required.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: renders and controls the category filter.
+- `src/features/works/worksApi.ts`: sends the optional encoded type code.
+- `src/i18n/resources.ts`: localizes all eight categories in English and Arabic.
+- `src/styles.css`: styles filter controls in light, dark, desktop, and narrow layouts.
+- `tests/foundation.test.mjs`: verifies the complete category-filter contract.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+- Calls `GET /api/v1/works?type_code=<canonical-code>` when a category is selected.
+- Calls the existing unfiltered `GET /api/v1/works` endpoint for All Works.
+- Response handling and authentication headers remain unchanged.
+
+### Database
+
+- Paired backend migration: `20261004_001_seed_work_categories.sql` in `inkfig-main-system`.
+- No frontend migration is required.
+
+### Permissions and scope
+
+- Category filters are public navigation controls and grant no permissions.
+- The backend remains authoritative for publication visibility and category filtering.
+- Like operations still require an authenticated session.
+
+### Frontend
+
+- Homepage visitors can navigate between All Works, Digital Art, Hand Art, Video, Audio, Animation, Games, Interactive, and VR/AR.
+- Labels follow the current Arabic/English locale and the active category is exposed visually and through `aria-pressed`.
+- Existing gallery cards, uploads, likes, themes, responsive behavior, and RTL layout are preserved.
+
+### Verification
+
+- `[passed] npm test` - 23 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[failed] initial npm test` - an older assertion required a literal `/works` URL; it was updated for the optional encoded query and the full suite then passed.
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Deploy `inkfig-main-system` and run migration `20261004_001_seed_work_categories.sql` first.
+- Deploy this frontend second through the existing Cloudflare workflow.
+- No new frontend environment variables are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+Filters request fresh backend results instead of filtering only the currently loaded page, so navigation remains correct as the gallery grows.

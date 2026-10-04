@@ -2,7 +2,10 @@ import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; created_at: string };
-export async function getWorks(token?: string): Promise<Work[]> { return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", "/works", {token})).data.items; }
+export async function getWorks(token?: string, typeCode?: string): Promise<Work[]> {
+  const query = typeCode ? `?type_code=${encodeURIComponent(typeCode)}` : "";
+  return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`, {token})).data.items;
+}
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
 export async function uploadWork(token: string, input: {typeId:string; title:string; description:string; file:File}): Promise<void> {
   const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {token, body:{type_id:input.typeId,title:input.title,description:input.description,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
