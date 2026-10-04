@@ -202,6 +202,10 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(homePage, /artwork-type-tag/);
   assert.match(homePage, /artwork-pin-uploader/);
   assert.match(styles, /\.artwork-type-tag/);
+  assert.match(homePage, /workTypeTone\(work\)/);
+  assert.match(styles, /artwork-type-tag--violet/);
+  assert.match(styles, /artwork-type-tag--terracotta/);
+  assert.match(styles, /artwork-type-tag--magenta/);
   assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-uploader/);
   assert.match(styles, /@media \(hover: none\)/);
   assert.match(resources, /"home\.collectionTitle"/);
