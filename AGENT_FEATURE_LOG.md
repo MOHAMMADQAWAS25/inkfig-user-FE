@@ -3016,3 +3016,70 @@ Allow multiple safe optional links on each uploaded work.
 ### Notes
 
 No live destination health check is performed because availability is transient and arbitrary server requests require dedicated SSRF defenses.
+
+## 2026-10-04 - Add artwork detail popup
+
+### Request
+
+Open a polished popup card when a visitor selects an artwork image and show the work's full public information.
+
+### Changes
+
+- Added an artwork detail modal containing the full image, title, artist, localized type, description, localized upload date and time, like count/state, and every related link.
+- Kept likes synchronized between the gallery card and the popup through the existing authenticated like workflow.
+- Added close-button, backdrop, and Escape-key dismissal, background scroll locking, initial close-button focus, reduced-motion support, RTL layout, dark theme, and responsive mobile presentation.
+- Kept the existing public feed, upload behavior, API contract, and authorization rules unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added the artwork detail interaction and presentation.
+
+### Files
+
+- `src/features/home/ArtworkDetailModal.tsx`: added the accessible detail modal.
+- `src/features/home/HomePage.tsx`: opens the modal from an artwork image and shares live work state.
+- `src/i18n/resources.ts`: added English and Arabic detail-view messages.
+- `src/styles.css`: added responsive, themed popup styling and motion.
+- `tests/foundation.test.mjs`: added detail-popup regression coverage.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Artwork details remain publicly visible to guests and authenticated users.
+- Only authenticated users can like or unlike a work; the backend continues to validate authorization.
+- No role, ownership, or data scope changed.
+
+### Frontend
+
+- Selecting an artwork image opens a localized modal with all public metadata already returned by the feed.
+- The modal supports desktop and mobile layouts, RTL/LTR, light/dark themes, loading-independent local rendering, safe external links, keyboard dismissal, and reduced motion.
+- Empty descriptions use a localized fallback and the links section is omitted when no links exist.
+
+### Verification
+
+- `[passed] npm.cmd test — 25 tests passed`
+- `[passed] npm.cmd run build — TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[not run] browser interaction test — automated source, accessibility-contract, and production-build checks cover this frontend-only change`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No migration, environment-variable, backend, or ordering changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `7be7e31`
+- Push: `successful`
+
+### Notes
+
+The modal displays all public work fields intended for visitors; internal identifiers and storage metadata remain hidden from the UI.
