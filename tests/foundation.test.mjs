@@ -7,6 +7,8 @@ const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const loginPage = readFileSync(new URL("../src/features/auth/LoginPage.tsx", import.meta.url), "utf8");
 const authenticationApi = readFileSync(new URL("../src/features/auth/authenticationApi.ts", import.meta.url), "utf8");
+const authContext = readFileSync(new URL("../src/features/auth/AuthContext.tsx", import.meta.url), "utf8");
+const sharedTypes = readFileSync(new URL("../src/shared/types.ts", import.meta.url), "utf8");
 const router = readFileSync(new URL("../src/app/AppRouter.tsx", import.meta.url), "utf8");
 const signup = readFileSync(new URL("../src/features/auth/SignupPage.tsx", import.meta.url), "utf8");
 const registrationApi = readFileSync(new URL("../src/features/auth/registrationApi.ts", import.meta.url), "utf8");
@@ -226,6 +228,19 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(homePage, /ArtworkDetailModal/);
   assert.match(homePage, /setSelectedWorkId/);
   assert.match(homePage, /artwork-image-button/);
+});
+
+test("keeps authentication tokens in secure backend cookies and refreshes expired access", () => {
+  assert.match(authenticationApi, /"\/auth\/login"/);
+  assert.match(authenticationApi, /"\/auth\/logout"/);
+  assert.doesNotMatch(authenticationApi, /access_token:\s*string|refresh_token:\s*string/);
+  assert.doesNotMatch(authContext, /\.accessToken|\.refreshToken/);
+  assert.doesNotMatch(sharedTypes, /accessToken|refreshToken/);
+  assert.doesNotMatch(loginPage, /response\.access_token|response\.refresh_token/);
+  assert.match(readFileSync(new URL("../src/api/httpClient.ts", import.meta.url), "utf8"), /credentials:\s*"include"/);
+  assert.match(readFileSync(new URL("../src/api/httpClient.ts", import.meta.url), "utf8"), /\/auth\/refresh/);
+  assert.match(readFileSync(new URL("../src/api/httpClient.ts", import.meta.url), "utf8"), /response\.status === 401/);
+  assert.doesNotMatch(worksApi, /Authorization|\{token\}/);
 });
 
 test("opens an accessible artwork detail modal with complete public metadata", () => {

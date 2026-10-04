@@ -27,11 +27,10 @@ export function ProfilePage() {
   const [failed,setFailed]=useState(false);
   const selected=[...posts,...likes].find(work=>work.work_id===selectedId)??null;
 
-  useEffect(()=>{if(!session)return;setLoading(true);setFailed(false);Promise.all([getMyWorks(session.accessToken),getLikedWorks(session.accessToken)]).then(([own,liked])=>{setPosts(own);setLikes(liked);}).catch(()=>setFailed(true)).finally(()=>setLoading(false));},[session]);
+  useEffect(()=>{if(!session)return;setLoading(true);setFailed(false);Promise.all([getMyWorks(),getLikedWorks()]).then(([own,liked])=>{setPosts(own);setLikes(liked);}).catch(()=>setFailed(true)).finally(()=>setLoading(false));},[session]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
-  const accessToken=session.accessToken;
 
-  async function toggleLike(work:Work){const next=!work.liked_by_me;const update=(item:Work)=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item;setPosts(current=>current.map(update));setLikes(current=>next?current.map(update):current.filter(item=>item.work_id!==work.work_id));try{await setWorkLike(accessToken,work.work_id,next);}catch{setPosts(current=>current.map(item=>item.work_id===work.work_id?work:item));if(!next)setLikes(current=>[work,...current.filter(item=>item.work_id!==work.work_id)]);}}
+  async function toggleLike(work:Work){const next=!work.liked_by_me;const update=(item:Work)=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item;setPosts(current=>current.map(update));setLikes(current=>next?current.map(update):current.filter(item=>item.work_id!==work.work_id));try{await setWorkLike(work.work_id,next);}catch{setPosts(current=>current.map(item=>item.work_id===work.work_id?work:item));if(!next)setLikes(current=>[work,...current.filter(item=>item.work_id!==work.work_id)]);}}
 
   return <main className="profile-page">
     <header className="profile-header"><Link to={`/${language}`}><img src={inkfigLogo} alt={t("app.name")}/></Link><div><ThemeToggle/><Link className="gallery-login-link" to={`/${language}/upload`}><Upload size={16}/>{t("works.upload")}</Link><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></div></header>

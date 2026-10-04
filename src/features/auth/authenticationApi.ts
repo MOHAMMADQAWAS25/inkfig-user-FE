@@ -1,9 +1,6 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
 export interface AuthenticationResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: "bearer";
   expires_in: number;
   user_id: string;
   email: string;
@@ -18,8 +15,6 @@ export async function loginUser(email: string, password: string): Promise<Authen
   return response.data;
 }
 
-export async function logoutUser(refreshToken: string): Promise<void> {
-  await requestJson<null>(userApiBaseUrl, "POST", "/auth/logout", {
-    body: { refresh_token: refreshToken },
-  });
+export async function logoutUser(): Promise<void> {
+  await requestJson<null>(userApiBaseUrl, "POST", "/auth/logout");
 }

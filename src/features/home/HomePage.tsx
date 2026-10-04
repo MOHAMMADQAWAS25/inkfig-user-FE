@@ -32,8 +32,8 @@ export function HomePage() {
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
   const normalizedSearch=searchQuery.trim().toLocaleLowerCase(language);
   const visibleWorks=normalizedSearch ? works.filter(work=>[work.title,work.artist_name,work.description,language==="ar"?work.type_name_ar:work.type_name_en].some(value=>value?.toLocaleLowerCase(language).includes(normalizedSearch))) : works;
-  useEffect(()=>{setLoading(true);setFeedError(false);getWorks(session?.accessToken,activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session?.accessToken]);
-  async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(session.accessToken,work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
+  useEffect(()=>{setLoading(true);setFeedError(false);getWorks(activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session]);
+  async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
   return (
     <main className="gallery-home">

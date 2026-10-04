@@ -24,23 +24,23 @@ export function isValidWorkUrl(value: string): boolean {
     return false;
   }
 }
-export async function getWorks(token?: string, typeCode?: string): Promise<Work[]> {
+export async function getWorks(typeCode?: string): Promise<Work[]> {
   const query = typeCode ? `?type_code=${encodeURIComponent(typeCode)}` : "";
-  return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`, {token})).data.items;
+  return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`)).data.items;
 }
-export async function getMyWorks(token: string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me",{token})).data.items; }
-export async function getLikedWorks(token: string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes",{token})).data.items; }
+export async function getMyWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me")).data.items; }
+export async function getLikedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes")).data.items; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
-export async function uploadWork(token: string, input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
+export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
   const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label.trim()||null}));
   if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
-  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {token, body:{type_id:input.typeId,title:input.title,description:input.description,links,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
+  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {body:{type_id:input.typeId,title:input.title,description:input.description,links,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
   const body = new FormData();
   body.append("cacheControl", "3600");
   body.append("", input.file);
   const uploaded = await fetch(prepared.upload_url, {method:"PUT", headers:{"x-upsert":"false"}, body});
   if (!uploaded.ok) throw new Error("Upload failed");
-  await requestJson<null>(mainApiBaseUrl, "POST", `/works/${prepared.work_id}/publish`, {token});
+  await requestJson<null>(mainApiBaseUrl, "POST", `/works/${prepared.work_id}/publish`);
 }
-export async function setWorkLike(token:string, id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`, {token}); }
+export async function setWorkLike(id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`); }

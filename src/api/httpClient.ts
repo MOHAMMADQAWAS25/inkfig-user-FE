@@ -14,21 +14,20 @@ export async function requestJson<TData>(
   baseUrl: string,
   method: HttpMethod,
   path: string,
-  options: { body?: unknown; token?: string; signal?: AbortSignal } = {},
+  options: { body?: unknown; signal?: AbortSignal } = {},
 ): Promise<ApiResult<TData>> {
   const headers: Record<string, string> = { Accept: "application/json" };
-  const request: RequestInit = { method, headers, signal: options.signal };
-
-  if (options.token?.trim()) {
-    headers.Authorization = `Bearer ${options.token.trim()}`;
-  }
+  const request: RequestInit = { method, headers, signal: options.signal, credentials: "include" };
 
   if (options.body !== undefined) {
     headers["Content-Type"] = "application/json";
     request.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
+  let response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
+  if (response.status === 401 && normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) && await refreshSession()) {
+    response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
+  }
   const data = await parseResponse<TData>(response);
 
   if (!response.ok) {
@@ -40,6 +39,24 @@ export async function requestJson<TData>(
 
 export const userApiBaseUrl = import.meta.env.VITE_USER_API_BASE_URL ?? "http://localhost:8001/api/v1";
 export const mainApiBaseUrl = import.meta.env.VITE_MAIN_API_BASE_URL ?? "http://localhost:8000/api/v1";
+
+let refreshRequest: Promise<boolean> | null = null;
+
+async function refreshSession(): Promise<boolean> {
+  if (refreshRequest) return refreshRequest;
+  refreshRequest = fetch(`${normalizeBaseUrl(userApiBaseUrl)}/auth/refresh`, {
+    method: "POST",
+    headers: { Accept: "application/json" },
+    credentials: "include",
+  }).then((response) => {
+    if (!response.ok) window.dispatchEvent(new Event("inkfig:auth-expired"));
+    return response.ok;
+  }).catch(() => {
+    window.dispatchEvent(new Event("inkfig:auth-expired"));
+    return false;
+  }).finally(() => { refreshRequest = null; });
+  return refreshRequest;
+}
 
 function normalizeBaseUrl(value: string): string {
   return value.replace(/\/+$/, "");

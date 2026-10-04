@@ -30,9 +30,6 @@ export function LoginPage() {
     try {
       const response = await loginUser(email.trim().toLowerCase(), password);
       setSession({
-        accessToken: response.access_token,
-        refreshToken: response.refresh_token,
-        expiresIn: response.expires_in,
         email: response.email,
         fullName: response.full_name,
         permissions: response.permissions,
