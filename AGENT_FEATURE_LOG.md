@@ -3364,3 +3364,74 @@ No migration required.
 ### Notes
 
 A real profile photo can replace the initial avatar once the user/session API exposes an avatar URL; this ticket does not invent or persist profile-image data.
+
+## 2026-10-05 - Use secure cookie sessions with automatic refresh
+
+### Request
+
+Stop storing authentication tokens in browser storage, use secure HTTP-only cookies, and keep sessions working after the 15-minute access token expires.
+
+### Changes
+
+- Removed access and refresh tokens from frontend types, login handling, localStorage, and API method parameters.
+- All API requests include cookies without exposing their values to JavaScript.
+- A main-API 401 triggers one shared refresh request and retries the original request once.
+- Concurrent expired requests share one refresh operation; failure clears local session metadata.
+- Legacy localStorage records are sanitized to retain only non-secret user metadata.
+- Preserved the concurrently added homepage hero, search, and profile-menu changes during rebase.
+
+### Repositories
+
+- `inkfig-user-FE`: credentialed requests, automatic refresh, and token-free session state.
+- `inkfig-user-system`: sets and rotates HTTP-only cookies.
+- `inkfig-main-system`: validates the access cookie.
+
+### Files
+
+- `src/api/httpClient.ts`: credentials, single-flight refresh, retry, and expiry event.
+- `src/features/auth/AuthContext.tsx`: token-free persisted metadata and expiry handling.
+- `src/features/auth/authenticationApi.ts`, `LoginPage.tsx`, `src/shared/types.ts`: token-free session handling.
+- Work, home, profile, upload, and like clients: removed bearer-token plumbing.
+- `tests/foundation.test.mjs`: verifies cookie credentials, refresh, and absence of stored tokens.
+
+### API
+
+- Authentication responses contain token-free session metadata; cookies carry credentials.
+- Main API requests retry once after successful `POST /api/v1/auth/refresh`.
+- No token value is read or sent by frontend JavaScript.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Protected routes and actions remain backend-authorized.
+- Cookies follow browser Domain, Path, Secure, HttpOnly, and SameSite rules.
+- Failed refresh removes the local signed-in presentation.
+
+### Frontend
+
+- Sessions survive access-token expiry and browser reload while the 30-day refresh cookie is valid.
+- Login, logout, upload, profile, likes, localization, responsive behavior, loading states, and errors remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test — 27 tests passed before rebase; full suite rerun after conflict resolution`
+- `[passed] npm.cmd run build before rebase; production build rerun after conflict resolution`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy after both backends through the existing Cloudflare workflow.
+- No frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `8afb837`
+- Push: `successful`
+
+### Notes
+
+Only non-secret profile metadata remains in localStorage; tokens are inaccessible to frontend JavaScript.
