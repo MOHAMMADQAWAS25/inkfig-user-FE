@@ -3083,3 +3083,73 @@ No migration required.
 ### Notes
 
 The modal displays all public work fields intended for visitors; internal identifiers and storage metadata remain hidden from the UI.
+
+## 2026-10-04 - Add user profile page
+
+### Request
+
+Add a profile page that shows each authenticated user their own posts and a section named Likes containing works they liked.
+
+### Changes
+
+- Added a protected localized profile page with user identity, Posts, and Likes sections.
+- Added responsive artwork grids, counts, empty states, loading and error states, mobile navigation, RTL, and dark-theme styling.
+- Linked the user's name in the homepage navigation to their profile.
+- Reused the artwork detail popup and existing optimistic like workflow; unliked works leave the Likes collection.
+- Kept signup, login, uploads, public gallery, and other navigation unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added the profile route, API calls, UI, localization, styles, and tests.
+- `inkfig-main-system`: provides backend-scoped posts and likes feeds.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: added the protected profile experience.
+- `src/features/works/worksApi.ts`: added current-user posts and liked-work requests.
+- `src/app/AppRouter.tsx`: added `/:language/profile`.
+- `src/features/home/HomePage.tsx`: linked the authenticated user's name to the profile.
+- `src/i18n/resources.ts`, `src/styles.css`, `tests/foundation.test.mjs`: localization, responsive presentation, and regression coverage.
+
+### API
+
+- `GET /api/v1/works/me`: loads the authenticated user's published posts.
+- `GET /api/v1/works/likes`: loads published works liked by the authenticated user.
+- Both requests send the current access token and handle loading or request failure without exposing stale data.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The profile route redirects guests to the localized sign-in page.
+- Posts and likes are scoped from the authenticated token by the backend, not a client-provided user ID.
+- Like changes remain backend-authorized.
+
+### Frontend
+
+- Added `/:language/profile`, linked from the homepage user name.
+- Shows profile identity, Posts and Likes collections, counts, empty states, error/loading feedback, detail dialogs, and responsive mobile layouts.
+- Supports English, Arabic, RTL/LTR, light/dark themes, and existing safe external links.
+
+### Verification
+
+- `[passed] npm.cmd test — 26 tests passed`
+- `[passed] npm.cmd run build — TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-main-system` first, then deploy `inkfig-user-FE`.
+- No migration or frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `9d98b42`
+- Push: `successful`
+
+### Notes
+
+The initial UI displays the latest 50 items in each collection; load-more controls can consume the existing cursor in a later ticket.
