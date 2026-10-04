@@ -22,6 +22,7 @@ const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.u
 const i18nProvider = readFileSync(new URL("../src/i18n/I18nProvider.tsx", import.meta.url), "utf8");
 const languageToggle = readFileSync(new URL("../src/i18n/LanguageToggle.tsx", import.meta.url), "utf8");
 const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
+const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDetailModal.tsx", import.meta.url), "utf8");
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 
@@ -221,6 +222,22 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(homePage, /noopener noreferrer/);
   assert.match(homePage, /getWorks/);
   assert.match(homePage, /setWorkLike/);
+  assert.match(homePage, /ArtworkDetailModal/);
+  assert.match(homePage, /setSelectedWorkId/);
+  assert.match(homePage, /artwork-image-button/);
+});
+
+test("opens an accessible artwork detail modal with complete public metadata", () => {
+  assert.match(artworkDetailModal, /role="dialog"/);
+  assert.match(artworkDetailModal, /aria-modal="true"/);
+  assert.match(artworkDetailModal, /work\.description/);
+  assert.match(artworkDetailModal, /work\.created_at/);
+  assert.match(artworkDetailModal, /work\.like_count/);
+  assert.match(artworkDetailModal, /work\.links\.map/);
+  assert.match(artworkDetailModal, /noopener noreferrer/);
+  assert.match(artworkDetailModal, /event\.key === "Escape"/);
+  assert.match(styles, /\.artwork-modal-backdrop/);
+  assert.match(styles, /@media \(max-width: 780px\)/);
 });
 
 test("filters the homepage by all canonical artwork categories", () => {

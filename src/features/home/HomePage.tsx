@@ -8,6 +8,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
+import { ArtworkDetailModal } from "./ArtworkDetailModal";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -25,6 +26,8 @@ export function HomePage() {
   const { language, setLanguage, t } = useI18n();
   const [activeCategory, setActiveCategory] = useState("all");
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
+  const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
+  const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
   useEffect(()=>{setLoading(true);setFeedError(false);getWorks(session?.accessToken,activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session?.accessToken]);
   async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(session.accessToken,work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
@@ -69,7 +72,7 @@ export function HomePage() {
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:<div className="artwork-grid">
           {works.map((work) => (
             <article className="artwork-card" key={work.work_id}>
-              <img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" />
+              <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button>
               <div className="artwork-details">
                 <div><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist_name}</span><div className="artwork-links">{work.links.map((link,index)=><a className="artwork-external-link" href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label||`${t("works.openLink")} ${index+1}`} <ExternalLink size={14}/></a>)}</div></div>
                 <button className={`artwork-likes ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={17} fill={work.liked_by_me?"currentColor":"none"}/> <span>{work.like_count}</span></button>
@@ -78,6 +81,8 @@ export function HomePage() {
           ))}
         </div>}
       </section>
+
+      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session)} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} t={t}/>}
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
     </main>
