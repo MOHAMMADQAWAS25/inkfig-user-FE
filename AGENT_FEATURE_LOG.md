@@ -3560,3 +3560,66 @@ No migration required.
 ### Notes
 
 None.
+
+## 2026-10-05 - Add artwork tags and uploader hover overlay
+
+### Request
+
+Display each artwork type as a familiar tag and reveal the uploader name professionally when the user hovers over the artwork.
+
+### Changes
+
+- Added an always-visible pill-shaped tag over each artwork image for its localized type.
+- Added a glass-style uploader overlay that fades and slides into view on hover or keyboard focus.
+- Kept uploader information visible on touch-only devices, where hover is unavailable.
+- Kept the like count visible and left artwork popup details and interactions unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: updated homepage artwork-card presentation.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: added the localized type tag and uploader overlay to each pin.
+- `src/styles.css`: styled the tag and accessible responsive uploader reveal effect.
+- `tests/foundation.test.mjs`: added coverage for tag and hover-overlay markup and styling.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Guests and authenticated users can see artwork types, uploader names, and like counts.
+- Only authenticated users can change likes; backend authorization remains authoritative.
+
+### Frontend
+
+- Homepage artwork types appear as compact rounded tags over their images.
+- Uploader names appear on pointer hover and keyboard focus, with a permanent touch-device fallback.
+- Existing localization, RTL/LTR placement, responsive masonry layout, loading, empty, and error states remain intact.
+
+### Verification
+
+- `[passed] npm.cmd test - 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No migrations, backend deployment, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `5530cda`
+- Push: `successful`
+
+### Notes
+
+Touch devices show uploader names persistently because they do not provide a dependable hover interaction.
