@@ -224,6 +224,11 @@ test("filters the homepage by all canonical artwork categories", () => {
   }
 });
 
+test("matches the homepage theme toggle to the navbar surface", () => {
+  assert.match(styles, /\.gallery-header \.theme-toggle \{[^}]*background:\s*rgb\(247 243 217 \/ 0\.82\)/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.gallery-header \.theme-toggle \{[^}]*background:\s*rgb\(16 20 12 \/ 0\.84\)/);
+});
+
 test("provides polished authentication controls and reset-page motion", () => {
   assert.match(passwordField, /EyeOff/);
   assert.match(passwordField, /auth\.showPassword/);

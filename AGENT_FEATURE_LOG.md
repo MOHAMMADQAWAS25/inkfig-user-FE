@@ -2756,3 +2756,71 @@ Create Digital Art, Hand Art, Video, Audio, Animation, Games, Interactive, and V
 ### Notes
 
 Filters request fresh backend results instead of filtering only the currently loaded page, so navigation remains correct as the gallery grows.
+
+## 2026-10-04 - Match homepage theme icon to navbar
+
+### Request
+
+Make the homepage dark-mode icon background compatible with the navbar background.
+
+### Changes
+
+- Matched the homepage theme-toggle background to the navbar's translucent cream surface in light mode.
+- Matched its border and moon color to the navbar's olive palette.
+- Matched the same control to the navbar's deep translucent surface, border, and light icon color in dark mode.
+- Added restrained theme-specific hover surfaces without affecting navbar layout.
+- Scoped every rule to `.gallery-header .theme-toggle`, leaving authentication and other theme controls unchanged.
+- Added regression coverage for the exact light and dark navbar surface values.
+
+### Repositories
+
+- `inkfig-user-FE`: updated homepage navbar theme-toggle styling and tests.
+- `inkfig-main-system`: no changes required.
+- `inkfig-user-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: coordinates the homepage theme icon with both navbar themes.
+- `tests/foundation.test.mjs`: verifies the navbar-matching surfaces.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The homepage moon button now blends with the light navbar instead of appearing as a separate white block.
+- In dark mode, the sun button blends with the dark navbar.
+- Homepage content, category filters, gallery cards, authentication controls, and responsive behavior remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 24 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No backend, database, environment-variable, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pushed directly to `origin/main` after synchronization.
+
+### Notes
+
+The control intentionally reuses the navbar's exact alpha-blended background values in each theme for visual continuity.

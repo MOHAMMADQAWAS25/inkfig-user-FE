@@ -378,7 +378,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-language { padding: 8px; border: 0; background: transparent; color: #617d2b; cursor: pointer; }
 .gallery-primary-link { display: inline-flex; min-height: 40px; align-items: center; padding: 8px 16px; border: 0; border-radius: 999px; background: #39431c; color: #fffdf0; font-size: 0.86rem; font-weight: 750; text-decoration: none; cursor: pointer; transition: transform 180ms ease, background-color 180ms ease; }
 .gallery-primary-link:hover { background: #617d2b; transform: translateY(-1px); }
-.gallery-header .theme-toggle { width: 40px; height: 40px; background: rgb(255 253 240 / 0.72); }
+.gallery-header .theme-toggle { width: 40px; height: 40px; border-color: rgb(57 67 28 / 0.16); background: rgb(247 243 217 / 0.82); color: #39431c; }
+.gallery-header .theme-toggle:hover { border-color: rgb(97 125 43 / 0.42); background: rgb(238 231 189 / 0.9); }
 .gallery-hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr); align-items: end; gap: 60px; width: min(1240px, calc(100% - 40px)); min-height: 440px; margin-inline: auto; padding: 80px 24px 64px; }
 .gallery-hero-copy { max-width: 780px; }
 .gallery-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; color: #617d2b; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
@@ -433,6 +434,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-footer p { margin: 0; font-size: 0.85rem; }
 :root[data-theme="dark"] .gallery-home { background: linear-gradient(rgb(16 20 12 / 0.84), rgb(16 20 12 / 0.94)), url("./assets/gallery-ivory-background.png") center top / cover fixed; color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-header { border-color: #3b4828; background: rgb(16 20 12 / 0.84); }
+:root[data-theme="dark"] .gallery-header .theme-toggle { border-color: #3b4828; background: rgb(16 20 12 / 0.84); color: #f7f2d8; }
+:root[data-theme="dark"] .gallery-header .theme-toggle:hover { border-color: #617d2b; background: rgb(23 29 17 / 0.94); }
 :root[data-theme="dark"] .gallery-nav a, :root[data-theme="dark"] .gallery-login-link, :root[data-theme="dark"] .gallery-hero h1, :root[data-theme="dark"] .gallery-section-heading h2 { color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-hero-copy > p:not(.gallery-kicker), :root[data-theme="dark"] .gallery-section-heading > span { color: #b7b59a; }
 :root[data-theme="dark"] .artwork-card { border-color: #3b4828; background: rgb(23 29 17 / 0.94); }
