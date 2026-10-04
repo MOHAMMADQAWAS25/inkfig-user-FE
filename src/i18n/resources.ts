@@ -110,6 +110,10 @@ const en = {
   "works.loading": "Loading works...",
   "works.loadFailed": "Works could not be loaded right now.",
   "works.uploadFailed": "The work could not be uploaded. Please try again.",
+  "works.selectFile": "Choose an image before publishing.",
+  "works.emptyFile": "The selected image is empty or unavailable. Download it to your device and choose it again.",
+  "works.fileTooLarge": "The selected image must be 10 MB or smaller.",
+  "works.unsupportedFile": "Choose a JPEG, PNG, WebP, or GIF image.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -224,6 +228,10 @@ const ar: Record<TranslationKey, string> = {
   "works.loading": "جارٍ تحميل الأعمال...",
   "works.loadFailed": "تعذر تحميل الأعمال حالياً.",
   "works.uploadFailed": "تعذر رفع العمل. حاول مرة أخرى.",
+  "works.selectFile": "اختر صورة قبل النشر.",
+  "works.emptyFile": "الصورة المحددة فارغة أو غير متاحة. نزّلها على جهازك ثم اخترها مرة أخرى.",
+  "works.fileTooLarge": "يجب ألا يتجاوز حجم الصورة المحددة 10 ميجابايت.",
+  "works.unsupportedFile": "اختر صورة بصيغة JPEG أو PNG أو WebP أو GIF.",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

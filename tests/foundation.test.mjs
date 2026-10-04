@@ -201,11 +201,17 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(worksApi, /"POST", "\/works\/uploads"/);
   assert.match(worksApi, /method:"PUT"/);
   assert.match(worksApi, /new FormData\(\)/);
+  assert.match(worksApi, /file\.size <= 0/);
+  assert.match(worksApi, /MAX_WORK_FILE_SIZE/);
+  assert.match(worksApi, /WORK_IMAGE_TYPES/);
   assert.match(worksApi, /\/publish/);
   assert.match(worksApi, /\/like/);
   assert.match(router, /\/:language\/upload/);
   assert.match(uploadWorkPage, /Navigate replace/);
   assert.match(uploadWorkPage, /accept="image\/jpeg,image\/png,image\/webp,image\/gif"/);
+  assert.match(uploadWorkPage, /handleFileChange/);
+  assert.match(uploadWorkPage, /works\.emptyFile/);
+  assert.match(uploadWorkPage, /event\.target\.value=""/);
   assert.match(homePage, /getWorks/);
   assert.match(homePage, /setWorkLike/);
 });
