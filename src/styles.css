@@ -444,6 +444,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 [dir="rtl"] .artwork-pin-like { inset: 12px auto auto 12px; }
 .artwork-pin-like:hover { background: #7f211e; }
 .artwork-pin-like:disabled { cursor: default; opacity: 1; }
+.artwork-type-tag { position: absolute; z-index: 2; inset: 12px auto auto 12px; max-width: calc(100% - 100px); padding: 7px 11px; overflow: hidden; border: 1px solid rgb(255 255 255 / .42); border-radius: 999px; background: rgb(255 253 240 / .9); color: #39431c; font-size: .68rem; font-weight: 850; letter-spacing: .055em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; box-shadow: 0 6px 18px rgb(0 0 0 / .14); backdrop-filter: blur(8px); }
+[dir="rtl"] .artwork-type-tag { inset: 12px 12px auto auto; }
+.artwork-pin-uploader { position: absolute; z-index: 2; right: 12px; bottom: 12px; left: 12px; display: flex; align-items: center; gap: 8px; min-width: 0; padding: 10px 12px; border: 1px solid rgb(255 255 255 / .22); border-radius: 12px; background: rgb(20 25 13 / .78); color: #fffdf0; font-size: .8rem; font-weight: 750; box-shadow: 0 10px 25px rgb(0 0 0 / .22); opacity: 0; transform: translateY(9px); backdrop-filter: blur(10px); transition: opacity 180ms ease,transform 180ms ease; }
+.artwork-pin-uploader > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.artwork-pin-media:hover .artwork-pin-uploader, .artwork-pin-media:focus-within .artwork-pin-uploader { opacity: 1; transform: translateY(0); }
 .artwork-visual::before, .artwork-visual::after { position: absolute; border-radius: 46% 54% 62% 38%; content: ""; filter: blur(1px); transform: rotate(-18deg); }
 .artwork-visual::before { inset: 14% 12% 24% 18%; background: rgb(255 253 240 / 0.26); box-shadow: 34px 28px 0 rgb(57 67 28 / 0.2); }
 .artwork-visual::after { width: 42%; height: 36%; inset: auto 13% 10% auto; background: rgb(152 40 36 / 0.42); }
@@ -599,4 +604,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .gallery-footer { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 340px) { .artwork-grid { columns: 1; } }
-@media (hover: none) { .artwork-pin-like { opacity: 1; transform: none; } }
+@media (hover: none) { .artwork-pin-like { opacity: 1; transform: none; } .artwork-pin-uploader { opacity: 1; transform: none; } }

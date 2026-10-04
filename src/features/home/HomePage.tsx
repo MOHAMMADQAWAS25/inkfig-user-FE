@@ -81,10 +81,7 @@ export function HomePage() {
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:visibleWorks.length===0?<p className="gallery-state">{t("home.noSearchResults")}</p>:<div className="artwork-grid">
           {visibleWorks.map((work) => (
             <article className="artwork-card" key={work.work_id}>
-              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button></div>
-              <div className="artwork-details">
-                <div><span>{work.artist_name}</span><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p></div>
-              </div>
+              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className="artwork-type-tag">{language==="ar"?work.type_name_ar:work.type_name_en}</span><span className="artwork-pin-uploader"><UserRound aria-hidden="true" size={16}/><span>{work.artist_name}</span></span><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button></div>
             </article>
           ))}
         </div>}
