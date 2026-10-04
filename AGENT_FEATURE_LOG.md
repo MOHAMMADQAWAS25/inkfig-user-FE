@@ -2824,3 +2824,66 @@ No migration required.
 ### Notes
 
 The control intentionally reuses the navbar's exact alpha-blended background values in each theme for visual continuity.
+## 2026-10-04 - Prevent zero-byte artwork upload requests
+
+### Request
+
+Fix artwork upload requests that reached the backend with `file_size: 0` and received a 422 greater-than validation error.
+
+### Changes
+
+- Added client-side validation for empty/unavailable files, the existing 10 MiB maximum, and supported JPEG, PNG, WebP, and GIF MIME types.
+- Prevents invalid files from reaching the upload-preparation API and clears the rejected file input so the user can select another image.
+- Added localized English and Arabic messages explaining empty/unavailable, oversized, unsupported, and missing image selections.
+- Retained the backend's authoritative positive-size, MIME-type, and maximum-size validation unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added artwork-file validation, localized feedback, and regression coverage.
+
+### Files
+
+- `src/features/works/worksApi.ts`: defines shared upload limits and validates the file before requesting a signed upload URL.
+- `src/features/works/UploadWorkPage.tsx`: validates on selection and submission and displays the appropriate localized message.
+- `src/i18n/resources.ts`: adds English and Arabic file-validation messages.
+- `tests/foundation.test.mjs`: verifies empty-size, maximum-size, MIME-type, input-reset, and message wiring.
+
+### API
+
+- `POST /api/v1/works/uploads`: request contract is unchanged; the frontend no longer sends requests with `file_size <= 0`, files larger than 10 MiB, or unsupported image MIME types.
+
+### Database
+
+- No migration required.
+
+### Permissions and scope
+
+- Uploading still requires an authenticated user.
+- Client-side validation improves feedback; the backend remains authoritative for authentication, ownership, type, and file validation.
+
+### Frontend
+
+- Invalid image selections are rejected immediately with specific localized feedback.
+- A zero-byte or unavailable cloud-placeholder file instructs the user to download it locally and select it again.
+- Valid upload navigation, signed Storage upload, publication, themes, RTL/LTR behavior, and responsive layout remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test — 24 tests passed`
+- `[passed] npm.cmd run build — TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare GitHub Actions workflow.
+- No backend deployment, migration, secret, or environment-variable change is required.
+
+### Git
+
+- Branch: `main`
+- Commit: `cfc74c9`
+- Push: `successful`
+
+### Notes
+
+The reported response proves the browser supplied a zero-byte `File`; accepting it in the backend would create an invalid empty Storage object, so the positive-size database/API constraint remains in place.
