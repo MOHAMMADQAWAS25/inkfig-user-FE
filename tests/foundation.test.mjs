@@ -195,7 +195,10 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(homePage, /session \?/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
-  assert.match(styles, /\.artwork-grid \{ columns: 3 300px/);
+  assert.match(styles, /\.artwork-grid \{ columns: 5 220px/);
+  assert.match(styles, /\.artwork-pin-media/);
+  assert.match(styles, /\.artwork-pin-like/);
+  assert.match(styles, /@media \(hover: none\)/);
   assert.match(resources, /"home\.collectionTitle"/);
 });
 
@@ -221,8 +224,8 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(uploadWorkPage, /event\.target\.value=""/);
   assert.match(uploadWorkPage, /links\.length<10/);
   assert.match(uploadWorkPage, /works\.addLink/);
-  assert.match(homePage, /work\.links\.map/);
-  assert.match(homePage, /noopener noreferrer/);
+  assert.match(artworkDetailModal, /work\.links\.map/);
+  assert.match(artworkDetailModal, /noopener noreferrer/);
   assert.match(homePage, /getWorks/);
   assert.match(homePage, /setWorkLike/);
   assert.match(homePage, /ArtworkDetailModal/);

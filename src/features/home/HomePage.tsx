@@ -1,4 +1,4 @@
-import { ArrowUpRight, ExternalLink, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
+import { ArrowUpRight, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -81,10 +81,9 @@ export function HomePage() {
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:visibleWorks.length===0?<p className="gallery-state">{t("home.noSearchResults")}</p>:<div className="artwork-grid">
           {visibleWorks.map((work) => (
             <article className="artwork-card" key={work.work_id}>
-              <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button>
+              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button></div>
               <div className="artwork-details">
-                <div><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p><h3>{work.title}</h3><span>{t("home.by")} {work.artist_name}</span><div className="artwork-links">{work.links.map((link,index)=><a className="artwork-external-link" href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label||`${t("works.openLink")} ${index+1}`} <ExternalLink size={14}/></a>)}</div></div>
-                <button className={`artwork-likes ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={17} fill={work.liked_by_me?"currentColor":"none"}/> <span>{work.like_count}</span></button>
+                <div><h3>{work.title}</h3><span>{work.artist_name}</span><p>{language==="ar"?work.type_name_ar:work.type_name_en}</p></div>
               </div>
             </article>
           ))}
