@@ -431,6 +431,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .upload-card textarea { min-height: 110px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; resize: vertical; }
 .artwork-external-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--brand-leaf); font-size: .8rem; font-weight: 700; text-decoration: none; }
 .artwork-external-link:hover { text-decoration: underline; }
+.artwork-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.work-links-field { display: grid; gap: 10px; margin: 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.work-links-field legend { padding-inline: 5px; color: var(--muted); font-size: .86rem; }
+.work-link-row { display: grid; grid-template-columns: minmax(110px,.7fr) minmax(180px,1.5fr) auto; gap: 8px; align-items: center; }
+.work-link-row .icon-button { min-width: 42px; min-height: 42px; }
+.add-link-button { display: inline-flex; align-items: center; gap: 6px; justify-self: start; }
+@media (max-width: 600px) { .work-link-row { grid-template-columns: 1fr auto; } .work-link-row input:first-child { grid-column: 1 / -1; } }
 .gallery-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 34px clamp(24px, 6vw, 90px); border-top: 1px solid rgb(57 67 28 / 0.18); background: rgb(57 67 28 / 0.94); color: #eee7bd; }
 .gallery-footer img { width: 94px; filter: brightness(1.65); }
 .gallery-footer p { margin: 0; font-size: 0.85rem; }

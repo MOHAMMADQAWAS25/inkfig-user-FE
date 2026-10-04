@@ -1,7 +1,8 @@
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
-export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; external_url: string | null; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; created_at: string };
+export type WorkLink = { url: string; label: string | null };
+export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; created_at: string };
 export const MAX_WORK_FILE_SIZE = 10 * 1024 * 1024;
 export const WORK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -28,10 +29,11 @@ export async function getWorks(token?: string, typeCode?: string): Promise<Work[
   return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`, {token})).data.items;
 }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
-export async function uploadWork(token: string, input: {typeId:string; title:string; description:string; externalUrl:string; file:File}): Promise<void> {
+export async function uploadWork(token: string, input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
-  if (!isValidWorkUrl(input.externalUrl)) throw new Error("Invalid work URL");
-  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {token, body:{type_id:input.typeId,title:input.title,description:input.description,external_url:input.externalUrl.trim() || null,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
+  const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label.trim()||null}));
+  if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
+  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {token, body:{type_id:input.typeId,title:input.title,description:input.description,links,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
   const body = new FormData();
   body.append("cacheControl", "3600");
   body.append("", input.file);
