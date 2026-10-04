@@ -3435,3 +3435,66 @@ No migration required.
 ### Notes
 
 Only non-secret profile metadata remains in localStorage; tokens are inaccessible to frontend JavaScript.
+
+## 2026-10-05 - Display homepage cards as Pinterest-style pins
+
+### Request
+
+Change only the way homepage artwork cards are displayed so the gallery resembles Pinterest.
+
+### Changes
+
+- Changed the homepage to a denser five-column masonry-style pin layout while preserving each image's natural aspect ratio.
+- Made cards image-first with rounded media, compact title, artist and category metadata, hover shading, and an overlaid like control.
+- Added responsive three-column tablet, two-column mobile, and one-column very-narrow layouts.
+- Kept search, category filters, API loading, popup details, links, authentication, uploads, and profile cards unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: updated homepage artwork-card presentation only.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: changed pin card markup and overlay like placement.
+- `src/styles.css`: added Pinterest-style masonry density, image-first surfaces, hover behavior, and responsive columns.
+- `tests/foundation.test.mjs`: updated gallery presentation coverage while retaining safe-link checks in the detail popup.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Public artwork visibility and authenticated like permissions are unchanged.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Desktop displays up to five masonry columns, tablets three, mobile two, and very narrow screens one.
+- Natural image dimensions create varied pin heights; complete details and links remain in the popup.
+- Touch devices keep the like control visible because hover is unavailable.
+
+### Verification
+
+- `[passed] npm.cmd test — 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, environment-variable, or deployment-order changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `1f8bcc9`
+- Push: `successful`
+
+### Notes
+
+This ticket changes only card presentation; data pagination and loading behavior were intentionally left unchanged.
