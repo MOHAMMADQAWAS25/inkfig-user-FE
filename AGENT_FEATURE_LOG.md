@@ -3286,3 +3286,81 @@ No migration required.
 ### Notes
 
 The outlined middle line deliberately uses the logo's burgundy accent while the final line uses the established gallery olive, making the message distinctive without introducing off-brand colors.
+
+## 2026-10-04 - Redesign the homepage header
+
+### Request
+
+Replace the homepage text-heavy header with an icon-first design: use the shared language icon, add an Instagram-style create button, add a themed search bar, move account actions into a profile menu, and remove Discover, About InkFig, and the standalone logout button.
+
+### Changes
+
+- Replaced the homepage text language switch with the shared localized Languages icon used by authentication pages.
+- Removed the Discover and About InkFig header links.
+- Added a responsive search bar that filters the currently loaded gallery by artwork title, artist, description, and localized category.
+- Replaced the Upload Work text link with a circular plus icon and retained an accessible label and tooltip.
+- Added an initial-based profile avatar because the current authenticated session contract does not include a profile-image URL.
+- Added a profile menu with user identity, View Profile, Upload Work, appearance/language controls, and Log out.
+- Removed the standalone header logout control while retaining the existing backend logout behavior inside the profile menu.
+- Added responsive two-row mobile layout, RTL-aware menu positioning, dark-theme styling, focus treatments, and localized empty-search feedback.
+- Added regression coverage for structure, functionality, localization, icon controls, and mobile positioning.
+
+### Repositories
+
+- inkfig-user-FE: redesigned the homepage header, added gallery search behavior, localization, styles, and tests.
+- inkfig-main-system: no changes required.
+- inkfig-user-system: no changes required.
+
+### Files
+
+- src/features/home/HomePage.tsx: implements search, icon controls, the profile/avatar menu, and simplified navigation.
+- src/i18n/resources.ts: adds English and Arabic search and profile-menu labels.
+- src/styles.css: styles the responsive light/dark/RTL header, search field, create control, avatar, and menu.
+- tests/foundation.test.mjs: verifies the new header contract.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+No API changes. Search filters the currently loaded category results in the browser.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Profile and upload links preserve their existing authenticated-route behavior.
+- Logout continues to invalidate the local session and calls the existing backend logout endpoint.
+- No authentication, authorization, role, permission, ownership, or data-scope rule changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- The sticky header now contains the InkFig logo, centered search, language/theme icons, a plus create control, and a profile avatar menu for signed-in users.
+- Guests continue to receive Sign in and Sign up actions.
+- Search updates gallery results immediately and shows a localized no-results state.
+- On narrow screens the search occupies a full second row while primary controls remain visible.
+- English positions account actions at the top-right; Arabic mirrors the layout and menu direction.
+
+### Verification
+
+- [passed] npm.cmd test - 28 tests passed.
+- [passed] npm.cmd run build - strict TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [failed] initial npm.cmd test - the existing theme-selector assertion and new mobile-placement assertion exposed two CSS selector/edit issues; both were corrected and the full suite passed.
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No backend deployment, migration, environment-variable, or deployment-order change is required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+A real profile photo can replace the initial avatar once the user/session API exposes an avatar URL; this ticket does not invent or persist profile-image data.

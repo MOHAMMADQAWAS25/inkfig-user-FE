@@ -334,3 +334,21 @@ test("features the Ink your world hero lockup", () => {
   assert.match(styles, /\.gallery-hero-title-outline[^}]*-webkit-text-stroke:\s*2px #982824/);
   assert.match(styles, /\.gallery-hero-title-accent\s*\{[^}]*color:\s*#779439/);
 });
+test("builds a searchable icon-first homepage header", () => {
+  assert.doesNotMatch(homePage, /gallery-nav|gallery-language/);
+  assert.match(homePage, /<LanguageToggle \/>/);
+  assert.match(homePage, /className="gallery-search"/);
+  assert.match(homePage, /setSearchQuery/);
+  assert.match(homePage, /visibleWorks\.map/);
+  assert.match(homePage, /className="gallery-create-button"/);
+  assert.match(homePage, /className="gallery-profile-menu"/);
+  assert.match(homePage, /className="gallery-profile-popover"/);
+  assert.match(homePage, /session\.fullName\.trim\(\)\.charAt\(0\)/);
+  assert.match(homePage, /onClick=\{signOut\}/);
+  assert.match(styles, /\.gallery-profile-popover/);
+  assert.match(styles, /\.gallery-search:focus-within/);
+  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.gallery-search \{ grid-column: 1 \/ -1; grid-row: 2; \}/);
+  for (const key of ["searchPlaceholder", "noSearchResults", "profileMenu", "viewProfile", "preferences"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"home\\.${key}"`, "g"))].length, 2);
+  }
+});

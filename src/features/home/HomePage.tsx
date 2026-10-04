@@ -1,10 +1,11 @@
-import { ArrowUpRight, ExternalLink, Heart, Image, Sparkles } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
+import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getWorks, setWorkLike } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
@@ -23,11 +24,14 @@ const workCategories = [
 
 export function HomePage() {
   const { session, signOut } = useAuth();
-  const { language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const [activeCategory, setActiveCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
+  const normalizedSearch=searchQuery.trim().toLocaleLowerCase(language);
+  const visibleWorks=normalizedSearch ? works.filter(work=>[work.title,work.artist_name,work.description,language==="ar"?work.type_name_ar:work.type_name_en].some(value=>value?.toLocaleLowerCase(language).includes(normalizedSearch))) : works;
   useEffect(()=>{setLoading(true);setFeedError(false);getWorks(session?.accessToken,activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session?.accessToken]);
   async function toggleLike(work:Work){if(!session)return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(session.accessToken,work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
@@ -37,14 +41,15 @@ export function HomePage() {
         <Link className="gallery-brand" to={`/${language}`} aria-label={t("app.name")}>
           <img src={inkfigLogo} alt="" />
         </Link>
-        <nav className="gallery-nav" aria-label={t("home.primaryNavigation")}>
-          <a href="#discover">{t("home.discover")}</a>
-          <a href="#about">{t("home.about")}</a>
-        </nav>
+        <label className="gallery-search">
+          <Search aria-hidden="true" size={19} />
+          <span className="sr-only">{t("home.searchPlaceholder")}</span>
+          <input type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
+        </label>
         <div className="gallery-header-actions">
-          <button className="gallery-language" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>{language === "ar" ? "English" : "العربية"}</button>
+          <LanguageToggle />
           <ThemeToggle />
-          {session ? <><Link className="gallery-login-link" to={`/${language}/upload`}>{t("works.upload")}</Link><Link className="gallery-user-name" to={`/${language}/profile`}>{session.fullName}</Link><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
+          {session ? <><Link className="gallery-create-button" to={`/${language}/upload`} aria-label={t("works.upload")} title={t("works.upload")}><Plus aria-hidden="true" size={23} /></Link><details className="gallery-profile-menu"><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span></summary><div className="gallery-profile-popover"><div className="gallery-profile-identity"><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span><div><strong>{session.fullName}</strong><small>{session.email}</small></div></div><Link to={`/${language}/profile`}><UserRound aria-hidden="true" size={18} />{t("home.viewProfile")}</Link><Link to={`/${language}/upload`}><Plus aria-hidden="true" size={18} />{t("works.upload")}</Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle /><ThemeToggle /></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18} />{t("nav.logout")}</button></div></details></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
         </div>
       </header>
 
@@ -73,8 +78,8 @@ export function HomePage() {
             <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
           ))}
         </div>
-        {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:<div className="artwork-grid">
-          {works.map((work) => (
+        {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:visibleWorks.length===0?<p className="gallery-state">{t("home.noSearchResults")}</p>:<div className="artwork-grid">
+          {visibleWorks.map((work) => (
             <article className="artwork-card" key={work.work_id}>
               <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button>
               <div className="artwork-details">
