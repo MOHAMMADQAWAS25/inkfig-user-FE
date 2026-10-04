@@ -2887,3 +2887,72 @@ Fix artwork upload requests that reached the backend with `file_size: 0` and rec
 ### Notes
 
 The reported response proves the browser supplied a zero-byte `File`; accepting it in the backend would create an invalid empty Storage object, so the positive-size database/API constraint remains in place.
+## 2026-10-04 - Add optional links to artwork uploads
+
+### Request
+
+Add an optional link field to work uploads and safely expose the link on published artwork.
+
+### Changes
+
+- Added an optional complete HTTP/HTTPS link field to the upload form.
+- Sends the normalized link or `null` with upload metadata and validates the scheme before making an API request.
+- Displays attached links on public artwork cards in a new tab with `noopener noreferrer` protection.
+- Added English and Arabic labels, instructions, and invalid-link feedback.
+- Intentionally does not perform destination health requests because browser CORS and server-side SSRF concerns make synchronous checks unsafe and unreliable.
+
+### Repositories
+
+- `inkfig-user-FE`: added link input, validation, API mapping, feed rendering, localization, styling, and tests.
+- `inkfig-main-system`: persists and validates the link in a paired change.
+
+### Files
+
+- `src/features/works/UploadWorkPage.tsx`: adds the optional link field and validation feedback.
+- `src/features/works/worksApi.ts`: validates, sends, and types nullable work links.
+- `src/features/home/HomePage.tsx`: renders safe external links on work cards.
+- `src/i18n/resources.ts`: localizes link UI and validation.
+- `src/styles.css`: styles work-card links.
+- `tests/foundation.test.mjs`: verifies URL schemes, request mapping, input, and safe link attributes.
+
+### API
+
+- `POST /api/v1/works/uploads`: sends optional `external_url` as a full HTTP/HTTPS URL or `null`.
+- `GET /api/v1/works`: consumes nullable `external_url` on feed items.
+
+### Database
+
+- No migration in this repository. Paired migration: `inkfig-main-system/migrations/20261004_002_add_work_external_url.sql`.
+
+### Permissions and scope
+
+- Uploads remain restricted to authenticated users; links become public only with published works.
+- Frontend validation improves feedback while backend validation remains authoritative.
+
+### Frontend
+
+- Upload form includes an optional URL control with a complete-address hint.
+- Invalid or unsafe schemes are rejected before upload.
+- Published work links open in a separate tab without granting opener access.
+- Existing image validation, upload flow, localization, responsive behavior, and likes remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test — 24 tests passed`
+- `[passed] npm.cmd run build — TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-main-system` and its migration before deploying `inkfig-user-FE`.
+- No frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `f58d5ca`
+- Push: `successful`
+
+### Notes
+
+Live availability is not guaranteed by syntactic validation; destination sites can become unavailable at any time.
