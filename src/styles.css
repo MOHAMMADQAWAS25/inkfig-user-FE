@@ -693,14 +693,14 @@ body { overflow: visible; }
 .gallery-header { padding-right: 32px; padding-left: 32px; }
 .gallery-header-actions { min-width: 34px; }
 .gallery-profile-menu > summary, .gallery-guest-avatar { width: 34px; height: 34px; }
-.app-sidebar-nav .app-sidebar-upload { border-color: #39431c; border-radius: 50%; background: #39431c; color: #fffdf0; box-shadow: 0 7px 18px rgb(57 67 28 / .2); }
-.app-sidebar-nav .app-sidebar-upload:hover { border-color: #617d2b; background: #617d2b; color: #fffdf0; transform: scale(1.04); }
-.app-sidebar-nav .app-sidebar-upload.active { border-color: #982824; background: #982824; color: #fffdf0; }
 [dir="rtl"] .gallery-header { padding-right: 32px; padding-left: 32px; }
 :root[data-theme="dark"] { scrollbar-color: #a9b65f #10140c; }
 :root[data-theme="dark"]::-webkit-scrollbar-track { background: #10140c; }
 :root[data-theme="dark"]::-webkit-scrollbar-thumb { border-color: #10140c; background: #a9b65f; }
-:root[data-theme="dark"] .app-sidebar-nav .app-sidebar-upload { border-color: #a9b65f; background: #a9b65f; color: #20270f; }
-:root[data-theme="dark"] .app-sidebar-nav .app-sidebar-upload:hover { border-color: #c5c970; background: #c5c970; }
-:root[data-theme="dark"] .app-sidebar-nav .app-sidebar-upload.active { border-color: #982824; background: #982824; color: #fffdf0; }
 @media (max-width: 520px) { .gallery-header, [dir="rtl"] .gallery-header { padding-right: 20px; padding-left: 20px; } .gallery-header-actions { min-width: 32px; } .gallery-profile-menu > summary, .gallery-guest-avatar { width: 32px; height: 32px; } html::-webkit-scrollbar { width: 9px; } }
+
+/* Centered profile-control column */
+.gallery-header { grid-template-columns: minmax(0,1fr) 72px; gap: 0; padding-right: 0; padding-left: 32px; }
+.gallery-header-actions { width: 72px; min-width: 72px; justify-content: center; }
+[dir="rtl"] .gallery-header { padding-right: 32px; padding-left: 0; }
+@media (max-width: 520px) { .gallery-header { grid-template-columns: minmax(0,1fr) 52px; padding-right: 0; padding-left: 20px; } .gallery-header-actions { width: 52px; min-width: 52px; } [dir="rtl"] .gallery-header { padding-right: 20px; padding-left: 0; } }

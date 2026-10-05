@@ -464,8 +464,14 @@ test("uses an edge scrollbar and aligns the compact avatar with gallery cards", 
   assert.match(styles, /body \{ overflow: visible/);
   assert.match(styles, /\.gallery-header \{ padding-right: 32px; padding-left: 32px/);
   assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
-  assert.match(appSidebar, /className: "app-sidebar-upload"/);
-  assert.match(styles, /\.app-sidebar-nav \.app-sidebar-upload \{/);
-  assert.match(styles, /border-radius: 50%/);
+  assert.doesNotMatch(appSidebar, /app-sidebar-upload/);
+  assert.doesNotMatch(styles, /\.app-sidebar-nav \.app-sidebar-upload/);
   assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header, \[dir="rtl"\] \.gallery-header \{ padding-right: 20px; padding-left: 20px/);
+});
+
+test("centers the avatar between the search edge and header edge", () => {
+  assert.match(styles, /\.gallery-header \{ grid-template-columns: minmax\(0,1fr\) 72px; gap: 0; padding-right: 0; padding-left: 32px/);
+  assert.match(styles, /\.gallery-header-actions \{ width: 72px; min-width: 72px; justify-content: center/);
+  assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right: 32px; padding-left: 0/);
+  assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header \{ grid-template-columns: minmax\(0,1fr\) 52px/);
 });

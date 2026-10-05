@@ -4305,3 +4305,69 @@ No authentication, role, permission, ownership, or backend authorization behavio
 ### Notes
 
 The scrollbar remains at the browser edge rather than becoming a gallery-local scrolling surface.
+## 2026-10-05 - Restore the plain Upload icon and center the avatar
+
+### Request
+
+Undo the most recent special Upload-button styling so it is a plain plus again, and center the profile avatar in the full area between the search field and the outer header edge.
+
+### Changes
+
+- Removed the dedicated filled, circular Upload class and all associated light, dark, hover, and active styling.
+- Restored Upload to the same plain 24px plus-icon treatment and generic navigation states as the other rail items.
+- Replaced edge-alignment positioning with a dedicated 72px profile-control column on desktop and 52px on mobile.
+- Centered the compact avatar horizontally within that complete column between the search boundary and header edge.
+- Mirrored the centered control column and header padding for Arabic.
+- Preserved the viewport scrollbar, avatar size, search behavior, navigation routes, and upload authorization.
+
+### Repositories
+
+- `inkfig-user-FE`: restored the Upload icon and refined header avatar placement.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: removed the Upload-specific class marker.
+- `src/styles.css`: removed Upload-specific styles and added the centered profile-control column.
+- `tests/foundation.test.mjs`: updated Upload expectations and added avatar-column regression coverage.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, role, permission, ownership, or backend authorization behavior changed.
+
+### Frontend
+
+- Upload is once again represented by a plain plus icon.
+- The avatar is centered between the search edge and header edge in English and Arabic.
+
+### Verification
+
+- `[passed] npm test` - 37 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no in-app browser was attached to this workspace.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pending final synchronization and push.
+
+### Notes
+
+The avatar column is explicitly sized, making its centering independent of the search field width.
