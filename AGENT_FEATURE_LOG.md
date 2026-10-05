@@ -4371,3 +4371,72 @@ No authentication, role, permission, ownership, or backend authorization behavio
 ### Notes
 
 The avatar column is explicitly sized, making its centering independent of the search field width.
+
+## 2026-10-05 - Keep save action and type tag in artwork details
+
+### Request
+
+Keep the Save button available after opening an artwork card and show its colored type tag in the popup.
+
+### Changes
+
+- Added Save/Unsave to the shared artwork detail popup instead of limiting it to closed homepage cards.
+- Connected popup saving from Home, Posts, Likes, and Saved profile collections.
+- Synchronizes saved state across the visible collections after a successful backend request.
+- Added the localized, color-coded artwork type tag above the popup title.
+- Kept public viewing, likes, links, descriptions, dates, and popup dismissal behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: fixed popup actions and extended tag presentation.
+
+### Files
+
+- `src/features/home/ArtworkDetailModal.tsx`: renders colored type and permission-controlled Save/Unsave actions.
+- `src/features/home/HomePage.tsx`: supplies save permissions and handler to the popup.
+- `src/features/profile/ProfilePage.tsx`: supplies profile save behavior and keeps collections synchronized.
+- `src/features/works/workTypePresentation.ts`: centralizes stable work-type color selection for popup reuse.
+- `src/styles.css`: adds popup tag positioning and polished Like/Save action styling.
+- `tests/foundation.test.mjs`: verifies popup Save and tag contracts.
+
+### API
+
+- Uses existing `PUT /api/v1/works/{work_id}/save` and `DELETE /api/v1/works/{work_id}/save` without contract changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Save/Unsave is displayed only with `works.save`.
+- Like remains controlled by `works.like`.
+- Public visitors can view popup details and tags but cannot perform protected actions.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Opened artwork cards show the localized colored type tag and persistent Save/Unsave action.
+- Save state stays aligned between Home, Posts, Likes, and Saved collections.
+- RTL/LTR, responsive layout, light/dark themes, loading, empty, and error states remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 37 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `6049576`
+- Push: `successful`
+
+### Notes
+
+The Save button previously disappeared because the shared popup accepted only Like state and callbacks.
