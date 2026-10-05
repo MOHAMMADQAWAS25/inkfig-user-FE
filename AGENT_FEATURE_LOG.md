@@ -4238,3 +4238,70 @@ No authentication, role, permission, ownership, or backend authorization behavio
 ### Notes
 
 The navigation remains fixed vertically while scrolling; only its physical side changes with the document language.
+## 2026-10-05 - Align the gallery header and edge scrollbar
+
+### Request
+
+Move scrolling to a Pinterest-style outer viewport scrollbar, restyle the Upload plus control, and make the smaller profile avatar align exactly with the artwork-card edge while resizing the search field.
+
+### Changes
+
+- Styled the root document scrollbar with theme-aware InkFig colors and a stable outer gutter, leaving the gallery itself free of nested scrolling.
+- Added WebKit and standards-based scrollbar treatments for consistent browser-edge presentation in light and dark themes.
+- Added a dedicated circular, filled Pinterest-inspired treatment for the Upload plus icon with hover and active states.
+- Reduced the profile avatar to 34px on desktop and 32px on mobile.
+- Aligned the avatar's outer edge to the gallery cards using the gallery's exact 32px desktop and 20px mobile effective gutters.
+- Shortened the search field by the matching aligned avatar gutter while preserving English and Arabic mirroring.
+
+### Repositories
+
+- `inkfig-user-FE`: refined gallery scrolling, upload navigation, avatar sizing, and header alignment.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: marks the Upload route for dedicated icon styling.
+- `src/styles.css`: adds root scrollbar styling, Upload control states, and precise header/avatar alignment.
+- `tests/foundation.test.mjs`: verifies the viewport scrollbar, dedicated Upload control, and responsive card-edge alignment.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, role, permission, ownership, or backend authorization behavior changed.
+
+### Frontend
+
+- The browser viewport owns page scrolling; artwork modals retain their intentional internal overflow behavior.
+- The avatar and artwork-card outer edges share the same visual guide in English and Arabic.
+- The Upload icon remains routed to the existing authorized publishing flow.
+
+### Verification
+
+- `[passed] npm test` - 36 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no in-app browser was attached to this workspace.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pending final synchronization and push.
+
+### Notes
+
+The scrollbar remains at the browser edge rather than becoming a gallery-local scrolling surface.

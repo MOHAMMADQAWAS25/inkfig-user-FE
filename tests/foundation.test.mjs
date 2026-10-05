@@ -457,3 +457,15 @@ test("refines and mirrors the gallery chrome for Arabic", () => {
   assert.match(styles, /\[dir="rtl"\] \.gallery-home,[^{]+\{ padding-right: 78px; padding-left: 0/);
   assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right:/);
 });
+
+test("uses an edge scrollbar and aligns the compact avatar with gallery cards", () => {
+  assert.match(styles, /html \{ overflow-y: scroll; scrollbar-gutter: stable/);
+  assert.match(styles, /html::-webkit-scrollbar \{ width: 12px/);
+  assert.match(styles, /body \{ overflow: visible/);
+  assert.match(styles, /\.gallery-header \{ padding-right: 32px; padding-left: 32px/);
+  assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
+  assert.match(appSidebar, /className: "app-sidebar-upload"/);
+  assert.match(styles, /\.app-sidebar-nav \.app-sidebar-upload \{/);
+  assert.match(styles, /border-radius: 50%/);
+  assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header, \[dir="rtl"\] \.gallery-header \{ padding-right: 20px; padding-left: 20px/);
+});
