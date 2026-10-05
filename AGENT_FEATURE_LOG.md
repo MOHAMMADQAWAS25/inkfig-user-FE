@@ -3880,3 +3880,67 @@ No migration required.
 ### Notes
 
 Only layout density was restored. The older bordered card design and title-heavy metadata were intentionally not reintroduced because the request was specifically about card layout.
+
+## 2026-10-05 - Use four gallery columns and two on mobile
+
+### Request
+
+Display homepage artwork in four columns on desktop and two columns on mobile using a responsive best-practice implementation, while ensuring images are not stretched beyond their natural proportions.
+
+### Changes
+
+- Replaced preferred-width column shorthand with explicit masonry column counts so responsive behavior is deterministic.
+- Uses four columns on large screens, three on medium screens, and two at tablet and mobile widths.
+- Tightens column gaps progressively for smaller screens while retaining usable image widths.
+- Preserved `width: 100%` with `height: auto` so every artwork keeps its source aspect ratio and card height follows the rendered image.
+- Preserved tags, uploader overlays, like counts, search, filters, detail popups, localization, and themes.
+
+### Repositories
+
+- `inkfig-user-FE`: updated homepage masonry layout and regression coverage.
+- `inkfig-main-system`: no changes required.
+- `inkfig-user-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: defines explicit four-, three-, and two-column responsive masonry counts and automatic image height.
+- `tests/foundation.test.mjs`: verifies all column breakpoints and natural image sizing.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, ownership, or data-scope behavior changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Desktop: four artwork columns.
+- Medium screens: three artwork columns.
+- Tablet and mobile: two artwork columns, including a 390px mobile viewport.
+- Artwork images retain their natural aspect ratios with automatic rendered height; no fixed image height or cropping was introduced.
+- Profile-page cards remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` - 29 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[passed] Playwright desktop verification` - computed `column-count` was 4 at 1440px; the sample image rendered proportionally at 326.982px × 420.399px.
+- `[passed] Playwright mobile verification` - computed `column-count` was 2 at 390px; the same sample image rendered proportionally at 162.963px × 209.52px.
+
+### Deployment
+
+- Push `inkfig-user-FE` directly to `main` to trigger the existing Cloudflare deployment workflow.
+- No backend deployment, migration, secret, environment-variable, or deployment-order change is required.
+
+### Notes
+
+CSS multi-column layout remains appropriate for the existing masonry reading order and variable image heights. Explicit column counts prevent width heuristics from unexpectedly reducing mobile to one column.

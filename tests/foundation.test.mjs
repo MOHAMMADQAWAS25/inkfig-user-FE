@@ -195,9 +195,11 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(homePage, /session \?/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
-  assert.match(styles, /\.artwork-grid \{ columns: 3 300px; column-gap: 22px/);
-  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.artwork-grid \{ columns: 2 240px; column-gap: 18px/);
-  assert.match(styles, /@media \(max-width: 520px\)[\s\S]*\.artwork-grid \{ columns: 1; \}/);
+  assert.match(styles, /\.artwork-grid \{ column-count: 4; column-gap: 18px/);
+  assert.match(styles, /@media \(max-width: 1100px\) \{ \.artwork-grid \{ column-count: 3; \} \}/);
+  assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.artwork-grid \{ column-count: 2; column-gap: 12px/);
+  assert.match(styles, /@media \(max-width: 520px\)[\s\S]*\.artwork-grid \{ column-count: 2; column-gap: 10px/);
+  assert.match(styles, /\.artwork-image \{[^}]*width: 100%;[^}]*height: auto;/);
   assert.match(styles, /\.artwork-pin-media/);
   assert.match(styles, /\.artwork-pin-like/);
   assert.doesNotMatch(homePage, /<h3>\{work\.title\}<\/h3>/);

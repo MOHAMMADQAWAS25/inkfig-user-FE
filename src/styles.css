@@ -428,7 +428,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-filters { display: flex; gap: 9px; margin: 28px 0 36px; overflow-x: auto; padding-bottom: 4px; }
 .gallery-filters button { flex: 0 0 auto; padding: 9px 15px; border: 1px solid rgb(57 67 28 / 0.25); border-radius: 999px; background: rgb(255 253 240 / 0.62); color: #58613d; cursor: pointer; }
 .gallery-filters button.active, .gallery-filters button:hover { border-color: #617d2b; background: #617d2b; color: #fffdf0; }
-.artwork-grid { columns: 3 300px; column-gap: 22px; }
+.artwork-grid { column-count: 4; column-gap: 18px; }
 .artwork-card { break-inside: avoid; margin: 0 0 22px; overflow: visible; border: 0; background: transparent; }
 .artwork-pin-media { position: relative; overflow: hidden; border-radius: 18px; background: #d9d3aa; }
 .artwork-pin-media::after { position: absolute; inset: 0; background: linear-gradient(180deg,rgb(0 0 0 / .08),transparent 45%,rgb(0 0 0 / .25)); content: ""; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
@@ -584,6 +584,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .gallery-filters button { border-color: #3b4828; background: rgb(23 29 17 / 0.86); color: #b7b59a; }
 :root[data-theme="dark"] .gallery-filters button.active, :root[data-theme="dark"] .gallery-filters button:hover { border-color: #a9b65f; background: #a9b65f; color: #20270f; }
 
+@media (max-width: 1100px) { .artwork-grid { column-count: 3; } }
+
 @media (max-width: 820px) {
   .gallery-header { grid-template-columns: 1fr auto; gap: 9px 14px; padding: 9px 16px 12px; }
   .gallery-brand { grid-column: 1; grid-row: 1; }
@@ -595,7 +597,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .gallery-hero-mark { display: none; }
   .gallery-section-heading { align-items: start; flex-direction: column; }
   .gallery-section-heading > span { text-align: start; }
-  .artwork-grid { columns: 2 240px; column-gap: 18px; }
+  .artwork-grid { column-count: 2; column-gap: 12px; }
 }
 
 @media (max-width: 520px) {
@@ -609,7 +611,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .gallery-search { min-height: 42px; }
   .gallery-hero, .gallery-feed { width: calc(100% - 20px); padding-inline: 10px; }
   .gallery-hero h1 { font-size: clamp(2.65rem, 15vw, 4.5rem); }
-  .artwork-grid { columns: 1; }
+  .artwork-grid { column-count: 2; column-gap: 10px; }
   .gallery-footer { align-items: flex-start; flex-direction: column; }
 }
 @media (hover: none) { .artwork-pin-like { opacity: 1; transform: none; } .artwork-pin-uploader { opacity: 1; transform: none; } }
