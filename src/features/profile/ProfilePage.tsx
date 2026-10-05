@@ -4,6 +4,7 @@ import { Link, Navigate, useSearchParams } from "react-router-dom";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
+import type { TranslationKey } from "../../i18n/resources";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "../auth/AuthContext";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
@@ -12,13 +13,9 @@ import type { Work } from "../works/worksApi";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 
-const profileTypeTones:Record<string,string>={"digital art":"violet","hand art":"terracotta",video:"crimson",audio:"teal",animation:"amber",games:"blue","interactive art":"emerald",interactive:"emerald","virtual and augmented reality":"magenta","vr/ar":"magenta"};
-const profileFallbackTones=["violet","terracotta","crimson","teal","amber","blue","emerald","magenta"] as const;
-function profileWorkTypeTone(work:Work):string{const name=work.type_name_en.trim().toLowerCase();if(profileTypeTones[name])return profileTypeTones[name];const hash=[...work.type_id].reduce((value,character)=>(value*31+character.charCodeAt(0))>>>0,0);return profileFallbackTones[hash%profileFallbackTones.length];}
-
-function ProfileArtworkGrid({ empty, language, onSelect, savedCollection=false, works }: { empty:string; language:"ar"|"en"; onSelect:(work:Work)=>void; savedCollection?:boolean; works:Work[] }) {
+function ProfileArtworkGrid({ canLike, canSave, empty, onSelect, onToggleLike, onToggleSave, t, works }: { canLike:boolean; canSave:boolean; empty:string; onSelect:(work:Work)=>void; onToggleLike:(work:Work)=>void; onToggleSave:(work:Work)=>void; t:(key:TranslationKey)=>string; works:Work[] }) {
   return <div className="profile-collection">
-    {works.length===0?<div className="profile-empty"><Image size={30}/><p>{empty}</p></div>:<div className="profile-artwork-grid">{works.map(work=><button className="profile-artwork" type="button" key={work.work_id} onClick={()=>onSelect(work)}><img src={work.image_url} alt={work.title} loading="lazy"/><span className={`artwork-type-tag artwork-type-tag--${profileWorkTypeTone(work)}`}>{language==="ar"?work.type_name_ar:work.type_name_en}</span><span className="profile-artwork-details"><strong>{work.title}</strong><small className={savedCollection?"saved":""}>{savedCollection?<Bookmark size={14} fill="currentColor"/>:<><Heart size={14} fill={work.liked_by_me?"currentColor":"none"}/>{work.like_count}</>}</small></span></button>)}</div>}
+    {works.length===0?<div className="profile-empty"><Image size={30}/><p>{empty}</p></div>:<div className="profile-artwork-grid">{works.map(work=><article className="artwork-card" key={work.work_id}><div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>onSelect(work)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></button><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onToggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onToggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div></article>)}</div>}
   </div>;
 }
 
@@ -55,7 +52,7 @@ export function ProfilePage() {
       <button id="profile-likes-tab" role="tab" type="button" aria-selected={activeSection==="likes"} aria-controls="profile-likes-panel" className={activeSection==="likes"?"active":""} onClick={()=>selectSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
       <button id="profile-saved-tab" role="tab" type="button" aria-selected={activeSection==="saved"} aria-controls="profile-saved-panel" className={activeSection==="saved"?"active":""} onClick={()=>selectSection("saved")}><Bookmark aria-hidden="true" size={16}/>{t("profile.saved")}<span>{saved.length}</span></button>
     </nav>
-    {loading?<p className="profile-state">{t("profile.loading")}</p>:failed?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<div className="profile-sections"><div id={`profile-${activeSection}-panel`} role="tabpanel" aria-labelledby={`profile-${activeSection}-tab`}><ProfileArtworkGrid empty={activeEmpty} language={language} savedCollection={activeSection==="saved"} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)}/></div></div>}
+    {loading?<p className="profile-state">{t("profile.loading")}</p>:failed?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<div className="profile-sections"><div id={`profile-${activeSection}-panel`} role="tabpanel" aria-labelledby={`profile-${activeSection}-tab`}><ProfileArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} empty={activeEmpty} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/></div></div>}
     {selected&&<ArtworkDetailModal language={language} work={selected} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}
   </main>;
 }

@@ -297,8 +297,12 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(worksApi, /"\/works\/me"/);
   assert.match(worksApi, /"\/works\/likes"/);
   assert.match(styles, /\.profile-artwork-grid/);
-  assert.match(profilePage, /artwork-type-tag/);
-  assert.match(profilePage, /profileWorkTypeTone\(work\)/);
+  assert.match(profilePage, /className="artwork-card"/);
+  assert.match(profilePage, /className="artwork-pin-media"/);
+  assert.match(profilePage, /className="artwork-image-button"/);
+  assert.match(profilePage, /className=\{`artwork-pin-like/);
+  assert.match(profilePage, /className=\{`artwork-pin-save/);
+  assert.doesNotMatch(profilePage, /artwork-type-tag|profile-artwork-details/);
   assert.match(styles, /\.profile-tabs/);
   assert.equal([...resources.matchAll(/"profile\.likes"/g)].length, 2);
 });
