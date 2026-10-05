@@ -4092,3 +4092,81 @@ No frontend migration. Paired migrations are inkfig-user-system/20261005_008_add
 ### Notes
 
 The save control uses the existing cookie-authenticated request flow; no tokens are exposed to frontend code.
+
+## 2026-10-05 - Redesign the gallery shell and card interactions
+
+### Request
+
+Simplify gallery cards, add hover-only social actions, introduce a fixed icon navigation rail, smooth gallery scrolling, a search-first header, Saved navigation, and future-feature templates.
+
+### Changes
+
+- Added a fixed, responsive, theme-aware left navigation rail with the InkFig logo and Home, Exhibition, Upload, Notifications, Saved, and Settings icons.
+- Kept Upload connected to the existing publishing flow and linked Saved directly to the user's persisted saved collection.
+- Added localized scaffold pages for Exhibition, Notifications, and Settings so each feature can be built independently later.
+- Reduced the home header to a full-width rectangular search field and a top-right profile avatar; appearance, language, profile, and logout remain available from the avatar menu.
+- Removed uploader and artwork-type overlays from gallery cards, hid like/save actions until hover or keyboard focus, preserved registered-user save authorization, and changed artwork hover cursors to pointers.
+- Preserved the full artwork detail dialog on card activation and enabled smooth, reduced-motion-aware scrolling to the gallery.
+- Extended the shared rail to Profile and Upload, and made profile tabs addressable through URL search parameters so Saved opens directly.
+
+### Repositories
+
+- `inkfig-user-FE`: implemented the application shell, card interactions, routes, localization, responsive styling, and regression coverage.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: shared fixed navigation rail.
+- `src/features/navigation/FeaturePlaceholderPage.tsx`: localized future-feature scaffold.
+- `src/features/home/HomePage.tsx`: simplified header and gallery card overlays.
+- `src/features/profile/ProfilePage.tsx`: shared rail and Saved deep-link handling.
+- `src/features/works/UploadWorkPage.tsx`: shared rail integration.
+- `src/app/AppRouter.tsx`: Exhibition, Notifications, and Settings routes.
+- `src/i18n/resources.ts`: localized navigation, placeholders, and concise search placeholder.
+- `src/styles.css`: rail, hover, smooth-scroll, responsive, light, and dark styling.
+- `tests/foundation.test.mjs`: regression checks for the new shell and interactions.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Saved actions remain available only to authenticated users with `works.save`.
+- Upload authorization and backend enforcement are unchanged.
+- No roles, permissions, or backend authorization behavior changed.
+
+### Frontend
+
+- The navigation rail remains fixed while the home gallery scrolls and reserves content width at desktop and mobile sizes.
+- The search placeholder is now only `Search` in English and `بحث` in Arabic.
+- Artwork cards reveal like/save controls on hover or keyboard focus and open the existing complete detail dialog when selected.
+- Smooth scrolling respects `prefers-reduced-motion`.
+
+### Verification
+
+- `[passed] npm test` - 34 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no in-app browser was attached to this workspace.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pending final synchronization and push.
+
+### Notes
+
+- Upload and Saved intentionally remain functional rather than becoming empty templates; Exhibition, Notifications, and Settings are the requested future-feature scaffolds.

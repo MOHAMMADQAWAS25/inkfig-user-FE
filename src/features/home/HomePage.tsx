@@ -1,4 +1,4 @@
-import { ArrowUpRight, Bookmark, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
+import { ArrowUpRight, Bookmark, Heart, Image, LogOut, Search, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,6 +11,7 @@ import { getWorks, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
 import { hasPermission } from "../../lib/permissions";
+import { AppSidebar } from "../navigation/AppSidebar";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -22,19 +23,6 @@ const workCategories = [
   { code: "interactive", label: "home.filter.interactive" },
   { code: "vr-ar", label: "home.filter.vrAr" },
 ] as const;
-
-const workTypeTones: Record<string,string> = {
-  "digital art":"violet", "hand art":"terracotta", video:"crimson", audio:"teal",
-  animation:"amber", games:"blue", "interactive art":"emerald", interactive:"emerald",
-  "virtual and augmented reality":"magenta", "vr/ar":"magenta",
-};
-const fallbackTones = ["violet","terracotta","crimson","teal","amber","blue","emerald","magenta"] as const;
-function workTypeTone(work:Work):string {
-  const name=work.type_name_en.trim().toLowerCase();
-  if(workTypeTones[name])return workTypeTones[name];
-  const hash=[...work.type_id].reduce((value,character)=>(value*31+character.charCodeAt(0))>>>0,0);
-  return fallbackTones[hash%fallbackTones.length];
-}
 
 export function HomePage() {
   const { session, signOut } = useAuth();
@@ -54,19 +42,15 @@ export function HomePage() {
 
   return (
     <main className="gallery-home">
+      <AppSidebar />
       <header className="gallery-header">
-        <Link className="gallery-brand" to={`/${language}`} aria-label={t("app.name")}>
-          <img src={inkfigLogo} alt="" />
-        </Link>
         <label className="gallery-search">
           <Search aria-hidden="true" size={19} />
           <span className="sr-only">{t("home.searchPlaceholder")}</span>
           <input type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
         </label>
         <div className="gallery-header-actions">
-          <LanguageToggle />
-          <ThemeToggle />
-          {session ? <><Link className="gallery-create-button" to={`/${language}/upload`} aria-label={t("works.upload")} title={t("works.upload")}><Plus aria-hidden="true" size={23} /></Link><details className="gallery-profile-menu" ref={profileMenuRef}><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span></summary><div className="gallery-profile-popover"><div className="gallery-profile-identity"><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span><div><strong>{session.fullName}</strong><small>{session.email}</small></div></div><Link to={`/${language}/profile`}><UserRound aria-hidden="true" size={18} />{t("home.viewProfile")}</Link><Link to={`/${language}/upload`}><Plus aria-hidden="true" size={18} />{t("works.upload")}</Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle /><ThemeToggle /></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18} />{t("nav.logout")}</button></div></details></> : <><Link className="gallery-login-link" to={`/${language}/login`}>{t("auth.signIn")}</Link><Link className="gallery-primary-link" to={`/${language}/signup`}>{t("auth.signUp")}</Link></>}
+          {session ? <details className="gallery-profile-menu" ref={profileMenuRef}><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span></summary><div className="gallery-profile-popover"><div className="gallery-profile-identity"><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span><div><strong>{session.fullName}</strong><small>{session.email}</small></div></div><Link to={`/${language}/profile`}><UserRound aria-hidden="true" size={18} />{t("home.viewProfile")}</Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle /><ThemeToggle /></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18} />{t("nav.logout")}</button></div></details> : <Link className="gallery-guest-avatar" to={`/${language}/login`} aria-label={t("auth.signIn")} title={t("auth.signIn")}><UserRound aria-hidden="true" size={20}/></Link>}
         </div>
       </header>
 
@@ -98,7 +82,7 @@ export function HomePage() {
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:visibleWorks.length===0?<p className="gallery-state">{t("home.noSearchResults")}</p>:<div className="artwork-grid">
           {visibleWorks.map((work) => (
             <article className="artwork-card" key={work.work_id}>
-              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language==="ar"?work.type_name_ar:work.type_name_en}</span><span className="artwork-pin-uploader"><UserRound aria-hidden="true" size={16}/><span>{work.artist_name}</span></span><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
+              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
             </article>
           ))}
         </div>}

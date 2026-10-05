@@ -8,6 +8,7 @@ import { HomePage } from "../features/home/HomePage";
 import { ProfilePage } from "../features/profile/ProfilePage";
 import { UploadWorkPage } from "../features/works/UploadWorkPage";
 import { AdminUsersPage } from "../features/admin/AdminUsersPage";
+import { FeaturePlaceholderPage } from "../features/navigation/FeaturePlaceholderPage";
 
 export function AppRouter() {
   return (
@@ -19,6 +20,9 @@ export function AppRouter() {
       <Route path="/:language/reset-password" element={<PasswordResetPage />} />
       <Route path="/:language/upload" element={<UploadWorkPage />} />
       <Route path="/:language/profile" element={<ProfilePage />} />
+      <Route path="/:language/exhibition" element={<FeaturePlaceholderPage feature="exhibition" />} />
+      <Route path="/:language/notifications" element={<FeaturePlaceholderPage feature="notifications" />} />
+      <Route path="/:language/settings" element={<FeaturePlaceholderPage feature="settings" />} />
       <Route path="/:language/admin/users" element={<AdminUsersPage />} />
       <Route path="*" element={<Navigate replace to="/en" />} />
     </Routes>

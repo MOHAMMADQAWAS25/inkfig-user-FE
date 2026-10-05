@@ -28,6 +28,8 @@ const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDet
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
+const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
+const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -191,7 +193,7 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(router, /Navigate replace to="\/en"/);
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
   assert.match(homePage, /className="artwork-grid"/);
-  assert.match(homePage, /gallery-primary-link/);
+  assert.match(homePage, /gallery-guest-avatar/);
   assert.match(homePage, /session \?/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
@@ -203,14 +205,14 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(styles, /\.artwork-pin-media/);
   assert.match(styles, /\.artwork-pin-like/);
   assert.doesNotMatch(homePage, /<h3>\{work\.title\}<\/h3>/);
-  assert.match(homePage, /artwork-type-tag/);
-  assert.match(homePage, /artwork-pin-uploader/);
+  assert.doesNotMatch(homePage, /artwork-type-tag/);
+  assert.doesNotMatch(homePage, /artwork-pin-uploader/);
   assert.match(styles, /\.artwork-type-tag/);
-  assert.match(homePage, /workTypeTone\(work\)/);
+  assert.doesNotMatch(homePage, /workTypeTone\(work\)/);
   assert.match(styles, /artwork-type-tag--violet/);
   assert.match(styles, /artwork-type-tag--terracotta/);
   assert.match(styles, /artwork-type-tag--magenta/);
-  assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-uploader/);
+  assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-like/);
   assert.match(styles, /@media \(hover: none\)/);
   assert.match(resources, /"home\.collectionTitle"/);
 });
@@ -373,7 +375,7 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(homePage, /className="gallery-search"/);
   assert.match(homePage, /setSearchQuery/);
   assert.match(homePage, /visibleWorks\.map/);
-  assert.match(homePage, /className="gallery-create-button"/);
+  assert.match(homePage, /<AppSidebar \/>/);
   assert.match(homePage, /className="gallery-profile-menu"/);
   assert.match(homePage, /className="gallery-profile-popover"/);
   assert.match(homePage, /session\.fullName\.trim\(\)\.charAt\(0\)/);
@@ -411,4 +413,33 @@ test("saves artworks for registered users and exposes a Saved profile tab", () =
   assert.match(styles, /\.artwork-pin-save\.saved[^}]*color:\s*#f4c430/);
   assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-save/);
   assert.equal([...resources.matchAll(/"profile\.saved"/g)].length, 2);
+});
+
+test("provides a fixed icon rail and future-feature templates", () => {
+  for (const icon of ["House", "Trophy", "Plus", "Bell", "Bookmark", "Settings"]) assert.match(appSidebar, new RegExp(icon));
+  assert.match(appSidebar, /profile\?section=saved/);
+  assert.match(styles, /\.app-sidebar \{ position: fixed/);
+  assert.match(styles, /border-right: 1px solid/);
+  assert.match(styles, /\.gallery-home, \.app-page-with-sidebar, \.app-feature-page \{ padding-left: 78px/);
+  for (const route of ["exhibition", "notifications", "settings"]) assert.match(router, new RegExp(`/:language/${route}`));
+  assert.match(placeholderPage, /app-feature-placeholder/);
+  assert.match(uploadWorkPage, /<AppSidebar\/>/);
+  assert.match(profilePage, /<AppSidebar\/>/);
+});
+
+test("keeps gallery cards minimal until hover and opens full details", () => {
+  assert.doesNotMatch(homePage, /artwork-pin-uploader|workTypeTone/);
+  assert.match(styles, /\.artwork-pin-like \{ opacity: 0/);
+  assert.match(styles, /\.artwork-pin-save\.saved \{ opacity: 0/);
+  assert.match(styles, /\.artwork-pin-media, \.artwork-image-button \{ cursor: pointer/);
+  assert.match(homePage, /setSelectedWorkId\(work\.work_id\)/);
+  assert.match(styles, /html \{ scroll-behavior: smooth/);
+  assert.match(resources, /"home\.searchPlaceholder": "Search"/);
+});
+
+test("opens Saved directly from the rail", () => {
+  assert.match(profilePage, /useSearchParams/);
+  assert.match(profilePage, /requestedSection/);
+  assert.match(profilePage, /setSearchParams/);
+  assert.match(profilePage, /section==="saved"/);
 });
