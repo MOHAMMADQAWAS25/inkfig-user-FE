@@ -3756,3 +3756,66 @@ No migration required.
 ### Notes
 
 Future unknown types use a stable type-ID hash across the same curated palette rather than an arbitrary color.
+
+## 2026-10-05 - Show artwork type tags on profiles
+
+### Request
+
+Show each artwork's colored type tag on profile cards.
+
+### Changes
+
+- Added the existing professional color-coded type tag to every card in both Posts and Likes.
+- Displays the localized Arabic or English type name according to the active language.
+- Positioned the tag over the image while preserving the title and like-count footer.
+- Kept profile navigation, popup details, like behavior, permissions, and responsive grid unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: extended the type-tag presentation to profile artwork cards.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: renders localized, color-coded type tags in both collections.
+- `src/styles.css`: establishes profile cards as the positioning context and preserves footer styling.
+- `tests/foundation.test.mjs`: verifies profile type-tag rendering and tone selection.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Profile access still requires `profile.read_own`.
+- Posts and likes remain scoped to the authenticated account by the backend.
+- No authorization behavior changed.
+
+### Frontend
+
+- Profile Posts and Likes now show the same type colors used on homepage pins.
+- RTL/LTR placement, localization, dark/light themes, loading, empty, and error states remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 29 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `f327c96`
+- Push: `successful`
+
+### Notes
+
+None.
