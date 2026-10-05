@@ -30,6 +30,8 @@ const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPag
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
+const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
+const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.ts", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -404,6 +406,21 @@ test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /!menu\.contains\(event\.target\)/);
   assert.match(homePage, /menu\.removeAttribute\("open"\)/);
   assert.match(homePage, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+});
+
+test("provides secure profile, password, and account settings", () => {
+  assert.match(router, /SettingsPage/);
+  assert.match(settingsPage, /"profile" \| "password" \| "account"/);
+  assert.match(settingsPage, /disabled dir="ltr" value=\{profile\.email\}/);
+  assert.match(settingsPage, /\^\\d\{10\}\$/);
+  assert.match(settingsPage, /password !== confirmation/);
+  assert.match(settingsPage, /reset-password/);
+  assert.match(settingsPage, /window\.confirm/);
+  assert.match(settingsApi, /\/settings\/profile/);
+  assert.match(settingsApi, /\/settings\/password/);
+  assert.match(settingsApi, /\/settings\/account-status/);
+  assert.match(styles, /\.settings-shell/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.settings-page/);
 });
 
 test("saves artworks for registered users and exposes a Saved profile tab", () => {

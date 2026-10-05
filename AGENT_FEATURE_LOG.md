@@ -4638,3 +4638,61 @@ No migration required.
 ### Notes
 
 CSS preserves the source image's intrinsic proportions; perceived resolution still depends on the resolution of the originally uploaded file.
+
+## 2026-10-06 - Build the account settings page
+
+### Request
+
+Replace the Settings placeholder with profile editing, password reset/change, and account management sections.
+
+### Changes
+
+- Added a responsive three-section settings page integrated with the fixed application navigation.
+- Added profile editing for full name, exactly 10 phone digits, gender, and date of birth.
+- Displays the verified email as disabled and never submits it for updates.
+- Added current/new/confirmation password fields plus access to the existing forgot-password flow.
+- Added active account status, confirmed deactivation, automatic sign-out, and administrator-reactivation guidance.
+- Added complete English/Arabic localization and light/dark responsive styling.
+- Updates the local session name after a successful profile save.
+- Added frontend API integration and regression coverage.
+
+### Repositories
+
+- `inkfig-user-FE`: settings UI, API client, routing, localization, styles, and tests.
+- `inkfig-user-system`: paired settings endpoints and backend enforcement.
+- `inkfig-main-system`: no changes required.
+
+### API
+
+- Consumes `GET/PUT /api/v1/settings/profile`.
+- Consumes `PUT /api/v1/settings/password`.
+- Consumes `PUT /api/v1/settings/account-status`.
+
+### Database
+
+- No frontend migration. The user database already enforces unique phone numbers.
+
+### Permissions and scope
+
+- Unauthenticated visitors are redirected to sign in.
+- Backend identity, validation, phone uniqueness, password verification, and account state remain authoritative.
+
+### Verification
+
+- `[passed] npm.cmd test` - 39 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-system` first, then deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No frontend environment-variable change is required.
+
+### Git
+
+- Branch: `feature/account-settings`
+- Commit and push: completed after final synchronization.
+
+### Notes
+
+Deactivation intentionally requires administrator reactivation because inactive accounts cannot safely authenticate themselves.
