@@ -4569,3 +4569,72 @@ No migration required.
 ### Notes
 
 The opened popup remains the single place for title, type, uploader, date, description, links, Like, and Save details.
+
+## 2026-10-06 - Make the complete frontend responsive
+
+### Request
+
+Make the full frontend responsive across all screen sizes, including navigation, search, cards, forms, and automatic column counts, while preserving artwork resolution and proportions.
+
+### Changes
+
+- Added one authoritative responsive layer across gallery, profile, navigation, authentication, upload, administration, placeholders, and artwork details.
+- Changed Home and Profile masonry grids to calculate column count automatically from available width.
+- Preserved natural image aspect ratios with width 100%, height auto, and no initial crop or forced square.
+- Converts the desktop side navigation into a fixed, safe-area-aware bottom navigation on screens at or below 720px.
+- Compacts the sticky search/header without hiding search or profile access.
+- Makes Profile tabs horizontally scrollable, preventing clipped labels and counters.
+- Makes the artwork popup full-screen and image-safe on mobile.
+- Tightens forms, upload, administration, placeholder, hero, and action controls for narrow screens.
+- Added extra-wide and very-narrow behavior, including one column below 360px.
+
+### Repositories
+
+- `inkfig-user-FE`: system-wide responsive styling and regression coverage.
+
+### Files
+
+- `src/styles.css`: adds adaptive columns, mobile navigation, safe areas, responsive pages, and natural-image rules.
+- `tests/foundation.test.mjs`: verifies automatic columns, image preservation, mobile navigation, tabs, and breakpoints.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No roles, permissions, ownership rules, or backend authorization changed.
+- Responsive presentation does not change feature access.
+
+### Frontend
+
+- Desktop retains the side navigation; phone/tablet layouts use bottom navigation.
+- Columns grow and shrink automatically with the available gallery width.
+- Below 600px the preferred pin width decreases to retain useful multi-column layouts; below 360px it becomes one column.
+- Search, Profile, authentication, upload, administration, placeholders, and modal layouts adapt without horizontal overflow.
+- RTL/LTR, dark/light themes, keyboard focus, reduced motion, and device safe areas remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 38 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `43f9b0c`
+- Push: `successful`
+
+### Notes
+
+CSS preserves the source image's intrinsic proportions; perceived resolution still depends on the resolution of the originally uploaded file.
