@@ -4908,3 +4908,12 @@ Replace the current-password form in Settings with the existing forgot-password 
 ### Notes
 
 - The settings flow intentionally shares the same backend rate-limit bucket and security rules as the logged-out forgot-password flow.
+
+## 2026-10-06 - Add secure deactivation and suspension messaging
+
+Added the confirmation-then-current-password self-deactivation flow, automatic sign-out, administrator-suspension login messaging, and blocked-reset messaging. Self-deactivated users can sign back in to reactivate; suspended users are directed to contact an administrator.
+
+- API: sends `current_password` to `/settings/account-status`; handles HTTP 423 for login and password reset.
+- Verification: `npm.cmd test` passed (41 tests), `npm.cmd run build` passed, and `git diff --check` passed.
+- Deployment: deploy after both backends.
+- Branch: `feature/account-status-lifecycle`; push to `main` after synchronization.

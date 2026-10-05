@@ -23,6 +23,6 @@ export async function changePassword(currentPassword: string, password: string, 
   await requestJson<null>(userApiBaseUrl, "PUT", "/settings/password", { body: { current_password: currentPassword, password, password_confirmation: passwordConfirmation } });
 }
 
-export async function deactivateAccount(): Promise<void> {
-  await requestJson<null>(userApiBaseUrl, "PUT", "/settings/account-status", { body: { is_active: false } });
+export async function deactivateAccount(currentPassword: string): Promise<void> {
+  await requestJson<null>(userApiBaseUrl, "PUT", "/settings/account-status", { body: { current_password: currentPassword } });
 }

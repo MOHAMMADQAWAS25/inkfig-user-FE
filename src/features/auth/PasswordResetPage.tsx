@@ -51,8 +51,8 @@ export function PasswordResetPage() {
       setCooldown(response.resend_after_seconds);
       setHourlyLimitReached(response.hourly_limit_reached);
       setStage("code");
-    } catch {
-      setError(t("auth.resetRequestFailed"));
+    } catch (requestError) {
+      setError(requestError instanceof ApiError && requestError.status === 423 ? t("auth.adminSuspended") : t("auth.resetRequestFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -66,8 +66,8 @@ export function PasswordResetPage() {
       setCooldown(response.resend_after_seconds);
       setHourlyLimitReached(response.hourly_limit_reached);
       setCode("");
-    } catch {
-      setError(t("auth.resetRequestFailed"));
+    } catch (requestError) {
+      setError(requestError instanceof ApiError && requestError.status === 423 ? t("auth.adminSuspended") : t("auth.resetRequestFailed"));
     } finally {
       setIsSubmitting(false);
     }

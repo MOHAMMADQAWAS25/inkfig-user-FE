@@ -34,6 +34,8 @@ export function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [deactivatePassword, setDeactivatePassword] = useState("");
+  const [confirmingDeactivation, setConfirmingDeactivation] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -88,7 +90,9 @@ export function SettingsPage() {
       setHourlyLimitReached(response.hourly_limit_reached);
       setCode("");
     } catch (requestError) {
-      if (requestError instanceof ApiError && requestError.status === 429) {
+      if (requestError instanceof ApiError && requestError.status === 423) {
+        fail(t("auth.adminSuspended"));
+      } else if (requestError instanceof ApiError && requestError.status === 429) {
         setHourlyLimitReached(true);
         setCooldown(3600);
         fail(t("auth.hourlyEmailLimit"));
@@ -126,11 +130,15 @@ export function SettingsPage() {
     } finally { setBusy(false); }
   }
 
-  async function deactivate() {
-    if (!window.confirm(t("settings.deactivateConfirm"))) return;
+  function requestDeactivation() {
+    if (window.confirm(t("settings.deactivateConfirm"))) setConfirmingDeactivation(true);
+  }
+
+  async function deactivate(event: FormEvent) {
+    event.preventDefault();
     setBusy(true);
-    try { await deactivateAccount(); signOut(); }
-    catch { fail(t("settings.deactivateFailed")); setBusy(false); }
+    try { await deactivateAccount(deactivatePassword); signOut(); }
+    catch (requestError) { fail(requestError instanceof ApiError && requestError.status===400?t("settings.currentPasswordInvalid"):t("settings.deactivateFailed")); setBusy(false); }
   }
 
   const tabs = [
@@ -152,7 +160,7 @@ export function SettingsPage() {
         <button className="settings-primary" disabled={busy} type="submit">{busy?t("settings.saving"):t("settings.save")}</button>
       </form>}
       {section==="password"&&<div className="settings-password-reset"><MailCheck aria-hidden="true" size={34}/><h2>{t("settings.password")}</h2><p>{t("settings.passwordDescription")}</p><div className="settings-reset-email"><span>{t("auth.email")}</span><strong dir="ltr">{session.email}</strong></div><button className="settings-primary" disabled={busy} type="button" onClick={openPasswordReset}>{t("settings.resetWithCode")}</button></div>}
-      {section==="account"&&<div className="settings-account"><h2>{t("settings.account")}</h2><p>{t("settings.accountDescription")}</p><div className="settings-status"><span>{t("settings.status")}</span><strong>{profile.is_active?t("settings.active"):t("settings.inactive")}</strong></div><div className="settings-danger"><h3>{t("settings.deactivate")}</h3><p>{t("settings.deactivateDescription")}</p><button disabled={busy} type="button" onClick={deactivate}>{t("settings.deactivate")}</button></div></div>}
+      {section==="account"&&<div className="settings-account"><h2>{t("settings.account")}</h2><p>{t("settings.accountDescription")}</p><div className="settings-status"><span>{t("settings.status")}</span><strong>{profile.is_active?t("settings.active"):t("settings.inactive")}</strong></div><div className="settings-danger"><h3>{t("settings.deactivate")}</h3><p>{t("settings.deactivateDescription")}</p>{confirmingDeactivation?<form onSubmit={deactivate}><PasswordField autoComplete="current-password" label={t("settings.currentPassword")} name="deactivate_password" value={deactivatePassword} onChange={setDeactivatePassword}/><button disabled={busy} type="submit">{t("settings.confirmDeactivate")}</button></form>:<button disabled={busy} type="button" onClick={requestDeactivation}>{t("settings.deactivate")}</button>}</div></div>}
     </section>
   </section>
   {resetOpen&&<div className="settings-reset-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!busy&&setResetOpen(false)}><section className="settings-reset-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-reset-title"><header><div><MailCheck size={22}/><h2 id="settings-reset-title">{t("settings.password")}</h2></div><button disabled={busy} type="button" aria-label={t("settings.closeReset")} onClick={()=>setResetOpen(false)}><X size={20}/></button></header>

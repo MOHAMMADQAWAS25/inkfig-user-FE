@@ -37,7 +37,8 @@ export function LoginPage() {
         userId: response.user_id,
       });
     } catch (requestError) {
-      if (requestError instanceof ApiError && requestError.status === 403) setError(t("auth.verifyBeforeLogin"));
+      if (requestError instanceof ApiError && requestError.status === 423) setError(t("auth.adminSuspended"));
+      else if (requestError instanceof ApiError && requestError.status === 403) setError(t("auth.verifyBeforeLogin"));
       else setError(t("auth.invalidCredentials"));
     } finally {
       setIsSubmitting(false);
