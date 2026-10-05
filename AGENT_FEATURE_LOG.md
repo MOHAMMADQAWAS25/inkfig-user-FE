@@ -4777,3 +4777,61 @@ Let users open one another's profiles, follow or unfollow accounts, inspect foll
 ### Notes
 
 - Follower/following dialogs currently load complete lists; add cursor pagination when account relationship volumes justify it.
+
+## 2026-10-06 - Align and animate profile collection tabs
+
+### Request
+
+Place Posts at the start of the profile divider, Saved in the center, and Likes at the end, with an animated red underline on hover and selection.
+
+### Changes
+
+- Reordered the owner-profile tabs to Posts, Saved, then Likes.
+- Changed the tab row to three equal grid columns aligned to logical start, center, and logical end.
+- Added a red underline that smoothly expands from the center on hover, keyboard focus, and active selection.
+- Preserved the selected tab's persistent underline and reduced-motion behavior.
+- Added regression coverage for order, alignment, color, and animation states.
+
+### Repositories
+
+- `inkfig-user-FE`: profile tab markup, styling, and tests.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, authorization, role, permission, ownership, or data-scope behavior changed.
+
+### Frontend
+
+- English and Arabic use logical start/end alignment.
+- Pointer hover, keyboard focus, and selected states share the animated red indicator.
+- Posts, Likes, Saved feeds and deep links remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` - 41 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Push `inkfig-user-FE` to `main` to trigger the existing Cloudflare deployment workflow.
+- No backend, migration, secret, or environment-variable changes are required.
+
+### Git
+
+- Branch: `feature/profile-tab-layout`
+- Commit and push: completed after final synchronization.
+
+### Notes
+
+The line beneath the tabs remains the shared divider; each label receives its own animated red indicator.

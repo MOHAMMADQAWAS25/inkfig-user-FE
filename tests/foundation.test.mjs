@@ -309,6 +309,19 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.equal([...resources.matchAll(/"profile\.likes"/g)].length, 2);
 });
 
+test("orders profile tabs across the divider with an animated red underline", () => {
+  const postsIndex = profilePage.indexOf('aria-selected={section==="posts"}');
+  const savedIndex = profilePage.indexOf('aria-selected={section==="saved"}');
+  const likesIndex = profilePage.indexOf('aria-selected={section==="likes"}');
+  assert.ok(postsIndex < savedIndex && savedIndex < likesIndex);
+  assert.match(styles, /\.profile-tabs \{ display: grid;[^}]*grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.profile-tabs button:nth-child\(1\) \{ justify-self: start/);
+  assert.match(styles, /\.profile-tabs button:nth-child\(2\) \{ justify-self: center/);
+  assert.match(styles, /\.profile-tabs button:nth-child\(3\) \{ justify-self: end/);
+  assert.match(styles, /background: #982824;[^}]*transform: scaleX\(0\)/);
+  assert.match(styles, /button:hover::after[^}]*button:focus-visible::after[^}]*button\.active::after[^}]*transform: scaleX\(1\)/);
+});
+
 test("filters the homepage by all canonical artwork categories", () => {
   for (const code of ["digital-art", "hand-art", "video", "audio", "animation", "games", "interactive", "vr-ar"]) {
     assert.ok(homePage.includes(`code: "${code}"`));

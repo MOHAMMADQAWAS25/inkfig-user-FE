@@ -110,8 +110,8 @@ export function ProfilePage() {
       </div></div>{!ownProfile&&<button className={`profile-follow-button ${profile.is_following?"following":""}`} disabled={followBusy===profile.user_id} type="button" onClick={toggleProfileFollow}>{t(profile.is_following?"profile.unfollow":"profile.follow")}</button>}</section>
       {ownProfile&&<nav className="profile-tabs" role="tablist" aria-label={t("profile.navigation")}>
         <button role="tab" type="button" aria-selected={section==="posts"} className={section==="posts"?"active":""} onClick={()=>selectSection("posts")}>{t("profile.posts")}<span>{posts.length}</span></button>
-        <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} onClick={()=>selectSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
         <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} onClick={()=>selectSection("saved")}><Bookmark size={16}/>{t("profile.saved")}<span>{saved.length}</span></button>
+        <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} onClick={()=>selectSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
       </nav>}
       <div className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onLike={toggleLike} onSave={toggleSave} t={t}/></div>
     </>}
