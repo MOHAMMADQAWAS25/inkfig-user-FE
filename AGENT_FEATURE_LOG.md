@@ -4503,3 +4503,69 @@ No migration required.
 ### Notes
 
 Keyboard focus reveals the text as well as hover so the control remains understandable without a mouse.
+
+## 2026-10-06 - Align profile cards with home pins
+
+### Request
+
+Display cards in every Profile section exactly like homepage cards, including which information is visible or hidden.
+
+### Changes
+
+- Replaced the Profile-only square card design with the homepage pin markup in Posts, Likes, and Saved.
+- Uses natural image proportions and the same responsive masonry column layout as Home.
+- Closed cards now show only the artwork image; titles, type tags, and footer metadata were removed.
+- Like count and Save actions use the same hover/focus overlays and saved/liked states as Home.
+- Full metadata and the colored type tag remain available in the opened artwork popup.
+- Removed obsolete Profile-card styling.
+
+### Repositories
+
+- `inkfig-user-FE`: unified Profile and Home card presentation.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: renders homepage-style pins and connects Like/Save actions in all sections.
+- `src/styles.css`: changes Profile collections to responsive masonry columns and removes obsolete square-card rules.
+- `tests/foundation.test.mjs`: verifies shared pin markup and absence of Profile-only metadata.
+
+### API
+
+No API changes. Existing Like, Save, Posts, Likes, and Saved endpoints are reused.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Profile access still requires `profile.read_own`.
+- Like requires `works.like`; Save requires `works.save`.
+- Posts, Likes, and Saved remain scoped by the backend to the authenticated account.
+
+### Frontend
+
+- Posts, Likes, and Saved now use four masonry columns on desktop, three on tablet, two on mobile, and one on very narrow screens.
+- Image dimensions remain natural instead of being cropped into squares.
+- Loading, empty, error, popup, theme, localization, RTL/LTR, and responsive behavior remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 37 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `90d8d56`
+- Push: `successful`
+
+### Notes
+
+The opened popup remains the single place for title, type, uploader, date, description, links, Like, and Save details.
