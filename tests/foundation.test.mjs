@@ -443,3 +443,17 @@ test("opens Saved directly from the rail", () => {
   assert.match(profilePage, /setSearchParams/);
   assert.match(profilePage, /section==="saved"/);
 });
+
+test("refines and mirrors the gallery chrome for Arabic", () => {
+  assert.match(appSidebar, /size=\{24\}/);
+  assert.match(styles, /\.app-sidebar-logo img \{ width: 48px; height: 48px/);
+  assert.match(styles, /\.app-sidebar-nav \{ gap: 14px; margin-top: 14px/);
+  assert.match(styles, /\.gallery-header \{ padding: 10px 0 10px/);
+  assert.match(styles, /background: rgb\(238 231 189 \/ \.94\)/);
+  assert.match(styles, /\.gallery-search \{ min-height: 46px; border-radius: 8px/);
+  assert.match(styles, /\.gallery-search:hover/);
+  assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 38px; height: 38px/);
+  assert.match(styles, /\[dir="rtl"\] \.app-sidebar \{ right: 0; left: auto/);
+  assert.match(styles, /\[dir="rtl"\] \.gallery-home,[^{]+\{ padding-right: 78px; padding-left: 0/);
+  assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right:/);
+});

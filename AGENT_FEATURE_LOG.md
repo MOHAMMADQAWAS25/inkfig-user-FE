@@ -4170,3 +4170,71 @@ No migration required.
 ### Notes
 
 - Upload and Saved intentionally remain functional rather than becoming empty templates; Exhibition, Notifications, and Settings are the requested future-feature scaffolds.
+## 2026-10-05 - Refine and mirror the gallery navigation shell
+
+### Request
+
+Slightly enlarge the rail logo and icons without widening the rail, equalize and increase their spacing, blend the header into the gallery, extend and sharpen the search field with a darker hover state, reduce and edge-align the avatar, and mirror the shell for Arabic.
+
+### Changes
+
+- Increased navigation icons from 22px to 24px and the rail logo from 44px to 48px while preserving the 78px desktop and 62px mobile rail widths.
+- Increased and equalized the visual gaps from the logo through the Saved icon.
+- Matched the sticky header surfaces to the gallery's light and dark background colors.
+- Extended the search field toward the smaller corner avatar, reduced its radius, and added darker theme-aware hover surfaces.
+- Reduced the avatar from 44px to 38px and removed physical edge padding so it sits at the outer corner.
+- Added complete RTL shell mirroring: Arabic places the rail and separator on the right, shifts content to the right-side offset, and places the avatar and popover at the left edge.
+- Preserved rail widths, routes, permissions, card behavior, and responsive gallery columns.
+
+### Repositories
+
+- `inkfig-user-FE`: refined the responsive and bidirectional gallery shell.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: slightly enlarged navigation icons.
+- `src/styles.css`: refined sizing, spacing, header/search/avatar styling, and RTL physical positioning.
+- `tests/foundation.test.mjs`: added regression coverage for the refined bidirectional shell.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, role, permission, ownership, or backend authorization behavior changed.
+
+### Frontend
+
+- English keeps the rail left and avatar right.
+- Arabic moves the rail right and avatar left while retaining fixed-on-scroll navigation.
+- Light and dark themes receive matching gallery/header surfaces and darker search hover feedback.
+
+### Verification
+
+- `[passed] npm test` - 35 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no in-app browser was attached to this workspace.
+
+### Deployment
+
+- Pushing `main` triggers the existing Cloudflare frontend deployment workflow.
+- No environment-variable, backend, or database changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: this ticket's focused commit.
+- Push: pending final synchronization and push.
+
+### Notes
+
+The navigation remains fixed vertically while scrolling; only its physical side changes with the document language.
