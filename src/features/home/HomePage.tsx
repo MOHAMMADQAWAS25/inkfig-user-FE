@@ -1,4 +1,4 @@
-import { ArrowUpRight, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
+import { ArrowUpRight, Bookmark, Heart, Image, LogOut, Plus, Search, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
@@ -7,7 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
-import { getWorks, setWorkLike } from "../works/worksApi";
+import { getWorks, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
 import { hasPermission } from "../../lib/permissions";
@@ -50,6 +50,7 @@ export function HomePage() {
   useEffect(()=>{setLoading(true);setFeedError(false);getWorks(activeCategory === "all" ? undefined : activeCategory).then(setWorks).catch(()=>setFeedError(true)).finally(()=>setLoading(false));},[activeCategory,session]);
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
+  async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
   return (
     <main className="gallery-home">
@@ -97,7 +98,7 @@ export function HomePage() {
         {loading?<p className="gallery-state">{t("works.loading")}</p>:feedError?<p className="gallery-state">{t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{t("works.empty")}</p>:visibleWorks.length===0?<p className="gallery-state">{t("home.noSearchResults")}</p>:<div className="artwork-grid">
           {visibleWorks.map((work) => (
             <article className="artwork-card" key={work.work_id}>
-              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language==="ar"?work.type_name_ar:work.type_name_en}</span><span className="artwork-pin-uploader"><UserRound aria-hidden="true" size={16}/><span>{work.artist_name}</span></span><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button></div>
+              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language==="ar"?work.type_name_ar:work.type_name_en}</span><span className="artwork-pin-uploader"><UserRound aria-hidden="true" size={16}/><span>{work.artist_name}</span></span><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
             </article>
           ))}
         </div>}

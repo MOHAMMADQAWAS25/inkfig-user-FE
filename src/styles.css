@@ -444,6 +444,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 [dir="rtl"] .artwork-pin-like { inset: 12px auto auto 12px; }
 .artwork-pin-like:hover { background: #7f211e; }
 .artwork-pin-like:disabled { cursor: default; opacity: 1; }
+.artwork-pin-save { position: absolute; z-index: 3; right: 12px; bottom: 12px; display: grid; width: 42px; height: 42px; padding: 0; border: 1px solid rgb(255 255 255 / .3); border-radius: 50%; place-items: center; background: rgb(20 25 13 / .82); color: #fffdf0; cursor: pointer; box-shadow: 0 8px 22px rgb(0 0 0 / .26); opacity: 0; transform: translateY(8px) scale(.94); backdrop-filter: blur(10px); transition: opacity 180ms ease,transform 180ms ease,color 180ms ease,background-color 180ms ease; }
+.artwork-pin-media:hover .artwork-pin-save, .artwork-pin-media:focus-within .artwork-pin-save, .artwork-pin-save.saved { opacity: 1; transform: translateY(0) scale(1); }
+.artwork-pin-save:hover { background: #39431c; transform: translateY(-2px) scale(1.03); }
+.artwork-pin-save.saved { border-color: rgb(244 196 48 / .72); background: rgb(35 35 18 / .92); color: #f4c430; }
+.artwork-pin-media:has(.artwork-pin-save) .artwork-pin-uploader { right: 64px; }
+@media (hover: none) { .artwork-pin-save { opacity: 1; transform: none; } }
 .artwork-type-tag { --tag-bg-start: rgb(255 253 240 / .94); --tag-bg-end: rgb(245 242 220 / .9); --tag-border: rgb(255 255 255 / .5); --tag-ink: #39431c; --tag-accent: #71813d; position: absolute; z-index: 2; inset: 12px auto auto 12px; display: inline-flex; align-items: center; gap: 7px; max-width: calc(100% - 100px); padding: 7px 11px 7px 9px; overflow: hidden; border: 1px solid var(--tag-border); border-radius: 999px; background: linear-gradient(135deg,var(--tag-bg-start),var(--tag-bg-end)); color: var(--tag-ink); font-size: .68rem; font-weight: 850; letter-spacing: .055em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; box-shadow: 0 7px 20px rgb(15 18 10 / .18),inset 0 1px 0 rgb(255 255 255 / .55); backdrop-filter: blur(10px) saturate(1.2); }
 .artwork-type-tag::before { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--tag-accent); box-shadow: 0 0 0 3px color-mix(in srgb,var(--tag-accent) 18%,transparent); content: ""; }
 .artwork-type-tag--violet { --tag-bg-start: rgb(244 239 255 / .95); --tag-bg-end: rgb(222 209 255 / .92); --tag-border: rgb(175 145 239 / .62); --tag-ink: #4b287c; --tag-accent: #7c4cc7; }
@@ -538,6 +544,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .profile-artwork-details { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; }
 .profile-artwork strong { overflow: hidden; font-family: Georgia,serif; font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
 .profile-artwork small { display: inline-flex; align-items: center; gap: 5px; color: #982824; }
+.profile-artwork small.saved { color: #d5a900; }
 .profile-empty,.profile-state { display: grid; min-height: 150px; padding: 30px; border: 1px dashed rgb(57 67 28 / .28); border-radius: 14px; place-items: center; align-content: center; gap: 7px; background: rgb(255 253 240 / .48); color: #667044; text-align: center; }
 .profile-empty p { margin: 0; }
 .profile-state { width: min(1180px,calc(100% - 40px)); margin: 0 auto; }

@@ -2,7 +2,7 @@ import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
-export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; created_at: string };
+export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string };
 export const MAX_WORK_FILE_SIZE = 10 * 1024 * 1024;
 export const WORK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -30,6 +30,7 @@ export async function getWorks(typeCode?: string): Promise<Work[]> {
 }
 export async function getMyWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me")).data.items; }
 export async function getLikedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes")).data.items; }
+export async function getSavedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/saves")).data.items; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
 export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
@@ -44,3 +45,4 @@ export async function uploadWork(input: {typeId:string; title:string; descriptio
   await requestJson<null>(mainApiBaseUrl, "POST", `/works/${prepared.work_id}/publish`);
 }
 export async function setWorkLike(id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`); }
+export async function setWorkSave(id:string, saved:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, saved ? "PUT" : "DELETE", `/works/${id}/save`); }

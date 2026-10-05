@@ -385,7 +385,6 @@ test("builds a searchable icon-first homepage header", () => {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.${key}"`, "g"))].length, 2);
   }
 });
-
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
   assert.match(homePage, /ref=\{profileMenuRef\}/);
@@ -393,4 +392,23 @@ test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /!menu\.contains\(event\.target\)/);
   assert.match(homePage, /menu\.removeAttribute\("open"\)/);
   assert.match(homePage, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+});
+
+test("saves artworks for registered users and exposes a Saved profile tab", () => {
+  assert.match(worksApi, /saved_by_me:\s*boolean/);
+  assert.match(worksApi, /getSavedWorks/);
+  assert.match(worksApi, /\/works\/saves/);
+  assert.match(worksApi, /setWorkSave/);
+  assert.match(worksApi, /\/save/);
+  assert.match(homePage, /hasPermission\(session\.permissions,"works\.save"\)/);
+  assert.match(homePage, /className=\{`artwork-pin-save/);
+  assert.match(homePage, /work\.saved_by_me/);
+  assert.match(homePage, /<Bookmark/);
+  assert.match(profilePage, /getSavedWorks/);
+  assert.match(profilePage, /profile\.saved/);
+  assert.match(profilePage, /profile\.noSaved/);
+  assert.match(profilePage, /activeSection==="saved"/);
+  assert.match(styles, /\.artwork-pin-save\.saved[^}]*color:\s*#f4c430/);
+  assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-save/);
+  assert.equal([...resources.matchAll(/"profile\.saved"/g)].length, 2);
 });

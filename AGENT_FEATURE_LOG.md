@@ -4012,3 +4012,83 @@ No migration required.
 ### Notes
 
 `pointerdown` is used so mouse, touch, and pen interactions all close the menu consistently.
+
+## 2026-10-05 - Add artwork bookmarks and Saved profile tab
+
+### Request
+
+Show registered users an Instagram-style save icon at the bottom-right of homepage cards on hover, turn it yellow after saving, and list saved artwork in a profile section like Likes.
+
+### Changes
+
+- Added an authenticated bookmark button to homepage artwork cards.
+- Shows the button on hover or keyboard focus, keeps saved bookmarks visible, and exposes it on touch devices.
+- Uses optimistic save/unsave updates with rollback when the backend request fails.
+- Turns the active bookmark yellow and localizes save/remove accessible labels.
+- Added a Saved profile tab with count, empty state, responsive artwork grid, and yellow bookmark markers.
+- Loads saved works with Posts and Likes and keeps like-state updates synchronized across all profile collections.
+- Hides the save control unless the current signed session has works.save.
+- Added regression coverage for API mapping, permission gating, styling, localization, and profile integration.
+
+### Repositories
+
+- inkfig-user-FE: bookmark interaction, Saved tab, localization, styles, and tests.
+- inkfig-main-system: paired persistence and save APIs.
+- inkfig-user-system: paired works.save permission migration.
+
+### Files
+
+- src/features/home/HomePage.tsx: adds the authorized optimistic bookmark overlay.
+- src/features/profile/ProfilePage.tsx: adds the Saved tab and collection.
+- src/features/works/worksApi.ts: maps saved_by_me and save/saved-feed requests.
+- src/i18n/resources.ts: adds English and Arabic save/profile labels.
+- src/styles.css: adds hover, focus, touch, and yellow saved-state styling.
+- tests/foundation.test.mjs: verifies the complete save UI contract.
+- AGENT_FEATURE_LOG.md: records this ticket.
+
+### API
+
+- Consumes GET /api/v1/works/saves.
+- Consumes PUT and DELETE /api/v1/works/{work_id}/save.
+- Consumes saved_by_me on published-work responses.
+
+### Database
+
+No frontend migration. Paired migrations are inkfig-user-system/20261005_008_add_work_save_permission.sql and inkfig-main-system/20261005_004_create_work_saves.sql.
+
+### Permissions and scope
+
+- The bookmark renders only for authenticated sessions with works.save.
+- Guests and viewer-only roles receive no save control.
+- The backend remains authoritative for identity, permission, publication state, and saved-feed scope.
+
+### Frontend
+
+- Hovering or focusing a homepage card reveals the bookmark at its physical bottom-right.
+- A saved bookmark stays visible and turns yellow.
+- Touch layouts keep the bookmark visible without relying on hover.
+- The profile adds a third Saved tab alongside Posts and Likes.
+- English, Arabic, RTL/LTR, light/dark themes, and responsive layouts are preserved.
+
+### Verification
+
+- [passed] npm.cmd test - 30 tests passed.
+- [passed] npm.cmd run build - strict TypeScript checks and Vite production build succeeded.
+- [passed] git diff --check
+- [not run] live browser visual inspection - the in-app browser was unavailable in this session.
+
+### Deployment
+
+- Deploy after user-system migration 008/user backend and main-system migration 004/main backend.
+- Pushing main triggers the existing Cloudflare frontend deployment workflow.
+- No frontend environment-variable change is required.
+
+### Git
+
+- Branch: main
+- Commit: this ticket's focused commit.
+- Push: pushed directly to origin/main after synchronization.
+
+### Notes
+
+The save control uses the existing cookie-authenticated request flow; no tokens are exposed to frontend code.
