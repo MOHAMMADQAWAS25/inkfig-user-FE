@@ -485,3 +485,13 @@ test("centers the avatar between the search edge and header edge", () => {
   assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right: 32px; padding-left: 0/);
   assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header \{ grid-template-columns: minmax\(0,1fr\) 52px/);
 });
+
+test("adapts the complete interface across screen sizes without cropping artwork", () => {
+  assert.match(styles, /\.artwork-grid, \.profile-artwork-grid \{ column-count: auto; column-width: 220px/);
+  assert.match(styles, /\.artwork-image, \.profile-artwork-grid \.artwork-image[^}]*height: auto[^}]*aspect-ratio: auto[^}]*object-fit: contain/);
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.app-sidebar, \[dir="rtl"\] \.app-sidebar[\s\S]*bottom: 0/);
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.profile-tabs[\s\S]*overflow-x: auto/);
+  assert.match(styles, /@media \(max-width: 600px\)[\s\S]*column-width: 155px/);
+  assert.match(styles, /@media \(max-width: 359px\)[\s\S]*column-count: 1/);
+  assert.match(styles, /env\(safe-area-inset-bottom\)/);
+});
