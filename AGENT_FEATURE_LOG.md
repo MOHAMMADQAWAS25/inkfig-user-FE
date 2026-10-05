@@ -3944,3 +3944,71 @@ No migration required.
 ### Notes
 
 CSS multi-column layout remains appropriate for the existing masonry reading order and variable image heights. Explicit column counts prevent width heuristics from unexpectedly reducing mobile to one column.
+
+## 2026-10-05 - Close the profile menu on outside click
+
+### Request
+
+Close the navbar profile menu whenever the user clicks anywhere outside the open menu.
+
+### Changes
+
+- Added a typed React reference to the native profile-menu `details` element.
+- Added a document-level `pointerdown` listener that closes the menu only when it is open and the event target is outside the menu.
+- Preserved clicks inside the profile popover so links, language switching, theme switching, and logout remain usable.
+- Added effect cleanup that removes the document listener when the homepage unmounts.
+- Added regression coverage for the reference, containment check, close operation, and cleanup.
+
+### Repositories
+
+- `inkfig-user-FE`: adds outside-click behavior and test coverage.
+- `inkfig-main-system`: no changes required.
+- `inkfig-user-system`: no changes required.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: detects outside pointer presses and closes the profile menu.
+- `tests/foundation.test.mjs`: verifies the complete outside-click lifecycle.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, roles, permissions, or access scopes changed.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Clicking outside an open navbar profile menu closes it immediately.
+- Clicking the profile avatar still uses the native `details` toggle behavior.
+- Interacting inside the menu does not trigger the outside-close behavior.
+- Menu styling, navigation, theme controls, localization, and responsive layout remain unchanged.
+
+### Verification
+
+- `[passed] npm test` - 30 tests passed.
+- `[passed] npm run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no browser surface is available in this session.
+
+### Deployment
+
+- Merge the dedicated branch through the normal pull-request workflow; the existing Cloudflare frontend deployment workflow runs after merge to `main`.
+- No backend, migration, environment-variable, or deployment-order changes are required.
+
+### Git
+
+- Branch: `fix/profile-menu-outside-click`
+- Commit: this ticket's focused commit.
+- Push: dedicated branch pushed to `origin` after synchronization with the latest `origin/main`.
+
+### Notes
+
+`pointerdown` is used so mouse, touch, and pen interactions all close the menu consistently.

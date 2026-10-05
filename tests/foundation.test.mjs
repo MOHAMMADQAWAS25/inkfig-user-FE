@@ -385,3 +385,12 @@ test("builds a searchable icon-first homepage header", () => {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.${key}"`, "g"))].length, 2);
   }
 });
+
+test("closes the homepage profile menu when clicking outside it", () => {
+  assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
+  assert.match(homePage, /ref=\{profileMenuRef\}/);
+  assert.match(homePage, /document\.addEventListener\("pointerdown",closeProfileMenu\)/);
+  assert.match(homePage, /!menu\.contains\(event\.target\)/);
+  assert.match(homePage, /menu\.removeAttribute\("open"\)/);
+  assert.match(homePage, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+});
