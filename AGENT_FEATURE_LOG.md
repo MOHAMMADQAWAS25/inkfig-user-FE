@@ -4440,3 +4440,66 @@ No migration required.
 ### Notes
 
 The Save button previously disappeared because the shared popup accepted only Like state and callbacks.
+
+## 2026-10-06 - Reveal short save label on hover
+
+### Request
+
+Remove the long “Save artwork” wording and show only “Save” when hovering over the Save button.
+
+### Changes
+
+- Shortened the English action labels to Save and Unsave.
+- Shortened the corresponding Arabic labels to حفظ and إلغاء الحفظ.
+- Made the popup Save control icon-only at rest and smoothly expand its text on hover or keyboard focus.
+- Preserved saved-state color, API behavior, permission checks, and accessibility naming.
+
+### Repositories
+
+- `inkfig-user-FE`: refined the artwork popup Save control.
+
+### Files
+
+- `src/i18n/resources.ts`: replaced long Save/Unsave wording with concise localized labels.
+- `src/styles.css`: added icon-only resting state and hover/focus label reveal.
+- `tests/foundation.test.mjs`: verifies concise wording and hover behavior.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Save remains available only with `works.save`.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Popup Save is a compact icon until pointer hover or keyboard focus.
+- Saved and unsaved states retain distinct styling and correct localized action text.
+- RTL/LTR, responsive layouts, and light/dark themes remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 37 tests passed`
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend, migration, or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `87e02b0`
+- Push: `successful`
+
+### Notes
+
+Keyboard focus reveals the text as well as hover so the control remains understandable without a mouse.
