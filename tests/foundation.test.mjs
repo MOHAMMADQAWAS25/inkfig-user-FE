@@ -197,7 +197,7 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
   assert.match(homePage, /className="artwork-grid"/);
   assert.match(homePage, /gallery-guest-avatar/);
-  assert.match(homePage, /session \?/);
+  assert.match(homePage, /!session&&<Link className="gallery-guest-avatar"/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ column-count: 4; column-gap: 18px/);
@@ -396,15 +396,15 @@ test("features the Ink your world hero lockup", () => {
 });
 test("builds a searchable icon-first homepage header", () => {
   assert.doesNotMatch(homePage, /gallery-nav|gallery-language/);
-  assert.match(homePage, /<LanguageToggle \/>/);
+  assert.match(appSidebar, /<LanguageToggle\/>/);
   assert.match(homePage, /className="gallery-search"/);
   assert.match(homePage, /setSearchQuery/);
   assert.match(homePage, /visibleWorks\.map/);
   assert.match(homePage, /<AppSidebar \/>/);
-  assert.match(homePage, /className="gallery-profile-menu"/);
-  assert.match(homePage, /className="gallery-profile-popover"/);
-  assert.match(homePage, /session\.fullName\.trim\(\)\.charAt\(0\)/);
-  assert.match(homePage, /onClick=\{signOut\}/);
+  assert.match(appSidebar, /className="gallery-profile-menu app-sidebar-profile"/);
+  assert.match(appSidebar, /className="gallery-profile-popover"/);
+  assert.match(appSidebar, /session\.fullName\.trim\(\)\.charAt\(0\)/);
+  assert.match(appSidebar, /onClick=\{signOut\}/);
   assert.match(styles, /\.gallery-profile-popover/);
   assert.match(styles, /\.gallery-search:focus-within/);
   assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.gallery-search \{ grid-column: 1 \/ -1; grid-row: 2; \}/);
@@ -413,12 +413,19 @@ test("builds a searchable icon-first homepage header", () => {
   }
 });
 test("closes the homepage profile menu when clicking outside it", () => {
-  assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
-  assert.match(homePage, /ref=\{profileMenuRef\}/);
-  assert.match(homePage, /document\.addEventListener\("pointerdown",closeProfileMenu\)/);
-  assert.match(homePage, /!menu\.contains\(event\.target\)/);
-  assert.match(homePage, /menu\.removeAttribute\("open"\)/);
-  assert.match(homePage, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+  assert.match(appSidebar, /useRef<HTMLDetailsElement>\(null\)/);
+  assert.match(appSidebar, /ref=\{profileMenuRef\}/);
+  assert.match(appSidebar, /document\.addEventListener\("pointerdown",closeProfileMenu\)/);
+  assert.match(appSidebar, /!menu\.contains\(event\.target\)/);
+  assert.match(appSidebar, /menu\.removeAttribute\("open"\)/);
+  assert.match(appSidebar, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+});
+
+test("places the signed-in profile control above Settings in the shared sidebar", () => {
+  assert.match(appSidebar, /app-sidebar-account/);
+  assert.ok(appSidebar.indexOf("app-sidebar-profile") < appSidebar.indexOf("app-sidebar-settings"));
+  assert.doesNotMatch(homePage, /ref=\{profileMenuRef\}/);
+  assert.match(styles, /\.app-sidebar-account \{[^}]*margin-top: auto/);
 });
 
 test("provides secure profile, password, and account settings", () => {

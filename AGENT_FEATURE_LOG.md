@@ -4917,3 +4917,38 @@ Added the confirmation-then-current-password self-deactivation flow, automatic s
 - Verification: `npm.cmd test` passed (41 tests), `npm.cmd run build` passed, and `git diff --check` passed.
 - Deployment: deploy after both backends.
 - Branch: `feature/account-status-lifecycle`; push to `main` after synchronization.
+
+## 2026-10-06 - Move profile control to the application sidebar
+
+### Request
+
+Move the signed-in profile icon out of the top navigation and place it in the shared side navigation directly above Settings.
+
+### Changes
+
+- Moved the authenticated profile menu, account identity, profile link, language/theme controls, and logout action into the shared application sidebar.
+- Positioned the profile control immediately above Settings on desktop and immediately before Settings in the responsive bottom navigation.
+- Preserved outside-click dismissal and added LTR/RTL-aware popover placement for desktop and mobile layouts.
+- Kept the guest sign-in control in the homepage header.
+- Updated frontend coverage to verify the new shared-sidebar ownership and control order.
+
+### Repositories
+
+- `inkfig-user-FE`: navigation placement, responsive styling, and tests.
+- No backend or database changes are required.
+
+### Verification
+
+- `[passed] npm.cmd test` - 42 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend deployment workflow.
+- No migration, secret, environment-variable, or configuration changes are required.
+
+### Git
+
+- Branch: `feature/sidebar-profile-control`
+- Commit, rebase, merge, and push: completed after final synchronization.
