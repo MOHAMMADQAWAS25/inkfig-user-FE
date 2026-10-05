@@ -7,7 +7,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "../auth/AuthContext";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
-import { getLikedWorks, getMyWorks, getSavedWorks, setWorkLike } from "../works/worksApi";
+import { getLikedWorks, getMyWorks, getSavedWorks, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -42,6 +42,7 @@ export function ProfilePage() {
   if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
 
   async function toggleLike(work:Work){const next=!work.liked_by_me;const update=(item:Work)=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item;setPosts(current=>current.map(update));setLikes(current=>next?current.map(update):current.filter(item=>item.work_id!==work.work_id));setSaved(current=>current.map(update));try{await setWorkLike(work.work_id,next);}catch{setPosts(current=>current.map(item=>item.work_id===work.work_id?work:item));setSaved(current=>current.map(item=>item.work_id===work.work_id?work:item));if(!next)setLikes(current=>[work,...current.filter(item=>item.work_id!==work.work_id)]);}}
+  async function toggleSave(work:Work){const next=!work.saved_by_me;try{await setWorkSave(work.work_id,next);const updated={...work,saved_by_me:next};setPosts(current=>current.map(item=>item.work_id===work.work_id?updated:item));setLikes(current=>current.map(item=>item.work_id===work.work_id?updated:item));setSaved(current=>next?(current.some(item=>item.work_id===work.work_id)?current.map(item=>item.work_id===work.work_id?updated:item):[updated,...current]):current.filter(item=>item.work_id!==work.work_id));}catch{return;}}
   const activeWorks=activeSection==="posts"?posts:activeSection==="likes"?likes:saved;
   const activeEmpty=activeSection==="posts"?t("profile.noPosts"):activeSection==="likes"?t("profile.noLikes"):t("profile.noSaved");
 
@@ -55,6 +56,6 @@ export function ProfilePage() {
       <button id="profile-saved-tab" role="tab" type="button" aria-selected={activeSection==="saved"} aria-controls="profile-saved-panel" className={activeSection==="saved"?"active":""} onClick={()=>selectSection("saved")}><Bookmark aria-hidden="true" size={16}/>{t("profile.saved")}<span>{saved.length}</span></button>
     </nav>
     {loading?<p className="profile-state">{t("profile.loading")}</p>:failed?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<div className="profile-sections"><div id={`profile-${activeSection}-panel`} role="tabpanel" aria-labelledby={`profile-${activeSection}-tab`}><ProfileArtworkGrid empty={activeEmpty} language={language} savedCollection={activeSection==="saved"} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)}/></div></div>}
-    {selected&&<ArtworkDetailModal language={language} work={selected} canLike onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} t={t}/>}
+    {selected&&<ArtworkDetailModal language={language} work={selected} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}
   </main>;
 }

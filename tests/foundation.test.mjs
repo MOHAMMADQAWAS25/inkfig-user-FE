@@ -267,6 +267,9 @@ test("opens an accessible artwork detail modal with complete public metadata", (
   assert.match(artworkDetailModal, /work\.description/);
   assert.match(artworkDetailModal, /work\.created_at/);
   assert.match(artworkDetailModal, /work\.like_count/);
+  assert.match(artworkDetailModal, /artwork-modal-save/);
+  assert.match(artworkDetailModal, /onToggleSave/);
+  assert.match(artworkDetailModal, /artwork-modal-type-tag/);
   assert.match(artworkDetailModal, /work\.links\.map/);
   assert.match(artworkDetailModal, /noopener noreferrer/);
   assert.match(artworkDetailModal, /event\.key === "Escape"/);

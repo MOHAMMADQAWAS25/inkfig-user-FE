@@ -88,7 +88,7 @@ export function HomePage() {
         </div>}
       </section>
 
-      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session)} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} t={t}/>}
+      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
     </main>
