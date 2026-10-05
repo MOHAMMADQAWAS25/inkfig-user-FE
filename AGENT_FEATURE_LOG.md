@@ -4696,3 +4696,84 @@ Replace the Settings placeholder with profile editing, password reset/change, an
 ### Notes
 
 Deactivation intentionally requires administrator reactivation because inactive accounts cannot safely authenticate themselves.
+## 2026-10-06 - Add social profile experience
+
+### Request
+
+Let users open one another's profiles, follow or unfollow accounts, inspect follower/following account lists, and see follower, following, and received-like counters.
+
+### Changes
+
+- Added profile URLs for other accounts and linked artist identities from gallery cards and artwork details.
+- Added follower, following, and total received-like counters to every signed-in profile view.
+- Added optimistic follow/unfollow controls on profiles and beside accounts in follower/following dialogs, with rollback on API failure.
+- Preserved the owner's Posts, Likes, and Saved navigation while other profiles display their published posts.
+- Added responsive, RTL-aware, light/dark social-profile styling and mobile bottom-sheet behavior.
+- Extended secure-cookie refresh retry behavior to authenticated user-API profile, settings, and administration routes.
+- Left guest gallery access, upload workflows, and existing private collections unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: implements the social-profile interface.
+- `inkfig-user-system`: provides profile data, relationships, counters, and mutations.
+- `inkfig-main-system`: provides selected-account artwork feeds.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: renders own/other profiles, counters, follow actions, connection dialogs, and artwork collections.
+- `src/features/profile/profileApi.ts`: provides typed social-profile API calls.
+- `src/features/works/worksApi.ts`: loads artworks for a selected account.
+- `src/features/home/HomePage.tsx`: links gallery artist identities to profiles.
+- `src/features/home/ArtworkDetailModal.tsx`: links modal artist identity to the profile.
+- `src/app/AppRouter.tsx`: adds `/:language/profile/:userId`.
+- `src/api/httpClient.ts`: retries authenticated user-API requests after secure-cookie refresh.
+- `src/i18n/resources.ts`: adds English and Arabic social-profile labels and states.
+- `src/styles.css`: adds responsive social profile, account-list, follow-button, and artist-link styling.
+- `tests/foundation.test.mjs`: updates profile expectations and adds social-profile coverage.
+
+### API
+
+- Consumes `GET /api/v1/profiles/{user_id}`.
+- Consumes `GET /api/v1/profiles/{user_id}/followers`.
+- Consumes `GET /api/v1/profiles/{user_id}/following`.
+- Consumes `PUT /api/v1/profiles/{user_id}/follow`.
+- Consumes `DELETE /api/v1/profiles/{user_id}/follow`.
+- Consumes `GET /api/v1/works/users/{user_id}`.
+
+### Database
+
+- Migration: `20261006_010_add_user_follows.sql` in `inkfig-user-system`.
+- No frontend-local database changes.
+
+### Permissions and scope
+
+- Signed-in users with `profile.read_own` can open social profiles and manage their own follow relationships.
+- Follow mutations never submit or select the acting user ID; secure cookies identify the actor and the backend validates authorization.
+- Artwork like/save controls continue to use their existing permissions.
+
+### Frontend
+
+- Adds route `/:language/profile/:userId` while preserving `/:language/profile`.
+- Adds clickable artist overlays, profile counters, Follow/Unfollow states, follower/following dialogs, account links, optimistic loading, empty/error states, responsive mobile presentation, RTL/LTR support, and English/Arabic localization.
+
+### Verification
+
+- `[passed] npm test — 40 passed`
+- `[passed] npm run build — TypeScript checks and Vite production build passed`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after both backend deployments.
+- Backend migration must run before frontend deployment; it has already been applied to Supabase.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `ba2f24f`
+- Push: `successful`
+
+### Notes
+
+- Follower/following dialogs currently load complete lists; add cursor pagination when account relationship volumes justify it.
