@@ -427,12 +427,19 @@ test("provides secure profile, password, and account settings", () => {
   assert.match(settingsPage, /disabled dir="ltr" value=\{profile\.email\}/);
   assert.match(settingsPage, /\^\\d\{10\}\$/);
   assert.match(settingsPage, /password !== confirmation/);
-  assert.match(settingsPage, /reset-password/);
+  assert.match(settingsPage, /requestPasswordReset/);
+  assert.match(settingsPage, /verifyPasswordResetCode/);
+  assert.match(settingsPage, /confirmPasswordReset/);
+  assert.match(settingsPage, /session!\.email/);
+  assert.doesNotMatch(settingsPage, /currentPassword/);
+  assert.match(settingsPage, /hourlyLimitReached/);
+  assert.match(settingsPage, /cooldown/);
   assert.match(settingsPage, /window\.confirm/);
   assert.match(settingsApi, /\/settings\/profile/);
   assert.match(settingsApi, /\/settings\/password/);
   assert.match(settingsApi, /\/settings\/account-status/);
   assert.match(styles, /\.settings-shell/);
+  assert.match(styles, /\.settings-reset-dialog/);
   assert.match(styles, /:root\[data-theme="dark"\] \.settings-page/);
 });
 

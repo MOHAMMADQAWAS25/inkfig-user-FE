@@ -897,3 +897,42 @@ img { max-width: 100%; image-rendering: auto; }
 @media (hover: none) {
   .artwork-artist-link { opacity: 1; transform: none; }
 }
+
+/* Settings email-code password reset */
+.settings-password-reset { display: grid; max-width: 620px; align-content: start; justify-items: start; gap: 16px; }
+.settings-password-reset > svg { padding: 10px; border-radius: 14px; box-sizing: content-box; background: rgb(97 125 43 / .12); color: #617d2b; }
+.settings-password-reset h2,.settings-password-reset p { margin: 0; }
+.settings-password-reset h2 { font-family: Georgia,"Times New Roman",serif; font-size: clamp(1.8rem,4vw,2.6rem); }
+.settings-password-reset p { color: #667044; line-height: 1.65; }
+.settings-reset-email { display: grid; width: 100%; padding: 15px 17px; border: 1px solid rgb(57 67 28 / .16); border-radius: 14px; background: rgb(97 125 43 / .07); gap: 4px; }
+.settings-reset-email span { color: #747a5e; font-size: .78rem; font-weight: 750; }
+.settings-reset-email strong { overflow-wrap: anywhere; }
+.settings-reset-backdrop { position: fixed; z-index: 90; inset: 0; display: grid; padding: 20px; place-items: center; background: rgb(13 17 9 / .65); backdrop-filter: blur(8px); }
+.settings-reset-dialog { width: min(500px,100%); max-height: 90svh; overflow-y: auto; border: 1px solid rgb(57 67 28 / .2); border-radius: 22px; background: #fffdf0; color: #39431c; box-shadow: 0 28px 90px rgb(11 15 7 / .34); animation: auth-card-enter 260ms ease both; }
+.settings-reset-dialog > header { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid rgb(57 67 28 / .14); }
+.settings-reset-dialog > header > div { display: flex; align-items: center; gap: 10px; }
+.settings-reset-dialog h2 { margin: 0; font-family: Georgia,"Times New Roman",serif; font-size: 1.55rem; }
+.settings-reset-dialog > header button { display: grid; width: 38px; height: 38px; border: 0; border-radius: 50%; place-items: center; background: rgb(57 67 28 / .09); color: inherit; cursor: pointer; }
+.settings-reset-dialog > form { display: grid; padding: 24px 22px; gap: 17px; }
+.settings-reset-dialog form > p { margin: 0; color: #667044; line-height: 1.6; }
+.settings-reset-dialog label { display: grid; font-weight: 750; gap: 7px; }
+.settings-reset-dialog input { width: 100%; min-height: 48px; padding: 11px 13px; border: 1px solid rgb(57 67 28 / .25); border-radius: 12px; background: #fffdf0; color: #283016; font: inherit; }
+.settings-reset-dialog .verification-code-input { text-align: center; font-size: 1.45rem; font-weight: 900; letter-spacing: .35em; }
+.settings-reset-resend { min-height: 42px; border: 0; background: transparent; color: #526b24; font: inherit; font-weight: 800; cursor: pointer; }
+.settings-reset-resend:disabled { color: #8b8e7a; cursor: wait; }
+:root[data-theme="dark"] .settings-password-reset p { color: #b7b59a; }
+:root[data-theme="dark"] .settings-reset-email { border-color: #465331; background: rgb(169 182 95 / .08); }
+:root[data-theme="dark"] .settings-reset-email span { color: #b7b59a; }
+:root[data-theme="dark"] .settings-reset-dialog { border-color: #3b4828; background: #171d11; color: #f7f2d8; }
+:root[data-theme="dark"] .settings-reset-dialog > header { border-color: #3b4828; }
+:root[data-theme="dark"] .settings-reset-dialog form > p { color: #b7b59a; }
+:root[data-theme="dark"] .settings-reset-dialog input { border-color: #465331; background: #11170e; color: #f1edd7; }
+:root[data-theme="dark"] .settings-reset-resend { color: #cbd88a; }
+@media (max-width: 520px) {
+  .settings-reset-backdrop { padding: 0; align-items: end; }
+  .settings-reset-dialog { width: 100%; max-height: 92svh; border-radius: 22px 22px 0 0; }
+  .settings-reset-dialog > form { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-reset-dialog { animation: none; }
+}
