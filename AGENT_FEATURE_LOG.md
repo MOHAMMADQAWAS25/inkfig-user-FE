@@ -4835,3 +4835,76 @@ No authentication, authorization, role, permission, ownership, or data-scope beh
 ### Notes
 
 The line beneath the tabs remains the shared divider; each label receives its own animated red indicator.
+## 2026-10-06 - Reset password from settings with email code
+
+### Request
+
+Replace the current-password form in Settings with the existing forgot-password verification-code workflow: send a code to the signed-in user's email, verify it, then allow a new password, with the established resend and rate-limit rules.
+
+### Changes
+
+- Replaced current-password entry in Settings with a verification-code reset action.
+- Automatically sends the first reset code to the authenticated account's fixed university email when the reset dialog opens.
+- Added code verification followed by new-password and confirmation fields only after successful verification.
+- Added resend countdown, five-code hourly-limit messaging, expired/invalid code errors, incorrect-attempt handling, and reset-token expiry handling.
+- Signs the user out after success because the backend invalidates existing sessions when the password changes.
+- Added responsive modal/bottom-sheet styling with light, dark, RTL, LTR, loading, error, disabled, and reduced-motion states.
+- Left the standalone logged-out forgot-password page and backend security rules unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: replaces the settings password form with the existing email-code reset flow.
+- `inkfig-user-system`: no changes; existing password-reset endpoints and enforcement are reused.
+
+### Files
+
+- `src/features/settings/SettingsPage.tsx`: adds the authenticated email-code dialog and three-stage reset workflow.
+- `src/i18n/resources.ts`: updates the settings explanation and adds English/Arabic reset-dialog labels.
+- `src/styles.css`: adds responsive and theme-aware settings reset styling.
+- `tests/foundation.test.mjs`: verifies endpoint reuse, fixed session email, absence of current-password input, cooldown, hourly limit, and dialog styling.
+
+### API
+
+- Reuses `POST /api/v1/auth/password-reset/request` with the authenticated session email.
+- Reuses `POST /api/v1/auth/password-reset/verify` with the six-digit code.
+- Reuses `POST /api/v1/auth/password-reset/confirm` with the reset token and new password.
+- No API contract changes.
+
+### Database
+
+- No migration required.
+- Existing password-reset challenge, attempt, expiry, reset-token, and email-rate-limit storage is reused.
+
+### Permissions and scope
+
+- The Settings page requires an authenticated frontend session.
+- The target email is taken from the authenticated session and is not editable in the dialog.
+- The backend continues to validate account eligibility, code lifetime, incorrect attempts, reset-token lifetime, resend cooldown, and the five-codes-per-hour limit.
+- Password confirmation invalidates existing refresh tokens and increments the account token version on the backend.
+
+### Frontend
+
+- Settings route `/:language/settings`, Reset password section now opens an accessible modal.
+- Stages: automatic send and code entry, verified new-password entry, then sign-out on success.
+- Provides resend countdown, hourly-limit state, loading/disabled controls, localized errors, responsive mobile bottom sheet, RTL/LTR, dark/light themes, and reduced-motion support.
+
+### Verification
+
+- `[passed] npm test — 41 passed`
+- `[passed] npm run build — TypeScript checks and Vite production build passed`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No backend deployment, migration, environment-variable, or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `c9b88ff`
+- Push: `successful`
+
+### Notes
+
+- The settings flow intentionally shares the same backend rate-limit bucket and security rules as the logged-out forgot-password flow.
