@@ -510,7 +510,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .artwork-modal-links a:hover { border-color: #617d2b; background: rgb(97 125 43 / .08); }
 .artwork-modal-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: auto; padding-top: 28px; }
 .artwork-modal-like, .artwork-modal-save { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 10px 14px; border: 1px solid rgb(57 67 28 / .18); border-radius: 999px; background: rgb(57 67 28 / .06); color: #982824; font-weight: 800; cursor: pointer; }
-.artwork-modal-save { color: #526225; }
+.artwork-modal-save { gap: 0; width: 42px; padding-inline: 10px; overflow: hidden; justify-content: center; color: #526225; transition: width 180ms ease,gap 180ms ease,transform 180ms ease,box-shadow 180ms ease; }
+.artwork-modal-save span { max-width: 0; overflow: hidden; opacity: 0; white-space: nowrap; transition: max-width 180ms ease,opacity 140ms ease; }
+.artwork-modal-save:hover, .artwork-modal-save:focus-visible { width: 104px; gap: 8px; }
+.artwork-modal-save:hover span, .artwork-modal-save:focus-visible span { max-width: 64px; opacity: 1; }
 .artwork-modal-save.saved { border-color: rgb(213 169 0 / .42); background: rgb(244 196 48 / .12); color: #a98100; }
 .artwork-modal-like:hover, .artwork-modal-save:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgb(57 67 28 / .12); }
 .artwork-modal-like:disabled { cursor: default; opacity: .62; }

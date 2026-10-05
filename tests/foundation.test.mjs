@@ -268,6 +268,9 @@ test("opens an accessible artwork detail modal with complete public metadata", (
   assert.match(artworkDetailModal, /work\.created_at/);
   assert.match(artworkDetailModal, /work\.like_count/);
   assert.match(artworkDetailModal, /artwork-modal-save/);
+  assert.match(resources, /"home\.saveWork": "Save"/);
+  assert.doesNotMatch(resources, /Save artwork/);
+  assert.match(styles, /\.artwork-modal-save:hover span/);
   assert.match(artworkDetailModal, /onToggleSave/);
   assert.match(artworkDetailModal, /artwork-modal-type-tag/);
   assert.match(artworkDetailModal, /work\.links\.map/);
