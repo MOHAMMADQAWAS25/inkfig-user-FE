@@ -1,5 +1,6 @@
 import { Bookmark, CalendarDays, ExternalLink, Heart, Link2, UserRound, X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 import type { Language, TranslationKey } from "../../i18n/resources";
 import type { Work } from "../works/worksApi";
@@ -48,7 +49,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, onClose, 
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
           <div className="artwork-modal-meta">
-            <span><UserRound size={16} />{t("home.by")} {work.artist_name}</span>
+            <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={onClose}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>
             <span><CalendarDays size={16} />{uploadedAt}</span>
           </div>
           <div className="artwork-modal-description">

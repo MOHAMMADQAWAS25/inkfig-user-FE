@@ -182,6 +182,15 @@ const en = {
   "profile.noSaved": "Artworks you save will appear here.",
   "profile.loading": "Loading your profile…",
   "profile.loadFailed": "Your profile could not be loaded right now.",
+  "profile.communityProfile": "InkFig profile",
+  "profile.followers": "Followers",
+  "profile.following": "Following",
+  "profile.totalLikes": "Likes",
+  "profile.follow": "Follow",
+  "profile.unfollow": "Unfollow",
+  "profile.closeConnections": "Close account list",
+  "profile.loadingConnections": "Loading accounts...",
+  "profile.noConnections": "No accounts to show yet.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -368,6 +377,15 @@ const ar: Record<TranslationKey, string> = {
   "profile.noSaved": "ستظهر هنا الأعمال التي تحفظها.",
   "profile.loading": "جارٍ تحميل ملفك الشخصي…",
   "profile.loadFailed": "تعذر تحميل ملفك الشخصي حالياً.",
+  "profile.communityProfile": "ملف InkFig الشخصي",
+  "profile.followers": "المتابعون",
+  "profile.following": "يتابع",
+  "profile.totalLikes": "الإعجابات",
+  "profile.follow": "متابعة",
+  "profile.unfollow": "إلغاء المتابعة",
+  "profile.closeConnections": "إغلاق قائمة الحسابات",
+  "profile.loadingConnections": "جارٍ تحميل الحسابات...",
+  "profile.noConnections": "لا توجد حسابات لعرضها بعد.",
 };
 
 export const translations: Record<Language, Record<TranslationKey, string>> = { ar, en };

@@ -28,6 +28,7 @@ const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDet
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
+const profileApi = readFileSync(new URL("../src/features/profile/profileApi.ts", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
@@ -286,15 +287,14 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(router, /\/:language\/profile/);
   assert.match(homePage, /\$\{language\}\/profile/);
   assert.match(profilePage, /Navigate replace/);
-  assert.match(profilePage, /getMyWorks/);
+  assert.match(profilePage, /getUserWorks/);
   assert.match(profilePage, /getLikedWorks/);
   assert.match(profilePage, /profile\.posts/);
   assert.match(profilePage, /profile\.likes/);
   assert.match(profilePage, /role="tablist"/);
   assert.match(profilePage, /role="tab"/);
   assert.match(profilePage, /aria-selected/);
-  assert.match(profilePage, /activeSection/);
-  assert.match(profilePage, /role="tabpanel"/);
+  assert.match(profilePage, /const \[section,setSection\]/);
   assert.match(profilePage, /ArtworkDetailModal/);
   assert.match(worksApi, /"\/works\/me"/);
   assert.match(worksApi, /"\/works\/likes"/);
@@ -436,7 +436,7 @@ test("saves artworks for registered users and exposes a Saved profile tab", () =
   assert.match(profilePage, /getSavedWorks/);
   assert.match(profilePage, /profile\.saved/);
   assert.match(profilePage, /profile\.noSaved/);
-  assert.match(profilePage, /activeSection==="saved"/);
+  assert.match(profilePage, /section==="saved"/);
   assert.match(styles, /\.artwork-pin-save\.saved[^}]*color:\s*#f4c430/);
   assert.match(styles, /\.artwork-pin-media:hover \.artwork-pin-save/);
   assert.equal([...resources.matchAll(/"profile\.saved"/g)].length, 2);
@@ -466,9 +466,22 @@ test("keeps gallery cards minimal until hover and opens full details", () => {
 
 test("opens Saved directly from the rail", () => {
   assert.match(profilePage, /useSearchParams/);
-  assert.match(profilePage, /requestedSection/);
+  assert.match(profilePage, /const requested=/);
   assert.match(profilePage, /setSearchParams/);
   assert.match(profilePage, /section==="saved"/);
+});
+
+test("provides public social profiles and follow controls", () => {
+  assert.match(router, /profile\/:userId/);
+  assert.match(profilePage, /profile\.followers/);
+  assert.match(profilePage, /profile\.following/);
+  assert.match(profilePage, /profile\.totalLikes/);
+  assert.match(profilePage, /setProfileFollow/);
+  assert.match(profilePage, /profile-account-list/);
+  assert.match(profileApi, /\/profiles\/\$\{userId\}\/follow/);
+  assert.match(homePage, /artwork-artist-link/);
+  assert.match(styles, /\.profile-social-stats/);
+  assert.match(styles, /\.profile-connections-dialog/);
 });
 
 test("refines and mirrors the gallery chrome for Arabic", () => {

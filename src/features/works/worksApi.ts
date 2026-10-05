@@ -29,6 +29,7 @@ export async function getWorks(typeCode?: string): Promise<Work[]> {
   return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`)).data.items;
 }
 export async function getMyWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me")).data.items; }
+export async function getUserWorks(userId:string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET",`/works/users/${userId}`)).data.items; }
 export async function getLikedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes")).data.items; }
 export async function getSavedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/saves")).data.items; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }

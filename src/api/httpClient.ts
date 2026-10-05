@@ -25,7 +25,14 @@ export async function requestJson<TData>(
   }
 
   let response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
-  if (response.status === 401 && normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) && await refreshSession()) {
+  const authenticatedUserPath = path.startsWith("/profiles")
+    || path.startsWith("/settings")
+    || path.startsWith("/admin");
+  if (
+    response.status === 401
+    && (normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) || authenticatedUserPath)
+    && await refreshSession()
+  ) {
     response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
   }
   const data = await parseResponse<TData>(response);

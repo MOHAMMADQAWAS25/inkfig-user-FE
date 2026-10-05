@@ -21,6 +21,7 @@ export function AppRouter() {
       <Route path="/:language/reset-password" element={<PasswordResetPage />} />
       <Route path="/:language/upload" element={<UploadWorkPage />} />
       <Route path="/:language/profile" element={<ProfilePage />} />
+      <Route path="/:language/profile/:userId" element={<ProfilePage />} />
       <Route path="/:language/exhibition" element={<FeaturePlaceholderPage feature="exhibition" />} />
       <Route path="/:language/notifications" element={<FeaturePlaceholderPage feature="notifications" />} />
       <Route path="/:language/settings" element={<SettingsPage />} />
