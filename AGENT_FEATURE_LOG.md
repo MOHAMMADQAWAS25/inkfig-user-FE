@@ -3819,3 +3819,64 @@ No migration required.
 ### Notes
 
 None.
+
+## 2026-10-05 - Restore the earlier homepage card layout
+
+### Request
+
+Restore the previous homepage artwork-card layout after the gallery had been changed to a denser Pinterest-style arrangement, and provide a visual preview.
+
+### Changes
+
+- Restored the earlier responsive masonry column counts and spacing without reverting the current card content or styling.
+- Desktop now uses three wider 300px-target columns with 22px gaps.
+- Tablet widths use two 240px-target columns with 18px gaps.
+- Mobile widths use one column.
+- Preserved natural image proportions, colored artwork tags, uploader hover overlays, like counts, search, filters, and detail popups.
+
+### Repositories
+
+- `inkfig-user-FE`: changed homepage gallery layout and regression coverage.
+- `inkfig-main-system`: no changes required.
+- `inkfig-user-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: restores the earlier three-, two-, and one-column responsive masonry layout.
+- `tests/foundation.test.mjs`: verifies the restored desktop, tablet, and mobile column rules.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No authentication, authorization, role, permission, ownership, or data-scope behavior changed.
+- Backend authorization remains authoritative.
+
+### Frontend
+
+- Homepage cards are larger and less dense: three columns on desktop, two on tablet, and one on mobile.
+- Current card tags, hover behavior, likes, localization, RTL/LTR behavior, and themes remain unchanged.
+- Profile-page card layout is unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` - 29 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[passed] Playwright visual inspection` - a browser-only mocked feed confirmed three wide masonry columns at desktop width; the mock did not modify source or production data.
+
+### Deployment
+
+- Push `inkfig-user-FE` directly to `main` to trigger the existing Cloudflare deployment workflow.
+- No backend deployment, migration, secret, environment-variable, or deployment-order change is required.
+
+### Notes
+
+Only layout density was restored. The older bordered card design and title-heavy metadata were intentionally not reintroduced because the request was specifically about card layout.
