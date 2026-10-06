@@ -5158,3 +5158,71 @@ No migration required.
 ### Notes
 
 Desktop control dimensions are intentionally fixed; only content capacity and artwork column count respond to wider screens.
+
+## 2026-10-06 - Scale desktop interface proportionally
+
+### Request
+
+Correct the responsive behavior so navigation and interface controls retain a balanced visual proportion on larger screens instead of remaining physically small, while artwork column count continues responding to screen width.
+
+### Changes
+
+- Replaced fixed desktop navigation dimensions with smoothly scaling, bounded viewport-relative values.
+- Made the side rail, navigation controls, logo, icons, header, search control, action area, gaps, and typography grow proportionally across laptop, desktop, QHD, and 4K widths.
+- Applied minimum and maximum sizes so controls remain usable on laptops and do not become excessively large on ultrawide displays.
+- Kept artwork masonry sizing independent so wider screens continue adding columns.
+- Preserved explicit compact dimensions for mobile and extra-narrow screens.
+- Left artwork quality, routes, APIs, authorization, themes, and application behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: proportional desktop interface scaling and responsive regression coverage.
+
+### Files
+
+- `src/styles.css`: introduced bounded viewport-relative navigation and header sizing.
+- `tests/foundation.test.mjs`: verifies proportional controls and responsive masonry behavior.
+- `AGENT_FEATURE_LOG.md`: recorded this correction.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No new permissions are required.
+- Proportional presentation applies to guests and every authenticated role on pages they can access.
+- Existing authorization remains validated by the backend.
+
+### Frontend
+
+- The side rail scales from 78px to 120px, controls from 48px to 68px, and icons from 24px to 32px according to viewport width.
+- Header and search dimensions scale smoothly within bounded values.
+- Artwork feeds independently add or remove Pinterest-style columns based on available width.
+- Mobile bottom navigation, RTL/LTR support, safe areas, themes, reduced motion, loading, empty, and error states remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 42 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build passed`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend GitHub Actions workflow.
+- No migrations must run before deployment.
+- No environment-variable or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `d9b1dc0`
+- Push: `successful`
+
+### Notes
+
+This supersedes the immediately previous fixed-desktop-size decision: desktop chrome now preserves visual proportion through bounded fluid scaling.
