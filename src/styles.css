@@ -950,19 +950,29 @@ img { max-width: 100%; image-rendering: auto; }
 
 /* Fluid viewport system: one scale shared by navigation, content and masonry feeds. */
 :root {
-  --app-rail-size: 78px;
+  --app-rail-size: clamp(78px, 4.7vw, 120px);
   --page-gutter: clamp(12px, 2.2vw, 36px);
   --feed-gutter: clamp(12px, 2.4vw, 44px);
   --artwork-column-size: 220px;
   --artwork-column-gap: clamp(10px, 1.15vw, 20px);
+  --nav-control-size: clamp(48px, 2.75vw, 68px);
+  --nav-icon-size: clamp(24px, 1.35vw, 32px);
+  --header-control-size: clamp(46px, 2.75vw, 60px);
 }
 
 .gallery-home, .app-page-with-sidebar, .app-feature-page { padding-left: var(--app-rail-size); }
 [dir="rtl"] .gallery-home, [dir="rtl"] .app-page-with-sidebar, [dir="rtl"] .app-feature-page { padding-right: var(--app-rail-size); padding-left: 0; }
 .app-sidebar { width: var(--app-rail-size); }
+.app-sidebar-logo { width: calc(var(--nav-control-size) + 8px); height: calc(var(--nav-control-size) + 8px); }
+.app-sidebar-logo img { width: var(--nav-control-size); height: var(--nav-control-size); }
+.app-sidebar-nav { gap: clamp(10px, .75vw, 18px); }
+.app-sidebar-nav a, .app-sidebar-settings, .app-sidebar-profile > summary { width: var(--nav-control-size); height: var(--nav-control-size); }
+.app-sidebar-nav svg, .app-sidebar-settings svg { width: var(--nav-icon-size); height: var(--nav-icon-size); }
 .gallery-header { padding-left: var(--page-gutter); }
 [dir="rtl"] .gallery-header { padding-right: var(--page-gutter); padding-left: 0; }
-.gallery-search { min-width: 0; }
+.gallery-header { min-height: clamp(64px, 4.5vw, 88px); }
+.gallery-header-actions { width: clamp(64px, 4.5vw, 96px); min-width: clamp(64px, 4.5vw, 96px); }
+.gallery-search { min-width: 0; min-height: var(--header-control-size); font-size: clamp(.94rem, .88vw, 1.08rem); }
 .gallery-search svg { width: clamp(18px, 1.15vw, 22px); height: clamp(18px, 1.15vw, 22px); flex: 0 0 auto; }
 .gallery-feed { width: 100%; padding-right: var(--feed-gutter); padding-left: var(--feed-gutter); }
 .profile-intro, .profile-tabs, .profile-sections, .profile-state { width: calc(100% - (2 * var(--feed-gutter))); max-width: none; }
@@ -996,16 +1006,18 @@ img { max-width: 100%; image-rendering: auto; }
 }
 
 @media (max-width: 720px) {
-  :root { --app-rail-size: 0px; --page-gutter: 14px; --feed-gutter: 12px; --artwork-column-size: 155px; --artwork-column-gap: 10px; }
+  :root { --app-rail-size: 0px; --page-gutter: 14px; --feed-gutter: 12px; --artwork-column-size: 155px; --artwork-column-gap: 10px; --nav-control-size: 44px; --nav-icon-size: 24px; --header-control-size: 44px; }
   .gallery-home, .app-page-with-sidebar, .app-feature-page,
   [dir="rtl"] .gallery-home, [dir="rtl"] .app-page-with-sidebar, [dir="rtl"] .app-feature-page { padding-right: 0; padding-left: 0; }
   .gallery-header, [dir="rtl"] .gallery-header { padding-inline: var(--page-gutter) 8px; }
   [dir="rtl"] .gallery-header { padding-inline: 8px var(--page-gutter); }
+  .gallery-header { min-height: 64px; }
+  .gallery-header-actions { width: 48px; min-width: 48px; }
   .profile-intro, .profile-tabs, .profile-sections, .profile-state { width: calc(100% - (2 * var(--feed-gutter))); }
   .settings-shell { width: calc(100% - (2 * var(--page-gutter))); grid-template-columns: 1fr; }
 }
 
 @media (max-width: 359px) {
-  :root { --feed-gutter: 10px; --artwork-column-size: auto; }
+  :root { --feed-gutter: 10px; --artwork-column-size: auto; --nav-control-size: 40px; --nav-icon-size: 22px; }
   .artwork-grid, .profile-artwork-grid { column-count: 1; column-width: auto; }
 }
