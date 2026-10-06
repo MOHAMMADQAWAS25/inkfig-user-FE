@@ -558,6 +558,9 @@ test("adapts the complete interface across screen sizes without cropping artwork
   assert.match(styles, /--app-rail-size: 78px/);
   assert.match(styles, /--artwork-column-size: 220px/);
   assert.match(styles, /@media \(min-width: 2200px\)[\s\S]*--artwork-column-size: 260px/);
+  assert.doesNotMatch(styles, /--app-rail-size: (?:86|94)px/);
+  assert.doesNotMatch(styles, /@media \(min-width: (?:1200|1600|2200)px\)[\s\S]*\.app-sidebar-nav svg/);
+  assert.doesNotMatch(styles, /@media \(min-width: (?:1200|1600|2200)px\)[\s\S]*\.gallery-search \{ min-height: (?:48|52)px/);
   assert.match(styles, /\.gallery-feed \{ width: 100%; padding-right: var\(--feed-gutter\)/);
   assert.match(styles, /content-visibility: auto/);
   assert.match(styles, /contain-intrinsic-size: 300px 420px/);
