@@ -555,4 +555,11 @@ test("adapts the complete interface across screen sizes without cropping artwork
   assert.match(styles, /@media \(max-width: 600px\)[\s\S]*column-width: 155px/);
   assert.match(styles, /@media \(max-width: 359px\)[\s\S]*column-count: 1/);
   assert.match(styles, /env\(safe-area-inset-bottom\)/);
+  assert.match(styles, /--app-rail-size: 78px/);
+  assert.match(styles, /--artwork-column-size: 220px/);
+  assert.match(styles, /@media \(min-width: 2200px\)[\s\S]*--artwork-column-size: 260px/);
+  assert.match(styles, /\.gallery-feed \{ width: 100%; padding-right: var\(--feed-gutter\)/);
+  assert.match(styles, /content-visibility: auto/);
+  assert.match(styles, /contain-intrinsic-size: 300px 420px/);
+  assert.match(styles, /image-rendering: auto/);
 });

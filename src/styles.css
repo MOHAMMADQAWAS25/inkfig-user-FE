@@ -947,3 +947,76 @@ img { max-width: 100%; image-rendering: auto; }
 @media (prefers-reduced-motion: reduce) {
   .settings-reset-dialog { animation: none; }
 }
+
+/* Fluid viewport system: one scale shared by navigation, content and masonry feeds. */
+:root {
+  --app-rail-size: 78px;
+  --page-gutter: clamp(12px, 2.2vw, 36px);
+  --feed-gutter: clamp(12px, 2.4vw, 44px);
+  --artwork-column-size: 220px;
+  --artwork-column-gap: clamp(10px, 1.15vw, 20px);
+}
+
+.gallery-home, .app-page-with-sidebar, .app-feature-page { padding-left: var(--app-rail-size); }
+[dir="rtl"] .gallery-home, [dir="rtl"] .app-page-with-sidebar, [dir="rtl"] .app-feature-page { padding-right: var(--app-rail-size); padding-left: 0; }
+.app-sidebar { width: var(--app-rail-size); }
+.gallery-header { padding-left: var(--page-gutter); }
+[dir="rtl"] .gallery-header { padding-right: var(--page-gutter); padding-left: 0; }
+.gallery-search { min-width: 0; }
+.gallery-search svg { width: clamp(18px, 1.15vw, 22px); height: clamp(18px, 1.15vw, 22px); flex: 0 0 auto; }
+.gallery-feed { width: 100%; padding-right: var(--feed-gutter); padding-left: var(--feed-gutter); }
+.profile-intro, .profile-tabs, .profile-sections, .profile-state { width: calc(100% - (2 * var(--feed-gutter))); max-width: none; }
+.artwork-grid, .profile-artwork-grid { column-width: var(--artwork-column-size); column-gap: var(--artwork-column-gap); }
+.artwork-card { margin-bottom: var(--artwork-column-gap); content-visibility: auto; contain-intrinsic-size: 300px 420px; }
+.artwork-image-button { line-height: 0; }
+.artwork-image, .profile-artwork-grid .artwork-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: auto;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.settings-shell { width: min(1320px, calc(100% - (2 * var(--page-gutter)))); grid-template-columns: clamp(220px, 20vw, 280px) minmax(0, 1fr); }
+.admin-card { width: min(1320px, 100%); }
+
+@media (min-width: 1200px) {
+  :root { --artwork-column-size: 230px; }
+  .gallery-search { min-height: 48px; }
+}
+
+@media (min-width: 1600px) {
+  :root { --app-rail-size: 86px; --artwork-column-size: 245px; }
+  .app-sidebar-logo { width: 60px; height: 60px; }
+  .app-sidebar-logo img { width: 52px; height: 52px; }
+  .app-sidebar-nav a, .app-sidebar-settings, .app-sidebar-profile > summary { width: 52px; height: 52px; }
+  .app-sidebar-nav svg, .app-sidebar-settings svg { width: 26px; height: 26px; }
+  .gallery-header { min-height: 78px; }
+  .gallery-feed { padding-inline: var(--feed-gutter); }
+  .profile-intro, .profile-tabs, .profile-sections { width: calc(100% - (2 * var(--feed-gutter))); }
+}
+
+@media (min-width: 2200px) {
+  :root { --app-rail-size: 94px; --page-gutter: 48px; --feed-gutter: 56px; --artwork-column-size: 260px; --artwork-column-gap: 24px; }
+  .app-sidebar-logo { width: 66px; height: 66px; }
+  .app-sidebar-logo img { width: 58px; height: 58px; }
+  .app-sidebar-nav a, .app-sidebar-settings, .app-sidebar-profile > summary { width: 56px; height: 56px; }
+  .gallery-search { min-height: 52px; font-size: 1.05rem; }
+  .gallery-header-actions { width: 84px; min-width: 84px; }
+}
+
+@media (max-width: 720px) {
+  :root { --app-rail-size: 0px; --page-gutter: 14px; --feed-gutter: 12px; --artwork-column-size: 155px; --artwork-column-gap: 10px; }
+  .gallery-home, .app-page-with-sidebar, .app-feature-page,
+  [dir="rtl"] .gallery-home, [dir="rtl"] .app-page-with-sidebar, [dir="rtl"] .app-feature-page { padding-right: 0; padding-left: 0; }
+  .gallery-header, [dir="rtl"] .gallery-header { padding-inline: var(--page-gutter) 8px; }
+  [dir="rtl"] .gallery-header { padding-inline: 8px var(--page-gutter); }
+  .profile-intro, .profile-tabs, .profile-sections, .profile-state { width: calc(100% - (2 * var(--feed-gutter))); }
+  .settings-shell { width: calc(100% - (2 * var(--page-gutter))); grid-template-columns: 1fr; }
+}
+
+@media (max-width: 359px) {
+  :root { --feed-gutter: 10px; --artwork-column-size: auto; }
+  .artwork-grid, .profile-artwork-grid { column-count: 1; column-width: auto; }
+}
