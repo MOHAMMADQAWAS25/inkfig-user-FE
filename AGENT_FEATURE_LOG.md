@@ -5261,3 +5261,71 @@ Display each post category in the top-left corner when an artwork card is hovere
 
 - Branch: `feature/artwork-category-badge`
 - Commit, rebase, merge, and push: completed after final synchronization.
+## 2026-10-06 - Semantic artwork search experience
+
+### Request
+
+Connect the home-page search bar to Voyage-powered artwork search with English and Arabic support.
+
+### Changes
+
+- Replaced local title/artist filtering with the main backend semantic search endpoint.
+- Added a 350 ms debounce and cancels stale UI updates when the query, category, or session changes.
+- Kept the normal public feed for empty and one-character queries.
+- Kept existing card layout, interactions, category filters, responsive behavior, and profile navigation unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: added the semantic search request and localized UI states.
+- `inkfig-main-system`: provides embedding generation, vector storage, and ranked search.
+
+### Files
+
+- `src/features/works/worksApi.ts`: added the typed semantic search request.
+- `src/features/home/HomePage.tsx`: added debounced server-side search and state handling.
+- `src/i18n/resources.ts`: added English and Arabic search status messages.
+- `tests/foundation.test.mjs`: verifies semantic search wiring and debounce behavior.
+
+### API
+
+- `GET /api/v1/works/search`: sends `query` and optional `type_code`; consumes the existing work-feed response shape and handles unavailable responses as a localized error state.
+
+### Database
+
+- Migration: `20261006_006_add_work_embeddings.sql` in `inkfig-main-system`.
+- No frontend-local database changes; the backend migration must run before this frontend is deployed.
+
+### Permissions and scope
+
+- Search is public for viewers and authenticated roles.
+- Like and save actions retain their existing permission checks.
+- Authorization and published/active-account scope are validated by the backend.
+
+### Frontend
+
+- Updated the existing localized home route for English and Arabic.
+- Search starts at two trimmed characters and is debounced by 350 ms.
+- Category selection narrows semantic results.
+- Added localized searching, no-results, and temporary-error states with an accessible live loading message.
+- Existing responsive mobile navigation and Pinterest-style cards remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` (43 tests)
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-main-system` and run its pgvector migration before deploying `inkfig-user-FE`.
+- No frontend environment-variable changes are required; the existing main API base URL is used.
+
+### Git
+
+- Branch: `main`
+- Commit: `2a8a1e8`
+- Push: `successful`
+
+### Notes
+
+Queries shorter than two characters intentionally show the standard feed to avoid unnecessary paid embedding requests.
