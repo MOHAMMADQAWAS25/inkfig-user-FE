@@ -400,7 +400,10 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(appSidebar, /<LanguageToggle\/>/);
   assert.match(homePage, /className="gallery-search"/);
   assert.match(homePage, /setSearchQuery/);
-  assert.match(homePage, /visibleWorks\.map/);
+  assert.match(homePage, /searchWorks\(normalizedSearch,typeCode\)/);
+  assert.match(homePage, /normalizedSearch\.length>=2\?350:0/);
+  assert.match(homePage, /works\.map/);
+  assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(homePage, /<AppSidebar \/>/);
   assert.match(appSidebar, /className="gallery-profile-menu app-sidebar-profile"/);
   assert.match(appSidebar, /className="gallery-profile-popover"/);

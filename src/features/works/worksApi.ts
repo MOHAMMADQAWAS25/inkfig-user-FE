@@ -28,6 +28,11 @@ export async function getWorks(typeCode?: string): Promise<Work[]> {
   const query = typeCode ? `?type_code=${encodeURIComponent(typeCode)}` : "";
   return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`)).data.items;
 }
+export async function searchWorks(queryText: string, typeCode?: string): Promise<Work[]> {
+  const query = new URLSearchParams({ query: queryText });
+  if (typeCode) query.set("type_code", typeCode);
+  return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`)).data.items;
+}
 export async function getMyWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me")).data.items; }
 export async function getUserWorks(userId:string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET",`/works/users/${userId}`)).data.items; }
 export async function getLikedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes")).data.items; }
