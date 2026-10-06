@@ -13,7 +13,7 @@ import {
   requestPasswordReset,
   verifyPasswordResetCode,
 } from "../auth/passwordResetApi";
-import { deactivateAccount, loadProfileSettings, saveProfileSettings, type ProfileSettings } from "./settingsApi";
+import { changePassword, deactivateAccount, loadProfileSettings, saveProfileSettings, type ProfileSettings } from "./settingsApi";
 
 type Section = "profile" | "password" | "account";
 const blankProfile: ProfileSettings = { email: "", full_name: "", phone_number: "", gender: "female", date_of_birth: "", is_active: true };
@@ -23,6 +23,7 @@ export function SettingsPage() {
   const { session, setSession, signOut } = useAuth();
   const [section, setSection] = useState<Section>("profile");
   const [profile, setProfile] = useState(blankProfile);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [resetStage, setResetStage] = useState<"code"|"password">("code");
   const [code, setCode] = useState("");
@@ -117,7 +118,19 @@ export function SettingsPage() {
     } finally { setBusy(false); }
   }
 
-  async function submitPassword(event: FormEvent) {
+  async function submitCurrentPasswordChange(event: FormEvent) {
+    event.preventDefault();
+    if (password !== confirmation) return fail(t("auth.passwordMismatch"));
+    setBusy(true);
+    try {
+      await changePassword(currentPassword, password, confirmation);
+      signOut();
+    } catch (requestError) {
+      fail(requestError instanceof ApiError && requestError.status === 400 ? t("settings.currentPasswordInvalid") : t("settings.passwordFailed"));
+    } finally { setBusy(false); }
+  }
+
+  async function submitResetPassword(event: FormEvent) {
     event.preventDefault();
     if (password !== confirmation) return fail(t("auth.passwordMismatch"));
     setBusy(true);
@@ -159,13 +172,18 @@ export function SettingsPage() {
         <DateOfBirthField label={t("auth.dateOfBirth")} value={profile.date_of_birth} onChange={date_of_birth=>setProfile({...profile,date_of_birth})}/>
         <button className="settings-primary" disabled={busy} type="submit">{busy?t("settings.saving"):t("settings.save")}</button>
       </form>}
-      {section==="password"&&<div className="settings-password-reset"><MailCheck aria-hidden="true" size={34}/><h2>{t("settings.password")}</h2><p>{t("settings.passwordDescription")}</p><div className="settings-reset-email"><span>{t("auth.email")}</span><strong dir="ltr">{session.email}</strong></div><button className="settings-primary" disabled={busy} type="button" onClick={openPasswordReset}>{t("settings.resetWithCode")}</button></div>}
+      {section==="password"&&<form onSubmit={submitCurrentPasswordChange}><h2>{t("settings.password")}</h2><p>{t("settings.passwordDescription")}</p>
+        <PasswordField autoComplete="current-password" label={t("settings.currentPassword")} name="current_password" value={currentPassword} onChange={setCurrentPassword}/>
+        <PasswordField autoComplete="new-password" label={t("settings.newPassword")} name="password" value={password} onChange={setPassword}/>
+        <PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={confirmation} onChange={setConfirmation}/>
+        <div className="settings-form-actions"><button className="settings-primary" disabled={busy} type="submit">{busy?t("settings.saving"):t("settings.changePassword")}</button><button className="settings-forgot-password" disabled={busy} type="button" onClick={openPasswordReset}>{t("auth.forgotPassword")}</button></div>
+      </form>}
       {section==="account"&&<div className="settings-account"><h2>{t("settings.account")}</h2><p>{t("settings.accountDescription")}</p><div className="settings-status"><span>{t("settings.status")}</span><strong>{profile.is_active?t("settings.active"):t("settings.inactive")}</strong></div><div className="settings-danger"><h3>{t("settings.deactivate")}</h3><p>{t("settings.deactivateDescription")}</p>{confirmingDeactivation?<form onSubmit={deactivate}><PasswordField autoComplete="current-password" label={t("settings.currentPassword")} name="deactivate_password" value={deactivatePassword} onChange={setDeactivatePassword}/><button disabled={busy} type="submit">{t("settings.confirmDeactivate")}</button></form>:<button disabled={busy} type="button" onClick={requestDeactivation}>{t("settings.deactivate")}</button>}</div></div>}
     </section>
   </section>
   {resetOpen&&<div className="settings-reset-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!busy&&setResetOpen(false)}><section className="settings-reset-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-reset-title"><header><div><MailCheck size={22}/><h2 id="settings-reset-title">{t("settings.password")}</h2></div><button disabled={busy} type="button" aria-label={t("settings.closeReset")} onClick={()=>setResetOpen(false)}><X size={20}/></button></header>
     {resetStage==="code"?<form onSubmit={submitCode}><p>{t("settings.codeSentTo")} <strong dir="ltr">{session.email}</strong></p><label><span>{t("auth.verificationCode")}</span><input className="verification-code-input" required autoComplete="one-time-code" dir="ltr" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} minLength={6} value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,""))}/></label>{error&&<p className="settings-alert error" role="alert">{error}</p>}{hourlyLimitReached&&!error&&<p className="settings-alert error" role="status">{t("auth.hourlyEmailLimit")}</p>}<button className="settings-primary" disabled={busy||code.length!==6} type="submit">{busy?t("auth.verifying"):t("auth.verify")}</button><button className="settings-reset-resend" disabled={busy||cooldown>0} type="button" onClick={sendResetCode}>{cooldown>0?`${t("auth.resendIn")} ${formatWait(cooldown)}`:t("auth.requestNewCode")}</button></form>
-    :<form onSubmit={submitPassword}><p>{t("auth.chooseNewPassword")}</p><PasswordField autoComplete="new-password" label={t("settings.newPassword")} name="password" value={password} onChange={setPassword}/><PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={confirmation} onChange={setConfirmation}/>{error&&<p className="settings-alert error" role="alert">{error}</p>}<button className="settings-primary" disabled={busy} type="submit">{busy?t("auth.resettingPassword"):t("auth.resetPassword")}</button></form>}
+    :<form onSubmit={submitResetPassword}><p>{t("auth.chooseNewPassword")}</p><PasswordField autoComplete="new-password" label={t("settings.newPassword")} name="password" value={password} onChange={setPassword}/><PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={confirmation} onChange={setConfirmation}/>{error&&<p className="settings-alert error" role="alert">{error}</p>}<button className="settings-primary" disabled={busy} type="submit">{busy?t("auth.resettingPassword"):t("auth.resetPassword")}</button></form>}
   </section></div>}
   </main>;
 }

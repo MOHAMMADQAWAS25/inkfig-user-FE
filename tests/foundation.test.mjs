@@ -438,9 +438,11 @@ test("provides secure profile, password, and account settings", () => {
   assert.match(settingsPage, /verifyPasswordResetCode/);
   assert.match(settingsPage, /confirmPasswordReset/);
   assert.match(settingsPage, /session!\.email/);
-  assert.doesNotMatch(settingsPage, /name="current_password"/);
   assert.match(settingsPage, /name="deactivate_password"/);
   assert.match(loginPage, /status === 423/);
+  assert.match(settingsPage, /changePassword\(currentPassword, password, confirmation\)/);
+  assert.match(settingsPage, /current-password/);
+  assert.match(settingsPage, /auth\.forgotPassword/);
   assert.match(settingsPage, /hourlyLimitReached/);
   assert.match(settingsPage, /cooldown/);
   assert.match(settingsPage, /window\.confirm/);

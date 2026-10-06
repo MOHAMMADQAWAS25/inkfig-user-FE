@@ -928,6 +928,8 @@ img { max-width: 100%; image-rendering: auto; }
 .settings-reset-dialog .verification-code-input { text-align: center; font-size: 1.45rem; font-weight: 900; letter-spacing: .35em; }
 .settings-reset-resend { min-height: 42px; border: 0; background: transparent; color: #526b24; font: inherit; font-weight: 800; cursor: pointer; }
 .settings-reset-resend:disabled { color: #8b8e7a; cursor: wait; }
+.settings-forgot-password { padding: 8px 0; border: 0; background: transparent; color: #526b24; font: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.settings-forgot-password:disabled { opacity: .55; cursor: wait; }
 :root[data-theme="dark"] .settings-password-reset p { color: #b7b59a; }
 :root[data-theme="dark"] .settings-reset-email { border-color: #465331; background: rgb(169 182 95 / .08); }
 :root[data-theme="dark"] .settings-reset-email span { color: #b7b59a; }
@@ -936,6 +938,7 @@ img { max-width: 100%; image-rendering: auto; }
 :root[data-theme="dark"] .settings-reset-dialog form > p { color: #b7b59a; }
 :root[data-theme="dark"] .settings-reset-dialog input { border-color: #465331; background: #11170e; color: #f1edd7; }
 :root[data-theme="dark"] .settings-reset-resend { color: #cbd88a; }
+:root[data-theme="dark"] .settings-forgot-password { color: #cbd88a; }
 @media (max-width: 520px) {
   .settings-reset-backdrop { padding: 0; align-items: end; }
   .settings-reset-dialog { width: 100%; max-height: 92svh; border-radius: 22px 22px 0 0; }
