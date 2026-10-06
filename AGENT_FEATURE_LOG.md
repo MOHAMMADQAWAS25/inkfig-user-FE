@@ -5002,10 +5002,10 @@ No migration required.
 
 ### Verification
 
-- `[passed] npm test — 41 passed before synchronization`
-- `[passed] npm run build — TypeScript and Vite production build passed before synchronization`
+- `[passed] npm test — 42 passed after synchronization`
+- `[passed] npm run build — TypeScript and Vite production build passed after synchronization`
 - `[passed] git diff --check`
-- `[not run] post-rebase verification — recorded below after conflict resolution`
+- `[passed] post-rebase verification — concurrent sidebar and secure-deactivation work preserved`
 
 ### Deployment
 
