@@ -1,6 +1,7 @@
 import { ArrowUpRight, Bookmark, Heart, Image, Search, Sparkles, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
@@ -28,20 +29,20 @@ export function HomePage() {
   const { language, t } = useI18n();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
-  const normalizedSearch=searchQuery.trim();
+  const normalizedSearch=submittedSearch.trim();
   useEffect(()=>{
     let active=true;
-    const timer=window.setTimeout(()=>{
-      setLoading(true);setFeedError(false);
-      const typeCode=activeCategory === "all" ? undefined : activeCategory;
-      const request=normalizedSearch.length>=2?searchWorks(normalizedSearch,typeCode):getWorks(typeCode);
-      request.then(items=>{if(active)setWorks(items)}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
-    },normalizedSearch.length>=2?350:0);
-    return()=>{active=false;window.clearTimeout(timer)};
+    setLoading(true);setFeedError(false);
+    const typeCode=activeCategory === "all" ? undefined : activeCategory;
+    const request=normalizedSearch.length>=2?searchWorks(normalizedSearch,typeCode):getWorks(typeCode);
+    request.then(items=>{if(active)setWorks(items)}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
+    return()=>{active=false};
   },[activeCategory,normalizedSearch,session]);
+  function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();setSubmittedSearch(searchQuery.trim());}
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
   async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
@@ -49,11 +50,11 @@ export function HomePage() {
     <main className="gallery-home">
       <AppSidebar />
       <header className="gallery-header">
-        <label className="gallery-search">
+        <form className="gallery-search" role="search" onSubmit={submitSearch}>
           <Search aria-hidden="true" size={19} />
-          <span className="sr-only">{t("home.searchPlaceholder")}</span>
-          <input type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
-        </label>
+          <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>
+          <input id="gallery-search-input" type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
+        </form>
       </header>
 
       <section className="gallery-hero" id="about">

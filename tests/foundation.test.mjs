@@ -402,7 +402,10 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(homePage, /className="gallery-search"/);
   assert.match(homePage, /setSearchQuery/);
   assert.match(homePage, /searchWorks\(normalizedSearch,typeCode\)/);
-  assert.match(homePage, /normalizedSearch\.length>=2\?350:0/);
+  assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(""\)/);
+  assert.match(homePage, /onSubmit=\{submitSearch\}/);
+  assert.match(homePage, /setSubmittedSearch\(searchQuery\.trim\(\)\)/);
+  assert.doesNotMatch(homePage, /setTimeout/);
   assert.match(homePage, /works\.map/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(homePage, /<AppSidebar \/>/);

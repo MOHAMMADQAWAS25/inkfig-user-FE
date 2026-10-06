@@ -5378,3 +5378,51 @@ Move the profile/account icon from the home-page header to immediately above Set
 
 - Branch: `main`
 - Pull/rebase, commit, push, and workflow status: pending final synchronization.
+
+## 2026-10-06 - Submit artwork searches with Enter
+
+### Request
+
+Do not send an artwork search request while the user is typing; send it only after the user presses Enter in the search bar.
+
+### Changes
+
+- Separated the editable search-field value from the submitted search value.
+- Replaced the 350 ms typing debounce with an explicit search-form submission handler.
+- Pressing Enter trims and submits the query; typing alone leaves the current results and network requests unchanged.
+- Submitting an empty or one-character value uses the existing normal artwork feed behavior.
+- Category changes continue to refresh the currently submitted query rather than unsubmitted text.
+- Preserved accessible search semantics with a named `role="search"` form and associated input label.
+
+### Repositories
+
+- `inkfig-user-FE`: search interaction, regression tests, and this log.
+- `inkfig-main-system`: no changes.
+- `inkfig-user-system`: no changes.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: adds submitted-query state and Enter-based form submission.
+- `tests/foundation.test.mjs`: verifies explicit submission and removal of the typing debounce.
+
+### API, database, permissions, and SnapStart
+
+- Uses the existing `GET /api/v1/works/search` endpoint without contract changes.
+- No database, migration, permission, environment-variable, or backend changes.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 44 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] Playwright request inspection` - typing `olive moon` sent no request; pressing Enter sent `GET /api/v1/works/search?query=olive+moon`.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, configuration changes, or backend deployment are required.
+
+### Git
+
+- Branch: `main`
+- Pull/rebase, commit, push, and workflow status: pending final synchronization.
