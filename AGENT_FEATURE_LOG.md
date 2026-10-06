@@ -4952,3 +4952,72 @@ Move the signed-in profile icon out of the top navigation and place it in the sh
 
 - Branch: `feature/sidebar-profile-control`
 - Commit, rebase, merge, and push: completed after final synchronization.
+## 2026-10-06 - Support both settings password reset methods
+
+### Request
+
+Correct Settings so users normally change their password with the current password, while email verification is an alternative when the current password is forgotten.
+
+### Changes
+
+- Restored current password, new password, and confirmation as the primary workflow.
+- Kept “Forgot password?” as a separate email-code workflow where verified email possession replaces current-password proof.
+- Preserved resend cooldown, five codes per hour, one-hour blocking, code expiry, incorrect-attempt limits, and reset-token expiry.
+- Preserved the concurrent secure account-deactivation and sidebar-profile changes.
+- Left backend contracts, database schema, and the standalone reset page unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: corrects the two Settings password workflows.
+- `inkfig-user-system`: no changes; existing password-change and password-reset endpoints are reused.
+
+### Files
+
+- `src/features/settings/SettingsPage.tsx`: restores current-password change and retains email-code recovery.
+- `src/i18n/resources.ts`: explains both methods in English and Arabic.
+- `src/styles.css`: styles the forgot-password action.
+- `tests/foundation.test.mjs`: verifies both proof methods and preserves deactivation coverage.
+
+### API
+
+- Reuses `PUT /api/v1/settings/password` for current-password changes.
+- Reuses `POST /api/v1/auth/password-reset/request`, `/verify`, and `/confirm` for recovery.
+- No API contract changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The normal endpoint requires authenticated `profile.read_own` access and validates the current password.
+- Recovery uses the signed-in account email, which the frontend cannot change.
+- Authorization and all reset limits remain backend-enforced.
+
+### Frontend
+
+- Reset password displays current password, new password, and confirmation.
+- “Forgot password?” opens the email-code modal; verification replaces current-password proof.
+- Responsive, RTL/LTR, localization, loading, error, cooldown, hourly-limit, and reduced-motion behavior remains.
+
+### Verification
+
+- `[passed] npm test — 41 passed before synchronization`
+- `[passed] npm run build — TypeScript and Vite production build passed before synchronization`
+- `[passed] git diff --check`
+- `[not run] post-rebase verification — recorded below after conflict resolution`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No backend deployment, migration, environment-variable, or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `847de8f`
+- Push: `successful`
+
+### Notes
+
+This supersedes only the prior interaction decision: email verification is an alternative to current-password proof, not the only Settings method.
