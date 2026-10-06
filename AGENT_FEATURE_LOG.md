@@ -5329,3 +5329,52 @@ Connect the home-page search bar to Voyage-powered artwork search with English a
 ### Notes
 
 Queries shorter than two characters intentionally show the standard feed to avoid unnecessary paid embedding requests.
+
+## 2026-10-06 - Move account control to navigation and remove horizontal overflow
+
+### Request
+
+Move the profile/account icon from the home-page header to immediately above Settings in the application navigation, and correct the layout defect that showed a horizontal page scrollbar.
+
+### Changes
+
+- Moved the signed-out account/sign-in control from the header into the shared sidebar account group above Settings.
+- Preserved the signed-in profile menu in the same position so the navigation is consistent in both authentication states.
+- Removed the unused header action column and allowed the search field to consume the available header width.
+- Corrected desktop and mobile header grid sizing in both LTR and RTL layouts. The previous desktop grid reserved 72 px while the responsive action control expanded to 86.17 px at 1915 px, causing 14.17 px of real horizontal overflow.
+- Added regression coverage for guest and authenticated account placement and the single-column responsive header.
+
+### Repositories
+
+- `inkfig-user-FE`: navigation, home header, responsive styles, tests, and this log.
+- `inkfig-main-system`: no changes.
+- `inkfig-user-system`: no changes.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: renders either the profile menu or sign-in account control directly above Settings.
+- `src/features/home/HomePage.tsx`: removes the duplicated account control and obsolete action column from the header.
+- `src/styles.css`: gives the header one flexible column and keeps navigation controls fluid across viewports.
+- `tests/foundation.test.mjs`: verifies account placement and overflow-safe header rules.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, permission, environment-variable, or backend changes.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 44 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and the Vite production build succeeded.
+- `[passed] Playwright at 1915x910` - no overflowing elements; signed-in profile and signed-out account controls both appear above Settings.
+- `[passed] Playwright at 390x844` - no overflowing elements; the account control remains in the responsive bottom navigation.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, configuration changes, or backend deployment are required.
+
+### Git
+
+- Branch: `main`
+- Pull/rebase, commit, push, and workflow status: pending final synchronization.

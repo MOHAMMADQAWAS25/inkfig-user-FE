@@ -54,9 +54,6 @@ export function HomePage() {
           <span className="sr-only">{t("home.searchPlaceholder")}</span>
           <input type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
         </label>
-        <div className="gallery-header-actions">
-          {!session&&<Link className="gallery-guest-avatar" to={`/${language}/login`} aria-label={t("auth.signIn")} title={t("auth.signIn")}><UserRound aria-hidden="true" size={20}/></Link>}
-        </div>
       </header>
 
       <section className="gallery-hero" id="about">

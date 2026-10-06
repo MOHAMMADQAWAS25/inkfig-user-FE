@@ -196,8 +196,9 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(router, /Navigate replace to="\/en"/);
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
   assert.match(homePage, /className="artwork-grid"/);
-  assert.match(homePage, /gallery-guest-avatar/);
-  assert.match(homePage, /!session&&<Link className="gallery-guest-avatar"/);
+  assert.match(appSidebar, /gallery-guest-avatar app-sidebar-guest/);
+  assert.match(appSidebar, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar app-sidebar-guest"/);
+  assert.doesNotMatch(homePage, /gallery-header-actions/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ column-count: 4; column-gap: 18px/);
@@ -432,6 +433,11 @@ test("places the signed-in profile control above Settings in the shared sidebar"
   assert.match(styles, /\.app-sidebar-account \{[^}]*margin-top: auto/);
 });
 
+test("places the signed-out account control above Settings in the shared sidebar", () => {
+  assert.ok(appSidebar.indexOf("app-sidebar-guest") < appSidebar.indexOf("app-sidebar-settings"));
+  assert.match(styles, /\.app-sidebar-profile > summary, \.app-sidebar-guest \{ width: var\(--nav-control-size\)|\.app-sidebar-profile > summary,[^{}]*\.app-sidebar-guest \{ width: var\(--nav-control-size\)/);
+});
+
 test("provides secure profile, password, and account settings", () => {
   assert.match(router, /SettingsPage/);
   assert.match(settingsPage, /"profile" \| "password" \| "account"/);
@@ -553,11 +559,11 @@ test("uses an edge scrollbar and aligns the compact avatar with gallery cards", 
   assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header, \[dir="rtl"\] \.gallery-header \{ padding-right: 20px; padding-left: 20px/);
 });
 
-test("centers the avatar between the search edge and header edge", () => {
-  assert.match(styles, /\.gallery-header \{ grid-template-columns: minmax\(0,1fr\) 72px; gap: 0; padding-right: 0; padding-left: 32px/);
-  assert.match(styles, /\.gallery-header-actions \{ width: 72px; min-width: 72px; justify-content: center/);
-  assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right: 32px; padding-left: 0/);
-  assert.match(styles, /@media \(max-width: 520px\)[^{]+\{ \.gallery-header \{ grid-template-columns: minmax\(0,1fr\) 52px/);
+test("lets the search header use its available width without horizontal overflow", () => {
+  assert.match(styles, /\.gallery-header \{ grid-template-columns: minmax\(0,1fr\); gap: 0/);
+  assert.match(styles, /\.gallery-header \{ padding-right: var\(--page-gutter\); padding-left: var\(--page-gutter\)/);
+  assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right: var\(--page-gutter\); padding-left: var\(--page-gutter\)/);
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.gallery-header, \[dir="rtl"\] \.gallery-header \{ grid-template-columns: minmax\(0,1fr\)/);
 });
 
 test("adapts the complete interface across screen sizes without cropping artwork", () => {
