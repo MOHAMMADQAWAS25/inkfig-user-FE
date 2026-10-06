@@ -5092,3 +5092,69 @@ No migration required.
 ### Notes
 
 CSS preserves the original image file and aspect ratio; visual display size still adapts to the card and device pixel density, which is required for a responsive layout.
+
+## 2026-10-06 - Keep desktop navigation sizing consistent
+
+### Request
+
+Keep navigation, icons, search, and other controls visually consistent across desktop and laptop resolutions while continuing to change the number of artwork columns according to available screen width.
+
+### Changes
+
+- Removed large-screen scaling of the desktop side rail, navigation logo, icons, buttons, header height, search height, and profile-control column.
+- Kept the desktop and laptop navigation rail fixed at 78px with consistent control sizing.
+- Preserved fluid gallery width and responsive masonry column counts at desktop and ultrawide breakpoints.
+- Preserved the dedicated compact bottom navigation on screens at 720px and below.
+- Left artwork aspect-ratio preservation, routes, APIs, authorization, themes, and application behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: corrected desktop responsive control sizing and regression coverage.
+
+### Files
+
+- `src/styles.css`: removed large-screen navigation and search scaling while preserving feed breakpoints.
+- `tests/foundation.test.mjs`: verifies that desktop navigation controls remain fixed while column targets remain responsive.
+- `AGENT_FEATURE_LOG.md`: recorded this correction.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No new permissions are required.
+- The presentation correction applies to all roles and guests on pages they can already access.
+- Existing authorization remains validated by the backend.
+
+### Frontend
+
+- Desktop and laptop navigation elements retain the same dimensions across screen widths.
+- Artwork feeds continue adding or removing Pinterest-style columns based on available width.
+- Mobile bottom navigation, RTL/LTR support, themes, safe-area spacing, loading states, empty states, and error states remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test - 42 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build passed`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend GitHub Actions workflow.
+- No migrations must run before deployment.
+- No environment-variable or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `859631c`
+- Push: `successful`
+
+### Notes
+
+Desktop control dimensions are intentionally fixed; only content capacity and artwork column count respond to wider screens.
