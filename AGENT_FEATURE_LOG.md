@@ -5021,3 +5021,74 @@ No migration required.
 ### Notes
 
 This supersedes only the prior interaction decision: email verification is an alternative to current-password proof, not the only Settings method.
+
+## 2026-10-06 - Make the frontend fluid across all viewport sizes
+
+### Request
+
+Make the complete InkFig interface responsive so artwork columns, navigation, search, icons, and page objects adapt to the screen while artwork keeps its original aspect ratio and source quality.
+
+### Changes
+
+- Added shared fluid viewport tokens for the side rail, page gutters, feed gutters, artwork target width, and masonry gaps.
+- Made home and profile artwork feeds consume the available viewport width and automatically add columns as space increases.
+- Scaled the sidebar, logo, navigation controls, icons, search control, and header spacing on large and ultrawide displays.
+- Preserved the compact bottom-navigation layout and touch-sized controls on tablets and phones, with a one-column fallback on very narrow screens.
+- Kept artwork images uncropped and unstretched with their natural aspect ratio, automatic browser-quality rendering, and the original image URL.
+- Added off-screen card rendering containment to improve long-feed performance without changing user-visible content.
+- Extended settings and administration containers to adapt cleanly to wider displays.
+- Left routes, application behavior, APIs, authentication, permissions, and backend logic unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: responsive layout, artwork rendering rules, and regression coverage.
+
+### Files
+
+- `src/styles.css`: added the shared fluid viewport system and responsive scaling rules.
+- `tests/foundation.test.mjs`: expanded responsive and image-preservation regression coverage.
+- `AGENT_FEATURE_LOG.md`: recorded this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No new permissions are required.
+- The responsive presentation applies to guests, users, supervisors, admins, and system administrators on their existing accessible pages.
+- Existing endpoint authorization remains validated by the backend and was not changed.
+
+### Frontend
+
+- Home and profile feeds use responsive Pinterest-style masonry columns tied to available width.
+- Desktop navigation scales at 1600px and 2200px breakpoints; screens at 720px and below use the existing bottom navigation.
+- Search, headers, content gutters, settings, administration, dialogs, and touch controls adapt to desktop, ultrawide, tablet, mobile, and narrow-mobile layouts.
+- RTL/LTR positioning, safe-area spacing, dark/light themes, reduced motion, loading states, empty states, and error states remain supported.
+
+### Verification
+
+- `[passed] npm.cmd test - 42 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build passed`
+- `[passed] git diff --check`
+- `[not run] in-app browser viewport inspection - the required browser runtime tool was unavailable in this session`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend GitHub Actions workflow.
+- No migrations must run before deployment.
+- No environment-variable or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `ba8949b`
+- Push: `successful`
+
+### Notes
+
+CSS preserves the original image file and aspect ratio; visual display size still adapts to the card and device pixel density, which is required for a responsive layout.
