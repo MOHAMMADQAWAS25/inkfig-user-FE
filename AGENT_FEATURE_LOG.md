@@ -5226,3 +5226,38 @@ No migration required.
 ### Notes
 
 This supersedes the immediately previous fixed-desktop-size decision: desktop chrome now preserves visual proportion through bounded fluid scaling.
+
+## 2026-10-06 - Show artwork categories on card hover
+
+### Request
+
+Display each post category in the top-left corner when an artwork card is hovered, alongside the existing like and publisher controls.
+
+### Changes
+
+- Added a localized category badge to homepage and profile artwork cards.
+- Reused the existing category-specific color palette from the artwork detail dialog.
+- Added a subtle fade-and-rise hover/focus animation with a permanent touch-device presentation.
+- Kept the badge in the physical top-left for English and Arabic, with the like control on the opposite side to prevent overlap.
+- Added regression coverage for localization, placement, hover behavior, and profile/home consistency.
+
+### Repositories
+
+- `inkfig-user-FE`: artwork-card markup, styling, and tests.
+- No backend or database changes are required.
+
+### Verification
+
+- `[passed] npm.cmd test` - 43 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, environment variables, or configuration changes are required.
+
+### Git
+
+- Branch: `feature/artwork-category-badge`
+- Commit, rebase, merge, and push: completed after final synchronization.

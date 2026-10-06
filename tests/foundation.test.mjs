@@ -208,10 +208,10 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(styles, /\.artwork-pin-media/);
   assert.match(styles, /\.artwork-pin-like/);
   assert.doesNotMatch(homePage, /<h3>\{work\.title\}<\/h3>/);
-  assert.doesNotMatch(homePage, /artwork-type-tag/);
+  assert.match(homePage, /artwork-card-type-tag/);
   assert.doesNotMatch(homePage, /artwork-pin-uploader/);
   assert.match(styles, /\.artwork-type-tag/);
-  assert.doesNotMatch(homePage, /workTypeTone\(work\)/);
+  assert.match(homePage, /workTypeTone\(work\)/);
   assert.match(styles, /artwork-type-tag--violet/);
   assert.match(styles, /artwork-type-tag--terracotta/);
   assert.match(styles, /artwork-type-tag--magenta/);
@@ -304,7 +304,8 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(profilePage, /className="artwork-image-button"/);
   assert.match(profilePage, /className=\{`artwork-pin-like/);
   assert.match(profilePage, /className=\{`artwork-pin-save/);
-  assert.doesNotMatch(profilePage, /artwork-type-tag|profile-artwork-details/);
+  assert.match(profilePage, /artwork-card-type-tag/);
+  assert.doesNotMatch(profilePage, /profile-artwork-details/);
   assert.match(styles, /\.profile-tabs/);
   assert.equal([...resources.matchAll(/"profile\.likes"/g)].length, 2);
 });
@@ -486,13 +487,22 @@ test("provides a fixed icon rail and future-feature templates", () => {
 });
 
 test("keeps gallery cards minimal until hover and opens full details", () => {
-  assert.doesNotMatch(homePage, /artwork-pin-uploader|workTypeTone/);
+  assert.doesNotMatch(homePage, /artwork-pin-uploader/);
   assert.match(styles, /\.artwork-pin-like \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-save\.saved \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-media, \.artwork-image-button \{ cursor: pointer/);
   assert.match(homePage, /setSelectedWorkId\(work\.work_id\)/);
   assert.match(styles, /html \{ scroll-behavior: smooth/);
   assert.match(resources, /"home\.searchPlaceholder": "Search"/);
+});
+
+test("reveals a localized category badge at the top left of artwork cards", () => {
+  assert.match(homePage, /artwork-card-type-tag artwork-type-tag--\$\{workTypeTone\(work\)\}/);
+  assert.match(homePage, /language === "ar" \? work\.type_name_ar : work\.type_name_en/);
+  assert.match(profilePage, /artwork-card-type-tag artwork-type-tag--\$\{workTypeTone\(work\)\}/);
+  assert.match(styles, /\.artwork-card-type-tag \{ inset: 12px auto auto 12px; opacity: 0;/);
+  assert.match(styles, /\.artwork-pin-media:hover \.artwork-card-type-tag[^}]*opacity: 1;/);
+  assert.match(styles, /\[dir="rtl"\] \.artwork-card-type-tag \{ inset: 12px auto auto 12px;/);
 });
 
 test("opens Saved directly from the rail", () => {

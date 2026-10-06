@@ -13,6 +13,7 @@ import { AppSidebar } from "../navigation/AppSidebar";
 import {
   getLikedWorks, getSavedWorks, getUserWorks, setWorkLike, setWorkSave, type Work,
 } from "../works/worksApi";
+import { workTypeTone } from "../works/workTypePresentation";
 import {
   getProfileConnections, getPublicProfile, setProfileFollow,
   type ProfileAccount, type PublicProfile,
@@ -29,6 +30,7 @@ function ArtworkGrid({ canLike, canSave, empty, language, onLike, onSave, onSele
   return <div className="profile-artwork-grid">{works.map(work=>
     <article className="artwork-card" key={work.work_id}><div className="artwork-pin-media">
       <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>onSelect(work)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></button>
+      <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>
       <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
       {canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onSave(work)}><Bookmark size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}
