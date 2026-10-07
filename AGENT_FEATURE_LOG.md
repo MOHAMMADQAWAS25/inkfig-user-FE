@@ -5799,6 +5799,7 @@ No migration required.
 ### Notes
 
 The menu uses a physical right-edge position intentionally to match the supplied visual reference in both language directions.
+
 ## 2026-10-07 - Add account-scoped artwork search to the home bar
 
 ### Request
@@ -6080,3 +6081,65 @@ Add edit/delete controls for a user's own posts, keep uploaded images immutable,
 
 - Branch: `feature/owner-work-management`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+
+## 2026-10-07 - Refine owner menu button
+
+### Request
+
+Remove the visible frame around the artwork three-dot control and make the control slightly smaller.
+
+### Changes
+
+- Removed the border, background fill, and shadow from the three-dot trigger.
+- Reduced the trigger to 28 by 28 pixels and its icon to 19 pixels.
+- Preserved the bottom-right placement and existing edit/delete behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: refined the owner-menu trigger styling and regression coverage.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: reduced the three-dot icon size.
+- `src/styles.css`: removed the trigger frame and reduced its dimensions.
+- `tests/foundation.test.mjs`: verifies the frameless compact control.
+- `AGENT_FEATURE_LOG.md`: recorded this completed refinement.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The control remains available only for manageable works owned by the signed-in user.
+- Backend ownership and permission validation remain unchanged and authoritative.
+
+### Frontend
+
+- The bottom-right three-dot control is now frameless and slightly smaller in both themes and language directions.
+- Edit/delete actions, popup placement, responsiveness, and error handling remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test - 48 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions workflow.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `316f817`
+- Push: `successful`
+
+### Notes
+
+None
