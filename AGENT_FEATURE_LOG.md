@@ -5974,3 +5974,45 @@ Add the supplied user icon to the navigation bar, open an adjacent account-only 
 ### Notes
 
 The uploaded raster is used only as an alpha mask; its visible color always follows the established navbar theme.
+## 2026-10-07 - Add owner post controls and refine profile hierarchy
+
+### Request
+
+Add edit/delete controls for a user's own posts, keep uploaded images immutable, and refine profile logout, name, statistics, and tab sizing.
+
+### Changes
+
+- Added an owner-only three-dot menu to profile post cards with Edit and Delete actions.
+- Added a responsive bilingual editor for title, description, category, and links that displays but never accepts replacement of the uploaded image.
+- Added permanent-deletion confirmation and removes deleted works from posts, likes, saves, and any open detail view.
+- Moved logout to the outer right/reading-end of the profile summary above the statistics area.
+- Reduced the username size and enlarged follower, following, likes, Posts, Saved, and Likes labels for a balanced profile hierarchy.
+- Added light/dark, RTL/LTR, responsive, error, loading, and accessibility states.
+
+### Repositories
+
+- `inkfig-user-FE`: owner controls, editor, profile styling, localization, tests, and this log.
+- `inkfig-main-system`: authoritative owner mutations and complete deletion.
+- `inkfig-user-system`: no changes required.
+
+### API, database, permissions, and SnapStart
+
+- Consumes `PATCH /api/v1/works/{work_id}` and `DELETE /api/v1/works/{work_id}`.
+- Controls appear only on the signed-in owner's Posts tab with `works.upload`; the backend remains authoritative.
+- No frontend database, migration, secret, environment-variable, or SnapStart change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 48 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and the Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-main-system` before `inkfig-user-FE`.
+- No migrations or configuration changes are required.
+
+### Git
+
+- Branch: `feature/owner-work-management`
+- Commit, rebase, push, merge, and main push: pending final synchronization.

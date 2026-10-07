@@ -61,3 +61,9 @@ export async function uploadWork(input: {typeId:string; title:string; descriptio
 }
 export async function setWorkLike(id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`); }
 export async function setWorkSave(id:string, saved:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, saved ? "PUT" : "DELETE", `/works/${id}/save`); }
+export async function updateWork(id:string,input:{typeId:string;title:string;description:string;links:WorkLink[]}):Promise<void>{
+  const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label?.trim()||null}));
+  if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
+  await requestJson<null>(mainApiBaseUrl,"PATCH",`/works/${id}`,{body:{type_id:input.typeId,title:input.title.trim(),description:input.description.trim(),links}});
+}
+export async function deleteWork(id:string):Promise<void>{await requestJson<null>(mainApiBaseUrl,"DELETE",`/works/${id}`);}

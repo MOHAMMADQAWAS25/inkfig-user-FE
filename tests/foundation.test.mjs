@@ -531,6 +531,19 @@ test("offers an optional backend-uploaded avatar during signup", () => {
   }
 });
 
+test("lets owners edit post metadata and permanently delete their posts", () => {
+  assert.match(profilePage, /className="artwork-owner-menu"/);
+  assert.match(profilePage, /canManage=\{ownProfile&&section==="posts"/);
+  assert.match(profilePage, /updateWork\(editing\.work_id/);
+  assert.match(profilePage, /deleteWork\(work\.work_id\)/);
+  assert.match(profilePage, /works\.imageCannotChange/);
+  assert.match(worksApi, /"PATCH",`\/works\/\$\{id\}`/);
+  assert.match(worksApi, /"DELETE",`\/works\/\$\{id\}`/);
+  assert.doesNotMatch(worksApi, /updateWork[^]*file:/);
+  assert.match(styles, /\.artwork-owner-menu/);
+  assert.match(styles, /\.work-edit-dialog/);
+});
+
 test("saves artworks for registered users and exposes a Saved profile tab", () => {
   assert.match(worksApi, /saved_by_me:\s*boolean/);
   assert.match(worksApi, /getSavedWorks/);
