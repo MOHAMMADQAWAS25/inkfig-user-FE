@@ -29,8 +29,8 @@ const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", impor
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
 const profileApi = readFileSync(new URL("../src/features/profile/profileApi.ts", import.meta.url), "utf8");
-const profileAvatarUpload = readFileSync(new URL("../src/features/profile/profileAvatarUpload.ts", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
+const profileAvatarUpload = readFileSync(new URL("../src/features/profile/profileAvatarUpload.ts", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
 const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.ts", import.meta.url), "utf8");
@@ -436,6 +436,17 @@ test("builds a searchable icon-first homepage header", () => {
   for (const key of ["searchPlaceholder", "noSearchResults", "profileMenu", "viewProfile", "preferences"]) {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.${key}"`, "g"))].length, 2);
   }
+});
+test("opens a paginated live account search panel from the navigation rail", () => {
+  assert.match(appSidebar, /app-sidebar-people-search/);
+  assert.match(appSidebar, /account-discovery-panel/);
+  assert.match(appSidebar, /searchProfilesPage\(normalizedQuery\)/);
+  assert.match(appSidebar, /searchProfilesPage\(normalizedQuery,nextCursor\)/);
+  assert.match(appSidebar, /setTimeout\(\(\)=>\{searchProfilesPage/);
+  assert.match(profileApi, /next_cursor: number \| null/);
+  assert.match(profileApi, /parameters\.set\("cursor", String\(cursor\)\)/);
+  assert.match(styles, /mask: url\("\.\/assets\/user-avatar\.png"\)/);
+  assert.match(styles, /\.account-discovery-panel/);
 });
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);

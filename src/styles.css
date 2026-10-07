@@ -790,6 +790,45 @@ img { max-width: 100%; image-rendering: auto; }
   .artwork-grid, .profile-artwork-grid { column-width: 235px; }
 }
 
+/* Account discovery panel */
+.app-sidebar-people-search { display: grid; width: var(--nav-control-size); height: var(--nav-control-size); padding: 0; place-items: center; border: 1px solid transparent; border-radius: 14px; background: transparent; color: #59613c; cursor: pointer; transition: background-color 180ms ease,color 180ms ease,transform 180ms ease,border-color 180ms ease; }
+.app-sidebar-people-search:hover { border-color: rgb(97 125 43 / .22); background: rgb(97 125 43 / .1); color: #39431c; transform: translateY(-1px); }
+.app-sidebar-people-search.active { border-color: rgb(97 125 43 / .34); background: #39431c; color: #fffdf0; box-shadow: 0 8px 20px rgb(57 67 28 / .2); }
+.app-sidebar-people-search > span { width: var(--nav-icon-size); height: var(--nav-icon-size); background: currentColor; -webkit-mask: url("./assets/user-avatar.png") center/contain no-repeat; mask: url("./assets/user-avatar.png") center/contain no-repeat; }
+.account-discovery-backdrop { position: fixed; z-index: 52; inset: 0; border: 0; background: rgb(20 25 12 / .2); backdrop-filter: blur(1px); }
+.account-discovery-panel { position: fixed; z-index: 53; top: 0; bottom: 0; left: var(--app-rail-size); display: flex; width: min(370px,calc(100vw - var(--app-rail-size))); padding: 22px 18px; border-right: 1px solid rgb(57 67 28 / .18); background: rgb(255 253 240 / .98); box-shadow: 18px 0 42px rgb(28 36 16 / .16); flex-direction: column; }
+[dir="rtl"] .account-discovery-panel { right: var(--app-rail-size); left: auto; border-right: 0; border-left: 1px solid rgb(57 67 28 / .18); box-shadow: -18px 0 42px rgb(28 36 16 / .16); }
+.account-discovery-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.account-discovery-panel h2 { margin: 0; color: #39431c; font-family: Georgia,"Times New Roman",serif; font-size: 1.45rem; }
+.account-discovery-panel > header button { display: grid; width: 38px; height: 38px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #59613c; cursor: pointer; }
+.account-discovery-panel > header button:hover { background: rgb(97 125 43 / .1); color: #39431c; }
+.account-discovery-input { display: flex; min-height: 46px; align-items: center; gap: 10px; margin-top: 20px; padding-inline: 14px; border: 1px solid rgb(57 67 28 / .2); border-radius: 12px; background: #f7f3d9; color: #617d2b; }
+.account-discovery-input:focus-within { border-color: #779439; box-shadow: 0 0 0 3px rgb(119 148 57 / .14); }
+.account-discovery-input input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #39431c; font: inherit; }
+.account-discovery-results { overflow-y: auto; display: grid; align-content: start; gap: 6px; margin-top: 14px; padding: 2px; }
+.account-discovery-results > p { margin: 14px 8px; color: #747a58; line-height: 1.55; }
+.account-discovery-results > a { display: flex; min-width: 0; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; color: #39431c; text-decoration: none; }
+.account-discovery-results > a:hover { background: rgb(97 125 43 / .1); }
+.account-discovery-results > a img,.account-discovery-results > a span { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; }
+.account-discovery-results > a img { object-fit: cover; }
+.account-discovery-results > a span { display: grid; place-items: center; background: #617d2b; color: #fffdf0; font-weight: 800; }
+.account-discovery-results > a strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-discovery-load-more { min-height: 42px; margin: 8px 10px 4px; border: 1px solid #617d2b; border-radius: 10px; background: transparent; color: #4d6722; font-weight: 800; cursor: pointer; }
+.account-discovery-load-more:hover { background: rgb(97 125 43 / .1); }
+.account-discovery-load-more:disabled { opacity: .65; cursor: wait; }
+:root[data-theme="dark"] .app-sidebar-people-search { color: #b7b59a; }
+:root[data-theme="dark"] .app-sidebar-people-search:hover { color: #f7f2d8; background: rgb(169 182 95 / .1); }
+:root[data-theme="dark"] .app-sidebar-people-search.active { background: #a9b65f; color: #20270f; }
+:root[data-theme="dark"] .account-discovery-backdrop { background: rgb(0 0 0 / .38); }
+:root[data-theme="dark"] .account-discovery-panel { border-color: #3b4828; background: rgb(16 20 12 / .98); box-shadow: 18px 0 42px rgb(0 0 0 / .38); }
+:root[data-theme="dark"][dir="rtl"] .account-discovery-panel { box-shadow: -18px 0 42px rgb(0 0 0 / .38); }
+:root[data-theme="dark"] .account-discovery-panel h2,:root[data-theme="dark"] .account-discovery-input input,:root[data-theme="dark"] .account-discovery-results > a { color: #f7f2d8; }
+:root[data-theme="dark"] .account-discovery-panel > header button,:root[data-theme="dark"] .account-discovery-results > p { color: #b7b59a; }
+:root[data-theme="dark"] .account-discovery-input { border-color: #3b4828; background: #171d11; }
+:root[data-theme="dark"] .account-discovery-results > a:hover { background: rgb(169 182 95 / .1); }
+:root[data-theme="dark"] .account-discovery-load-more { border-color: #a9b65f; color: #d9df9d; }
+@media (max-width: 720px) { .account-discovery-panel,[dir="rtl"] .account-discovery-panel { top: auto; right: 10px; bottom: calc(68px + env(safe-area-inset-bottom)); left: 10px; width: auto; max-height: min(72vh,620px); padding: 18px 14px; border: 1px solid rgb(57 67 28 / .18); border-radius: 18px; box-shadow: 0 -12px 38px rgb(28 36 16 / .2); } .account-discovery-backdrop { bottom: calc(64px + env(safe-area-inset-bottom)); } }
+
 @media (max-width: 980px) {
   .gallery-hero { grid-template-columns: minmax(0,1fr) minmax(180px,.45fr); gap: 28px; }
   .profile-intro, .profile-tabs, .profile-sections, .profile-state { width: calc(100% - 32px); }

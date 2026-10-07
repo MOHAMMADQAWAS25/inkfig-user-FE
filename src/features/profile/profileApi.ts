@@ -24,15 +24,29 @@ export type ProfileSearchResult = {
   avatar_url: string | null;
 };
 
-export async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {
-  const parameters = new URLSearchParams({ query, limit: "8" });
+export type ProfileSearchPage = {
+  items: ProfileSearchResult[];
+  next_cursor: number | null;
+};
+
+export async function searchProfilesPage(
+  query: string,
+  cursor?: number,
+  limit = 20,
+): Promise<ProfileSearchPage> {
+  const parameters = new URLSearchParams({ query, limit: String(limit) });
+  if (cursor !== undefined) parameters.set("cursor", String(cursor));
   return (
-    await requestJson<{ items: ProfileSearchResult[] }>(
+    await requestJson<ProfileSearchPage>(
       userApiBaseUrl,
       "GET",
       `/profiles/search?${parameters.toString()}`,
     )
-  ).data.items;
+  ).data;
+}
+
+export async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {
+  return (await searchProfilesPage(query, undefined, 8)).items;
 }
 
 export async function getPublicProfile(userId: string): Promise<PublicProfile> {
