@@ -6143,3 +6143,66 @@ No migration required.
 ### Notes
 
 None
+
+## 2026-10-07 - Remove owner-control footer surface
+
+### Request
+
+Remove the marked rounded surface around and below owned artwork while giving the three-dot control a visible hover response.
+
+### Changes
+
+- Removed the manageable card's visible background, outline-like shadow, and altered lower image corners.
+- Reduced the reserved control spacing while retaining the three-dot control below the image at the bottom-right.
+- Added a subtle olive background and one-pixel ring on hover, keyboard focus, and while the action menu is open.
+- Added matching dark-theme interaction styling.
+
+### Repositories
+
+- `inkfig-user-FE`: refined the owned artwork card and menu interaction styling.
+
+### Files
+
+- `src/styles.css`: removes the footer surface and adds hover/focus/open feedback.
+- `tests/foundation.test.mjs`: verifies the transparent container and interaction ring.
+- `AGENT_FEATURE_LOG.md`: recorded this completed refinement.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The control remains restricted to manageable works owned by the signed-in user.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Owned artwork no longer has a visible rounded container beneath or around its image.
+- The three-dot control visibly responds to pointer hover and keyboard focus and remains highlighted while open.
+- Existing menu actions, positioning, themes, RTL/LTR behavior, responsiveness, and errors remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test - 48 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions workflow.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `71c0271`
+- Push: `successful`
+
+### Notes
+
+None
