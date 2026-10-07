@@ -5599,3 +5599,82 @@ Move the profile avatar back to the outer top corner of the home header and refi
 
 - Branch: `fix/home-header-spacing`
 - Commit, rebase, push, and pull-request status: pending final synchronization.
+
+## 2026-10-07 - Add artwork feed pagination
+
+### Request
+
+Implement complete user-facing pagination for artwork feeds and semantic-search results.
+
+### Changes
+
+- Changed artwork API helpers to return page objects containing items and continuation cursors.
+- Added localized Load more controls to the home feed, semantic search, profile posts, liked works, and saved works.
+- Preserves an independent cursor for every profile collection tab.
+- Appends new pages without duplicate artwork IDs and preserves semantic rank ordering.
+- Keeps already loaded artwork visible when a later page fails and shows a retryable error state.
+- Preserved artwork aspect ratios, original image URLs, Pinterest-style masonry, likes, saves, filters, themes, and navigation.
+
+### Repositories
+
+- `inkfig-user-FE`: adds page-aware API helpers and user-facing continuation controls.
+- `inkfig-main-system`: adds search continuation and already provides feed/profile cursors.
+
+### Files
+
+- `src/features/works/worksApi.ts`: returns typed page responses and sends feed/search cursors.
+- `src/features/home/HomePage.tsx`: loads and appends public-feed or ranked-search pages.
+- `src/features/profile/ProfilePage.tsx`: tracks and loads pages independently for posts, likes, and saved tabs.
+- `src/i18n/resources.ts`: adds English and Arabic load-more labels.
+- `src/styles.css`: styles responsive, theme-aware pagination controls and errors.
+- `tests/foundation.test.mjs`: verifies cursor transport, state, localization, and controls.
+
+### API
+
+- Consumes `GET /api/v1/works` with optional `before`.
+- Consumes `GET /api/v1/works/search` with optional integer `cursor`.
+- Consumes `GET /api/v1/works/users/{user_id}`, `/likes`, and `/saves` with optional `before`.
+- All page responses consume `items` and nullable `next_cursor`; request validation, filters, permissions, and error contracts remain backend-owned.
+
+### Database
+
+No migration required. The frontend has no local database; the backend uses its existing feed indexes and pgvector search data.
+
+### Permissions and scope
+
+- Public viewers can paginate the home feed and search.
+- Authenticated users with `profile.read_own` can paginate their liked and saved collections.
+- Existing like/save permissions are unchanged.
+- Published-work, active-owner, ownership, and viewer scopes continue to be validated by the backend.
+
+### Frontend
+
+- Adds accessible disabled/loading Load more controls in English and Arabic.
+- Home category or submitted-query changes reset to the new first page.
+- Each profile tab retains its own continuation cursor.
+- Later-page failures preserve loaded cards and expose an error message; the cursor remains available for retry.
+- Existing responsive desktop/mobile masonry, RTL/LTR, dark/light themes, empty states, and original-resolution image behavior remain.
+
+### Verification
+
+- `[passed] npm.cmd test - 44 passed`
+- `[passed] npm.cmd run build - TypeScript and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[passed] backend pytest - 30 passed`
+- `[passed] backend mypy - no issues in 48 source files`
+
+### Deployment
+
+- Deploy `inkfig-main-system` before `inkfig-user-FE`.
+- No migrations must run before deployment.
+- No environment-variable, secret, or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `f91ad8d`
+- Push: `successful`
+
+### Notes
+
+The explicit Load more interaction avoids unexpected network and Voyage requests while users scroll.
