@@ -6144,6 +6144,87 @@ No migration required.
 
 None
 
+## 2026-10-07 - Build the system-administrator workspace
+
+### Request
+
+Build dedicated frontend interfaces for the system administrator according to the account's backend permissions, and keep those interfaces hidden from every other role.
+
+### Changes
+
+- Replaced the minimal administration screen with a complete user-management workspace.
+- Added account totals for all, active, suspended, and elevated administrator accounts.
+- Added live name/email search, role and status filters, result counts, and ten-account client-side pagination.
+- Added localized role selectors and activate/suspend actions connected to the existing administration API.
+- Added confirmation dialogs, success feedback, retryable errors, loading skeletons, empty states, and refresh behavior.
+- Prevented self-role and self-status changes in the UI while preserving backend authorization as authoritative.
+- Added an administration navigation icon that appears only for a `system_administrator` session with `users.read`.
+- Independently gates role and status controls through `users.role.manage` and `users.status.manage`.
+- Added responsive desktop/mobile, RTL/LTR, light/dark, keyboard-focus, and accessible dialog behavior.
+- Intentionally left public navigation and every non-system-administrator interface unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: system-administrator navigation, workspace, localization, responsive styling, tests, and this log.
+- `inkfig-user-system`: no changes; existing protected administration endpoints are reused.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/admin/AdminUsersPage.tsx`: implements the permission-driven user administration workspace and workflows.
+- `src/features/navigation/AppSidebar.tsx`: conditionally exposes the administration destination only to the system administrator.
+- `src/i18n/resources.ts`: adds complete English and Arabic administration translations.
+- `src/styles.css`: adds polished responsive, themed, RTL-aware administration presentation.
+- `tests/foundation.test.mjs`: verifies role visibility, permission gates, API usage, pagination, dialogs, themes, and localization.
+- `AGENT_FEATURE_LOG.md`: records this completed ticket.
+
+### API
+
+- `GET /api/v1/admin/users`: loads the protected user directory.
+- `PATCH /api/v1/admin/users/{user_id}/role`: changes a selected user's role after confirmation; requires `users.role.manage` and backend hierarchy validation.
+- `PATCH /api/v1/admin/users/{user_id}/status`: activates or suspends a selected account after confirmation; requires `users.status.manage` and backend hierarchy validation.
+- No request or response contracts changed.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The navigation entry and page require both role `system_administrator` and permission `users.read`.
+- Role controls require `users.role.manage`; account-status controls require `users.status.manage`.
+- The current administrator cannot change their own role or status through the UI.
+- Backend permission, role hierarchy, target scope, and self-management checks remain authoritative for every mutation.
+
+### Frontend
+
+- Route `/:language/admin/users` now provides the full administration workspace.
+- The shared navigation rail conditionally displays a shield icon only for eligible system-administrator sessions.
+- The directory includes statistics, search, filters, pagination, localized role/status labels, confirmation dialogs, and mutation feedback.
+- Loading, empty, success, failure, retry, disabled, responsive mobile, dark/light, and RTL/LTR states are handled.
+
+### Verification
+
+- `[passed] npm.cmd test - 49 tests passed`
+- `[passed] npm.cmd run build - strict TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[not run] authenticated production browser verification - deployment runs through the GitHub workflow after push`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions Cloudflare workflow.
+- No backend deployment, migration, environment-variable, or configuration change is required.
+
+### Git
+
+- Branch: `main`
+- Commit: `ecd0af1`
+- Push: `successful`
+
+### Notes
+
+Pagination is currently performed over the protected user collection returned by the existing backend endpoint; server-side pagination can be introduced when the administration dataset requires it.
+
 ## 2026-10-07 - Remove owner-control footer surface
 
 ### Request
