@@ -484,6 +484,20 @@ test("opens a paginated live account search panel from the navigation rail", () 
   assert.match(styles, /mask: url\("\.\/assets\/user-avatar\.png"\)/);
   assert.match(styles, /\.account-discovery-panel/);
 });
+
+test("smoothly opens account and notification panels from the navigation rail", () => {
+  assert.match(appSidebar, /app-sidebar-panel-button/);
+  assert.match(appSidebar, /aria-controls="notifications-panel"/);
+  assert.match(appSidebar, /className="account-discovery-panel notifications-panel sidebar-panel-enter"/);
+  assert.doesNotMatch(appSidebar, /to:\s*`\/\$\{language\}\/notifications`/);
+  assert.match(appSidebar, /event\.key==="Escape"/);
+  assert.match(styles, /@keyframes sidebar-panel-in/);
+  assert.match(styles, /@keyframes sidebar-panel-in-mobile/);
+  assert.match(styles, /prefers-reduced-motion: reduce/);
+  for (const key of ["close", "emptyTitle", "emptyDescription"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"notifications\\.${key}"`, "g"))].length, 2);
+  }
+});
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
   assert.match(homePage, /ref=\{profileMenuRef\}/);

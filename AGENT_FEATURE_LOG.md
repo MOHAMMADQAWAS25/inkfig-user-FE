@@ -6358,3 +6358,47 @@ Give system administrators and administrators a UI for deleting any work and req
 ### Notes
 
 Administrators with an existing session must sign out and sign in again to load the newly assigned permission into the frontend session.
+
+## 2026-10-08 - Add smoothly animated account and notification panels
+
+### Request
+
+Open Find Accounts and Notifications as smooth sidebar sliders instead of navigating Notifications to a separate page.
+
+### Changes
+
+- Added a navigation-rail Notifications button that opens an adjacent panel without changing routes.
+- Added smooth directional entrance motion to both the existing account finder and the new notification panel.
+- Mirrors horizontal motion for Arabic and uses bottom-sheet motion above the mobile navigation.
+- Ensures opening either panel closes the other and supports backdrop, close-button, Escape, and navigation dismissal.
+- Added a localized empty notification state ready for notification data in a future ticket.
+- Honors reduced-motion preferences and preserves existing account search, pagination, themes, and responsive behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: sidebar interactions, notification panel, animation, localization, tests, and this log.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, permission, secret, or environment-variable changes.
+- Notifications remain an empty frontend template; no notification backend contract was invented.
+- No SnapStart impact because this is a frontend-only interaction change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 51 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and the Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser interaction` - the in-app browser could not attach because the Windows sandbox helper failed during startup.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend deployment or migration is required.
+
+### Git
+
+- Branch: `feature/sidebar-sliding-panels`
+- Commit, rebase, push, merge, and main push: pending final synchronization.
