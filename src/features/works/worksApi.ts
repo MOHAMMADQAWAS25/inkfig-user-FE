@@ -25,17 +25,19 @@ export function isValidWorkUrl(value: string): boolean {
     return false;
   }
 }
-export async function getWorks(typeCode?: string, cursor?: string): Promise<WorkPage> {
+export async function getWorks(typeCode?: string, cursor?: string, ownerUserId?: string): Promise<WorkPage> {
   const query = new URLSearchParams();
   if (typeCode) query.set("type_code", typeCode);
   if (cursor) query.set("before", cursor);
+  if (ownerUserId) query.set("owner_user_id", ownerUserId);
   const suffix=query.size?`?${query.toString()}`:"";
   return (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works${suffix}`)).data;
 }
-export async function searchWorks(queryText: string, typeCode?: string, cursor?: number): Promise<WorkPage> {
+export async function searchWorks(queryText: string, typeCode?: string, cursor?: number, ownerUserId?: string): Promise<WorkPage> {
   const query = new URLSearchParams({ query: queryText });
   if (typeCode) query.set("type_code", typeCode);
   if (cursor !== undefined) query.set("cursor", String(cursor));
+  if (ownerUserId) query.set("owner_user_id", ownerUserId);
   const page = (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`)).data;
   return {...page,items:[...page.items].sort((left, right) => (left.search_rank ?? Number.MAX_SAFE_INTEGER) - (right.search_rank ?? Number.MAX_SAFE_INTEGER))};
 }

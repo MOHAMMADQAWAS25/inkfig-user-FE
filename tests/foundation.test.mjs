@@ -400,12 +400,16 @@ test("builds a searchable icon-first homepage header", () => {
   assert.doesNotMatch(homePage, /gallery-nav|gallery-language/);
   assert.match(homePage, /<LanguageToggle\/>/);
   assert.match(homePage, /className="gallery-search"/);
+  assert.match(homePage, /searchProfiles\(mentionQuery\)/);
+  assert.match(homePage, /role="combobox"/);
+  assert.match(homePage, /submittedAccount\?\.user_id/);
+  assert.match(styles, /\.account-search-suggestions/);
   assert.match(homePage, /setSearchQuery/);
-  assert.match(homePage, /searchWorks\(normalizedSearch,typeCode\)/);
+  assert.match(homePage, /searchWorks\(normalizedArtworkSearch,typeCode,undefined,submittedAccount\?\.user_id\)/);
   assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(""\)/);
   assert.match(homePage, /onSubmit=\{submitSearch\}/);
   assert.match(homePage, /setSubmittedSearch\(searchQuery\.trim\(\)\)/);
-  assert.doesNotMatch(homePage, /setTimeout/);
+  assert.match(homePage, /window\.setTimeout/);
   assert.match(homePage, /works\.map/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(worksApi, /search_rank\?: number \| null/);

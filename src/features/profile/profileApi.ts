@@ -16,6 +16,22 @@ export type ProfileAccount = {
   is_following: boolean;
 };
 
+export type ProfileSearchResult = {
+  user_id: string;
+  full_name: string;
+};
+
+export async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {
+  const parameters = new URLSearchParams({ query, limit: "8" });
+  return (
+    await requestJson<{ items: ProfileSearchResult[] }>(
+      userApiBaseUrl,
+      "GET",
+      `/profiles/search?${parameters.toString()}`,
+    )
+  ).data.items;
+}
+
 export async function getPublicProfile(userId: string): Promise<PublicProfile> {
   return (await requestJson<PublicProfile>(userApiBaseUrl, "GET", `/profiles/${userId}`)).data;
 }
@@ -40,4 +56,3 @@ export async function setProfileFollow(userId: string, following: boolean): Prom
     `/profiles/${userId}/follow`,
   );
 }
-
