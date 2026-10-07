@@ -5902,3 +5902,75 @@ Make the navigation bar and its buttons slightly smaller while keeping the logo 
 
 - Branch: `fix/smaller-navigation-rail`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+## 2026-10-07 - Add themed account-discovery side panel
+
+### Request
+
+Add the supplied user icon to the navigation bar, open an adjacent account-only side panel on click, search names live without `@`, and paginate every backend result set.
+
+### Changes
+
+- Added the supplied `user-avatar.png` silhouette to the shared navigation rail.
+- Renders the bitmap as a `currentColor` CSS mask so it matches existing navigation icon sizing, hover, active, light, dark, desktop, and mobile states.
+- Added an adjacent side panel with a dedicated name search bar and 250 ms live-search debounce from the first character.
+- Added real profile avatars with initial fallbacks, profile navigation, loading, empty, error, close, outside-backdrop, RTL/LTR, English/Arabic, and responsive states.
+- Added cursor-based Load more behavior with client-side duplicate protection.
+- Left the existing home `@` account selector and artwork search behavior unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: shared navigation control, responsive panel, API client pagination, localization, asset, styles, and tests.
+- `inkfig-user-system`: paginated privacy-safe account discovery.
+
+### Files
+
+- `src/assets/user-avatar.png`: supplied navigation icon source.
+- `src/features/navigation/AppSidebar.tsx`: adds the icon, panel, debounced live search, pagination, profile links, and states.
+- `src/features/profile/profileApi.ts`: adds paginated account-search requests while preserving the eight-result `@` helper.
+- `src/i18n/resources.ts`: adds English and Arabic panel labels and states.
+- `src/styles.css`: themes the uploaded icon as a mask and adds desktop/mobile/RTL panel presentation.
+- `tests/foundation.test.mjs`: verifies the themed icon, live request, cursor request, and panel structure.
+
+### API
+
+- `GET /api/v1/profiles/search`: sends name-only `query`, page `limit`, and optional integer `cursor`; consumes `items` and nullable `next_cursor`. No `@` character is required or inserted by this panel.
+
+### Database
+
+- Migration: `No migration required`
+- The existing optimized account-name index is reused. No frontend database, schema, backfill, or rollback change exists.
+
+### Permissions and scope
+
+- No authenticated permission is required for minimal public account discovery.
+- All roles and viewers can search only active, verified accounts.
+- The user backend enforces visibility and response-field scope; the frontend never receives email, phone, role, or other private account data.
+
+### Frontend
+
+- The shared navbar icon opens and closes the adjacent side panel on every page using `AppSidebar`.
+- Desktop panels open beside the left or right RTL rail; mobile panels open above the bottom navigation.
+- Search starts after one typed character, resets on query changes, and appends unique results through Load more.
+- Loading, empty, failure, pagination failure, avatar fallback, dark/light, RTL/LTR, and responsive behavior are handled.
+
+### Verification
+
+- `[passed] npm.cmd test - 47 passed`
+- `[passed] npm.cmd run build - strict TypeScript and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[not run] live deployed browser verification - deployment workflows run after GitHub push`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after `inkfig-user-system`.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `890608e`
+- Push: `successful`
+
+### Notes
+
+The uploaded raster is used only as an alpha mask; its visible color always follows the established navbar theme.
