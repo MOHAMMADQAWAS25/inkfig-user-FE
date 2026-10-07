@@ -34,6 +34,8 @@ const profileAvatarUpload = readFileSync(new URL("../src/features/profile/profil
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
 const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.ts", import.meta.url), "utf8");
+const adminUsersPage = readFileSync(new URL("../src/features/admin/AdminUsersPage.tsx", import.meta.url), "utf8");
+const administrationApi = readFileSync(new URL("../src/features/admin/administrationApi.ts", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -42,6 +44,27 @@ test("uses the approved frontend dependencies", () => {
   for (const forbidden of ["@mui/material", "bootstrap", "redux", "styled-components", "tailwindcss"]) {
     assert.equal(packageJson.dependencies[forbidden], undefined);
   }
+});
+
+test("provides a permission-driven system administrator workspace", () => {
+  assert.match(router, /\/:language\/admin\/users/);
+  assert.match(appSidebar, /session\?\.role==="system_administrator"/);
+  assert.match(appSidebar, /hasPermission\(session\.permissions,"users\.read"\)/);
+  assert.match(appSidebar, /nav\.administration/);
+  assert.match(adminUsersPage, /session\.role==="system_administrator"/);
+  assert.match(adminUsersPage, /users\.role\.manage/);
+  assert.match(adminUsersPage, /users\.status\.manage/);
+  assert.match(adminUsersPage, /admin-stats/);
+  assert.match(adminUsersPage, /admin-filters/);
+  assert.match(adminUsersPage, /PAGE_SIZE=10/);
+  assert.match(adminUsersPage, /role="alertdialog"/);
+  assert.match(administrationApi, /GET","\/admin\/users/);
+  assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/role`/);
+  assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/status`/);
+  assert.match(styles, /\.admin-dialog-backdrop/);
+  assert.match(styles, /:root\[data-theme="dark"\] \.admin-page/);
+  assert.match(resources, /"admin\.title": "User administration"/);
+  assert.equal([...resources.matchAll(/"admin\.title"/g)].length, 2);
 });
 
 test("requires a six-digit email verification code before login", () => {

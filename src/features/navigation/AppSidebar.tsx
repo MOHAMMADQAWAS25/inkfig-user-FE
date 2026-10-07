@@ -1,14 +1,17 @@
-import { Bell, Bookmark, House, Plus, Search, Settings, Trophy, X } from "lucide-react";
+import { Bell, Bookmark, House, Plus, Search, Settings, ShieldCheck, Trophy, X } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
+import { hasPermission } from "../../lib/permissions";
+import { useAuth } from "../auth/AuthContext";
 import { searchProfilesPage } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
 
 export function AppSidebar() {
   const { language, t } = useI18n();
+  const { session } = useAuth();
   const location = useLocation();
   const [accountsOpen,setAccountsOpen]=useState(false);
   const [accountQuery,setAccountQuery]=useState("");
@@ -25,6 +28,7 @@ export function AppSidebar() {
     { to: `/${language}/upload`, label: t("nav.upload"), icon: Plus },
     { to: `/${language}/notifications`, label: t("nav.notifications"), icon: Bell },
   ];
+  const showSystemAdministration=session?.role==="system_administrator"&&hasPermission(session.permissions,"users.read");
   const normalizedQuery=accountQuery.trim();
   useEffect(()=>{if(!accountsOpen){return;}window.setTimeout(()=>searchInputRef.current?.focus(),0);},[accountsOpen]);
   useEffect(()=>{if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery]);
@@ -35,6 +39,7 @@ export function AppSidebar() {
     <Link className="app-sidebar-logo" to={`/${language}`} aria-label={t("app.name")}><img src={inkfigLogo} alt="" /></Link>
     <nav className="app-sidebar-nav">
       {items.map(({to,label,icon:Icon,end})=><NavLink key={to} to={to} end={end} aria-label={label} title={label}><Icon aria-hidden="true" size={24}/></NavLink>)}
+      {showSystemAdministration&&<NavLink to={`/${language}/admin/users`} aria-label={t("nav.administration")} title={t("nav.administration")}><ShieldCheck aria-hidden="true" size={24}/></NavLink>}
       <button className={`app-sidebar-people-search${accountsOpen?" active":""}`} type="button" aria-label={t("accounts.openSearch")} title={t("accounts.openSearch")} aria-expanded={accountsOpen} aria-controls="account-discovery-panel" onClick={()=>setAccountsOpen(open=>!open)}><span aria-hidden="true"/></button>
       <Link className={savedActive?"active":""} to={`/${language}/profile?section=saved`} aria-label={t("nav.saved")} title={t("nav.saved")}><Bookmark aria-hidden="true" size={24}/></Link>
     </nav>
