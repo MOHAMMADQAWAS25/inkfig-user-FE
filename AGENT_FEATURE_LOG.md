@@ -5735,6 +5735,70 @@ Slightly enlarge the navigation rail, its controls, and logo; reduce the home se
 
 - Branch: `feature/profile-avatar-controls`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+
+## 2026-10-07 - Position owner controls below artwork
+
+### Request
+
+Place the three-dot control used to edit or delete an owned work at the bottom-right of the artwork card, matching the supplied reference image.
+
+### Changes
+
+- Moved the owner-only three-dot menu from the image overlay into a compact footer below the artwork.
+- Anchored the control to the physical bottom-right in both LTR and RTL layouts and made its action menu open upward so it remains associated with the card.
+- Added light- and dark-theme styling while preserving the existing edit/delete behavior, authorization rules, image rendering, and non-owner cards.
+
+### Repositories
+
+- `inkfig-user-FE`: repositioned and restyled the existing owner work menu and updated its frontend tests.
+
+### Files
+
+- `src/features/profile/ProfilePage.tsx`: moved the owner menu outside the image container and marked manageable cards for footer styling.
+- `src/styles.css`: added the bottom action footer, bottom-right menu placement, upward popup, and dark-theme presentation.
+- `tests/foundation.test.mjs`: verifies the new manageable-card markup and menu placement.
+- `AGENT_FEATURE_LOG.md`: recorded this completed ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The control remains limited to the signed-in owner where the existing `works.upload` permission and ownership checks allow management.
+- Edit and delete authorization continues to be validated by the backend; this change does not broaden access or scope.
+
+### Frontend
+
+- The owner menu is displayed in a white or themed footer below owned artwork cards on the profile Posts section.
+- The three-dot button stays at the physical bottom-right and its localized Edit/Delete popup opens above it.
+- Existing responsive masonry layout, RTL/LTR support, dark mode, image resolution behavior, and confirmation/error workflows remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test - 48 tests passed`
+- `[passed] npm.cmd run build - TypeScript checks and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[not run] deployed browser verification - deployment occurs through the GitHub workflow after push`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions workflow.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `e366b1e`
+- Push: `successful`
+
+### Notes
+
+The menu uses a physical right-edge position intentionally to match the supplied visual reference in both language directions.
 ## 2026-10-07 - Add account-scoped artwork search to the home bar
 
 ### Request
