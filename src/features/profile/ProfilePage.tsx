@@ -1,12 +1,10 @@
-import { Bookmark, Heart, Image, Upload, UserRound, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Bookmark, Camera, Heart, Image, LogOut, UserRound, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
-import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
 import type { TranslationKey } from "../../i18n/resources";
 import { hasPermission } from "../../lib/permissions";
-import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "../auth/AuthContext";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -19,6 +17,7 @@ import {
   getProfileConnections, getPublicProfile, setProfileFollow,
   type ProfileAccount, type PublicProfile,
 } from "./profileApi";
+import { getStoredProfileAvatar, isValidProfileAvatar, PROFILE_AVATAR_ACCEPT, readProfileAvatar, storeProfileAvatar } from "./profileAvatarStorage";
 
 type Section = "posts" | "likes" | "saved";
 type PageCursors = Record<Section,string|null>;
@@ -62,6 +61,9 @@ export function ProfilePage() {
   const [paginationFailed,setPaginationFailed]=useState(false);
   const [cursors,setCursors]=useState<PageCursors>({posts:null,likes:null,saved:null});
   const [failed,setFailed]=useState(false);
+  const [avatarUrl,setAvatarUrl]=useState(()=>getStoredProfileAvatar(profileUserId));
+  const [avatarError,setAvatarError]=useState(false);
+  const avatarInputRef=useRef<HTMLInputElement>(null);
   const selected=[...posts,...likes,...saved].find(work=>work.work_id===selectedId)??null;
 
   useEffect(()=>{
@@ -77,6 +79,7 @@ export function ProfilePage() {
     }).catch(()=>setFailed(true)).finally(()=>setLoading(false));
   },[ownProfile,profileUserId,session]);
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
+  useEffect(()=>{setAvatarUrl(getStoredProfileAvatar(profileUserId));setAvatarError(false);},[profileUserId]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
   if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
 
@@ -107,13 +110,13 @@ export function ProfilePage() {
   }
   async function loadMore(){const cursor=cursors[section];if(!cursor||loadingMore)return;setLoadingMore(true);setPaginationFailed(false);try{const page=section==="posts"?await getUserWorks(profileUserId,cursor):section==="likes"?await getLikedWorks(cursor):await getSavedWorks(cursor);const append=(current:Work[])=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];};if(section==="posts")setPosts(append);else if(section==="likes")setLikes(append);else setSaved(append);setCursors(current=>({...current,[section]:String(page.next_cursor??"")||null}));}catch{setPaginationFailed(true);}finally{setLoadingMore(false)}}
   function selectSection(next:Section){setSection(next);setSearchParams(next==="posts"?{}:{section:next},{replace:true});}
+  async function changeAvatar(file:File|undefined){if(!file||!isValidProfileAvatar(file)){setAvatarError(Boolean(file));return;}try{const value=await readProfileAvatar(file);storeProfileAvatar(profileUserId,value);setAvatarUrl(value);setAvatarError(false);}catch{setAvatarError(true);}finally{if(avatarInputRef.current)avatarInputRef.current.value="";}}
   const activeWorks=section==="posts"?posts:section==="likes"?likes:saved;
   const empty=section==="posts"?t("profile.noPosts"):section==="likes"?t("profile.noLikes"):t("profile.noSaved");
 
   return <main className="profile-page app-page-with-sidebar"><AppSidebar/>
-    <header className="profile-header"><Link to={`/${language}`}><img src={inkfigLogo} alt={t("app.name")}/></Link><div><ThemeToggle/><Link className="gallery-login-link" to={`/${language}/upload`}><Upload size={16}/>{t("works.upload")}</Link><button className="gallery-primary-link" type="button" onClick={signOut}>{t("nav.logout")}</button></div></header>
     {loading?<p className="profile-state">{t("profile.loading")}</p>:failed||!profile?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<>
-      <section className="profile-intro"><div className="profile-avatar" aria-hidden="true">{profile.full_name.trim().charAt(0).toUpperCase()}</div><div className="profile-identity"><p>{t(ownProfile?"profile.label":"profile.communityProfile")}</p><h1>{profile.full_name}</h1><div className="profile-social-stats">
+      <section className="profile-intro"><div className={`profile-avatar ${ownProfile?"editable":""}`}>{avatarUrl?<img src={avatarUrl} alt=""/>:<span aria-hidden="true">{profile.full_name.trim().charAt(0).toUpperCase()}</span>}{ownProfile&&<><button type="button" aria-label={t("profile.changePicture")} title={t("profile.changePicture")} onClick={()=>avatarInputRef.current?.click()}><Camera aria-hidden="true" size={24}/><span>{t("profile.changePicture")}</span></button><input ref={avatarInputRef} className="sr-only" type="file" accept={PROFILE_AVATAR_ACCEPT} onChange={event=>void changeAvatar(event.target.files?.[0])}/></>}</div><div className="profile-identity"><div className="profile-name-row"><h1>{profile.full_name}</h1>{ownProfile&&<button className="profile-logout" type="button" onClick={signOut}><LogOut aria-hidden="true" size={18}/>{t("nav.logout")}</button>}</div>{avatarError&&<p className="profile-avatar-error" role="alert">{t("profile.pictureError")}</p>}<div className="profile-social-stats">
         <button type="button" onClick={()=>openConnections("followers")}><strong>{profile.follower_count}</strong><span>{t("profile.followers")}</span></button>
         <button type="button" onClick={()=>openConnections("following")}><strong>{profile.following_count}</strong><span>{t("profile.following")}</span></button>
         <div><strong>{profile.like_count}</strong><span>{t("profile.totalLikes")}</span></div>

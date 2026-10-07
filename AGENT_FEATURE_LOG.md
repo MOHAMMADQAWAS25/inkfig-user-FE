@@ -5678,3 +5678,60 @@ No migration required. The frontend has no local database; the backend uses its 
 ### Notes
 
 The explicit Load more interaction avoids unexpected network and Voyage requests while users scroll.
+
+## 2026-10-07 - Refine navigation sizing and profile controls
+
+### Request
+
+Slightly enlarge the navigation rail, its controls, and logo; reduce the home search and profile-avatar sizes; make the account identity open the profile; and simplify the profile page with an editable avatar and nearby logout control.
+
+### Changes
+
+- Increased the desktop navigation rail to 96 pixels, navigation controls to 52 pixels, icons to 26 pixels, and logo container to 64 pixels.
+- Reduced the desktop search height to 52 pixels and the home profile avatar to 34 pixels for more balanced proportions.
+- Removed the separate View profile menu item and made the account identity block itself link to the profile.
+- Removed the complete profile-page header and the Your InkFig Profile / community-profile eyebrow.
+- Added an owner-only profile-picture picker that appears on hover/focus, validates JPEG/PNG/WebP files up to 2 MB, previews immediately, and persists per signed-in user in browser storage.
+- Reused the selected picture in the home account avatar and identity block.
+- Added an accessible logout button beside the owner name while preserving backend logout behavior.
+- Added responsive touch presentation, dark-theme styling, and English/Arabic labels and errors.
+
+### Repositories
+
+- `inkfig-user-FE`: navigation sizing, account menu, profile layout, local avatar persistence, localization, tests, and this log.
+- `inkfig-user-system`: no changes; it currently exposes no profile-image upload contract.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: uses the compact stored avatar and makes account information the profile link.
+- `src/features/profile/ProfilePage.tsx`: removes the header/eyebrow and adds avatar selection plus adjacent logout.
+- `src/features/profile/profileAvatarStorage.ts`: validates, reads, and stores per-user browser-local avatar images.
+- `src/i18n/resources.ts`: adds bilingual avatar action and validation text.
+- `src/styles.css`: balances navigation/search/avatar sizing and styles profile upload/logout controls.
+- `tests/foundation.test.mjs`: verifies the revised structure, persistence helper, localization, and final sizing tokens.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, backend permission, secret, or environment-variable changes.
+- The avatar is browser-local because no backend profile-image endpoint currently exists; it is not synchronized across devices.
+- Avatar editing is exposed only on the signed-in user's own profile; existing backend authorization remains authoritative.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only change and browser APIs run only in the client.
+
+### Verification
+
+- `[passed] npm.cmd test` - 45 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`.
+- `[not run] live browser visual inspection` - the in-app browser runtime could not start because of the Windows sandbox lock failure.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, configuration changes, or backend deployment are required.
+
+### Git
+
+- Branch: `feature/profile-avatar-controls`
+- Commit, rebase, push, merge, and main push: pending final synchronization.

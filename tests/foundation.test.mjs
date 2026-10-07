@@ -29,6 +29,7 @@ const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", impor
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
 const profileApi = readFileSync(new URL("../src/features/profile/profileApi.ts", import.meta.url), "utf8");
+const profileAvatarStorage = readFileSync(new URL("../src/features/profile/profileAvatarStorage.ts", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
@@ -478,6 +479,23 @@ test("provides secure profile, password, and account settings", () => {
   assert.match(styles, /\.settings-shell/);
   assert.match(styles, /\.settings-reset-dialog/);
   assert.match(styles, /:root\[data-theme="dark"\] \.settings-page/);
+});
+
+test("provides a compact account menu and editable profile avatar", () => {
+  assert.doesNotMatch(profilePage, /className="profile-header"|profile\.label|profile\.communityProfile/);
+  assert.match(profilePage, /className="profile-name-row"/);
+  assert.match(profilePage, /className="profile-logout"[\s\S]*onClick=\{signOut\}/);
+  assert.match(profilePage, /avatarInputRef\.current\?\.click\(\)/);
+  assert.match(profilePage, /accept=\{PROFILE_AVATAR_ACCEPT\}/);
+  assert.match(profileAvatarStorage, /PROFILE_AVATAR_MAX_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(profileAvatarStorage, /localStorage\.setItem/);
+  assert.match(homePage, /<Link className="gallery-profile-identity" to=\{`\/\$\{language\}\/profile`\}/);
+  assert.doesNotMatch(homePage, /home\.viewProfile/);
+  assert.match(styles, /--app-rail-size: 96px;[\s\S]*--nav-control-size: 52px;[\s\S]*--header-control-size: 52px/);
+  assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
+  for (const key of ["changePicture", "pictureError"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"profile\\.${key}"`, "g"))].length, 2);
+  }
 });
 
 test("saves artworks for registered users and exposes a Saved profile tab", () => {
