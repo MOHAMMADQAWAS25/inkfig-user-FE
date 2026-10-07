@@ -301,7 +301,7 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(worksApi, /`\/works\/me\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(worksApi, /`\/works\/likes\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(styles, /\.profile-artwork-grid/);
-  assert.match(profilePage, /className="artwork-card"/);
+  assert.match(profilePage, /artwork-card-manageable/);
   assert.match(profilePage, /className="artwork-pin-media"/);
   assert.match(profilePage, /className="artwork-image-button"/);
   assert.match(profilePage, /className=\{`artwork-pin-like/);
@@ -541,6 +541,9 @@ test("lets owners edit post metadata and permanently delete their posts", () => 
   assert.match(worksApi, /"DELETE",`\/works\/\$\{id\}`/);
   assert.doesNotMatch(worksApi, /updateWork[^]*file:/);
   assert.match(styles, /\.artwork-owner-menu/);
+  assert.match(profilePage, /artwork-card-manageable/);
+  assert.match(styles, /\.artwork-owner-menu \{ position: absolute; z-index: 8; right: 4px; bottom: 3px;/);
+  assert.match(styles, /\.artwork-owner-menu > div \{ position: absolute; right: 0; bottom: calc\(100% \+ 7px\)/);
   assert.match(styles, /\.work-edit-dialog/);
 });
 
