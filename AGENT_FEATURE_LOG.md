@@ -6402,3 +6402,32 @@ Open Find Accounts and Notifications as smooth sidebar sliders instead of naviga
 
 - Branch: `feature/sidebar-sliding-panels`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+
+## 2026-10-08 - Complete notifications and navigation hover refinement
+
+### Request
+
+Build the notification feed and counter, animate panel closing, refine navigation tooltips and hover scaling, rename Find Users, and lighten the search hover across devices.
+
+### Changes
+
+- Added server-backed notifications with unread badge, list, read state, 30-second/focus refresh, actor avatars, localized event messages, and timestamps.
+- Added smooth reversed close animations for account and notification panels across desktop, mobile, LTR, RTL, and reduced-motion modes.
+- Enlarges the logo and profile avatar on hover, adds faster soft-corner icon tooltips, darkens Find Users, and lightens search hover.
+- Preserves responsive sizing and caps the badge at 99+.
+
+### API and database
+
+- Consumes `GET /api/v1/notifications` and `PUT /api/v1/notifications/read`.
+- No frontend migration; depends on user-system migration `20261008_015_create_notifications.sql`.
+
+### Verification
+
+- `[passed] npm.cmd test` - 52 tests passed.
+- `[passed] npm.cmd run build` - TypeScript and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment and Git
+
+- Deploy after both backends, in user-system → main-system → frontend order.
+- Branch: `feature/full-notifications`; commit/push pending final synchronization.

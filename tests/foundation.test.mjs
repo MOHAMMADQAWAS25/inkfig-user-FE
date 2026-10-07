@@ -36,6 +36,7 @@ const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage
 const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.ts", import.meta.url), "utf8");
 const adminUsersPage = readFileSync(new URL("../src/features/admin/AdminUsersPage.tsx", import.meta.url), "utf8");
 const administrationApi = readFileSync(new URL("../src/features/admin/administrationApi.ts", import.meta.url), "utf8");
+const notificationApi = readFileSync(new URL("../src/features/notifications/notificationApi.ts", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -497,6 +498,21 @@ test("smoothly opens account and notification panels from the navigation rail", 
   for (const key of ["close", "emptyTitle", "emptyDescription"]) {
     assert.equal([...resources.matchAll(new RegExp(`"notifications\\.${key}"`, "g"))].length, 2);
   }
+});
+
+test("provides persistent responsive social notifications and refined hover feedback", () => {
+  assert.match(notificationApi, /\/notifications\?limit=50/);
+  assert.match(notificationApi, /\/notifications\/read/);
+  assert.match(appSidebar, /notification-badge/);
+  assert.match(appSidebar, /setInterval\([^]*30000/);
+  assert.match(appSidebar, /closingPanel/);
+  assert.match(appSidebar, /data-tooltip/);
+  assert.match(styles, /animation-direction: reverse/);
+  assert.match(styles, /\.app-sidebar-logo:hover img/);
+  assert.match(styles, /\.gallery-profile-menu > summary:hover/);
+  assert.match(styles, /\.notification-badge/);
+  assert.match(styles, /transition: opacity 120ms ease 300ms/);
+  assert.match(styles, /\.gallery-search:hover[^}]*255 253 240/);
 });
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
