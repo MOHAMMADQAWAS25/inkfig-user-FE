@@ -543,6 +543,8 @@ test("lets owners edit post metadata and permanently delete their posts", () => 
   assert.match(styles, /\.artwork-owner-menu/);
   assert.match(profilePage, /artwork-card-manageable/);
   assert.match(styles, /\.artwork-owner-menu \{ position: absolute; z-index: 8; right: 4px; bottom: 3px;/);
+  assert.match(styles, /\.artwork-owner-menu > summary \{[^}]*width: 28px;[^}]*height: 28px;[^}]*border: 0;/);
+  assert.match(profilePage, /<MoreHorizontal size=\{19\}\/>/);
   assert.match(styles, /\.artwork-owner-menu > div \{ position: absolute; right: 0; bottom: calc\(100% \+ 7px\)/);
   assert.match(styles, /\.work-edit-dialog/);
 });

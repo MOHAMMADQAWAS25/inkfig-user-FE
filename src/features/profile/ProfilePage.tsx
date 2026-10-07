@@ -36,7 +36,7 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>
       <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
       {canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onSave(work)}><Bookmark size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}
-    </div>{canManage&&<details className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={22}/></summary><div><button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></details>}</article>)}</div>;
+    </div>{canManage&&<details className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div><button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></details>}</article>)}</div>;
 }
 
 export function ProfilePage() {
