@@ -222,7 +222,7 @@ test("serves a public localized artwork gallery as the default experience", () =
 });
 
 test("loads public works and provides authenticated direct image uploads", () => {
-  assert.match(worksApi, /"GET", `\/works\$\{query\}`/);
+  assert.match(worksApi, /"GET", `\/works\$\{suffix\}`/);
   assert.match(worksApi, /"GET", "\/works\/types"/);
   assert.match(worksApi, /"POST", "\/works\/uploads"/);
   assert.match(worksApi, /method:"PUT"/);
@@ -297,8 +297,8 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(profilePage, /aria-selected/);
   assert.match(profilePage, /const \[section,setSection\]/);
   assert.match(profilePage, /ArtworkDetailModal/);
-  assert.match(worksApi, /"\/works\/me"/);
-  assert.match(worksApi, /"\/works\/likes"/);
+  assert.match(worksApi, /`\/works\/me\$\{cursorSuffix\(cursor\)\}`/);
+  assert.match(worksApi, /`\/works\/likes\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(styles, /\.profile-artwork-grid/);
   assert.match(profilePage, /className="artwork-card"/);
   assert.match(profilePage, /className="artwork-pin-media"/);
@@ -331,7 +331,7 @@ test("filters the homepage by all canonical artwork categories", () => {
   assert.match(homePage, /className="gallery-filters"/);
   assert.match(homePage, /aria-pressed/);
   assert.match(homePage, /setActiveCategory/);
-  assert.match(worksApi, /type_code=\$\{encodeURIComponent\(typeCode\)\}/);
+  assert.match(worksApi, /query\.set\("type_code", typeCode\)/);
   assert.match(styles, /:root\[data-theme="dark"\] \.gallery-filters button/);
   for (const key of ["digitalArt", "handArt", "video", "audio", "animation", "games", "interactive", "vrAr"]) {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.filter\\.${key}"`, "g"))].length, 2);
@@ -409,7 +409,17 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(worksApi, /search_rank\?: number \| null/);
   assert.match(worksApi, /similarity_score\?: number \| null/);
-  assert.match(worksApi, /\[\.\.\.items\]\.sort\(\(left, right\) => \(left\.search_rank \?\? Number\.MAX_SAFE_INTEGER\) - \(right\.search_rank \?\? Number\.MAX_SAFE_INTEGER\)\)/);
+  assert.match(worksApi, /next_cursor: string \| number \| null/);
+  assert.match(worksApi, /query\.set\("before", cursor\)/);
+  assert.match(worksApi, /query\.set\("cursor", String\(cursor\)\)/);
+  assert.match(homePage, /async function loadMore/);
+  assert.match(homePage, /pagination-load-more/);
+  assert.match(profilePage, /type PageCursors = Record<Section,string\|null>/);
+  assert.match(profilePage, /cursors\[section\]/);
+  assert.match(profilePage, /pagination-load-more/);
+  assert.equal([...resources.matchAll(/"works\.loadMore"/g)].length, 2);
+  assert.equal([...resources.matchAll(/"works\.loadingMore"/g)].length, 2);
+  assert.match(worksApi, /\[\.\.\.page\.items\]\.sort\(\(left, right\) => \(left\.search_rank \?\? Number\.MAX_SAFE_INTEGER\) - \(right\.search_rank \?\? Number\.MAX_SAFE_INTEGER\)\)/);
   assert.match(homePage, /<AppSidebar \/>/);
   assert.match(appSidebar, /className="gallery-profile-menu app-sidebar-profile"/);
   assert.match(appSidebar, /className="gallery-profile-popover"/);

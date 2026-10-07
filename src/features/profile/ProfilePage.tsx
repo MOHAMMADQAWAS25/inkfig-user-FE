@@ -12,6 +12,7 @@ import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { AppSidebar } from "../navigation/AppSidebar";
 import {
   getLikedWorks, getSavedWorks, getUserWorks, setWorkLike, setWorkSave, type Work,
+  type WorkPage,
 } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
 import {
@@ -20,6 +21,7 @@ import {
 } from "./profileApi";
 
 type Section = "posts" | "likes" | "saved";
+type PageCursors = Record<Section,string|null>;
 
 function ArtworkGrid({ canLike, canSave, empty, language, onLike, onSave, onSelect, t, works }: {
   canLike:boolean; canSave:boolean; empty:string; language:string;
@@ -56,6 +58,9 @@ export function ProfilePage() {
   const [connectionsLoading,setConnectionsLoading]=useState(false);
   const [followBusy,setFollowBusy]=useState<string|null>(null);
   const [loading,setLoading]=useState(true);
+  const [loadingMore,setLoadingMore]=useState(false);
+  const [paginationFailed,setPaginationFailed]=useState(false);
+  const [cursors,setCursors]=useState<PageCursors>({posts:null,likes:null,saved:null});
   const [failed,setFailed]=useState(false);
   const selected=[...posts,...likes,...saved].find(work=>work.work_id===selectedId)??null;
 
@@ -64,9 +69,11 @@ export function ProfilePage() {
     setLoading(true);setFailed(false);
     const requests:Promise<unknown>[]=[getPublicProfile(profileUserId),getUserWorks(profileUserId)];
     if(ownProfile)requests.push(getLikedWorks(),getSavedWorks());
-    Promise.all(requests).then(([details,works,liked=[],savedWorks=[]])=>{
-      setProfile(details as PublicProfile);setPosts(works as Work[]);
-      setLikes(liked as Work[]);setSaved(savedWorks as Work[]);
+    Promise.all(requests).then(([details,works,liked={items:[],next_cursor:null},savedWorks={items:[],next_cursor:null}])=>{
+      const postsPage=works as WorkPage;const likesPage=liked as WorkPage;const savedPage=savedWorks as WorkPage;
+      setProfile(details as PublicProfile);setPosts(postsPage.items);
+      setLikes(likesPage.items);setSaved(savedPage.items);
+      setCursors({posts:String(postsPage.next_cursor??"")||null,likes:String(likesPage.next_cursor??"")||null,saved:String(savedPage.next_cursor??"")||null});
     }).catch(()=>setFailed(true)).finally(()=>setLoading(false));
   },[ownProfile,profileUserId,session]);
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
@@ -98,6 +105,7 @@ export function ProfilePage() {
     const next=!work.saved_by_me;
     try{await setWorkSave(work.work_id,next);const updated={...work,saved_by_me:next};setPosts(current=>current.map(item=>item.work_id===work.work_id?updated:item));setLikes(current=>current.map(item=>item.work_id===work.work_id?updated:item));setSaved(current=>next?(current.some(item=>item.work_id===work.work_id)?current.map(item=>item.work_id===work.work_id?updated:item):[updated,...current]):current.filter(item=>item.work_id!==work.work_id));}catch{return;}
   }
+  async function loadMore(){const cursor=cursors[section];if(!cursor||loadingMore)return;setLoadingMore(true);setPaginationFailed(false);try{const page=section==="posts"?await getUserWorks(profileUserId,cursor):section==="likes"?await getLikedWorks(cursor):await getSavedWorks(cursor);const append=(current:Work[])=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];};if(section==="posts")setPosts(append);else if(section==="likes")setLikes(append);else setSaved(append);setCursors(current=>({...current,[section]:String(page.next_cursor??"")||null}));}catch{setPaginationFailed(true);}finally{setLoadingMore(false)}}
   function selectSection(next:Section){setSection(next);setSearchParams(next==="posts"?{}:{section:next},{replace:true});}
   const activeWorks=section==="posts"?posts:section==="likes"?likes:saved;
   const empty=section==="posts"?t("profile.noPosts"):section==="likes"?t("profile.noLikes"):t("profile.noSaved");
@@ -115,7 +123,7 @@ export function ProfilePage() {
         <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} onClick={()=>selectSection("saved")}><Bookmark size={16}/>{t("profile.saved")}<span>{saved.length}</span></button>
         <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} onClick={()=>selectSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
       </nav>}
-      <div className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onLike={toggleLike} onSave={toggleSave} t={t}/></div>
+      <div className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onLike={toggleLike} onSave={toggleSave} t={t}/>{cursors[section]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</div>
     </>}
     {connectionKind&&<div className="profile-connections-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&setConnectionKind(null)}><section className="profile-connections-dialog" role="dialog" aria-modal="true" aria-labelledby="connections-title"><header><h2 id="connections-title">{t(connectionKind==="followers"?"profile.followers":"profile.following")}</h2><button type="button" aria-label={t("profile.closeConnections")} onClick={()=>setConnectionKind(null)}><X size={20}/></button></header>{connectionsLoading?<p>{t("profile.loadingConnections")}</p>:!accounts.length?<p>{t("profile.noConnections")}</p>:<div className="profile-account-list">{accounts.map(account=><div className="profile-account-row" key={account.user_id}><Link to={`/${language}/profile/${account.user_id}`} onClick={()=>setConnectionKind(null)}><span>{account.full_name.charAt(0).toUpperCase()}</span><strong>{account.full_name}</strong></Link>{account.user_id!==session.userId&&<button type="button" disabled={followBusy===account.user_id} className={account.is_following?"following":""} onClick={()=>toggleAccountFollow(account)}>{t(account.is_following?"profile.unfollow":"profile.follow")}</button>}</div>)}</div>}</section></div>}
     {selected&&<ArtworkDetailModal language={language} work={selected} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}

@@ -553,6 +553,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @keyframes profile-panel-in { from { opacity: 0; transform: translateY(7px); } }
 .profile-artwork-grid { column-count: 4; column-gap: 18px; }
 .profile-empty,.profile-state { display: grid; min-height: 150px; padding: 30px; border: 1px dashed rgb(57 67 28 / .28); border-radius: 14px; place-items: center; align-content: center; gap: 7px; background: rgb(255 253 240 / .48); color: #667044; text-align: center; }
+.pagination-load-more { display: block; min-width: 142px; min-height: 44px; margin: 26px auto 0; padding: 0 22px; border: 1px solid #617d2b; border-radius: 999px; background: #617d2b; color: #fff; font: inherit; font-weight: 850; cursor: pointer; transition: transform 160ms ease,background-color 160ms ease; }
+.pagination-load-more:hover:not(:disabled) { transform: translateY(-1px); background: #526b24; }
+.pagination-load-more:disabled { opacity: .62; cursor: wait; }
+.pagination-error { margin: 12px auto 0; color: #982824; text-align: center; }
+:root[data-theme="dark"] .pagination-load-more { border-color: #a9b65f; background: #779439; }
 .profile-empty p { margin: 0; }
 .profile-state { width: min(1180px,calc(100% - 40px)); margin: 0 auto; }
 :root[data-theme="dark"] .profile-page { background: linear-gradient(rgb(16 20 12 / .88),rgb(16 20 12 / .96)),url("./assets/gallery-ivory-background.png") center/cover fixed; color: #f7f2d8; }

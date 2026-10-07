@@ -31,6 +31,7 @@ export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
+  const [nextCursor,setNextCursor]=useState<string|number|null>(null); const [loadingMore,setLoadingMore]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
   const normalizedSearch=submittedSearch.trim();
@@ -39,10 +40,11 @@ export function HomePage() {
     setLoading(true);setFeedError(false);
     const typeCode=activeCategory === "all" ? undefined : activeCategory;
     const request=normalizedSearch.length>=2?searchWorks(normalizedSearch,typeCode):getWorks(typeCode);
-    request.then(items=>{if(active)setWorks(items)}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
+    request.then(page=>{if(active){setWorks(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
     return()=>{active=false};
   },[activeCategory,normalizedSearch,session]);
   function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();setSubmittedSearch(searchQuery.trim());}
+  async function loadMore(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedSearch.length>=2?await searchWorks(normalizedSearch,typeCode,Number(nextCursor)):await getWorks(typeCode,String(nextCursor));setWorks(current=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];});setNextCursor(page.next_cursor);}catch{setFeedError(true);}finally{setLoadingMore(false)}}
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
   async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
 
@@ -64,13 +66,13 @@ export function HomePage() {
             <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
           ))}
         </div>
-        {loading?<p className="gallery-state" aria-live="polite">{normalizedSearch.length>=2?t("home.searching"):t("works.loading")}</p>:feedError?<p className="gallery-state">{normalizedSearch.length>=2?t("home.searchUnavailable"):t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{normalizedSearch.length>=2?t("home.noSearchResults"):t("works.empty")}</p>:<div className="artwork-grid">
+        {loading?<p className="gallery-state" aria-live="polite">{normalizedSearch.length>=2?t("home.searching"):t("works.loading")}</p>:feedError&&works.length===0?<p className="gallery-state">{normalizedSearch.length>=2?t("home.searchUnavailable"):t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{normalizedSearch.length>=2?t("home.noSearchResults"):t("works.empty")}</p>:<><div className="artwork-grid">
           {works.map((work) => (
             <article className="artwork-card" key={work.work_id}>
               <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span><Link className="artwork-artist-link" to={session?`/${language}/profile/${work.owner_user_id}`:`/${language}/login`}><UserRound size={15}/>{work.artist_name}</Link><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
             </article>
           ))}
-        </div>}
+        </div>{nextCursor!==null&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{feedError&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</>}
       </section>
 
       {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}

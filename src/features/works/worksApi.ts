@@ -3,6 +3,7 @@ import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
 export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
+export type WorkPage = { items: Work[]; next_cursor: string | number | null };
 export const MAX_WORK_FILE_SIZE = 10 * 1024 * 1024;
 export const WORK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -24,20 +25,25 @@ export function isValidWorkUrl(value: string): boolean {
     return false;
   }
 }
-export async function getWorks(typeCode?: string): Promise<Work[]> {
-  const query = typeCode ? `?type_code=${encodeURIComponent(typeCode)}` : "";
-  return (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works${query}`)).data.items;
+export async function getWorks(typeCode?: string, cursor?: string): Promise<WorkPage> {
+  const query = new URLSearchParams();
+  if (typeCode) query.set("type_code", typeCode);
+  if (cursor) query.set("before", cursor);
+  const suffix=query.size?`?${query.toString()}`:"";
+  return (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works${suffix}`)).data;
 }
-export async function searchWorks(queryText: string, typeCode?: string): Promise<Work[]> {
+export async function searchWorks(queryText: string, typeCode?: string, cursor?: number): Promise<WorkPage> {
   const query = new URLSearchParams({ query: queryText });
   if (typeCode) query.set("type_code", typeCode);
-  const items = (await requestJson<{items: Work[]}>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`)).data.items;
-  return [...items].sort((left, right) => (left.search_rank ?? Number.MAX_SAFE_INTEGER) - (right.search_rank ?? Number.MAX_SAFE_INTEGER));
+  if (cursor !== undefined) query.set("cursor", String(cursor));
+  const page = (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`)).data;
+  return {...page,items:[...page.items].sort((left, right) => (left.search_rank ?? Number.MAX_SAFE_INTEGER) - (right.search_rank ?? Number.MAX_SAFE_INTEGER))};
 }
-export async function getMyWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/me")).data.items; }
-export async function getUserWorks(userId:string): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET",`/works/users/${userId}`)).data.items; }
-export async function getLikedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/likes")).data.items; }
-export async function getSavedWorks(): Promise<Work[]> { return (await requestJson<{items:Work[]}>(mainApiBaseUrl,"GET","/works/saves")).data.items; }
+function cursorSuffix(cursor?:string){return cursor?`?before=${encodeURIComponent(cursor)}`:"";}
+export async function getMyWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/me${cursorSuffix(cursor)}`)).data; }
+export async function getUserWorks(userId:string,cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/users/${userId}${cursorSuffix(cursor)}`)).data; }
+export async function getLikedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/likes${cursorSuffix(cursor)}`)).data; }
+export async function getSavedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/saves${cursorSuffix(cursor)}`)).data; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
 export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
