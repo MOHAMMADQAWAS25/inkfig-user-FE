@@ -382,6 +382,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .account-search-suggestions button { display: flex; width: 100%; align-items: center; gap: 12px; padding: 9px 11px; border: 0; border-radius: 11px; background: transparent; color: #39431c; text-align: start; cursor: pointer; }
 .account-search-suggestions button:hover,.account-search-suggestions button.active { background: rgb(119 148 57 / .13); }
 .account-search-suggestions button span { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 50%; background: #617d2b; color: #fffdf0; font-weight: 800; }
+.account-search-suggestions button span img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 .account-search-suggestions button strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gallery-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; direction: ltr; }
 .gallery-login-link { color: #39431c; font-size: 0.9rem; font-weight: 700; text-decoration: none; }

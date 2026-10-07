@@ -21,6 +21,7 @@ export type ProfileAccount = {
 export type ProfileSearchResult = {
   user_id: string;
   full_name: string;
+  avatar_url: string | null;
 };
 
 export async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {

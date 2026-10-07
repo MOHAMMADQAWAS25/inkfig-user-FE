@@ -513,6 +513,7 @@ test("offers an optional backend-uploaded avatar during signup", () => {
   assert.match(registrationApi, /avatar_object_path:avatarObjectPath/);
   assert.match(profilePage, /profile\.avatar_url/);
   assert.match(homePage, /profile\.avatar_url/);
+  assert.match(homePage, /account\.avatar_url/);
   for (const key of ["profilePictureOptional", "profilePictureFallback"]) {
     assert.equal([...resources.matchAll(new RegExp(`"auth\\.${key}"`, "g"))].length, 2);
   }
