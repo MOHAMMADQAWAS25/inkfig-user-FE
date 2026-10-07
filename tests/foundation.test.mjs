@@ -407,6 +407,9 @@ test("builds a searchable icon-first homepage header", () => {
   assert.doesNotMatch(homePage, /setTimeout/);
   assert.match(homePage, /works\.map/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
+  assert.match(worksApi, /search_rank\?: number \| null/);
+  assert.match(worksApi, /similarity_score\?: number \| null/);
+  assert.match(worksApi, /\[\.\.\.items\]\.sort\(\(left, right\) => \(left\.search_rank \?\? Number\.MAX_SAFE_INTEGER\) - \(right\.search_rank \?\? Number\.MAX_SAFE_INTEGER\)\)/);
   assert.match(homePage, /<AppSidebar \/>/);
   assert.match(appSidebar, /className="gallery-profile-menu app-sidebar-profile"/);
   assert.match(appSidebar, /className="gallery-profile-popover"/);
