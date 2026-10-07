@@ -1087,6 +1087,10 @@ img { max-width: 100%; image-rendering: auto; }
 }
 
 /* Balanced navigation and profile controls */
+.signup-avatar-field { grid-column: 1 / -1; }
+.signup-avatar-field input[type="file"] { min-height: 48px; padding: 9px; border: 1px dashed rgb(57 67 28 / .3); border-radius: 12px; background: rgb(255 253 240 / .48); cursor: pointer; }
+.signup-avatar-field small { color: #73795e; font-weight: 500; }
+:root[data-theme="dark"] .signup-avatar-field input[type="file"] { border-color: #465331; background: rgb(17 23 14 / .72); color: #f1edd7; }
 .gallery-profile-menu > summary > img,
 .gallery-profile-identity > img {
   width: 100%;

@@ -1,4 +1,5 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
+import type { AvatarUpload } from "../profile/profileAvatarUpload";
 
 export type Gender = "male" | "female";
 
@@ -10,6 +11,9 @@ export interface RegistrationRequest {
   date_of_birth: string;
   password: string;
   password_confirmation: string;
+  avatar_file_name?: string;
+  avatar_mime_type?: string;
+  avatar_file_size?: number;
 }
 
 export interface RegistrationResponse {
@@ -18,6 +22,7 @@ export interface RegistrationResponse {
   expires_in_seconds: number;
   resend_after_seconds: number;
   hourly_limit_reached: boolean;
+  avatar_upload: AvatarUpload | null;
 }
 
 export interface VerificationResponse { email: string; verified: boolean; }
@@ -38,9 +43,9 @@ export async function registerUser(body: RegistrationRequest): Promise<Registrat
   return result.data;
 }
 
-export async function verifyEmail(email: string, code: string): Promise<VerificationResponse> {
+export async function verifyEmail(email: string, code: string, avatarObjectPath?:string): Promise<VerificationResponse> {
   const result = await requestJson<VerificationResponse>(userApiBaseUrl, "POST", "/auth/verify-email", {
-    body: { email, code },
+    body: { email, code, avatar_object_path:avatarObjectPath },
   });
   return result.data;
 }

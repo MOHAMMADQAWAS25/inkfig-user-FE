@@ -13,6 +13,7 @@ interface VerificationLocationState {
   email?: string;
   resendAfterSeconds?: number;
   hourlyLimitReached?: boolean;
+  avatarObjectPath?: string;
 }
 
 export function VerifyEmailPage() {
@@ -44,7 +45,7 @@ export function VerifyEmailPage() {
     setError("");
     setIsSubmitting(true);
     try {
-      await verifyEmail(email.trim().toLowerCase(), code);
+      await verifyEmail(email.trim().toLowerCase(), code, state?.avatarObjectPath);
       setSuccess(true);
     } catch (requestError) {
       if (requestError instanceof ApiError && requestError.status === 410) setError(t("auth.codeExpired"));

@@ -3,6 +3,7 @@ import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 export type PublicProfile = {
   user_id: string;
   full_name: string;
+  avatar_url: string | null;
   follower_count: number;
   following_count: number;
   like_count: number;
@@ -13,6 +14,7 @@ export type PublicProfile = {
 export type ProfileAccount = {
   user_id: string;
   full_name: string;
+  avatar_url: string | null;
   is_following: boolean;
 };
 

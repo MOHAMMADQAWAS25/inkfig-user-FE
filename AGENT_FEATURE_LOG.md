@@ -5812,3 +5812,47 @@ Open a Facebook-style live account list below the search bar whenever `@` is typ
 ### Notes
 
 Account avatars remain initials in suggestions because current profile pictures are browser-local and cannot be safely retrieved for other users.
+
+## 2026-10-07 - Connect avatars to backend storage and signup
+
+### Request
+
+Replace browser-local profile pictures with backend persistence, make profile-picture selection optional during signup, and use the first letter of the user's name when no picture is selected.
+
+### Changes
+
+- Replaced localStorage avatar data with a signed-upload client that sends files directly to Supabase and asks the backend to verify/persist the completed object.
+- Added an optional bilingual profile-picture field to signup with JPEG/PNG/WebP and 2 MB validation.
+- Carries the uploaded object path through email verification so the backend claims it only for the verified pending account.
+- Uses backend `avatar_url` values on the profile page, home avatar, and account identity.
+- Preserves the user's first initial as the default whenever `avatar_url` is null.
+- Preserved existing hover/focus editing, responsive behavior, navigation sizing, profile logout, localization, and themes.
+
+### Repositories
+
+- `inkfig-user-FE`: signup, verification, upload client, profile/home rendering, localization, tests, and this log.
+- `inkfig-user-system`: signed upload, verification, persistence, storage, schema, and authorization.
+- `inkfig-main-system`: no changes required.
+
+### API, database, permissions, and SnapStart
+
+- Consumes the new authenticated prepare/complete profile-avatar endpoints and optional signup/verification avatar fields.
+- Database migration `20261007_012_add_profile_avatars.sql` is owned by `inkfig-user-system`.
+- The browser never receives the Supabase service-role key; it receives only a short-lived object-specific signed upload URL.
+- No frontend SnapStart impact; backend network clients remain request-scoped.
+
+### Verification
+
+- `[passed] npm.cmd test` - 46 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`.
+
+### Deployment
+
+- Run the user-system migration and deploy `inkfig-user-system` before `inkfig-user-FE`.
+- Configure the new backend Supabase parameters; no frontend environment-variable changes are required.
+
+### Git
+
+- Branch: `feature/profile-avatar-upload`
+- Commit, rebase, push, merge, and main push: pending final synchronization.

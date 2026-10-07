@@ -29,7 +29,7 @@ const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", impor
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
 const profileApi = readFileSync(new URL("../src/features/profile/profileApi.ts", import.meta.url), "utf8");
-const profileAvatarStorage = readFileSync(new URL("../src/features/profile/profileAvatarStorage.ts", import.meta.url), "utf8");
+const profileAvatarUpload = readFileSync(new URL("../src/features/profile/profileAvatarUpload.ts", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
@@ -491,14 +491,30 @@ test("provides a compact account menu and editable profile avatar", () => {
   assert.match(profilePage, /className="profile-logout"[\s\S]*onClick=\{signOut\}/);
   assert.match(profilePage, /avatarInputRef\.current\?\.click\(\)/);
   assert.match(profilePage, /accept=\{PROFILE_AVATAR_ACCEPT\}/);
-  assert.match(profileAvatarStorage, /PROFILE_AVATAR_MAX_BYTES = 2 \* 1024 \* 1024/);
-  assert.match(profileAvatarStorage, /localStorage\.setItem/);
+  assert.match(profileAvatarUpload, /PROFILE_AVATAR_MAX_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(profileAvatarUpload, /\/profiles\/avatar-uploads/);
+  assert.match(profileAvatarUpload, /\/profiles\/avatar-uploads\/complete/);
+  assert.doesNotMatch(profileAvatarUpload, /localStorage/);
   assert.match(homePage, /<Link className="gallery-profile-identity" to=\{`\/\$\{language\}\/profile`\}/);
   assert.doesNotMatch(homePage, /home\.viewProfile/);
   assert.match(styles, /--app-rail-size: 96px;[\s\S]*--nav-control-size: 52px;[\s\S]*--header-control-size: 52px/);
   assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
   for (const key of ["changePicture", "pictureError"]) {
     assert.equal([...resources.matchAll(new RegExp(`"profile\\.${key}"`, "g"))].length, 2);
+  }
+});
+
+test("offers an optional backend-uploaded avatar during signup", () => {
+  assert.match(signup, /auth\.profilePictureOptional/);
+  assert.match(signup, /accept=\{PROFILE_AVATAR_ACCEPT\}/);
+  assert.match(signup, /response\.avatar_upload/);
+  assert.match(signup, /putAvatarFile/);
+  assert.match(verifyEmailPage, /state\?\.avatarObjectPath/);
+  assert.match(registrationApi, /avatar_object_path:avatarObjectPath/);
+  assert.match(profilePage, /profile\.avatar_url/);
+  assert.match(homePage, /profile\.avatar_url/);
+  for (const key of ["profilePictureOptional", "profilePictureFallback"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"auth\\.${key}"`, "g"))].length, 2);
   }
 });
 
