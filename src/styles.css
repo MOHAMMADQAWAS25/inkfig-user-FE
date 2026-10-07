@@ -438,10 +438,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-filters button.active, .gallery-filters button:hover { border-color: #617d2b; background: #617d2b; color: #fffdf0; }
 .artwork-grid { column-count: 4; column-gap: 18px; }
 .artwork-card { break-inside: avoid; margin: 0 0 22px; overflow: visible; border: 0; background: transparent; }
-.artwork-card-manageable { position: relative; padding-bottom: 40px; border-radius: 18px; background: #fff; box-shadow: 0 1px 0 rgb(57 67 28 / .08); }
-.artwork-card-manageable .artwork-pin-media { border-radius: 18px 18px 12px 12px; }
+.artwork-card-manageable { position: relative; padding-bottom: 36px; background: transparent; box-shadow: none; }
+.artwork-card-manageable .artwork-pin-media { border-radius: 18px; }
 .artwork-owner-menu { position: absolute; z-index: 8; right: 4px; bottom: 3px; }
-.artwork-owner-menu > summary { display: grid; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; place-items: center; background: transparent; color: #17254c; box-shadow: none; cursor: pointer; list-style: none; }
+.artwork-owner-menu > summary { display: grid; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; place-items: center; background: transparent; color: #17254c; box-shadow: none; cursor: pointer; list-style: none; transition: background 150ms ease,box-shadow 150ms ease,color 150ms ease; }
+.artwork-owner-menu > summary:hover,.artwork-owner-menu > summary:focus-visible,.artwork-owner-menu[open] > summary { background: rgb(97 125 43 / .12); color: #39431c; box-shadow: 0 0 0 1px rgb(97 125 43 / .42); }
 .artwork-owner-menu > summary::-webkit-details-marker { display: none; }
 .artwork-owner-menu > div { position: absolute; right: 0; bottom: calc(100% + 7px); display: grid; width: 142px; padding: 6px; border: 1px solid rgb(57 67 28 / .18); border-radius: 13px; background: #fffdf0; box-shadow: 0 16px 34px rgb(26 31 17 / .22); }
 .artwork-owner-menu button { display: flex; align-items: center; gap: 9px; padding: 10px; border: 0; border-radius: 9px; background: transparent; color: #39431c; font: inherit; font-size: .84rem; font-weight: 800; cursor: pointer; }
@@ -585,8 +586,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="dark"] .profile-tabs button.active { color: #f7f2d8; }
 :root[data-theme="dark"] .profile-empty { border-color: #3b4828; background: rgb(23 29 17 / .9); color: #f7f2d8; }
 :root[data-theme="dark"] .artwork-owner-menu > div { border-color: #3b4828; background: #171d11; }
-:root[data-theme="dark"] .artwork-card-manageable { background: #171d11; box-shadow: 0 1px 0 #3b4828; }
+:root[data-theme="dark"] .artwork-card-manageable { background: transparent; box-shadow: none; }
 :root[data-theme="dark"] .artwork-owner-menu > summary { background: transparent; color: #f7f2d8; }
+:root[data-theme="dark"] .artwork-owner-menu > summary:hover,:root[data-theme="dark"] .artwork-owner-menu > summary:focus-visible,:root[data-theme="dark"] .artwork-owner-menu[open] > summary { background: rgb(169 182 95 / .14); color: #f7f2d8; box-shadow: 0 0 0 1px rgb(169 182 95 / .48); }
 :root[data-theme="dark"] .artwork-owner-menu button { color: #f7f2d8; }
 :root[data-theme="dark"] .artwork-owner-menu button.danger { color: #efaaa1; }
 @media (max-width: 900px) { .profile-artwork-grid { column-count: 3; } }
