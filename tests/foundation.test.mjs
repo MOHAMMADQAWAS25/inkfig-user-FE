@@ -196,9 +196,9 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(router, /Navigate replace to="\/en"/);
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
   assert.match(homePage, /className="artwork-grid"/);
-  assert.match(appSidebar, /gallery-guest-avatar app-sidebar-guest/);
-  assert.match(appSidebar, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar app-sidebar-guest"/);
-  assert.doesNotMatch(homePage, /gallery-header-actions/);
+  assert.doesNotMatch(appSidebar, /gallery-guest-avatar|gallery-profile-menu|app-sidebar-account/);
+  assert.match(homePage, /className="gallery-header-actions"/);
+  assert.match(homePage, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar"/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ column-count: 4; column-gap: 18px/);
@@ -397,7 +397,7 @@ test("starts the homepage directly with filters and artwork cards", () => {
 });
 test("builds a searchable icon-first homepage header", () => {
   assert.doesNotMatch(homePage, /gallery-nav|gallery-language/);
-  assert.match(appSidebar, /<LanguageToggle\/>/);
+  assert.match(homePage, /<LanguageToggle\/>/);
   assert.match(homePage, /className="gallery-search"/);
   assert.match(homePage, /setSearchQuery/);
   assert.match(homePage, /searchWorks\(normalizedSearch,typeCode\)/);
@@ -421,10 +421,10 @@ test("builds a searchable icon-first homepage header", () => {
   assert.equal([...resources.matchAll(/"works\.loadingMore"/g)].length, 2);
   assert.match(worksApi, /\[\.\.\.page\.items\]\.sort\(\(left, right\) => \(left\.search_rank \?\? Number\.MAX_SAFE_INTEGER\) - \(right\.search_rank \?\? Number\.MAX_SAFE_INTEGER\)\)/);
   assert.match(homePage, /<AppSidebar \/>/);
-  assert.match(appSidebar, /className="gallery-profile-menu app-sidebar-profile"/);
-  assert.match(appSidebar, /className="gallery-profile-popover"/);
-  assert.match(appSidebar, /session\.fullName\.trim\(\)\.charAt\(0\)/);
-  assert.match(appSidebar, /onClick=\{signOut\}/);
+  assert.match(homePage, /className="gallery-profile-menu"/);
+  assert.match(homePage, /className="gallery-profile-popover"/);
+  assert.match(homePage, /session\.fullName\.trim\(\)\.charAt\(0\)/);
+  assert.match(homePage, /onClick=\{signOut\}/);
   assert.match(styles, /\.gallery-profile-popover/);
   assert.match(styles, /\.gallery-search:focus-within/);
   assert.match(styles, /@media \(max-width: 820px\)[\s\S]*\.gallery-search \{ grid-column: 1 \/ -1; grid-row: 2; \}/);
@@ -433,24 +433,25 @@ test("builds a searchable icon-first homepage header", () => {
   }
 });
 test("closes the homepage profile menu when clicking outside it", () => {
-  assert.match(appSidebar, /useRef<HTMLDetailsElement>\(null\)/);
-  assert.match(appSidebar, /ref=\{profileMenuRef\}/);
-  assert.match(appSidebar, /document\.addEventListener\("pointerdown",closeProfileMenu\)/);
-  assert.match(appSidebar, /!menu\.contains\(event\.target\)/);
-  assert.match(appSidebar, /menu\.removeAttribute\("open"\)/);
-  assert.match(appSidebar, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
+  assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
+  assert.match(homePage, /ref=\{profileMenuRef\}/);
+  assert.match(homePage, /document\.addEventListener\("pointerdown",closeProfileMenu\)/);
+  assert.match(homePage, /!menu\.contains\(event\.target\)/);
+  assert.match(homePage, /menu\.removeAttribute\("open"\)/);
+  assert.match(homePage, /document\.removeEventListener\("pointerdown",closeProfileMenu\)/);
 });
 
-test("places the signed-in profile control above Settings in the shared sidebar", () => {
-  assert.match(appSidebar, /app-sidebar-account/);
-  assert.ok(appSidebar.indexOf("app-sidebar-profile") < appSidebar.indexOf("app-sidebar-settings"));
-  assert.doesNotMatch(homePage, /ref=\{profileMenuRef\}/);
-  assert.match(styles, /\.app-sidebar-account \{[^}]*margin-top: auto/);
+test("places the signed-in profile control at the outer edge of the home header", () => {
+  assert.match(homePage, /gallery-header-actions/);
+  assert.match(homePage, /ref=\{profileMenuRef\}/);
+  assert.doesNotMatch(appSidebar, /app-sidebar-account|app-sidebar-profile/);
+  assert.match(appSidebar, /className="app-sidebar-settings"/);
 });
 
-test("places the signed-out account control above Settings in the shared sidebar", () => {
-  assert.ok(appSidebar.indexOf("app-sidebar-guest") < appSidebar.indexOf("app-sidebar-settings"));
-  assert.match(styles, /\.app-sidebar-profile > summary, \.app-sidebar-guest \{ width: var\(--nav-control-size\)|\.app-sidebar-profile > summary,[^{}]*\.app-sidebar-guest \{ width: var\(--nav-control-size\)/);
+test("places the signed-out account control at the outer edge of the home header", () => {
+  assert.match(homePage, /className="gallery-guest-avatar"/);
+  assert.doesNotMatch(appSidebar, /app-sidebar-guest/);
+  assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 40px; height: 40px/);
 });
 
 test("provides secure profile, password, and account settings", () => {
@@ -575,10 +576,12 @@ test("uses an edge scrollbar and aligns the compact avatar with gallery cards", 
 });
 
 test("lets the search header use its available width without horizontal overflow", () => {
-  assert.match(styles, /\.gallery-header \{ grid-template-columns: minmax\(0,1fr\); gap: 0/);
+  assert.match(styles, /Pinterest-inspired application rhythm/);
+  assert.match(styles, /grid-template-columns: minmax\(0,1fr\) 40px;[\s\S]*gap: 12px/);
   assert.match(styles, /\.gallery-header \{ padding-right: var\(--page-gutter\); padding-left: var\(--page-gutter\)/);
   assert.match(styles, /\[dir="rtl"\] \.gallery-header \{ padding-right: var\(--page-gutter\); padding-left: var\(--page-gutter\)/);
-  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.gallery-header, \[dir="rtl"\] \.gallery-header \{ grid-template-columns: minmax\(0,1fr\)/);
+  assert.match(styles, /@media \(max-width: 720px\)[\s\S]*grid-template-columns: minmax\(0,1fr\) 40px/);
+  assert.match(styles, /--app-rail-size: 88px;[\s\S]*--feed-gutter: 20px;[\s\S]*--artwork-column-gap: 20px/);
 });
 
 test("adapts the complete interface across screen sizes without cropping artwork", () => {

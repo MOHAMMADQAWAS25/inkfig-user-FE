@@ -1033,3 +1033,44 @@ img { max-width: 100%; image-rendering: auto; }
 /* Gallery-first homepage */
 .gallery-feed { padding-top: clamp(22px,3vw,38px); border-top: 0; }
 .gallery-feed > .gallery-filters { margin-top: 0; }
+
+/* Pinterest-inspired application rhythm */
+@media (min-width: 721px) {
+  :root {
+    --app-rail-size: 88px;
+    --page-gutter: 20px;
+    --feed-gutter: 20px;
+    --artwork-column-gap: 20px;
+    --nav-control-size: 48px;
+    --nav-icon-size: 24px;
+    --header-control-size: 60px;
+  }
+  .app-sidebar { padding: 12px 10px 16px; }
+  .app-sidebar-logo { width: 56px; height: 56px; }
+  .app-sidebar-nav { margin-top: 20px; gap: 16px; }
+  .gallery-header, [dir="rtl"] .gallery-header {
+    grid-template-columns: minmax(0,1fr) 40px;
+    min-height: 100px;
+    padding: 20px 18px 20px 20px;
+    gap: 12px;
+  }
+  [dir="rtl"] .gallery-header { padding: 20px 20px 20px 18px; }
+  .gallery-header-actions { display: flex; width: 40px; min-width: 40px; justify-content: center; }
+  .gallery-profile-menu > summary, .gallery-guest-avatar { width: 40px; height: 40px; }
+  .gallery-search { min-height: 60px; padding-inline: 18px; border-radius: 16px; }
+  .gallery-feed { padding-top: 20px; padding-inline: 20px; }
+  .gallery-filters { margin-bottom: 28px; gap: 12px; }
+}
+
+@media (max-width: 720px) {
+  .gallery-header, [dir="rtl"] .gallery-header {
+    grid-template-columns: minmax(0,1fr) 40px;
+    min-height: 64px;
+    padding: 10px 10px 10px 12px;
+    gap: 8px;
+  }
+  [dir="rtl"] .gallery-header { padding: 10px 12px 10px 10px; }
+  .gallery-header-actions { display: flex; width: 40px; min-width: 40px; justify-content: center; }
+  .gallery-profile-menu > summary, .gallery-guest-avatar { width: 38px; height: 38px; }
+  .gallery-feed { padding-top: 16px; }
+}

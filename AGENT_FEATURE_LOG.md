@@ -5548,3 +5548,54 @@ Remove all promotional content above the home-page gallery, including the Ink Yo
 ### Notes
 
 The existing localization strings and legacy hero CSS remain available but unused; removing shared styling or translations was intentionally avoided to keep this ticket focused and conflict-safe.
+
+## 2026-10-07 - Restore the home profile avatar and Pinterest-inspired spacing
+
+### Request
+
+Move the profile avatar back to the outer top corner of the home header and refine the spacing between the navigation rail, search bar, avatar, filters, and artwork grid using the supplied Pinterest layout as a visual reference.
+
+### Changes
+
+- Moved the signed-in profile menu and signed-out login avatar from the navigation rail back into the home-page header.
+- Preserved profile navigation, language and theme controls, logout, guest sign-in, and outside-click menu dismissal.
+- Kept Settings anchored at the bottom of the navigation rail after removing the account control from that rail.
+- Added a consistent desktop rhythm with an 88px rail, 20px content gutters, 20px masonry gaps, a 12px search-to-avatar gap, and a compact 40px avatar.
+- Extended the search field across the available header width while keeping the avatar aligned at the outer edge.
+- Mirrored the header and sidebar relationship for Arabic and retained a compact search-plus-avatar layout on mobile.
+
+### Repositories
+
+- `inkfig-user-FE`: home header composition, responsive spacing, regression tests, and this log.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: restores the account/avatar control to the home header.
+- `src/features/navigation/AppSidebar.tsx`: removes the duplicated account control while retaining Settings at the rail bottom.
+- `src/styles.css`: adds the Pinterest-inspired spacing system and responsive RTL/mobile alignment.
+- `tests/foundation.test.mjs`: updates header ownership checks and verifies the new spacing tokens.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, permission, environment-variable, or backend changes.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only presentation change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 44 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`.
+- `[not run] live browser visual inspection` - the in-app browser was unavailable in this session; responsive and RTL behavior were verified through the production build and regression assertions.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, configuration changes, or backend deployment are required.
+
+### Git
+
+- Branch: `fix/home-header-spacing`
+- Commit, rebase, push, and pull-request status: pending final synchronization.

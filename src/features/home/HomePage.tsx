@@ -1,6 +1,6 @@
-import { Bookmark, Heart, Search, UserRound } from "lucide-react";
+import { Bookmark, Heart, LogOut, Search, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
@@ -12,6 +12,8 @@ import { workTypeTone } from "../works/workTypePresentation";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
+import { LanguageToggle } from "../../i18n/LanguageToggle";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -25,7 +27,7 @@ const workCategories = [
 ] as const;
 
 export function HomePage() {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,6 +35,7 @@ export function HomePage() {
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
   const [nextCursor,setNextCursor]=useState<string|number|null>(null); const [loadingMore,setLoadingMore]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
+  const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
   const normalizedSearch=submittedSearch.trim();
   useEffect(()=>{
@@ -43,6 +46,7 @@ export function HomePage() {
     request.then(page=>{if(active){setWorks(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
     return()=>{active=false};
   },[activeCategory,normalizedSearch,session]);
+  useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();setSubmittedSearch(searchQuery.trim());}
   async function loadMore(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedSearch.length>=2?await searchWorks(normalizedSearch,typeCode,Number(nextCursor)):await getWorks(typeCode,String(nextCursor));setWorks(current=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];});setNextCursor(page.next_cursor);}catch{setFeedError(true);}finally{setLoadingMore(false)}}
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
@@ -57,6 +61,7 @@ export function HomePage() {
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>
           <input id="gallery-search-input" type="search" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={(event)=>setSearchQuery(event.target.value)} />
         </form>
+        <div className="gallery-header-actions">{session?<details className="gallery-profile-menu" ref={profileMenuRef}><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span></summary><div className="gallery-profile-popover"><div className="gallery-profile-identity"><span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span><div><strong>{session.fullName}</strong><small>{session.email}</small></div></div><Link to={`/${language}/profile`}><UserRound aria-hidden="true" size={18}/>{t("home.viewProfile")}</Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle/><ThemeToggle/></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18}/>{t("nav.logout")}</button></div></details>:<Link className="gallery-guest-avatar" to={`/${language}/login`} aria-label={t("auth.signIn")} title={t("auth.signIn")}><UserRound aria-hidden="true" size={20}/></Link>}</div>
       </header>
 
       <section className="gallery-feed" aria-label={t("home.collectionTitle")}>
