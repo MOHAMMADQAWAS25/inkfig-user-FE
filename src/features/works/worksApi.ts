@@ -67,3 +67,4 @@ export async function updateWork(id:string,input:{typeId:string;title:string;des
   await requestJson<null>(mainApiBaseUrl,"PATCH",`/works/${id}`,{body:{type_id:input.typeId,title:input.title.trim(),description:input.description.trim(),links}});
 }
 export async function deleteWork(id:string):Promise<void>{await requestJson<null>(mainApiBaseUrl,"DELETE",`/works/${id}`);}
+export async function deleteWorkAsModerator(id:string,reason:string):Promise<void>{await requestJson<null>(mainApiBaseUrl,"DELETE",`/works/${id}/moderation`,{body:{reason:reason.trim()}});}

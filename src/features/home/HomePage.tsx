@@ -7,7 +7,7 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
-import { getWorks, searchWorks, setWorkLike, setWorkSave } from "../works/worksApi";
+import { deleteWorkAsModerator, getWorks, searchWorks, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
@@ -70,6 +70,7 @@ export function HomePage() {
   async function loadMore(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedArtworkSearch.length>=2?await searchWorks(normalizedArtworkSearch,typeCode,Number(nextCursor),submittedAccount?.user_id):await getWorks(typeCode,String(nextCursor),submittedAccount?.user_id);setWorks(current=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];});setNextCursor(page.next_cursor);}catch{setFeedError(true);}finally{setLoadingMore(false)}}
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
   async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
+  async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));setSelectedWorkId(null);}
 
   return (
     <main className="gallery-home">
@@ -100,7 +101,7 @@ export function HomePage() {
         </div>{nextCursor!==null&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{feedError&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</>}
       </section>
 
-      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t}/>}
+      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
     </main>

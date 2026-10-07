@@ -67,6 +67,19 @@ test("provides a permission-driven system administrator workspace", () => {
   assert.equal([...resources.matchAll(/"admin\.title"/g)].length, 2);
 });
 
+test("lets authorized administrators delete artwork with a required audited reason", () => {
+  assert.match(homePage, /works\.delete_any/);
+  assert.match(profilePage, /works\.delete_any/);
+  assert.match(artworkDetailModal, /canModerateDelete/);
+  assert.match(artworkDetailModal, /minLength=\{10\}/);
+  assert.match(artworkDetailModal, /maxLength=\{1000\}/);
+  assert.match(artworkDetailModal, /onModerateDelete\(work,reason\.trim\(\)\)/);
+  assert.match(worksApi, /DELETE",`\/works\/\$\{id\}\/moderation`/);
+  assert.match(worksApi, /body:\{reason:reason\.trim\(\)\}/);
+  assert.match(styles, /\.moderation-dialog-backdrop/);
+  assert.equal([...resources.matchAll(/"works\.deletionReason"/g)].length, 2);
+});
+
 test("requires a six-digit email verification code before login", () => {
   assert.match(router, /\/:language\/verify-email/);
   assert.match(registrationApi, /\/auth\/verify-email/);
