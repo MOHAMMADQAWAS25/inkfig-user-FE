@@ -5426,3 +5426,57 @@ Do not send an artwork search request while the user is typing; send it only aft
 
 - Branch: `main`
 - Pull/rebase, commit, push, and workflow status: pending final synchronization.
+
+## 2026-10-07 - Start the homepage directly with the artwork gallery
+
+### Request
+
+Remove all promotional content above the home-page gallery, including the Ink Your World lockup and Explore Gallery prompt, so the page shows artwork-type filters followed by cards.
+
+### Changes
+
+- Removed the complete promotional hero, kicker, title lockup, description, Explore Gallery link, and decorative curated-art mark.
+- Removed the Community Gallery / Works Worth Discovering heading and viewer-note block above the filters.
+- Made the localized artwork-type buttons the first content beneath the sticky search header.
+- Preserved an accessible localized label on the gallery section after removing its visible heading.
+- Added compact responsive top spacing and removed the obsolete top divider for a clean gallery-first composition.
+- Preserved semantic search, category filtering, artwork cards, category badges, artist links, likes, saves, detail dialogs, navigation, themes, localization, and responsive behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: simplified the homepage composition and updated regression coverage.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: removes the hero and gallery-heading blocks and their unused icons.
+- `src/styles.css`: gives the gallery-first layout compact top spacing without a divider.
+- `tests/foundation.test.mjs`: verifies the homepage starts with filters and no promotional markup remains.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, permission, environment-variable, or backend changes.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only presentation change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 44 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+- `[not run] live browser visual inspection` - no in-app browser was attached to this workspace.
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations, secrets, configuration changes, or backend deployment are required.
+
+### Git
+
+- Branch: `main`
+- Commit, rebase, and push: pending final synchronization.
+
+### Notes
+
+The existing localization strings and legacy hero CSS remain available but unused; removing shared styling or translations was intentionally avoided to keep this ticket focused and conflict-safe.

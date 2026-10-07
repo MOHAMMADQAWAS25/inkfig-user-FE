@@ -1,4 +1,4 @@
-import { ArrowUpRight, Bookmark, Heart, Image, Search, Sparkles, UserRound } from "lucide-react";
+import { Bookmark, Heart, Search, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -57,25 +57,7 @@ export function HomePage() {
         </form>
       </header>
 
-      <section className="gallery-hero" id="about">
-        <div className="gallery-hero-copy">
-          <p className="gallery-kicker"><Sparkles size={16} /> {t("home.kicker")}</p>
-          <h1 className="gallery-hero-title" aria-label={t("home.title")}>
-            <span>{t("home.titleInk")}</span>
-            <span className="gallery-hero-title-outline">{t("home.titleYour")}</span>
-            <span className="gallery-hero-title-accent">{t("home.titleWorld")}</span>
-          </h1>
-          <p>{t("home.description")}</p>
-          <a className="gallery-explore" href="#discover">{t("home.explore")} <ArrowUpRight size={18} /></a>
-        </div>
-        <div className="gallery-hero-mark" aria-hidden="true"><span>{t("home.curated")}</span><Image size={34} /></div>
-      </section>
-
-      <section className="gallery-feed" id="discover" aria-labelledby="gallery-feed-title">
-        <div className="gallery-section-heading">
-          <div><p>{t("home.collectionLabel")}</p><h2 id="gallery-feed-title">{t("home.collectionTitle")}</h2></div>
-          <span>{t("home.viewerNote")}</span>
-        </div>
+      <section className="gallery-feed" aria-label={t("home.collectionTitle")}>
         <div className="gallery-filters" role="group" aria-label={t("home.filters")}>
           <button className={activeCategory === "all" ? "active" : ""} type="button" aria-pressed={activeCategory === "all"} onClick={() => setActiveCategory("all")}>{t("home.filter.all")}</button>
           {workCategories.map((category) => (

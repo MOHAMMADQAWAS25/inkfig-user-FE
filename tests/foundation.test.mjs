@@ -387,14 +387,13 @@ test("uses the fixed language and theme controls on signup and password reset", 
   assert.doesNotMatch(passwordResetPage, /className="eyebrow brand-name"/);
 });
 
-test("features the Ink your world hero lockup", () => {
-  assert.match(homePage, /className="gallery-hero-title"/);
-  assert.match(homePage, /home\.titleInk/);
-  assert.match(homePage, /home\.titleYour/);
-  assert.match(homePage, /home\.titleWorld/);
-  assert.match(resources, /"home\.title": "Ink your world"/);
-  assert.match(styles, /\.gallery-hero-title-outline[^}]*-webkit-text-stroke:\s*2px #982824/);
-  assert.match(styles, /\.gallery-hero-title-accent\s*\{[^}]*color:\s*#779439/);
+test("starts the homepage directly with filters and artwork cards", () => {
+  assert.doesNotMatch(homePage, /gallery-hero|gallery-section-heading|home\.titleInk|home\.explore/);
+  assert.match(homePage, /<section className="gallery-feed" aria-label=\{t\("home\.collectionTitle"\)\}>/);
+  assert.match(homePage, /className="gallery-filters"/);
+  assert.match(styles, /\/\* Gallery-first homepage \*\//);
+  assert.match(styles, /\.gallery-feed \{ padding-top: clamp\(22px,3vw,38px\); border-top: 0/);
+  assert.match(styles, /\.gallery-feed > \.gallery-filters \{ margin-top: 0/);
 });
 test("builds a searchable icon-first homepage header", () => {
   assert.doesNotMatch(homePage, /gallery-nav|gallery-language/);

@@ -1024,3 +1024,7 @@ img { max-width: 100%; image-rendering: auto; }
   :root { --feed-gutter: 10px; --artwork-column-size: auto; --nav-control-size: 40px; --nav-icon-size: 22px; }
   .artwork-grid, .profile-artwork-grid { column-count: 1; column-width: auto; }
 }
+
+/* Gallery-first homepage */
+.gallery-feed { padding-top: clamp(22px,3vw,38px); border-top: 0; }
+.gallery-feed > .gallery-filters { margin-top: 0; }
