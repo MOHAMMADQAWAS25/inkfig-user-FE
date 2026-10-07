@@ -5735,3 +5735,80 @@ Slightly enlarge the navigation rail, its controls, and logo; reduce the home se
 
 - Branch: `feature/profile-avatar-controls`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+## 2026-10-07 - Add account-scoped artwork search to the home bar
+
+### Request
+
+Open a Facebook-style live account list below the search bar whenever `@` is typed, require explicit account selection, search that user's matching works, and show all of that user's works when the selected `@account` has no artwork description.
+
+### Changes
+
+- Added a 250 ms debounced live account picker with prefix/partial-name results.
+- Added mouse, touch, Arrow Up, Arrow Down, Enter, Escape, outside-click, loading, empty, light/dark, responsive, Arabic, English, RTL, and LTR behavior.
+- Stores the selected immutable `user_id` separately from visible text; manually typed account names never create an owner filter.
+- Invalidates the selected account if its inserted mention is removed or edited.
+- Uses chronological owner-filtered feed results for an account-only query and ranked owner-filtered semantic results when artwork words remain.
+- Preserved cards, image rendering, category filters, pagination, likes, saves, and account navigation.
+
+### Repositories
+
+- `inkfig-user-FE`: live account picker and owner-aware feed/search requests.
+- `inkfig-user-system`: active verified account discovery endpoint and search index.
+- `inkfig-main-system`: owner-aware public feed and semantic search.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: implements account suggestions, explicit selection, query parsing, owner-scoped loading, and pagination.
+- `src/features/profile/profileApi.ts`: adds the minimal account-search client.
+- `src/features/works/worksApi.ts`: sends optional `owner_user_id` for normal and semantic feeds.
+- `src/i18n/resources.ts`: adds English and Arabic account-search states.
+- `src/styles.css`: adds responsive themed dropdown presentation.
+- `tests/foundation.test.mjs`: verifies the account picker and owner-filter integration.
+
+### API
+
+- `GET /api/v1/profiles/search`: consumed with `query` and `limit=8` for live active-account suggestions.
+- `GET /api/v1/works`: sends optional `owner_user_id` when only a selected account is searched.
+- `GET /api/v1/works/search`: sends `query` plus optional `owner_user_id` for artwork text scoped to the selected account.
+
+### Database
+
+- Migration: `20261007_012_add_profile_name_search_index.sql` in `inkfig-user-system`
+- The migration adds the partial trigram name-search index and has already been applied to Supabase. No frontend-local database change exists.
+
+### Permissions and scope
+
+- Account suggestions, public feed, and public semantic search require no authenticated permission and expose only active verified accounts and published works from active owners.
+- Likes and saves retain their existing authenticated permissions.
+- The selected backend owner ID, not visible account text, defines scope; backend services validate all authorization and visibility rules.
+
+### Frontend
+
+- The dropdown is anchored below the search bar and shows a fallback initial plus full name.
+- Typing `@` alone displays guidance; typing one or more characters performs live search.
+- A selected account with no remaining artwork words lists all of that account's public works.
+- A selected account plus artwork words returns that account's works ordered by semantic rank.
+- Loading, empty, unavailable, pagination, mobile, keyboard, RTL/LTR, and theme states are handled.
+
+### Verification
+
+- `[passed] npm.cmd test - 45 passed`
+- `[passed] npm.cmd run build - TypeScript and Vite production build succeeded`
+- `[passed] git diff --check`
+- `[not run] live deployed browser verification - deployment workflows run after GitHub push`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after both backend services.
+- Run the user-backend migration before deployment; it has already been applied.
+- No environment-variable or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `41244bf`
+- Push: `successful`
+
+### Notes
+
+Account avatars remain initials in suggestions because current profile pictures are browser-local and cannot be safely retrieved for other users.
