@@ -1120,13 +1120,14 @@ img { max-width: 100%; image-rendering: auto; }
 
 @media (min-width: 721px) {
   :root {
-    --app-rail-size: 96px;
-    --nav-control-size: 52px;
-    --nav-icon-size: 26px;
+    --app-rail-size: 90px;
+    --nav-control-size: 48px;
+    --nav-icon-size: 24px;
     --header-control-size: 52px;
   }
   .app-sidebar-logo { width: 64px; height: 64px; }
-  .app-sidebar-nav { gap: 18px; }
+  .app-sidebar-logo img { width: 52px; height: 52px; }
+  .app-sidebar-nav { gap: 16px; }
   .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: minmax(0,1fr) 34px; min-height: 84px; padding-block: 16px; gap: 10px; }
   .gallery-header-actions { width: 34px; min-width: 34px; }
   .gallery-profile-menu > summary, .gallery-guest-avatar { width: 34px; height: 34px; }

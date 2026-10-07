@@ -5856,3 +5856,49 @@ Replace browser-local profile pictures with backend persistence, make profile-pi
 
 - Branch: `feature/profile-avatar-upload`
 - Commit, rebase, push, merge, and main push: pending final synchronization.
+
+## 2026-10-07 - Slightly reduce the desktop navigation rail
+
+### Request
+
+Make the navigation bar and its buttons slightly smaller while keeping the logo at its current size.
+
+### Changes
+
+- Reduced the desktop navigation rail from 96 pixels to 90 pixels.
+- Reduced desktop navigation controls from 52 pixels to 48 pixels and their icons from 26 pixels to 24 pixels.
+- Preserved the existing 64-pixel logo container and 52-pixel logo image.
+- Tightened the navigation spacing proportionally without changing mobile navigation or header sizing.
+
+### Repositories
+
+- `inkfig-user-FE`: desktop navigation sizing, regression coverage, and this log.
+- `inkfig-user-system`: no changes required.
+- `inkfig-main-system`: no changes required.
+
+### Files
+
+- `src/styles.css`: adjusts only the desktop navigation sizing overrides.
+- `tests/foundation.test.mjs`: verifies the smaller rail and unchanged logo size.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API, database, permissions, and SnapStart
+
+- No API, database, migration, permission, secret, or environment-variable changes.
+- No effect on AWS Lambda SnapStart compatibility because this is a frontend-only presentation change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 46 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and the Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+- No migrations or backend deployment are required.
+
+### Git
+
+- Branch: `fix/smaller-navigation-rail`
+- Commit, rebase, push, merge, and main push: pending final synchronization.

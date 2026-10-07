@@ -497,7 +497,8 @@ test("provides a compact account menu and editable profile avatar", () => {
   assert.doesNotMatch(profileAvatarUpload, /localStorage/);
   assert.match(homePage, /<Link className="gallery-profile-identity" to=\{`\/\$\{language\}\/profile`\}/);
   assert.doesNotMatch(homePage, /home\.viewProfile/);
-  assert.match(styles, /--app-rail-size: 96px;[\s\S]*--nav-control-size: 52px;[\s\S]*--header-control-size: 52px/);
+  assert.match(styles, /--app-rail-size: 90px;[\s\S]*--nav-control-size: 48px;[\s\S]*--header-control-size: 52px/);
+  assert.match(styles, /\.app-sidebar-logo img \{ width: 52px; height: 52px/);
   assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
   for (const key of ["changePicture", "pictureError"]) {
     assert.equal([...resources.matchAll(new RegExp(`"profile\\.${key}"`, "g"))].length, 2);
