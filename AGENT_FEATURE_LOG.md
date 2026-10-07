@@ -6287,3 +6287,74 @@ No migration required.
 ### Notes
 
 None
+
+## 2026-10-07 - Add administrator work deletion controls
+
+### Request
+
+Give system administrators and administrators a UI for deleting any work and require them to write the deletion reason.
+
+### Changes
+
+- Added a Delete control to an opened artwork only when the authenticated session has `works.delete_any`.
+- Added a confirmation dialog with a required 10–1000 character reason, validation, loading state, and API error handling.
+- Removes a successfully deleted work from home and profile collections without requiring a reload.
+- Added matching English and Arabic localization, dark-theme styling, and mobile-responsive dialog layout.
+- Left owner controls and non-administrator artwork views unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: implemented the administrative UI and request helper.
+- `inkfig-main-system`: provides the protected, audited deletion endpoint.
+- `inkfig-user-system`: provides the administrator permission claim.
+
+### Files
+
+- `src/features/works/worksApi.ts`: added the moderation delete request.
+- `src/features/home/ArtworkDetailModal.tsx`: added the permission-gated action and reason dialog.
+- `src/features/home/HomePage.tsx`: wired deletion and local feed removal.
+- `src/features/profile/ProfilePage.tsx`: wired deletion and local profile-list removal.
+- `src/i18n/resources.ts`: added English and Arabic moderation text.
+- `src/styles.css`: added responsive themed styles.
+- `tests/foundation.test.mjs`: added structural coverage for permission, API, validation, styling, and translations.
+
+### API
+
+- `DELETE /api/v1/works/{work_id}/moderation`: sends `{ "reason": string }`; handles backend validation, authorization, missing-work, and storage errors through the shared request client.
+
+### Database
+
+- Migration: `20261007_011_create_work_deletion_audits.sql` in `inkfig-main-system`.
+- Permission migration: `20261007_014_add_work_moderation_permission.sql` in `inkfig-user-system`.
+
+### Permissions and scope
+
+- Required permission: `works.delete_any`.
+- The control appears only for `admin` and `system_administrator` sessions containing that permission.
+- The backend remains authoritative and validates permission for every deletion request.
+
+### Frontend
+
+- Updated the existing artwork detail modal used by home and profile routes.
+- Included localized validation, confirmation, loading, success-state removal, API errors, dark mode, and narrow-screen behavior.
+
+### Verification
+
+- `[passed] npm test` — 50 tests passed.
+- `[passed] npm run build` — TypeScript and Vite production build completed.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after both backend deployments and migrations.
+- No frontend environment-variable changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `2e2b9aa`
+- Push: `successful`
+
+### Notes
+
+Administrators with an existing session must sign out and sign in again to load the newly assigned permission into the frontend session.
