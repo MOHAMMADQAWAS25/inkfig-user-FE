@@ -5379,6 +5379,74 @@ Move the profile/account icon from the home-page header to immediately above Set
 - Branch: `main`
 - Pull/rebase, commit, push, and workflow status: pending final synchronization.
 
+## 2026-10-07 - Preserve semantic search ranking
+
+### Request
+
+Display semantic-search artworks according to the explicit similarity rank returned by the backend.
+
+### Changes
+
+- Extended the artwork API type with search-only `search_rank` and `similarity_score` metadata.
+- Defensively sorts a copied semantic-search response array by ascending rank before returning it to the home page.
+- Places missing ranks last for backward compatibility during staggered deployment.
+- Kept normal feeds, card presentation, image quality, interactions, and layout unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: consumes and preserves backend semantic ranking.
+- `inkfig-main-system`: returns rank and cosine similarity for every search result.
+
+### Files
+
+- `src/features/works/worksApi.ts`: types search metadata and orders semantic results by rank.
+- `tests/foundation.test.mjs`: verifies the response fields and rank-based ordering.
+
+### API
+
+- Consumes `GET /api/v1/works/search` items containing `search_rank` and `similarity_score`.
+- No request fields, filters, validation, permissions, or frontend error handling changed.
+
+### Database
+
+No migration required. The frontend has no local database, and ranking is calculated by `inkfig-main-system` from existing embeddings.
+
+### Permissions and scope
+
+- Public viewers and authenticated roles can use semantic search as before.
+- Like and save actions retain their existing permissions.
+- Published-work and active-owner scope remains validated by the backend.
+
+### Frontend
+
+- Search results render from rank 1 onward in the existing responsive Pinterest-style gallery.
+- Missing rank values are placed after ranked results during rolling deployment.
+- No visible rank badge, route, navigation, localization, loading, empty, error, responsive, or card-design changes were added.
+
+### Verification
+
+- `[passed] npm.cmd test - 44 passed after rebase`
+- `[passed] npm.cmd run build - TypeScript and Vite production build succeeded after rebase`
+- `[passed] git diff --check`
+- `[passed] backend pytest - 29 passed`
+- `[passed] backend mypy - no issues in 48 source files`
+
+### Deployment
+
+- Deploy `inkfig-main-system` before `inkfig-user-FE` for the complete response contract.
+- No migrations must run before deployment.
+- No environment-variable, secret, or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `6c61c62`
+- Push: `successful`
+
+### Notes
+
+The similarity value is diagnostic ranking metadata and must not be presented as a probability without separate calibration.
+
 ## 2026-10-06 - Submit artwork searches with Enter
 
 ### Request
