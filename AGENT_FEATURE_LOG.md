@@ -6431,3 +6431,67 @@ Build the notification feed and counter, animate panel closing, refine navigatio
 
 - Deploy after both backends, in user-system → main-system → frontend order.
 - Branch: `feature/full-notifications`; commit/push pending final synchronization.
+
+## 2026-10-08 - Disable automatic notification refresh
+
+### Request
+
+Stop recurring frontend notification refreshes and the focus-triggered refresh behavior.
+
+### Changes
+
+- Removed the 30-second notification polling interval.
+- Removed notification refresh when the browser window regains focus.
+- Preserved one initial notification load for the signed-in session and an explicit load when the notification panel opens.
+- Preserved unread badges, mark-as-read behavior, persistent backend storage, responsive presentation, and authorization.
+
+### Repositories
+
+- `inkfig-user-FE`: changed notification-loading triggers and regression coverage.
+- `inkfig-user-system`: no change required.
+- `inkfig-main-system`: no change required.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: removes interval and focus-based notification requests.
+- `tests/foundation.test.mjs`: prevents recurring or focus-triggered notification refresh from returning.
+- `AGENT_FEATURE_LOG.md`: records this ticket.
+
+### API
+
+No API contract changes. The frontend continues using `GET /api/v1/notifications` and `PUT /api/v1/notifications/read` only at explicit loading points.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Authentication and `profile.read_own` backend enforcement are unchanged.
+- Users continue to receive only their own notification feed.
+
+### Frontend
+
+- Notifications load once when a signed-in session starts and whenever the user opens the notification panel.
+- The frontend no longer makes background notification requests every 30 seconds or on browser focus.
+
+### Verification
+
+- `[passed] npm.cmd test` - 52 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing Cloudflare workflow.
+- No backend, migration, secret, or environment-variable changes are required.
+
+### Git
+
+- Branch: `fix/disable-notification-auto-refresh`
+- Commit: included in this focused frontend commit.
+- Push: pending final synchronization.
+
+### Notes
+
+The initial session request remains necessary to display an unread badge without requiring the user to open the panel first.

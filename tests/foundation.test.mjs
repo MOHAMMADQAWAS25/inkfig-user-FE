@@ -504,7 +504,8 @@ test("provides persistent responsive social notifications and refined hover feed
   assert.match(notificationApi, /\/notifications\?limit=50/);
   assert.match(notificationApi, /\/notifications\/read/);
   assert.match(appSidebar, /notification-badge/);
-  assert.match(appSidebar, /setInterval\([^]*30000/);
+  assert.doesNotMatch(appSidebar, /setInterval\([^]*30000/);
+  assert.doesNotMatch(appSidebar, /addEventListener\("focus"/);
   assert.match(appSidebar, /closingPanel/);
   assert.match(appSidebar, /data-tooltip/);
   assert.match(styles, /animation-direction: reverse/);
