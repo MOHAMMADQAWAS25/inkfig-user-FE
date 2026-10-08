@@ -602,6 +602,11 @@ test("provides a compact account menu and editable profile avatar", () => {
   assert.match(profileAvatarUpload, /PROFILE_AVATAR_MAX_BYTES = 2 \* 1024 \* 1024/);
   assert.match(profileAvatarUpload, /\/profiles\/avatar-uploads/);
   assert.match(profileAvatarUpload, /\/profiles\/avatar-uploads\/complete/);
+  assert.match(profileAvatarUpload, /"DELETE","\/profiles\/avatar"/);
+  assert.match(profilePage, /profile\.removePicture/);
+  assert.match(profilePage, /removeProfileAvatar\(\)/);
+  assert.match(profilePage, /avatar_url:null/);
+  assert.match(styles, /\.profile-avatar-actions/);
   assert.doesNotMatch(profileAvatarUpload, /localStorage/);
   assert.match(homePage, /<Link className="gallery-profile-identity" to=\{`\/\$\{language\}\/profile`\}/);
   assert.doesNotMatch(homePage, /home\.viewProfile/);

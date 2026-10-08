@@ -17,7 +17,7 @@ import {
   getProfileConnections, getPublicProfile, setProfileFollow,
   type ProfileAccount, type PublicProfile,
 } from "./profileApi";
-import { isValidProfileAvatar, PROFILE_AVATAR_ACCEPT, uploadProfileAvatar } from "./profileAvatarUpload";
+import { isValidProfileAvatar, PROFILE_AVATAR_ACCEPT, removeProfileAvatar, uploadProfileAvatar } from "./profileAvatarUpload";
 
 type Section = "posts" | "likes" | "saved";
 type PageCursors = Record<Section,string|null>;
@@ -63,6 +63,8 @@ export function ProfilePage() {
   const [cursors,setCursors]=useState<PageCursors>({posts:null,likes:null,saved:null});
   const [failed,setFailed]=useState(false);
   const [avatarError,setAvatarError]=useState(false);
+  const [avatarRemoveError,setAvatarRemoveError]=useState(false);
+  const [avatarBusy,setAvatarBusy]=useState(false);
   const [workTypes,setWorkTypes]=useState<WorkType[]>([]);
   const [editing,setEditing]=useState<Work|null>(null);
   const [editTitle,setEditTitle]=useState("");
@@ -87,7 +89,7 @@ export function ProfilePage() {
     }).catch(()=>setFailed(true)).finally(()=>setLoading(false));
   },[ownProfile,profileUserId,session]);
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
-  useEffect(()=>{setAvatarError(false);},[profileUserId]);
+  useEffect(()=>{setAvatarError(false);setAvatarRemoveError(false);},[profileUserId]);
   useEffect(()=>{if(ownProfile)void getWorkTypes().then(setWorkTypes).catch(()=>setWorkTypes([]));},[ownProfile]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
   if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
@@ -119,7 +121,8 @@ export function ProfilePage() {
   }
   async function loadMore(){const cursor=cursors[section];if(!cursor||loadingMore)return;setLoadingMore(true);setPaginationFailed(false);try{const page=section==="posts"?await getUserWorks(profileUserId,cursor):section==="likes"?await getLikedWorks(cursor):await getSavedWorks(cursor);const append=(current:Work[])=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];};if(section==="posts")setPosts(append);else if(section==="likes")setLikes(append);else setSaved(append);setCursors(current=>({...current,[section]:String(page.next_cursor??"")||null}));}catch{setPaginationFailed(true);}finally{setLoadingMore(false)}}
   function selectSection(next:Section){setSection(next);setSearchParams(next==="posts"?{}:{section:next},{replace:true});}
-  async function changeAvatar(file:File|undefined){if(!file||!isValidProfileAvatar(file)){setAvatarError(Boolean(file));return;}try{const avatar_url=await uploadProfileAvatar(file);setProfile(current=>current?{...current,avatar_url}:current);setAvatarError(false);}catch{setAvatarError(true);}finally{if(avatarInputRef.current)avatarInputRef.current.value="";}}
+  async function changeAvatar(file:File|undefined){if(!file||!isValidProfileAvatar(file)){setAvatarError(Boolean(file));return;}setAvatarBusy(true);setAvatarRemoveError(false);try{const avatar_url=await uploadProfileAvatar(file);setProfile(current=>current?{...current,avatar_url}:current);setAvatarError(false);}catch{setAvatarError(true);}finally{setAvatarBusy(false);if(avatarInputRef.current)avatarInputRef.current.value="";}}
+  async function removeAvatar(){if(!profile?.avatar_url||avatarBusy||!window.confirm(t("profile.removePictureConfirm")))return;setAvatarBusy(true);setAvatarError(false);setAvatarRemoveError(false);try{await removeProfileAvatar();setProfile(current=>current?{...current,avatar_url:null}:current);}catch{setAvatarRemoveError(true);}finally{setAvatarBusy(false);}}
   function beginEdit(work:Work){setEditing(work);setEditTitle(work.title);setEditDescription(work.description);setEditTypeId(work.type_id);setEditLinks(work.links.length?work.links:[{url:"",label:null}]);setMutationError(false);}
   async function saveEdit(event:React.FormEvent){event.preventDefault();if(!editing||mutationBusy)return;setMutationBusy(true);setMutationError(false);try{await updateWork(editing.work_id,{typeId:editTypeId,title:editTitle,description:editDescription,links:editLinks});const type=workTypes.find(item=>item.type_id===editTypeId);const update=(work:Work):Work=>work.work_id===editing.work_id?{...work,title:editTitle.trim(),description:editDescription.trim(),type_id:editTypeId,type_name_en:type?.name_en??work.type_name_en,type_name_ar:type?.name_ar??work.type_name_ar,links:editLinks.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label?.trim()||null}))}:work;setPosts(current=>current.map(update));setLikes(current=>current.map(update));setSaved(current=>current.map(update));setEditing(null);}catch{setMutationError(true);}finally{setMutationBusy(false);}}
   async function removeWork(work:Work){if(mutationBusy||!window.confirm(t("works.deleteConfirm")))return;setMutationBusy(true);setMutationError(false);try{await deleteWork(work.work_id);const remove=(items:Work[])=>items.filter(item=>item.work_id!==work.work_id);setPosts(remove);setLikes(remove);setSaved(remove);if(selectedId===work.work_id)setSelectedId(null);}catch{setMutationError(true);}finally{setMutationBusy(false);}}
@@ -129,7 +132,7 @@ export function ProfilePage() {
 
   return <main className="profile-page app-page-with-sidebar"><AppSidebar/>
     {loading?<p className="profile-state">{t("profile.loading")}</p>:failed||!profile?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<>
-      <section className="profile-intro"><div className={`profile-avatar ${ownProfile?"editable":""}`}>{profile.avatar_url?<img src={profile.avatar_url} alt=""/>:<span aria-hidden="true">{profile.full_name.trim().charAt(0).toUpperCase()}</span>}{ownProfile&&<><button type="button" aria-label={t("profile.changePicture")} title={t("profile.changePicture")} onClick={()=>avatarInputRef.current?.click()}><Camera aria-hidden="true" size={24}/><span>{t("profile.changePicture")}</span></button><input ref={avatarInputRef} className="sr-only" type="file" accept={PROFILE_AVATAR_ACCEPT} onChange={event=>void changeAvatar(event.target.files?.[0])}/></>}</div><div className="profile-identity"><div className="profile-name-row"><h1>{profile.full_name}</h1></div>{avatarError&&<p className="profile-avatar-error" role="alert">{t("profile.pictureError")}</p>}<div className="profile-social-stats">
+      <section className="profile-intro"><div className={`profile-avatar ${ownProfile?"editable":""}`}>{profile.avatar_url?<img src={profile.avatar_url} alt=""/>:<span aria-hidden="true">{profile.full_name.trim().charAt(0).toUpperCase()}</span>}{ownProfile&&<><div className="profile-avatar-actions"><button type="button" disabled={avatarBusy} aria-label={t("profile.changePicture")} title={t("profile.changePicture")} onClick={()=>avatarInputRef.current?.click()}><Camera aria-hidden="true" size={22}/><span>{t("profile.changePicture")}</span></button>{profile.avatar_url&&<button className="remove" type="button" disabled={avatarBusy} aria-label={t("profile.removePicture")} title={t("profile.removePicture")} onClick={()=>void removeAvatar()}><Trash2 aria-hidden="true" size={20}/><span>{t("profile.removePicture")}</span></button>}</div><input ref={avatarInputRef} className="sr-only" type="file" accept={PROFILE_AVATAR_ACCEPT} onChange={event=>void changeAvatar(event.target.files?.[0])}/></>}</div><div className="profile-identity"><div className="profile-name-row"><h1>{profile.full_name}</h1></div>{avatarError&&<p className="profile-avatar-error" role="alert">{t("profile.pictureError")}</p>}{avatarRemoveError&&<p className="profile-avatar-error" role="alert">{t("profile.removePictureError")}</p>}<div className="profile-social-stats">
         <button type="button" onClick={()=>openConnections("followers")}><strong>{profile.follower_count}</strong><span>{t("profile.followers")}</span></button>
         <button type="button" onClick={()=>openConnections("following")}><strong>{profile.following_count}</strong><span>{t("profile.following")}</span></button>
         <div><strong>{profile.like_count}</strong><span>{t("profile.totalLikes")}</span></div>

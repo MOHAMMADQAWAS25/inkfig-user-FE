@@ -19,3 +19,7 @@ export async function uploadProfileAvatar(file:File):Promise<string>{
   await putAvatarFile(upload,file);
   return (await requestJson<{avatar_url:string}>(userApiBaseUrl,"POST","/profiles/avatar-uploads/complete",{body:{object_path:upload.object_path}})).data.avatar_url;
 }
+
+export async function removeProfileAvatar():Promise<void>{
+  await requestJson<void>(userApiBaseUrl,"DELETE","/profiles/avatar");
+}
