@@ -6554,3 +6554,80 @@ No frontend migration required.
 ### Notes
 
 None
+
+## 2026-10-09 - Link like notifications to artwork cards
+
+### Request
+
+Show which artwork was liked, open that artwork card from the notification, and open the actor profile when their avatar is clicked.
+
+### Changes
+
+- Displays the related artwork title for like notifications.
+- Separates avatar navigation from notification-content navigation.
+- Opens actor avatars on their public profile.
+- Opens like notification content on the exact artwork card through a shareable `work` query parameter.
+- Fetches an artwork directly when it is not present in the current paginated home feed.
+- Removes invalid or stale artwork query parameters safely.
+- Intentionally leaves follow navigation, notification read state, WebSocket refresh behavior, and historical save rendering unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: implements notification presentation and deep-link modal behavior.
+- `inkfig-user-system`: supplies related artwork titles.
+- `inkfig-main-system`: supplies exact published artwork lookup.
+
+### Files
+
+- `src/features/notifications/notificationApi.ts`: adds nullable artwork title typing.
+- `src/features/navigation/AppSidebar.tsx`: renders artwork context and separate avatar/content links.
+- `src/features/works/worksApi.ts`: adds exact artwork retrieval.
+- `src/features/home/HomePage.tsx`: resolves the artwork query parameter and opens the detail modal.
+- `src/styles.css`: styles split notification links and truncated artwork titles in both themes.
+- `tests/foundation.test.mjs`: verifies notification and deep-link wiring.
+
+### API
+
+- Consumes `GET /api/v1/notifications` with the new nullable `work_title` response field.
+- Consumes `GET /api/v1/works/{work_id}` to retrieve the exact published artwork.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Notification data remains available only to the authenticated recipient.
+- Actor profiles and published artwork retain their existing public visibility.
+- Like/save controls inside the opened card remain permission-gated.
+- Backend services validate notification scope and artwork visibility.
+
+### Frontend
+
+- Like notification text includes the artwork title.
+- Clicking the notification avatar opens `/:language/profile/:actorUserId`.
+- Clicking like notification content opens `/:language?work=:workId` and displays `ArtworkDetailModal`.
+- Deleted or inaccessible artwork links are removed without leaving a broken modal.
+- Existing responsive notification-panel behavior, RTL/LTR behavior, loading state, empty state, and dark theme remain supported.
+
+### Verification
+
+- `[passed] npm test` — 54 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after both backend deployments.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `3c6b618`
+- Push: `successful`
+
+### Notes
+
+The artwork URL is shareable and does not depend on the artwork being present in the first feed page.
