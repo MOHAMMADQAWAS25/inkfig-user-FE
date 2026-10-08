@@ -6828,3 +6828,73 @@ No migration required.
 ### Notes
 
 The stack is presentation-only; all notification history remains available from the backend-backed panel even after a toast expires or is evicted.
+
+## 2026-10-09 - Add profile picture removal controls
+
+### Request
+
+Let profile owners either replace their current profile picture or remove it completely and return to the no-picture state.
+
+### Changes
+
+- Added separate Change and Remove actions to the editable profile avatar.
+- Shows Remove only when the profile currently has an image.
+- Added confirmation, busy-state protection, localized failure messaging, and immediate initials fallback after successful removal.
+- Preserved existing image validation and replacement behavior.
+- Intentionally left other users' profiles, signup avatar selection, account data, and profile navigation unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adds profile-avatar removal API usage and responsive controls.
+- `inkfig-user-system`: provides authenticated removal and storage cleanup.
+
+### Files
+
+- `src/features/profile/profileAvatarUpload.ts`: calls the profile-avatar DELETE endpoint.
+- `src/features/profile/ProfilePage.tsx`: adds owner-only removal workflow and state handling.
+- `src/i18n/resources.ts`: adds English and Arabic labels, confirmation, and error text.
+- `src/styles.css`: styles responsive Change and Remove controls.
+- `tests/foundation.test.mjs`: verifies API and UI wiring.
+
+### API
+
+- Consumes `DELETE /api/v1/profiles/avatar`, which returns 204 after clearing the authenticated user's avatar.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Controls appear only on the authenticated user's own profile.
+- Requires the existing `profile.read_own` permission.
+- The backend validates ownership using the authenticated principal.
+
+### Frontend
+
+- Hovering/focusing the owner avatar exposes Change and Remove controls.
+- Mobile layouts keep the actions visible.
+- Removing requires confirmation and replaces the image with the existing initials fallback.
+- Supports Arabic/English, RTL/LTR, light/dark themes, busy states, and error handling.
+
+### Verification
+
+- `[passed] npm test` — 55 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after `inkfig-user-system`.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `997af41`
+- Push: `successful`
+
+### Notes
+
+The UI returns immediately to the same no-picture initials state used by accounts that never uploaded an avatar.
