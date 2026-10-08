@@ -6759,3 +6759,72 @@ No migration required.
 ### Notes
 
 A stacked or queued toast presentation can be added later without changing stored notification history.
+
+## 2026-10-09 - Stack the newest five live notifications
+
+### Request
+
+Allow multiple live notification popups, display no more than the newest five, remove the oldest when a sixth arrives, and keep notifications unread until the notification panel is opened.
+
+### Changes
+
+- Replaced the single live toast with a FIFO stack capped at five notification items.
+- Detects every newly fetched notification after a WebSocket invalidation, including several events discovered in one refresh.
+- Removes the oldest visible item when the five-item limit is exceeded.
+- Gives each toast its own one-minute expiration timer and manual dismissal behavior.
+- Preserved unread state when toasts appear or are dismissed.
+- Intentionally left database persistence, backend APIs, WebSocket messages, notification-panel behavior, and navigation targets unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adds the capped live-notification stack.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: tracks known notification IDs, manages a five-item FIFO stack, and manages per-item timers.
+- `src/styles.css`: lays out responsive stacked notifications at the physical bottom-left.
+- `tests/foundation.test.mjs`: verifies the five-item limit, live detection, one-minute timeout, and stack placement.
+
+### API
+
+No API changes. The existing notification feed and WebSocket invalidation event are reused.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Only notifications returned for the authenticated recipient can enter the live stack.
+- Toast display does not modify notification read state.
+- Backend notification scope and authorization remain unchanged and backend-validated.
+
+### Frontend
+
+- Shows up to five compact notification rectangles at the physical bottom-left.
+- New notifications are appended; when a sixth arrives, the oldest visible notification is removed.
+- Each notification disappears one minute after arrival or immediately when dismissed or followed.
+- Notifications become read only through the existing notification-panel open flow.
+- Responsive mobile placement, light/dark themes, RTL/LTR support, reduced motion, profile links, and artwork links remain supported.
+
+### Verification
+
+- `[passed] npm test` — 55 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `b53de54`
+- Push: `successful`
+
+### Notes
+
+The stack is presentation-only; all notification history remains available from the backend-backed panel even after a toast expires or is evicted.
