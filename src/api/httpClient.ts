@@ -27,7 +27,8 @@ export async function requestJson<TData>(
   let response = await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, request);
   const authenticatedUserPath = path.startsWith("/profiles")
     || path.startsWith("/settings")
-    || path.startsWith("/admin");
+    || path.startsWith("/admin")
+    || path.startsWith("/notifications");
   if (
     response.status === 401
     && (normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) || authenticatedUserPath)

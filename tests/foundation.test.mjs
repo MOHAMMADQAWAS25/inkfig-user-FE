@@ -515,6 +515,14 @@ test("provides persistent responsive social notifications and refined hover feed
   assert.match(styles, /transition: opacity 120ms ease 300ms/);
   assert.match(styles, /\.gallery-search:hover[^}]*255 253 240/);
 });
+
+test("receives live notification invalidations over an authenticated websocket", () => {
+  assert.match(notificationApi, /\/notifications\/socket-ticket/);
+  assert.match(appSidebar, /new WebSocket/);
+  assert.match(appSidebar, /notifications\.changed/);
+  assert.match(appSidebar, /encodeURIComponent\(access\.ticket\)/);
+  assert.match(appSidebar, /Math\.min\(30000/);
+});
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
   assert.match(homePage, /ref=\{profileMenuRef\}/);

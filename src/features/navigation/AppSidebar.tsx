@@ -6,7 +6,7 @@ import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
 import { hasPermission } from "../../lib/permissions";
 import { useAuth } from "../auth/AuthContext";
-import { getNotifications, markNotificationsRead, type NotificationItem } from "../notifications/notificationApi";
+import { getNotifications, getWebSocketTicket, markNotificationsRead, type NotificationItem } from "../notifications/notificationApi";
 import { searchProfilesPage } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
 
@@ -40,6 +40,7 @@ export function AppSidebar() {
   function setNotificationsOpen(value:SetStateAction<boolean>){transitionPanel("notifications",value);}
   async function refreshNotifications(){if(!session)return;try{const feed=await getNotifications();setNotifications(feed.items);setUnreadCount(feed.unread_count);}catch{return;}}
   useEffect(()=>{if(!session){setNotifications([]);setUnreadCount(0);return;}void refreshNotifications();},[session]);
+  useEffect(()=>{if(!session)return;let active=true;let socket:WebSocket|null=null;let retry:number|undefined;let attempts=0;const connect=async()=>{try{const access=await getWebSocketTicket();if(!active)return;socket=new WebSocket(`${access.websocket_url}?ticket=${encodeURIComponent(access.ticket)}`);socket.onopen=()=>{attempts=0};socket.onmessage=event=>{try{if(JSON.parse(String(event.data)).type==="notifications.changed")void refreshNotifications();}catch{return;}};socket.onclose=()=>{if(active){attempts+=1;retry=window.setTimeout(()=>void connect(),Math.min(30000,1000*2**Math.min(attempts,5)));}};}catch{if(active){attempts+=1;retry=window.setTimeout(()=>void connect(),Math.min(30000,1000*2**Math.min(attempts,5)));}}};void connect();return()=>{active=false;if(retry!==undefined)window.clearTimeout(retry);socket?.close();};},[session]);
   useEffect(()=>{if(!notificationsOpen||!session)return;setNotificationsLoading(true);getNotifications().then(feed=>{setNotifications(feed.items);setUnreadCount(feed.unread_count);if(feed.unread_count>0)return markNotificationsRead().then(()=>setUnreadCount(0));}).catch(()=>undefined).finally(()=>setNotificationsLoading(false));},[notificationsOpen,session]);
   useEffect(()=>{if(!accountsOpen){return;}window.setTimeout(()=>searchInputRef.current?.focus(),0);},[accountsOpen]);
   useEffect(()=>{if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery]);
