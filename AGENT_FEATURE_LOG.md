@@ -6495,3 +6495,62 @@ No migration required.
 ### Notes
 
 The initial session request remains necessary to display an unread badge without requiring the user to open the panel first.
+
+## 2026-10-08 - Receive live notifications
+
+### Request
+
+Show new notifications without refreshing or reopening InkFig.
+
+### Changes
+
+- Requests a short-lived WebSocket ticket, connects to AWS, refreshes the REST feed on notification invalidations, and reconnects with capped exponential backoff.
+- Keeps the existing initial and panel-open loads as recovery paths.
+
+### Repositories
+
+- `inkfig-user-FE`: live connection and refresh behavior.
+
+### Files
+
+- `src/features/notifications/notificationApi.ts`: ticket API contract.
+- `src/features/navigation/AppSidebar.tsx`: connection lifecycle and live refresh.
+- `src/api/httpClient.ts`: permits notification requests to refresh expired sessions.
+- `tests/foundation.test.mjs`: realtime regression coverage.
+
+### API
+
+- `POST /api/v1/notifications/socket-ticket`: obtains connection credentials.
+- Receives `notifications.changed` over WSS and reloads `GET /api/v1/notifications`.
+
+### Database
+
+No frontend migration required.
+
+### Permissions and scope
+
+- Available only to authenticated sessions; backend ticket and feed authorization remain authoritative.
+
+### Frontend
+
+- Bell count and feed update live; reconnect delay grows to a maximum of 30 seconds.
+
+### Verification
+
+- `[passed] npm test` — 53 tests passed.
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy after both backends. No frontend environment variable is required because the backend returns the WebSocket URL.
+
+### Git
+
+- Branch: `main`
+- Commit: `1b1e3ee`
+- Push: `successful`
+
+### Notes
+
+None
