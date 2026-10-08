@@ -918,7 +918,8 @@ img { max-width: 100%; image-rendering: auto; }
 :root[data-theme="dark"] .notification-badge { border-color: #10140c; }
 :root[data-theme="dark"] .notifications-empty { color: #b7b59a; }
 :root[data-theme="dark"] .notifications-empty h3 { color: #f7f2d8; }
-.live-notification-toast { position: fixed; z-index: 140; bottom: 24px; left: 24px; display: grid; width: min(360px,calc(100vw - 48px)); grid-template-columns: 42px minmax(0,1fr) 30px; align-items: center; padding: 12px; border: 1px solid rgb(97 125 43 / .28); border-radius: 16px; background: rgb(255 253 240 / .97); box-shadow: 0 18px 48px rgb(28 36 16 / .24); color: #39431c; gap: 11px; animation: live-notification-in 260ms ease-out both; backdrop-filter: blur(16px); }
+.live-notification-stack { position: fixed; z-index: 140; bottom: 24px; left: 24px; display: flex; width: min(360px,calc(100vw - 48px)); max-height: calc(100svh - 48px); flex-direction: column; justify-content: flex-end; gap: 9px; pointer-events: none; }
+.live-notification-toast { display: grid; width: 100%; grid-template-columns: 42px minmax(0,1fr) 30px; align-items: center; padding: 12px; border: 1px solid rgb(97 125 43 / .28); border-radius: 16px; background: rgb(255 253 240 / .97); box-shadow: 0 18px 48px rgb(28 36 16 / .24); color: #39431c; gap: 11px; animation: live-notification-in 260ms ease-out both; pointer-events: auto; backdrop-filter: blur(16px); }
 .live-notification-content { min-width: 0; color: inherit; line-height: 1.35; text-decoration: none; }
 .live-notification-content b { display: block; overflow: hidden; margin-top: 3px; color: #617d2b; text-overflow: ellipsis; white-space: nowrap; }
 .live-notification-toast > button { display: grid; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; place-items: center; background: transparent; color: #747a58; cursor: pointer; }
@@ -927,7 +928,7 @@ img { max-width: 100%; image-rendering: auto; }
 :root[data-theme="dark"] .live-notification-toast > button { color: #b7b59a; }
 @keyframes live-notification-in { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 720px) { .account-discovery-panel,[dir="rtl"] .account-discovery-panel { top: auto; right: 10px; bottom: calc(68px + env(safe-area-inset-bottom)); left: 10px; width: auto; max-height: min(72vh,620px); padding: 18px 14px; border: 1px solid rgb(57 67 28 / .18); border-radius: 18px; box-shadow: 0 -12px 38px rgb(28 36 16 / .2); } .account-discovery-panel.sidebar-panel-enter,[dir="rtl"] .account-discovery-panel.sidebar-panel-enter { animation-name: sidebar-panel-in-mobile; } .account-discovery-backdrop { bottom: calc(64px + env(safe-area-inset-bottom)); } .notifications-panel { min-height: min(52vh,420px); } }
-@media (max-width: 720px) { .live-notification-toast { right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); left: 12px; width: auto; } }
+@media (max-width: 720px) { .live-notification-stack { right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); left: 12px; width: auto; max-height: calc(100svh - 100px - env(safe-area-inset-bottom)); } }
 @media (prefers-reduced-motion: reduce) { .live-notification-toast { animation: none; } }
 @keyframes sidebar-panel-in-mobile { from { opacity: 0; transform: translateY(24px) scale(.985); } }
 @media (prefers-reduced-motion: reduce) { .account-discovery-backdrop.sidebar-panel-enter,.account-discovery-panel.sidebar-panel-enter { animation-duration: 1ms; } }
