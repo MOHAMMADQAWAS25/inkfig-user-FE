@@ -6698,3 +6698,64 @@ No migration required.
 ### Notes
 
 Only the frontend presentation changed; notification persistence and delivery semantics remain unchanged.
+
+## 2026-10-09 - Shorten live notification duration
+
+### Request
+
+Make the bottom-left live notification disappear after one minute and clarify behavior when multiple notifications arrive together.
+
+### Changes
+
+- Reduced the live notification auto-dismiss timeout from 120 seconds to 60 seconds.
+- Preserved the existing newest-notification behavior: a newer event replaces the visible toast and restarts its timer.
+- Intentionally left notification persistence, panel history, WebSocket delivery, navigation, and styling unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: updates the live toast duration and its regression test.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: changes the live toast timeout to 60 seconds.
+- `tests/foundation.test.mjs`: verifies the one-minute timeout.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Existing authenticated notification-recipient scope is unchanged.
+- Authorization continues to be validated by the backend.
+
+### Frontend
+
+- The active live notification toast now disappears after one minute.
+- When multiple notifications arrive, the newest replaces the visible toast; all notifications remain available in the notification panel.
+
+### Verification
+
+- `[passed] npm test` — 55 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `35ab373`
+- Push: `successful`
+
+### Notes
+
+A stacked or queued toast presentation can be added later without changing stored notification history.
