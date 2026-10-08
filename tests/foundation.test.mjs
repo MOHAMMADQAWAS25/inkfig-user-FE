@@ -524,10 +524,10 @@ test("receives live notification invalidations over an authenticated websocket",
   assert.match(appSidebar, /Math\.min\(30000/);
 });
 
-test("shows live websocket notifications in a two-minute bottom-left toast", () => {
+test("shows live websocket notifications in a one-minute bottom-left toast", () => {
   assert.match(appSidebar, /refreshNotifications\(true\)/);
   assert.match(appSidebar, /setLiveNotification\(item\)/);
-  assert.match(appSidebar, /window\.setTimeout\([^]*120000/);
+  assert.match(appSidebar, /window\.setTimeout\([^]*60000/);
   assert.match(appSidebar, /className="live-notification-toast"/);
   assert.match(appSidebar, /role="status" aria-live="polite"/);
   assert.match(styles, /\.live-notification-toast[^}]*position: fixed[^}]*bottom: 24px[^}]*left: 24px/);
