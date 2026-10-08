@@ -523,6 +523,15 @@ test("receives live notification invalidations over an authenticated websocket",
   assert.match(appSidebar, /encodeURIComponent\(access\.ticket\)/);
   assert.match(appSidebar, /Math\.min\(30000/);
 });
+
+test("links like notifications to the exact work and keeps actor avatars linked to profiles", () => {
+  assert.match(notificationApi, /work_title:string\|null/);
+  assert.match(appSidebar, /className="notification-avatar" to=\{`\/\$\{language\}\/profile\/\$\{item\.actor_user_id\}`\}/);
+  assert.match(appSidebar, /`\/\$\{language\}\?work=\$\{item\.work_id\}`/);
+  assert.match(appSidebar, /notification-work-title/);
+  assert.match(homePage, /searchParams\.get\("work"\)/);
+  assert.match(worksApi, /GET",`\/works\/\$\{id\}`/);
+});
 test("closes the homepage profile menu when clicking outside it", () => {
   assert.match(homePage, /useRef<HTMLDetailsElement>\(null\)/);
   assert.match(homePage, /ref=\{profileMenuRef\}/);

@@ -1,6 +1,6 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
-export type NotificationItem={notification_id:string;event_type:"follow"|"like"|"save";actor_user_id:string;actor_name:string;actor_avatar_url:string|null;work_id:string|null;created_at:string;read:boolean};
+export type NotificationItem={notification_id:string;event_type:"follow"|"like"|"save";actor_user_id:string;actor_name:string;actor_avatar_url:string|null;work_id:string|null;work_title:string|null;created_at:string;read:boolean};
 export type NotificationFeed={items:NotificationItem[];unread_count:number};
 export type WebSocketTicket={ticket:string;websocket_url:string;expires_in:number};
 

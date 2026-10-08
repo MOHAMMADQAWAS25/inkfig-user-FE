@@ -1,5 +1,5 @@
 import { Bookmark, Heart, LogOut, Search, UserRound } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
@@ -7,7 +7,7 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
-import { deleteWorkAsModerator, getWorks, searchWorks, setWorkLike, setWorkSave } from "../works/worksApi";
+import { deleteWorkAsModerator, getWork, getWorks, searchWorks, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
@@ -32,6 +32,7 @@ const workCategories = [
 export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
+  const [searchParams,setSearchParams]=useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
@@ -44,10 +45,11 @@ export function HomePage() {
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
   const [nextCursor,setNextCursor]=useState<string|number|null>(null); const [loadingMore,setLoadingMore]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
+  const [deepLinkedWork,setDeepLinkedWork]=useState<Work|null>(null);
   const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const searchRef=useRef<HTMLFormElement>(null);
   const [profileAvatar,setProfileAvatar]=useState<string|null>(null);
-  const selectedWork=works.find(work=>work.work_id===selectedWorkId)??null;
+  const selectedWork=works.find(work=>work.work_id===selectedWorkId)??(deepLinkedWork?.work_id===selectedWorkId?deepLinkedWork:null);
   const normalizedSearch=submittedSearch.trim();
   function artworkQuery(value:string, account:ProfileSearchResult|null){return account?value.replace(`@${account.full_name}`," ").replace(/\s+/g," ").trim():value.trim();}
   const normalizedArtworkSearch=artworkQuery(normalizedSearch,submittedAccount);
@@ -63,6 +65,7 @@ export function HomePage() {
   useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target))setMentionQuery(null);}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
+  useEffect(()=>{const workId=searchParams.get("work");if(!workId)return;const loaded=works.find(work=>work.work_id===workId);if(loaded){setSelectedWorkId(workId);setDeepLinkedWork(null);return;}let active=true;getWork(workId).then(work=>{if(active){setDeepLinkedWork(work);setSelectedWorkId(work.work_id)}}).catch(()=>{if(active){const next=new URLSearchParams(searchParams);next.delete("work");setSearchParams(next,{replace:true})}});return()=>{active=false};},[searchParams,works,setSearchParams]);
   function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}setSubmittedSearch(searchQuery.trim());setSubmittedAccount(selectedAccount);setMentionQuery(null);}
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
@@ -101,7 +104,7 @@ export function HomePage() {
         </div>{nextCursor!==null&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{feedError&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</>}
       </section>
 
-      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={()=>setSelectedWorkId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
+      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={()=>{setSelectedWorkId(null);setDeepLinkedWork(null);const next=new URLSearchParams(searchParams);next.delete("work");setSearchParams(next,{replace:true});}} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
     </main>

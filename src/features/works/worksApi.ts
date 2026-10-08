@@ -33,6 +33,7 @@ export async function getWorks(typeCode?: string, cursor?: string, ownerUserId?:
   const suffix=query.size?`?${query.toString()}`:"";
   return (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works${suffix}`)).data;
 }
+export async function getWork(id:string):Promise<Work>{return (await requestJson<Work>(mainApiBaseUrl,"GET",`/works/${id}`)).data;}
 export async function searchWorks(queryText: string, typeCode?: string, cursor?: number, ownerUserId?: string): Promise<WorkPage> {
   const query = new URLSearchParams({ query: queryText });
   if (typeCode) query.set("type_code", typeCode);
