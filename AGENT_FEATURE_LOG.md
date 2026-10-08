@@ -6631,3 +6631,70 @@ No migration required.
 ### Notes
 
 The artwork URL is shareable and does not depend on the artwork being present in the first feed page.
+
+## 2026-10-09 - Show live notification toast
+
+### Request
+
+Display a small notification rectangle at the physical bottom-left when an online user receives a WebSocket notification, and hide it after two minutes.
+
+### Changes
+
+- Added a compact live notification toast triggered only by WebSocket notification invalidations.
+- Shows the actor avatar, action, and related artwork title when available.
+- Automatically dismisses the toast after 120 seconds; a newer notification replaces it and restarts the timer.
+- Added manual dismissal and preserved profile/artwork navigation from the toast.
+- Intentionally left the existing notification panel, database persistence, read state, backend APIs, and WebSocket protocol unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adds the live notification toast UI and behavior.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: detects newly fetched live notifications and manages toast state and timeout.
+- `src/styles.css`: adds responsive bottom-left toast styling, animation, dark theme, and reduced-motion behavior.
+- `tests/foundation.test.mjs`: verifies live-only triggering, placement, accessibility, and two-minute duration.
+
+### API
+
+No API changes. The frontend continues consuming the existing notification feed and WebSocket invalidation event.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Only authenticated users with an active WebSocket connection can receive the live toast.
+- Notification feed scope remains restricted to the authenticated recipient and is validated by the backend.
+- Existing artwork and profile permissions remain unchanged.
+
+### Frontend
+
+- Adds an accessible `aria-live` toast at the physical bottom-left on desktop.
+- Places the toast above mobile navigation on small screens.
+- Supports light/dark themes, RTL/LTR layouts, manual close, reduced motion, profile navigation, and artwork deep links.
+- Existing notifications loaded on initial page entry do not trigger a toast.
+
+### Verification
+
+- `[passed] npm test` — 55 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE`.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `73757ab`
+- Push: `successful`
+
+### Notes
+
+Only the frontend presentation changed; notification persistence and delivery semantics remain unchanged.
