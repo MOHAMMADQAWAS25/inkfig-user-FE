@@ -1,6 +1,7 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
 export const PROFILE_AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+export const PROFILE_AVATAR_SOURCE_MAX_BYTES = 20 * 1024 * 1024;
 export const PROFILE_AVATAR_ACCEPT = "image/jpeg,image/png,image/webp";
 
 export type AvatarUpload = { object_path:string; upload_url:string; upload_token:string };
@@ -18,6 +19,10 @@ export async function uploadProfileAvatar(file:File):Promise<string>{
   const upload=(await requestJson<AvatarUpload>(userApiBaseUrl,"POST","/profiles/avatar-uploads",{body:{file_name:file.name,mime_type:file.type,file_size:file.size}})).data;
   await putAvatarFile(upload,file);
   return (await requestJson<{avatar_url:string}>(userApiBaseUrl,"POST","/profiles/avatar-uploads/complete",{body:{object_path:upload.object_path}})).data.avatar_url;
+}
+
+export function isValidProfileAvatarSource(file:File):boolean{
+  return PROFILE_AVATAR_ACCEPT.split(",").includes(file.type) && file.size > 0 && file.size <= PROFILE_AVATAR_SOURCE_MAX_BYTES;
 }
 
 export async function removeProfileAvatar():Promise<void>{

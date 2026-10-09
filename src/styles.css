@@ -1257,6 +1257,25 @@ img { max-width: 100%; image-rendering: auto; }
 .profile-avatar-actions button:disabled { opacity: .58; cursor: wait; }
 .profile-avatar.editable:hover .profile-avatar-actions,.profile-avatar-actions:focus-within { opacity: 1; }
 .profile-intro .profile-avatar-error { margin: 8px 0 0; color: #982824; font-size: .82rem; font-weight: 700; letter-spacing: normal; text-transform: none; }
+.profile-crop-backdrop { position: fixed; z-index: 160; inset: 0; display: grid; overflow-y: auto; padding: 24px; place-items: center; background: rgb(12 15 8 / .76); backdrop-filter: blur(9px); }
+.profile-crop-dialog { display: grid; width: min(560px,100%); max-height: calc(100svh - 48px); overflow-y: auto; padding: 22px; border: 1px solid rgb(97 125 43 / .25); border-radius: 22px; background: #fffdf0; box-shadow: 0 30px 90px rgb(0 0 0 / .38); color: #39431c; gap: 16px; }
+.profile-crop-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.profile-crop-dialog h2 { margin: 0; font-size: clamp(1.25rem,4vw,1.65rem); }
+.profile-crop-dialog header button { display: grid; width: 36px; height: 36px; border: 0; border-radius: 50%; place-items: center; background: rgb(57 67 28 / .08); color: inherit; cursor: pointer; }
+.profile-crop-viewport { position: relative; width: min(360px,calc(100vw - 92px)); aspect-ratio: 1; overflow: hidden; justify-self: center; border-radius: 16px; background: #171d11; cursor: grab; touch-action: none; user-select: none; }
+.profile-crop-viewport:active { cursor: grabbing; }
+.profile-crop-viewport > img { position: absolute; top: 50%; left: 50%; max-width: none; object-fit: cover; pointer-events: none; }
+.profile-crop-mask { position: absolute; top: 50%; left: 50%; width: 76%; aspect-ratio: 1; border: 2px solid rgb(255 253 240 / .94); border-radius: 50%; box-shadow: 0 0 0 999px rgb(5 7 3 / .58),0 0 0 5px rgb(97 125 43 / .22); pointer-events: none; transform: translate(-50%,-50%); }
+.profile-crop-drag-hint { position: absolute; right: 50%; bottom: 12px; display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 999px; background: rgb(12 15 8 / .74); color: #fffdf0; font-size: .72rem; font-weight: 750; gap: 5px; pointer-events: none; transform: translateX(50%); white-space: nowrap; }
+.profile-crop-controls { display: grid; width: min(390px,100%); grid-template-columns: 22px minmax(0,1fr) 22px; align-items: center; justify-self: center; color: #617d2b; gap: 10px; }
+.profile-crop-controls label,.profile-crop-controls input { width: 100%; }
+.profile-crop-controls input { accent-color: #617d2b; cursor: pointer; }
+.profile-crop-dialog footer { display: flex; justify-content: flex-end; padding-top: 4px; gap: 10px; }
+.profile-crop-dialog footer button { min-width: 120px; min-height: 44px; padding: 9px 16px; border: 1px solid rgb(57 67 28 / .22); border-radius: 12px; background: transparent; color: inherit; font: inherit; font-weight: 850; cursor: pointer; }
+.profile-crop-dialog footer button.primary { border-color: #617d2b; background: #617d2b; color: #fff; }
+.profile-crop-dialog button:disabled { opacity: .58; cursor: wait; }
+:root[data-theme="dark"] .profile-crop-dialog { border-color: #465331; background: #171d11; color: #f7f2d8; }
+:root[data-theme="dark"] .profile-crop-dialog header button { background: rgb(255 253 240 / .08); }
 :root[data-theme="dark"] .profile-logout { border-color: rgb(230 134 125 / .3); background: rgb(152 40 36 / .16); color: #efaaa1; }
 .profile-social-stats strong { font-size: 1.4rem; }
 .profile-social-stats span { font-size: .9rem; }
@@ -1310,4 +1329,9 @@ img { max-width: 100%; image-rendering: auto; }
   .work-edit-link input:first-child { grid-column: 1 / -1; }
   .profile-avatar-actions { justify-content: flex-end; padding: 8px; background: linear-gradient(transparent 22%,rgb(18 24 11 / .84)); opacity: 1; }
   .profile-avatar-actions button { min-height: 31px; font-size: .62rem; }
+  .profile-crop-backdrop { padding: 10px; place-items: center; }
+  .profile-crop-dialog { max-height: calc(100svh - 20px); padding: 16px; border-radius: 18px; gap: 13px; }
+  .profile-crop-viewport { width: min(360px,calc(100vw - 52px)); }
+  .profile-crop-dialog footer { display: grid; grid-template-columns: 1fr 1fr; }
+  .profile-crop-dialog footer button { min-width: 0; }
 }

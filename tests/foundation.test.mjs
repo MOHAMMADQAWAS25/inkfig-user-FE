@@ -31,6 +31,7 @@ const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.ts
 const profileApi = readFileSync(new URL("../src/features/profile/profileApi.ts", import.meta.url), "utf8");
 const appSidebar = readFileSync(new URL("../src/features/navigation/AppSidebar.tsx", import.meta.url), "utf8");
 const profileAvatarUpload = readFileSync(new URL("../src/features/profile/profileAvatarUpload.ts", import.meta.url), "utf8");
+const profileAvatarCropDialog = readFileSync(new URL("../src/features/profile/ProfileAvatarCropDialog.tsx", import.meta.url), "utf8");
 const placeholderPage = readFileSync(new URL("../src/features/navigation/FeaturePlaceholderPage.tsx", import.meta.url), "utf8");
 const settingsPage = readFileSync(new URL("../src/features/settings/SettingsPage.tsx", import.meta.url), "utf8");
 const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.ts", import.meta.url), "utf8");
@@ -614,6 +615,21 @@ test("provides a compact account menu and editable profile avatar", () => {
   assert.match(styles, /\.app-sidebar-logo img \{ width: 52px; height: 52px/);
   assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
   for (const key of ["changePicture", "pictureError"]) {
+    assert.equal([...resources.matchAll(new RegExp(`"profile\\.${key}"`, "g"))].length, 2);
+  }
+});
+
+test("crops profile pictures with drag and zoom before uploading", () => {
+  assert.match(profilePage, /<ProfileAvatarCropDialog/);
+  assert.match(profilePage, /isValidProfileAvatarSource/);
+  assert.match(profileAvatarUpload, /PROFILE_AVATAR_SOURCE_MAX_BYTES = 20 \* 1024 \* 1024/);
+  assert.match(profileAvatarCropDialog, /onPointerMove=\{pointerMove\}/);
+  assert.match(profileAvatarCropDialog, /type="range" min="1" max="3"/);
+  assert.match(profileAvatarCropDialog, /canvas\.width=512/);
+  assert.match(profileAvatarCropDialog, /"image\/jpeg",\.9/);
+  assert.match(profileAvatarCropDialog, /frameSize=cropSize\*\.76/);
+  assert.match(styles, /\.profile-crop-mask[^}]*border-radius: 50%/);
+  for (const key of ["cropTitle", "cropDrag", "cropZoom", "cropCancel", "cropSave", "cropSaving", "cropSourceError", "pictureUploadError"]) {
     assert.equal([...resources.matchAll(new RegExp(`"profile\\.${key}"`, "g"))].length, 2);
   }
 });
