@@ -6898,3 +6898,76 @@ No migration required.
 ### Notes
 
 The UI returns immediately to the same no-picture initials state used by accounts that never uploaded an avatar.
+
+## 2026-10-09 - Crop profile pictures before upload
+
+### Request
+
+After selecting a profile picture, let the user choose the visible area through a circular crop frame with drag and zoom controls before saving.
+
+### Changes
+
+- Added an accessible modal crop workflow after profile-image selection.
+- Supports pointer/touch dragging, 1×–3× zoom, Escape/cancel behavior, and responsive sizing.
+- The circular frame exactly represents the portion used by the final circular avatar.
+- Exports a 512×512 JPEG at 90 percent quality and uploads only the cropped result.
+- Accepts JPEG, PNG, or WebP source images up to 20 MB while keeping the final backend upload within 2 MB.
+- Added dedicated validation and upload error states.
+- Intentionally left signup avatar upload, profile-picture removal controls, and backend image validation unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adds native client-side cropping and localized UI.
+- `inkfig-user-system`: guarantees removed avatar objects are deleted before the database reference is cleared.
+
+### Files
+
+- `src/features/profile/ProfileAvatarCropDialog.tsx`: implements crop positioning, zoom, canvas export, and modal controls.
+- `src/features/profile/ProfilePage.tsx`: opens the crop dialog and uploads the cropped file.
+- `src/features/profile/profileAvatarUpload.ts`: validates larger local source images separately from final upload limits.
+- `src/i18n/resources.ts`: adds English and Arabic crop labels and errors.
+- `src/styles.css`: adds responsive crop-frame, modal, mask, controls, and dark-theme styling.
+- `tests/foundation.test.mjs`: verifies crop, zoom, output, localization, and styling contracts.
+
+### API
+
+No API changes. The cropped file uses the existing avatar upload preparation and completion endpoints.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Crop and upload controls appear only on the authenticated user's own profile.
+- Existing `profile.read_own` backend permission and user-scoped object paths remain enforced.
+- Backend validation still restricts the final upload to JPEG, PNG, or WebP and at most 2 MB.
+
+### Frontend
+
+- Selecting a valid image opens a centered crop dialog instead of uploading immediately.
+- Users drag the image behind a fixed circular frame and adjust zoom from 1× to 3×.
+- Save generates and uploads a 512×512 JPEG; Cancel leaves the current avatar unchanged.
+- Supports mouse, touch, mobile sizing, keyboard Escape, English/Arabic, RTL/LTR, light/dark themes, busy states, and errors.
+
+### Verification
+
+- `[passed] npm test` — 56 passed
+- `[passed] npm run build`
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` after `inkfig-user-system`.
+- No migrations are required before deployment.
+- No environment-variable or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `befd627`
+- Push: `successful`
+
+### Notes
+
+The cropper uses native browser canvas and pointer events, so no additional UI or image-processing dependency was introduced.
