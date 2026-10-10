@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import type { AuthSession } from "../../shared/types";
 import { logoutUser } from "./authenticationApi";
@@ -14,26 +15,29 @@ const SESSION_KEY = "inkfig.auth-session";
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSessionState] = useState<AuthSession | null>(loadSession);
   useEffect(() => {
-    const expire = () => { localStorage.removeItem(SESSION_KEY); setSessionState(null); };
+    const expire = () => { queryClient.clear(); localStorage.removeItem(SESSION_KEY); setSessionState(null); };
     window.addEventListener("inkfig:auth-expired", expire);
     return () => window.removeEventListener("inkfig:auth-expired", expire);
-  }, []);
+  }, [queryClient]);
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
       setSession: (nextSession) => {
+        queryClient.clear();
         localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
         setSessionState(nextSession);
       },
       signOut: () => {
+        queryClient.clear();
         void logoutUser().catch(() => undefined);
         localStorage.removeItem(SESSION_KEY);
         setSessionState(null);
       },
     }),
-    [session],
+    [session, queryClient],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

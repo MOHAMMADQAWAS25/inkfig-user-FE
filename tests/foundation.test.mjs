@@ -24,6 +24,11 @@ const resources = readFileSync(new URL("../src/i18n/resources.ts", import.meta.u
 const i18nProvider = readFileSync(new URL("../src/i18n/I18nProvider.tsx", import.meta.url), "utf8");
 const languageToggle = readFileSync(new URL("../src/i18n/LanguageToggle.tsx", import.meta.url), "utf8");
 const homePage = readFileSync(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
+const feed = readFileSync(new URL("../src/features/feed/Feed.tsx", import.meta.url), "utf8");
+const postCard = readFileSync(new URL("../src/features/feed/PostCard.tsx", import.meta.url), "utf8");
+const feedQuery = readFileSync(new URL("../src/features/feed/useInfiniteFeed.ts", import.meta.url), "utf8");
+const feedSentinel = readFileSync(new URL("../src/features/feed/useFeedSentinel.ts", import.meta.url), "utf8");
+const feedLayout = readFileSync(new URL("../src/features/feed/feedLayout.ts", import.meta.url), "utf8");
 const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDetailModal.tsx", import.meta.url), "utf8");
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
@@ -258,7 +263,8 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(router, /path="\/:language" element=\{<HomePage \/>\}/);
   assert.match(router, /Navigate replace to="\/en"/);
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
-  assert.match(homePage, /className="artwork-stable-masonry"/);
+  assert.match(homePage, /<Feed key=\{feed.cacheKey\}/);
+  assert.match(feed, /layout = "masonry"/);
   assert.doesNotMatch(appSidebar, /gallery-guest-avatar|gallery-profile-menu|app-sidebar-account/);
   assert.match(homePage, /className="gallery-header-actions"/);
   assert.match(homePage, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar"/);
@@ -272,10 +278,10 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(styles, /\.artwork-pin-media/);
   assert.match(styles, /\.artwork-pin-like/);
   assert.doesNotMatch(homePage, /<h3>\{work\.title\}<\/h3>/);
-  assert.match(homePage, /artwork-card-type-tag/);
+  assert.match(postCard, /artwork-card-type-tag/);
   assert.doesNotMatch(homePage, /artwork-pin-uploader/);
   assert.match(styles, /\.artwork-type-tag/);
-  assert.match(homePage, /workTypeTone\(work\)/);
+  assert.match(postCard, /workTypeTone\(work\)/);
   assert.match(styles, /artwork-type-tag--violet/);
   assert.match(styles, /artwork-type-tag--terracotta/);
   assert.match(styles, /artwork-type-tag--magenta/);
@@ -308,11 +314,11 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(uploadWorkPage, /works\.addLink/);
   assert.match(artworkDetailModal, /work\.links\.map/);
   assert.match(artworkDetailModal, /noopener noreferrer/);
-  assert.match(homePage, /getWorks/);
+  assert.match(feedQuery, /getFeed/);
   assert.match(homePage, /setWorkLike/);
   assert.match(homePage, /ArtworkDetailModal/);
   assert.match(homePage, /setSelectedWorkId/);
-  assert.match(homePage, /artwork-image-button/);
+  assert.match(postCard, /artwork-image-button/);
 });
 
 test("keeps authentication tokens in secure backend cookies and refreshes expired access", () => {
@@ -467,25 +473,25 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(homePage, /submittedAccount\?\.user_id/);
   assert.match(styles, /\.account-search-suggestions/);
   assert.match(homePage, /setSearchQuery/);
-  assert.match(homePage, /searchWorks\(normalizedArtworkSearch,typeCode,undefined,submittedAccount\?\.user_id\)/);
-  assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(""\)/);
+  assert.match(feedQuery, /searchWorks\(scope.search, scope.category/);
+  assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(searchParams.get\("q"\)/);
   assert.match(homePage, /onSubmit=\{submitSearch\}/);
   assert.match(homePage, /setSubmittedSearch\(searchQuery\.trim\(\)\)/);
   assert.match(homePage, /window\.setTimeout/);
-  assert.match(homePage, /masonryColumns\.map/);
+  assert.match(feedLayout, /heights.indexOf\(Math.min\(\.\.\.heights\)\)/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(worksApi, /search_rank\?: number \| null/);
   assert.match(worksApi, /similarity_score\?: number \| null/);
   assert.match(worksApi, /next_cursor: string \| number \| null/);
   assert.match(worksApi, /query\.set\("before", cursor\)/);
   assert.match(worksApi, /query\.set\("cursor", String\(cursor\)\)/);
-  assert.match(homePage, /async function loadMore/);
-  assert.match(homePage, /loadMoreSentinelRef/);
-  assert.match(homePage, /new IntersectionObserver/);
-  assert.match(homePage, /rootMargin:"300px 0px"/);
-  assert.match(homePage, /gallery-scroll-sentinel/);
-  assert.equal([...homePage.matchAll(/<button className="pagination-load-more"/g)].length, 1);
-  assert.match(homePage, /feedError&&<div className="pagination-error"[^]*pagination-load-more/);
+  assert.match(feedQuery, /query.fetchNextPage/);
+  assert.match(feed, /useFeedSentinel/);
+  assert.match(feedSentinel, /new IntersectionObserver/);
+  assert.match(feedSentinel, /rootMargin: "1200px 0px"/);
+  assert.match(feed, /gallery-scroll-sentinel/);
+  assert.match(feed, /onClick=\{retry\}/);
+  assert.match(feed, /error \? <div className="pagination-error"/);
   assert.match(profilePage, /type PageCursors = Record<Section,string\|null>/);
   assert.match(profilePage, /cursors\[section\]/);
   assert.match(profilePage, /pagination-load-more/);
@@ -506,15 +512,15 @@ test("builds a searchable icon-first homepage header", () => {
 });
 
 test("automatically loads the next gallery page near the scroll boundary", () => {
-  assert.match(homePage, /observer\.observe\(sentinel\)/);
-  assert.match(homePage, /entries\.some\(entry=>entry\.isIntersecting\)/);
-  assert.match(homePage, /nextCursor===null\|\|loadingMore\|\|feedError/);
-  assert.match(homePage, /return\(\)=>observer\.disconnect\(\)/);
+  assert.match(feedSentinel, /observer\.observe\(sentinel\)/);
+  assert.match(feedSentinel, /entries\.some\(entry => entry\.isIntersecting\)/);
+  assert.match(feed, /!loading && !loadingMore && !error && hasNextPage/);
+  assert.match(feedSentinel, /return \(\) => observer\.disconnect\(\)/);
   assert.match(styles, /\.gallery-scroll-sentinel \{[^}]*min-height: 64px/);
   assert.match(styles, /@keyframes gallery-scroll-spin/);
-    assert.match(homePage, /new ResizeObserver/);
-    assert.match(homePage, /getBoundingClientRect\(\)\.height/);
-    assert.match(homePage, /if\(heights\[index\]<heights\[shortest\]\)shortest=index/);
+    assert.match(feed, /new ResizeObserver/);
+    assert.match(feed, /translate3d/);
+    assert.match(feedLayout, /heights.indexOf\(Math.min\(\.\.\.heights\)\)/);
     assert.match(styles, /\.artwork-stable-masonry \{[^}]*display:flex[^}]*gap:/);
     assert.match(styles, /\.artwork-stable-column \{[^}]*flex-direction:column/);
 });
@@ -734,9 +740,9 @@ test("saves artworks for registered users and exposes a Saved profile tab", () =
   assert.match(worksApi, /setWorkSave/);
   assert.match(worksApi, /\/save/);
   assert.match(homePage, /hasPermission\(session\.permissions,"works\.save"\)/);
-  assert.match(homePage, /className=\{`artwork-pin-save/);
+  assert.match(postCard, /className=\{`artwork-pin-save/);
   assert.match(homePage, /work\.saved_by_me/);
-  assert.match(homePage, /<Bookmark/);
+  assert.match(postCard, /<Bookmark/);
   assert.match(profilePage, /getSavedWorks/);
   assert.match(profilePage, /profile\.saved/);
   assert.match(profilePage, /profile\.noSaved/);
@@ -763,14 +769,14 @@ test("keeps gallery cards minimal until hover and opens full details", () => {
   assert.match(styles, /\.artwork-pin-like \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-save\.saved \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-media, \.artwork-image-button \{ cursor: pointer/);
-  assert.match(homePage, /setSelectedWorkId\(work\.work_id\)/);
+  assert.match(homePage, /next.set\("work", work.work_id\)/);
   assert.match(styles, /html \{ scroll-behavior: smooth/);
   assert.match(resources, /"home\.searchPlaceholder": "Search"/);
 });
 
 test("reveals a localized category badge at the top left of artwork cards", () => {
-  assert.match(homePage, /artwork-card-type-tag artwork-type-tag--\$\{workTypeTone\(work\)\}/);
-  assert.match(homePage, /language === "ar" \? work\.type_name_ar : work\.type_name_en/);
+  assert.match(postCard, /artwork-card-type-tag artwork-type-tag--\$\{workTypeTone\(work\)\}/);
+  assert.match(postCard, /language === "ar" \? work\.type_name_ar : work\.type_name_en/);
   assert.match(profilePage, /artwork-card-type-tag artwork-type-tag--\$\{workTypeTone\(work\)\}/);
   assert.match(styles, /\.artwork-card-type-tag \{ inset: 12px auto auto 12px; opacity: 0;/);
   assert.match(styles, /\.artwork-pin-media:hover \.artwork-card-type-tag[^}]*opacity: 1;/);
@@ -792,7 +798,7 @@ test("provides public social profiles and follow controls", () => {
   assert.match(profilePage, /setProfileFollow/);
   assert.match(profilePage, /profile-account-list/);
   assert.match(profileApi, /\/profiles\/\$\{userId\}\/follow/);
-  assert.match(homePage, /artwork-artist-link/);
+  assert.match(postCard, /artwork-artist-link/);
   assert.match(styles, /\.profile-social-stats/);
   assert.match(styles, /\.profile-connections-dialog/);
 });

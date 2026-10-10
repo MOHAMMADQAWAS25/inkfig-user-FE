@@ -4,6 +4,9 @@ InkFig is a graduation project for Hebron University. It is a web platform where
 
 This repository contains the web frontend through which students, teachers, and other authorized users access InkFig.
 
+See [the infinite image feed guide](docs/infinite-feed.md) for masonry/list layout,
+lazy images, virtualization, tuning, and verification commands.
+
 ## Product vision
 
 InkFig is an art-focused community platform with some similarities to Pinterest, while remaining tailored to the university context. Each student has an account and a personal body of work. Students can upload and display different kinds of art, including digital artwork made with tools such as Photoshop, hand-created artwork, and other art forms.

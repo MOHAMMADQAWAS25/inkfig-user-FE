@@ -2,8 +2,21 @@ import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
+export type ImageMedia = { url: string; width: number; height: number; dominantColor: string; sizes: { w: number; url: string }[] };
 export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
-export type WorkPage = { items: Work[]; next_cursor: string | number | null };
+export type FeedWork = Work & { media?: ImageMedia | null };
+export type WorkPage = { items: FeedWork[]; next_cursor: string | number | null };
+export type InfiniteFeedPage = { items: FeedWork[]; nextCursor: string | number | null; hasNextPage: boolean };
+
+export async function getFeed(typeCode?: string, cursor?: string, ownerUserId?: string, signal?: AbortSignal): Promise<InfiniteFeedPage> {
+  const query = new URLSearchParams({ limit: "20" });
+  if (typeCode) query.set("type_code", typeCode);
+  if (cursor) query.set("cursor", cursor);
+  if (ownerUserId) query.set("owner_user_id", ownerUserId);
+  const page = (await requestJson<InfiniteFeedPage>(mainApiBaseUrl, "GET", `/feed?${query}`, { signal })).data;
+  // Details are deliberately fetched only when opening a card.
+  return { ...page, items: page.items.map(item => ({ ...item, description: "", links: [] })) };
+}
 export const MAX_WORK_FILE_SIZE = 10 * 1024 * 1024;
 export const WORK_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -33,13 +46,13 @@ export async function getWorks(typeCode?: string, cursor?: string, ownerUserId?:
   const suffix=query.size?`?${query.toString()}`:"";
   return (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works${suffix}`)).data;
 }
-export async function getWork(id:string):Promise<Work>{return (await requestJson<Work>(mainApiBaseUrl,"GET",`/works/${id}`)).data;}
-export async function searchWorks(queryText: string, typeCode?: string, cursor?: number, ownerUserId?: string): Promise<WorkPage> {
+export async function getWork(id:string, signal?:AbortSignal):Promise<FeedWork>{return (await requestJson<FeedWork>(mainApiBaseUrl,"GET",`/works/${id}`,{signal})).data;}
+export async function searchWorks(queryText: string, typeCode?: string, cursor?: number, ownerUserId?: string, signal?:AbortSignal): Promise<WorkPage> {
   const query = new URLSearchParams({ query: queryText });
   if (typeCode) query.set("type_code", typeCode);
   if (cursor !== undefined) query.set("cursor", String(cursor));
   if (ownerUserId) query.set("owner_user_id", ownerUserId);
-  const page = (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`)).data;
+  const page = (await requestJson<WorkPage>(mainApiBaseUrl, "GET", `/works/search?${query.toString()}`, {signal})).data;
   return {...page,items:[...page.items].sort((left, right) => (left.search_rank ?? Number.MAX_SAFE_INTEGER) - (right.search_rank ?? Number.MAX_SAFE_INTEGER))};
 }
 function cursorSuffix(cursor?:string){return cursor?`?before=${encodeURIComponent(cursor)}`:"";}

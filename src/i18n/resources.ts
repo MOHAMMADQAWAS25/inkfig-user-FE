@@ -1,6 +1,10 @@
 export type Language = "ar" | "en";
 
 const en = {
+  "feed.retry": "Retry",
+  "feed.end": "You're all caught up",
+  "feed.loaded": "artworks loaded",
+  "feed.imageFailed": "Image unavailable",
   "app.name": "InkFig",
   "app.tagline": "Hebron University art community",
   "auth.email": "Email",
@@ -366,6 +370,10 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
+  "feed.retry": "إعادة المحاولة",
+  "feed.end": "لقد شاهدت جميع الأعمال",
+  "feed.loaded": "عمل فني تم تحميله",
+  "feed.imageFailed": "الصورة غير متاحة",
   "app.name": "InkFig",
   "app.tagline": "مجتمع الفنون في جامعة الخليل",
   "auth.email": "البريد الإلكتروني",

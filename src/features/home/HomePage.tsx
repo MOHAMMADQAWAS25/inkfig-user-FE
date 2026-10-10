@@ -1,15 +1,17 @@
-import { Bookmark, Heart, LogOut, Search, UserRound } from "lucide-react";
+import { LogOut, Search, UserRound } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
-import { deleteWorkAsModerator, getWork, getWorks, searchWorks, setWorkLike, setWorkSave } from "../works/worksApi";
+import { deleteWorkAsModerator, getWork, setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
-import { workTypeTone } from "../works/workTypePresentation";
+import { useInfiniteFeed } from "../feed/useInfiniteFeed";
+import { Feed } from "../feed/Feed";
+import { PostCard } from "../feed/PostCard";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -29,73 +31,112 @@ const workCategories = [
   { code: "vr-ar", label: "home.filter.vrAr" },
 ] as const;
 
-function distributeWorks(workIds:string[],columnCount:number){const columns=Array.from({length:columnCount},()=>[] as string[]);workIds.forEach((workId,index)=>columns[index%columnCount].push(workId));return columns;}
 
 export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const [searchParams,setSearchParams]=useSearchParams();
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [submittedSearch, setSubmittedSearch] = useState("");
-  const [selectedAccount,setSelectedAccount]=useState<ProfileSearchResult|null>(null);
-  const [submittedAccount,setSubmittedAccount]=useState<ProfileSearchResult|null>(null);
+  const [activeCategory, setActiveCategory] = useState(searchParams.get("category") ?? "all");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
+  const [submittedSearch, setSubmittedSearch] = useState(searchParams.get("q") ?? "");
+  const initialAccount = searchParams.get("artist") ? {user_id:searchParams.get("artist")!,full_name:searchParams.get("artistName") ?? "",avatar_url:null} as ProfileSearchResult : null;
+  const [selectedAccount,setSelectedAccount]=useState<ProfileSearchResult|null>(initialAccount);
+  const [submittedAccount,setSubmittedAccount]=useState<ProfileSearchResult|null>(initialAccount);
   const [accountSuggestions,setAccountSuggestions]=useState<ProfileSearchResult[]>([]);
   const [accountSearchLoading,setAccountSearchLoading]=useState(false);
   const [activeSuggestion,setActiveSuggestion]=useState(0);
   const [mentionQuery,setMentionQuery]=useState<string|null>(null);
-  const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
-  const [masonryColumnCount,setMasonryColumnCount]=useState(1);
-  const [masonryColumns,setMasonryColumns]=useState<string[][]>([[]]);
-  const [nextCursor,setNextCursor]=useState<string|number|null>(null); const [loadingMore,setLoadingMore]=useState(false);
+  const [detailError,setDetailError]=useState(false);
+  const [detailLoading,setDetailLoading]=useState(false);
+  const [detailAttempt,setDetailAttempt]=useState(0);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
   const [deepLinkedWork,setDeepLinkedWork]=useState<Work|null>(null);
   const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const searchRef=useRef<HTMLFormElement>(null);
-  const loadMoreSentinelRef=useRef<HTMLDivElement>(null);
-  const masonryRef=useRef<HTMLDivElement>(null);
-  const masonryColumnRefs=useRef<Array<HTMLDivElement|null>>([]);
-  const columnCountRef=useRef(1);
-  const worksRef=useRef(works);
-  const feedGenerationRef=useRef(0);
-  const paginationPendingRef=useRef(false);
-  useLayoutEffect(()=>{worksRef.current=works;},[works]);
+  const interactionRequests=useRef(new Set<string>());
   const [profileAvatar,setProfileAvatar]=useState<string|null>(null);
-  const selectedWork=works.find(work=>work.work_id===selectedWorkId)??(deepLinkedWork?.work_id===selectedWorkId?deepLinkedWork:null);
   const normalizedSearch=submittedSearch.trim();
   function artworkQuery(value:string, account:ProfileSearchResult|null){return account?value.replace(`@${account.full_name}`," ").replace(/\s+/g," ").trim():value.trim();}
   const normalizedArtworkSearch=artworkQuery(normalizedSearch,submittedAccount);
-  useEffect(()=>{
-    let active=true;
-    const generation=++feedGenerationRef.current;
-    paginationPendingRef.current=false;setLoadingMore(false);setNextCursor(null);
-    setLoading(true);setFeedError(false);
-    const typeCode=activeCategory === "all" ? undefined : activeCategory;
-    const request=normalizedArtworkSearch.length>=2?searchWorks(normalizedArtworkSearch,typeCode,undefined,submittedAccount?.user_id):getWorks(typeCode,undefined,submittedAccount?.user_id);
-    request.then(page=>{if(active){setWorks(page.items);setMasonryColumns(distributeWorks(page.items.map(work=>work.work_id),columnCountRef.current));setNextCursor(page.next_cursor)}}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
-    return()=>{active=false;if(feedGenerationRef.current===generation)feedGenerationRef.current+=1;};
-  },[activeCategory,normalizedArtworkSearch,submittedAccount,session]);
+  const feed = useInfiniteFeed({
+    category: activeCategory === "all" ? undefined : activeCategory,
+    search: normalizedArtworkSearch.length >= 2 ? normalizedArtworkSearch : undefined,
+    ownerId: submittedAccount?.user_id,
+    viewer: session ? `${session.userId}:${session.role}:${session.permissions.join(",")}` : "guest",
+  });
+  const { items: works, setItems: setWorks } = feed;
+  const loadedWork = works.find(work => work.work_id === selectedWorkId);
+  const selectedWork = deepLinkedWork?.work_id === selectedWorkId ? {
+    ...deepLinkedWork,
+    ...(loadedWork ? { like_count: loadedWork.like_count, liked_by_me: loadedWork.liked_by_me, saved_by_me: loadedWork.saved_by_me } : {}),
+  } : null;
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (activeCategory === "all") next.delete("category"); else next.set("category", activeCategory);
+    if (submittedSearch) next.set("q", submittedSearch); else next.delete("q");
+    if (submittedAccount) { next.set("artist", submittedAccount.user_id); next.set("artistName", submittedAccount.full_name); }
+    else { next.delete("artist"); next.delete("artistName"); }
+    if (next.toString() !== searchParams.toString()) setSearchParams(next, {replace:true});
+  }, [activeCategory, submittedSearch, submittedAccount, searchParams, setSearchParams]);
   useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
   useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target))setMentionQuery(null);}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
-  useEffect(()=>{const workId=searchParams.get("work");if(!workId)return;const loaded=works.find(work=>work.work_id===workId);if(loaded){setSelectedWorkId(workId);setDeepLinkedWork(null);return;}let active=true;getWork(workId).then(work=>{if(active){setDeepLinkedWork(work);setSelectedWorkId(work.work_id)}}).catch(()=>{if(active){const next=new URLSearchParams(searchParams);next.delete("work");setSearchParams(next,{replace:true})}});return()=>{active=false};},[searchParams,works,setSearchParams]);
-  useEffect(()=>{const sentinel=loadMoreSentinelRef.current;if(!sentinel||loading||nextCursor===null||loadingMore||feedError)return;const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting))void loadMore();},{rootMargin:"300px 0px"});observer.observe(sentinel);return()=>observer.disconnect();},[loading,nextCursor,loadingMore,feedError,activeCategory,normalizedArtworkSearch,submittedAccount,masonryColumnCount]);
-  // The gallery mounts after loading finishes; attach again whenever it returns.
-  useLayoutEffect(()=>{
-    const masonry=masonryRef.current;if(!masonry)return;
-    function measure(width:number){const minimum=width<700?155:220;const gap=Number.parseFloat(getComputedStyle(masonry!).columnGap)||18;const count=Math.max(1,Math.min(6,Math.floor((width+gap)/(minimum+gap))));if(count===columnCountRef.current)return;columnCountRef.current=count;setMasonryColumnCount(count);setMasonryColumns(distributeWorks(worksRef.current.map(work=>work.work_id),count));}
-    measure(masonry.getBoundingClientRect().width);
-    const observer=new ResizeObserver(([entry])=>measure(entry.contentRect.width));observer.observe(masonry);return()=>observer.disconnect();
-  },[loading,works.length>0]);
+  const detailWorkId = searchParams.get("work");
+  useEffect(() => {
+    setSelectedWorkId(detailWorkId);
+    setDeepLinkedWork(null); setDetailError(false);
+    if (!detailWorkId) { setDetailLoading(false); return; }
+    const controller = new AbortController();
+    setDetailLoading(true);
+    getWork(detailWorkId, controller.signal).then(work => { if (!controller.signal.aborted) setDeepLinkedWork(work); })
+      .catch(() => { if (!controller.signal.aborted) setDetailError(true); })
+      .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
+    return () => controller.abort();
+  }, [detailWorkId, detailAttempt, session?.userId]);
+  function openWork(work: Work) {
+    const next = new URLSearchParams(searchParams); next.set("work", work.work_id);
+    setSearchParams(next);
+  }
+  function closeWork() {
+    const id = selectedWorkId;
+    setSelectedWorkId(null); setDeepLinkedWork(null);
+    const next = new URLSearchParams(searchParams); next.delete("work"); setSearchParams(next, {replace:true});
+    requestAnimationFrame(() => {
+      document.querySelector<HTMLButtonElement>(`button[data-work-id="${CSS.escape(id ?? "")}"]`)?.focus({preventScroll:true});
+    });
+  }
   function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}setSubmittedSearch(searchQuery.trim());setSubmittedAccount(selectedAccount);setMentionQuery(null);}
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
   function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
-  async function loadMore(){if(loading||nextCursor===null||loadingMore||paginationPendingRef.current)return;const generation=feedGenerationRef.current;paginationPendingRef.current=true;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedArtworkSearch.length>=2?await searchWorks(normalizedArtworkSearch,typeCode,Number(nextCursor),submittedAccount?.user_id):await getWorks(typeCode,String(nextCursor),submittedAccount?.user_id);if(generation!==feedGenerationRef.current)return;const known=new Set(worksRef.current.map(work=>work.work_id));const nextItems=page.items.filter(work=>!known.has(work.work_id));setWorks(current=>[...current,...nextItems]);if(nextItems.length)setMasonryColumns(current=>{const columns=current.map(column=>[...column]);const heights=columns.map((_,index)=>masonryColumnRefs.current[index]?.getBoundingClientRect().height??0);const estimatedHeight=heights.reduce((sum,height)=>sum+height,0)/Math.max(worksRef.current.length,1)||320;for(const work of nextItems){let shortest=0;for(let index=1;index<heights.length;index+=1)if(heights[index]<heights[shortest])shortest=index;columns[shortest].push(work.work_id);heights[shortest]+=estimatedHeight;}return columns;});setNextCursor(page.next_cursor);}catch{if(generation===feedGenerationRef.current)setFeedError(true);}finally{if(generation===feedGenerationRef.current){paginationPendingRef.current=false;setLoadingMore(false)}}}
-  async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
-  async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
-  async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));setMasonryColumns(current=>current.map(column=>column.filter(workId=>workId!==work.work_id)));setSelectedWorkId(null);}
+  async function toggleLike(work:Work){
+    const key=`like:${work.work_id}`;
+    if(!session || !hasPermission(session.permissions,"works.like") || interactionRequests.current.has(key))return;
+    interactionRequests.current.add(key);
+    const next=!work.liked_by_me;
+    const patch={liked_by_me:next,like_count:work.like_count+(next?1:-1)};
+    setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,...patch}:item));
+    setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,...patch}:current);
+    try{await setWorkLike(work.work_id,next);}catch{
+      const previous={liked_by_me:work.liked_by_me,like_count:work.like_count};
+      setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,...previous}:item));
+      setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,...previous}:current);
+    }finally{interactionRequests.current.delete(key);}
+  }
+  async function toggleSave(work:Work){
+    const key=`save:${work.work_id}`;
+    if(!session || !hasPermission(session.permissions,"works.save") || interactionRequests.current.has(key))return;
+    interactionRequests.current.add(key);
+    const next=!work.saved_by_me;
+    setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item));
+    setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,saved_by_me:next}:current);
+    try{await setWorkSave(work.work_id,next);}catch{
+      setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:work.saved_by_me}:item));
+      setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,saved_by_me:work.saved_by_me}:current);
+    }finally{interactionRequests.current.delete(key);}
+  }
+  async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));closeWork();}
 
   return (
     <main className="gallery-home">
@@ -117,17 +158,15 @@ export function HomePage() {
             <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
           ))}
         </div>
-        {loading?<p className="gallery-state" aria-live="polite">{normalizedArtworkSearch.length>=2?t("home.searching"):t("works.loading")}</p>:feedError&&works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2?t("home.searchUnavailable"):t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2||submittedAccount?t("home.noSearchResults"):t("works.empty")}</p>:<><div className="artwork-stable-masonry" ref={masonryRef}>
-          {masonryColumns.map((column,columnIndex)=><div className="artwork-stable-column" ref={element=>{masonryColumnRefs.current[columnIndex]=element}} key={columnIndex}>
-          {column.map(workId=>{const work=works.find(item=>item.work_id===workId);return work?(
-            <article className="artwork-card" key={work.work_id}>
-              <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span><Link className="artwork-artist-link" to={session?`/${language}/profile/${work.owner_user_id}`:`/${language}/login`}><UserRound size={15}/>{work.artist_name}</Link><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
-            </article>
-          ):null})}
-        </div>)}</div>{nextCursor!==null&&<div className="gallery-scroll-sentinel" ref={loadMoreSentinelRef} aria-hidden={!loadingMore}>{loadingMore&&<span aria-live="polite">{t("works.loadingMore")}</span>}</div>}{feedError&&<div className="pagination-error" role="alert"><p>{t("works.loadFailed")}</p>{nextCursor!==null&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t("works.loadMore")}</button>}</div>}</>}
+        <Feed key={feed.cacheKey} cacheKey={feed.cacheKey} items={works} loading={feed.loading} loadingMore={feed.loadingMore}
+          error={feed.error} hasNextPage={feed.hasNextPage} loadMore={feed.loadMore} retry={feed.retry}
+          emptyMessage={normalizedArtworkSearch.length>=2||submittedAccount?t("home.noSearchResults"):t("works.empty")}
+          renderItem={(work,width,priority)=><PostCard work={work} width={width} priority={priority} onOpen={openWork} onLike={toggleLike} onSave={toggleSave}/>} />
+
       </section>
 
-      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canReport={Boolean(session&&session.userId!==selectedWork.owner_user_id&&hasPermission(session.permissions,"reports.create"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={()=>{setSelectedWorkId(null);setDeepLinkedWork(null);const next=new URLSearchParams(searchParams);next.delete("work");setSearchParams(next,{replace:true});}} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
+      {detailWorkId&&!selectedWork&&<div className="artwork-modal-backdrop"><section className="moderation-dialog" role="dialog" aria-modal="true" aria-label={t("works.viewDetails")}><p role="status">{t(detailLoading?"works.loading":"works.loadFailed")}</p>{detailError&&<button type="button" onClick={()=>setDetailAttempt(current=>current+1)}>{t("feed.retry")}</button>}<button type="button" onClick={closeWork}>{t("works.closeDetails")}</button></section></div>}
+      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canReport={Boolean(session&&session.userId!==selectedWork.owner_user_id&&hasPermission(session.permissions,"reports.create"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={closeWork} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
 
       <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
     </main>

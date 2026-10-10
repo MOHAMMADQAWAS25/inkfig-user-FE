@@ -7498,3 +7498,50 @@ Fix the oversized first artwork on page opening and the identified pagination re
 
 - Frontend deployment through the existing main-branch workflow; no backend deployment required.
 - Commit and synchronize with `git pull --rebase origin main` immediately before pushing main, under the user's standing workflow authorization.
+
+## 2026-10-11 - Complete lazy infinite image feed and virtual masonry
+
+### Request and repository scope
+
+Complete the remaining image-only feed stages while preserving masonry by default,
+natural image proportions, responsive layout, RTL, controls and Enter-only search.
+Frontend owns the reusable hook/layout/media/UI; main-system adds media metadata
+and variants. User-system is unchanged.
+
+### Changes and files
+
+- Added TanStack Query provider and `useInfiniteFeed` with cursor paging, ID deduplication, synchronous duplicate-request lock, cancellation, visible retry and scoped in-memory page caching.
+- Added `Feed`, `PostCard`, `LazyImage`, `FeedLayout` and `useFeedSentinel` under `src/features/feed`.
+- Default masonry computes image heights before loading, appends into the shortest column, uses stable translate3d positions, and keeps total scroll height while virtualizing off-screen cards. List mode is available via `layout="list"` (470px default maximum).
+- Container-responsive one/two/three-to-six columns; mobile normally uses two. ResizeObserver is debounced and preserves a visible anchor. Natural aspect ratios remain uncropped, including tall/wide images.
+- Sentinel prefetches 1200px ahead through IntersectionObserver; no pagination scroll listeners. Virtualization binary-searches ordered columns, buffers two screens and retains a focused card. Viewport monitoring pauses in hidden documents.
+- Lazy responsive images reserve dimensions, show dominant-color/error placeholders, prioritize the first visible pair, and respect reduced motion and Save-Data/2G.
+- Added skeleton/loading/empty/end/retry states, meaningful alt text, focus styles, feed semantics and polite announcements in English/Arabic.
+- Home uses `/feed`; details load separately. URL filters, cached pages and scroll memory preserve navigation back. Fixed a browser-discovered Strict Mode restoration issue.
+- Auth transitions clear personalized query caches. Existing permission-aware likes/saves remain, with per-artwork mutation locks and consistent detail updates.
+- Updated HomePage, works API types/AbortSignals, provider/auth integration, CSS, translations, README and `docs/infinite-feed.md`.
+- Added Vitest, jsdom and Testing Library as dev-only dependencies; TanStack Query is the only new runtime library, providing the requested cache/cancellation behavior.
+
+### API, database, permissions
+
+- Consumes main-system cursor endpoint and optional media metadata/variant URLs; no frontend database migration.
+- Requires main-system `20261011_012_add_work_media.sql` and media backfill before frontend deployment for accurate legacy proportions.
+- Backend remains authoritative for permissions/visibility; no role changes or frontend credential storage added.
+
+### Verification
+
+- 60 existing foundation tests and 17 new behavior tests passed; TypeScript and Vite production build passed.
+- Tests cover shortest-column placement, append stability, RTL/resize/list, 10,000-record bounded rendering, deduplication, concurrency, abort/stale responses, retry, cache, repeated cursors, sentinel cleanup, lazy responsive media, skeletons and Strict Mode restoration.
+- Real Playwright browser checks passed: desktop five columns at 1440px, two columns at 390px, no horizontal overflow, matching reserved image/card height, stable append positions, visible retry, full details, Enter-only search and Arabic RTL.
+- Browser back restored scrollY 2500 exactly without extra feed fetches. A hundreds-of-items scenario kept 65 cards rendered near the bottom; zero page errors.
+- Production dependency audit reported no vulnerabilities; git diff whitespace check passed.
+
+### Deployment and limitations
+
+Deploy main-system migration/backend/backfill first, then frontend through the
+existing main workflow. Profile galleries and ranked semantic search retain their
+existing pagination APIs; search is adapted without claiming keyset guarantees.
+No video pipeline is included. DOM bounds and geometry are tested; physical-phone
+60fps and field CLS budgets are not certified. Task verification artifacts remain
+local under ignored `output/playwright` and `.playwright-cli`. Commit separately,
+pull/rebase main immediately before pushing, and verify deployment.
