@@ -7573,3 +7573,29 @@ No API changes. No migration required. No permission, data-scope, environment or
 ### Deployment and Git
 
 Frontend deployment only through the existing main push workflow; no migration or backend deployment. Commit separately, pull/rebase origin main immediately before push, and verify deployment. Physical device/user-authenticated reproduction remains unverified.
+
+## 2026-10-11 - Tailor report reasons and require details for Other
+
+### Request and repository scope
+
+Remove Sexual content from report popups, separate user/post reasons, default user reports to Impersonation or fake account, and make additional details required for Other on both targets. Frontend owns UI; user-system owns matching validation; main-system is unchanged.
+
+### Changes and files
+
+- `src/features/reports/ReportDialog.tsx`: five account-specific reasons, distinct seven-reason post list, user impersonation default and existing post harassment default. User labels include fake account and spam/scam. No Sexual content option remains.
+- Conditionally required textarea with a required/optional label, 10-2000 length bounds, whitespace-normalized validation and localized errors. Nonempty optional details also retain the existing minimum. Switching away from Other makes details optional again; pending requests disable editing.
+- `src/i18n/resources.ts`: English/Arabic user labels and required-details/error copy. Historical reason translations/types remain for administrator records.
+- `tests/reports.test.tsx` and `tests/foundation.test.mjs`: verify reason sets/defaults, both Other flows, normalization, optional reset and Arabic labels.
+- `AGENT_FEATURE_LOG.md`: record this ticket.
+
+### API, database and permissions
+
+Uses existing POST /reports shape and reason codes; backend now rejects missing Other details and invalid target reasons. No migration required, no permission/data-scope/environment changes. Historical reports remain unchanged. Frontend code has no Lambda/SnapStart impact.
+
+### Verification
+
+61 foundation tests plus 23 component/feed behavior tests passed (84 total). Strict TypeScript checks and Vite production build passed. New component tests use mocked report submission; no production report was created. Initial new tests used the wrong translation export; corrected and rerun successfully. Git diff whitespace validation passed.
+
+### Deployment
+
+Deploy user-system first, then frontend via existing main workflows; main-system is unchanged. Read/sync all repositories before changes, append affected logs, commit independently and pull/rebase main immediately before each push. No new database constraint is added for Other; backend enforces that conditional rule for new submissions.

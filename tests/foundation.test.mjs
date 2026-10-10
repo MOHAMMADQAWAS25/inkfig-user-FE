@@ -57,7 +57,8 @@ test("uses the approved frontend dependencies", () => {
 });
 
 test("reports posts and users with localized reasons and duplicate protection", () => {
-  assert.match(reportDialog, /harassment.*hate_speech.*sexual_content.*violence.*spam.*copyright.*impersonation.*other/);
+  assert.match(reportDialog, /harassment.*hate_speech.*violence.*spam.*copyright.*impersonation.*other/);
+  assert.doesNotMatch(reportDialog, /sexual_content/);
   assert.match(reportsApi, /POST","\/reports"/);
   assert.match(homePage, /reports\.create/);
   assert.match(profilePage, /targetType="user"/);
