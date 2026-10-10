@@ -7278,3 +7278,37 @@ No migration required.
 ### Notes
 
 The frontend receives only an invalidation signal, then loads canonical report data from the permission-protected REST endpoint.
+
+## 2026-10-10 - Keep infinite-scroll batches below prior artwork
+
+### Request
+
+Ensure newly loaded homepage feed artwork appears below the final work from the previous batch instead of visually moving into the top of the gallery.
+
+### Changes
+
+- Preserved the existing cursor-based infinite-scroll requests and duplicate filtering.
+- Records each response as a stable visual batch while retaining the shared artwork state used by likes, saves, moderation, and detail views.
+- Renders each batch in its own responsive masonry container so CSS column balancing cannot move newly appended cards above earlier results.
+- Added regression coverage for batch appending, rendering, and spacing.
+
+### API, database, permissions, and SnapStart
+
+- Reuses the existing paginated works and search APIs without contract changes.
+- No migration, permission, secret, environment-variable, or backend change is required.
+- Browser-only code has no AWS Lambda SnapStart impact.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+
+### Git
+
+- Branch: `fix/gallery-batch-order`
+- Commit, rebase, merge, and push: completed after final synchronization.

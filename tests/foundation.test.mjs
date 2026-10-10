@@ -512,6 +512,9 @@ test("automatically loads the next gallery page near the scroll boundary", () =>
   assert.match(homePage, /return\(\)=>observer\.disconnect\(\)/);
   assert.match(styles, /\.gallery-scroll-sentinel \{[^}]*min-height: 64px/);
   assert.match(styles, /@keyframes gallery-scroll-spin/);
+    assert.match(homePage, /setWorkBatches\(current=>\[\.\.\.current,nextItems\.map/);
+    assert.match(homePage, /workBatches\.map\(\(batch,batchIndex\)=>/);
+    assert.match(styles, /\.artwork-batches \{[^}]*display:grid[^}]*gap:/);
 });
 test("opens a paginated live account search panel from the navigation rail", () => {
   assert.match(appSidebar, /app-sidebar-people-search/);
