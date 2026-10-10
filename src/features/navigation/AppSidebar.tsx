@@ -1,4 +1,4 @@
-import { Bell, Bookmark, House, Plus, Search, Settings, ShieldCheck, Trophy, X } from "lucide-react";
+import { Bell, Bookmark, Flag, House, Plus, Search, Settings, ShieldCheck, Trophy, X } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState, type SetStateAction } from "react";
 
@@ -39,6 +39,7 @@ export function AppSidebar() {
     { to: `/${language}/upload`, label: t("nav.upload"), icon: Plus },
   ];
   const showSystemAdministration=session?.role==="system_administrator"&&hasPermission(session.permissions,"users.read");
+  const showReportAdministration=Boolean(session&&hasPermission(session.permissions,"reports.manage"));
   const normalizedQuery=accountQuery.trim();
   function transitionPanel(kind:"accounts"|"notifications",value:SetStateAction<boolean>){const raw=kind==="accounts"?setAccountsOpenRaw:setNotificationsOpenRaw;raw(current=>{const next=typeof value==="function"?value(current):value;if(current&&!next){setClosingPanel(kind);window.setTimeout(()=>{raw(false);setClosingPanel(open=>open===kind?null:open);},260);return current;}return next;});}
   function setAccountsOpen(value:SetStateAction<boolean>){transitionPanel("accounts",value);}
@@ -65,6 +66,7 @@ export function AppSidebar() {
       {items.map(({to,label,icon:Icon,end})=><NavLink key={to} to={to} end={end} aria-label={label} data-tooltip={label}><Icon aria-hidden="true" size={24}/></NavLink>)}
       <button className={`app-sidebar-panel-button${notificationsOpen?" active":""}`} type="button" aria-label={t("nav.notifications")} data-tooltip={t("nav.notifications")} aria-expanded={notificationsOpen} aria-controls="notifications-panel" onClick={()=>{setAccountsOpen(false);setNotificationsOpen(open=>!open);}}><Bell aria-hidden="true" size={24}/>{unreadCount>0&&<span className="notification-badge">{unreadCount>99?"99+":unreadCount}</span>}</button>
       {showSystemAdministration&&<NavLink to={`/${language}/admin/users`} aria-label={t("nav.administration")} data-tooltip={t("nav.administration")}><ShieldCheck aria-hidden="true" size={24}/></NavLink>}
+      {showReportAdministration&&<NavLink to={`/${language}/admin/reports`} aria-label={t("nav.reports")} data-tooltip={t("nav.reports")}><Flag aria-hidden="true" size={24}/></NavLink>}
       <button className={`app-sidebar-people-search${accountsOpen?" active":""}`} type="button" aria-label={t("accounts.findUsers")} data-tooltip={t("accounts.findUsers")} aria-expanded={accountsOpen} aria-controls="account-discovery-panel" onClick={()=>{setNotificationsOpen(false);setAccountsOpen(open=>!open);}}><span aria-hidden="true"/></button>
       <Link className={savedActive?"active":""} to={`/${language}/profile?section=saved`} aria-label={t("nav.saved")} data-tooltip={t("nav.saved")}><Bookmark aria-hidden="true" size={24}/></Link>
     </nav>

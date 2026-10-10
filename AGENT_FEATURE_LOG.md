@@ -7177,3 +7177,40 @@ Ensure pagination is implemented throughout the project.
 
 - Branch: `feature/complete-list-pagination`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Post and user reporting experience
+
+### Request
+
+Let users report posts or accounts using standard reasons or their own explanation, and send those reports to administrators for review and action.
+
+### Changes
+
+- Added a responsive, theme-aware, bilingual reporting dialog with standard safety reasons, optional details, success feedback, and duplicate-report messaging.
+- Added report actions to eligible artwork details and other users' profile pages while preventing self-report controls.
+- Added a permission-gated reports icon and administrator queue with status filters and bounded continuation loading.
+- Administrators can mark reports reviewed, dismiss them, delete a reported post through the existing audited moderation API, or suspend a reported user through the existing account-management API.
+- Preserved links to the reported post/account and the report audit trail after an action.
+
+### API, permissions, and SnapStart
+
+- Consumes the new `/api/v1/reports` create, list, and review endpoints.
+- Uses `reports.create` and `reports.manage` UI gates; backend authorization remains authoritative.
+- Reuses existing `works.delete_any` and `users.status.manage` backend enforcement for destructive actions.
+- Browser-only code has no AWS Lambda SnapStart impact.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy the `inkfig-user-system` migration and API before `inkfig-user-FE`.
+- No frontend environment-variable change is required.
+
+### Git
+
+- Branch: `feature/content-reporting`
+- Commit, rebase, merge, and push: completed after final synchronization.

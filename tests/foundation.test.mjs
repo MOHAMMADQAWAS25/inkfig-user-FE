@@ -38,6 +38,9 @@ const settingsApi = readFileSync(new URL("../src/features/settings/settingsApi.t
 const adminUsersPage = readFileSync(new URL("../src/features/admin/AdminUsersPage.tsx", import.meta.url), "utf8");
 const administrationApi = readFileSync(new URL("../src/features/admin/administrationApi.ts", import.meta.url), "utf8");
 const notificationApi = readFileSync(new URL("../src/features/notifications/notificationApi.ts", import.meta.url), "utf8");
+const reportDialog = readFileSync(new URL("../src/features/reports/ReportDialog.tsx", import.meta.url), "utf8");
+const reportsApi = readFileSync(new URL("../src/features/reports/reportsApi.ts", import.meta.url), "utf8");
+const adminReportsPage = readFileSync(new URL("../src/features/admin/AdminReportsPage.tsx", import.meta.url), "utf8");
 
 test("uses the approved frontend dependencies", () => {
   assert.ok(packageJson.dependencies.react);
@@ -46,6 +49,25 @@ test("uses the approved frontend dependencies", () => {
   for (const forbidden of ["@mui/material", "bootstrap", "redux", "styled-components", "tailwindcss"]) {
     assert.equal(packageJson.dependencies[forbidden], undefined);
   }
+});
+
+test("reports posts and users with localized reasons and duplicate protection", () => {
+  assert.match(reportDialog, /harassment.*hate_speech.*sexual_content.*violence.*spam.*copyright.*impersonation.*other/);
+  assert.match(reportsApi, /POST","\/reports"/);
+  assert.match(homePage, /reports\.create/);
+  assert.match(profilePage, /targetType="user"/);
+  assert.match(resources, /"reports\.reportWork"/);
+  assert.match(resources, /"reports\.duplicate"/);
+});
+
+test("provides a permission-gated paginated administration report queue", () => {
+  assert.match(router, /admin\/reports/);
+  assert.match(appSidebar, /reports\.manage/);
+  assert.match(adminReportsPage, /getReports/);
+  assert.match(adminReportsPage, /reviewReport/);
+  assert.match(adminReportsPage, /deleteWorkAsModerator/);
+  assert.match(adminReportsPage, /setManagedUserStatus/);
+  assert.match(adminReportsPage, /cursor/);
 });
 
 test("provides a permission-driven system administrator workspace", () => {
