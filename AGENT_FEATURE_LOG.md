@@ -7463,3 +7463,38 @@ Fix the homepage collapsing to one column when the next artwork batch arrives.
 
 - Branch: `fix/pagination-masonry-columns`
 - Commit: recorded in Git history; branch and main pushed after synchronization under standing user authorization.
+
+## 2026-10-11 - Correct initial artwork sizing and stale pagination
+
+### Request
+
+Fix the oversized first artwork on page opening and the identified pagination response race.
+
+### Changes
+
+- Measure gallery width synchronously in a layout effect before the browser paints artwork, then observe subsequent resizing.
+- Use the measured column count for new feed responses and the actual CSS column gap when calculating responsive columns.
+- Keep current artwork references for resize callbacks and pagination deduplication.
+- Invalidate outstanding pagination when the search, category, account scope, or session changes, or the page unmounts.
+- Ignore obsolete pagination successes, failures, and completion callbacks; reset cursors and pagination state for each new feed.
+- Prevent duplicate simultaneous pagination requests with a synchronous request lock and avoid loading another page while the initial feed is loading.
+- Update an existing source assertion to recognize explicit masonry-column rendering.
+
+### Scope
+
+- Changed `inkfig-user-FE`: `src/features/home/HomePage.tsx`, `tests/foundation.test.mjs`, and this log.
+- Both backend repositories were synchronized and required no changes.
+- No API, database, migrations, permissions, secrets, configuration, or SnapStart changes.
+
+### Verification
+
+- Passed all 60 existing frontend tests, TypeScript checks, and Vite production build.
+- Passed deterministic Playwright browser checks using mocked artwork responses: first desktop frames at 1440x900 showed five columns and 244px cards within a 1300px gallery.
+- A deliberately delayed page response after switching category did not append old artwork or change the new collection.
+- Mobile resizing to 390x844 produced two columns without horizontal overflow; no browser page errors occurred in the scenario.
+- Passed `git diff --check`.
+
+### Deployment and Git
+
+- Frontend deployment through the existing main-branch workflow; no backend deployment required.
+- Commit and synchronize with `git pull --rebase origin main` immediately before pushing main, under the user's standing workflow authorization.

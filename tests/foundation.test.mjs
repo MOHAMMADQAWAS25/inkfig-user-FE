@@ -472,7 +472,7 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(homePage, /onSubmit=\{submitSearch\}/);
   assert.match(homePage, /setSubmittedSearch\(searchQuery\.trim\(\)\)/);
   assert.match(homePage, /window\.setTimeout/);
-  assert.match(homePage, /works\.map/);
+  assert.match(homePage, /masonryColumns\.map/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
   assert.match(worksApi, /search_rank\?: number \| null/);
   assert.match(worksApi, /similarity_score\?: number \| null/);
