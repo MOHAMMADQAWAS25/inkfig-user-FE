@@ -4952,6 +4952,7 @@ Move the signed-in profile icon out of the top navigation and place it in the sh
 
 - Branch: `feature/sidebar-profile-control`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
 ## 2026-10-06 - Support both settings password reset methods
 
 ### Request
@@ -7013,4 +7014,42 @@ Load additional gallery artwork automatically as the user scrolls down without r
 ### Git
 
 - Branch: `feature/gallery-infinite-scroll`
+- Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Complete pagination for all growing collections
+
+### Request
+
+Ensure pagination is implemented throughout the project.
+
+### Changes
+
+- Added continuation loading to notification history while preserving unread counts and realtime refresh.
+- Added paginated follower/following dialogs with duplicate-safe page appending.
+- Updated administration loading to consume the backend's bounded page contract across every continuation page while preserving existing statistics, filters, and local page navigation.
+- Retained existing pagination for artwork feeds, semantic search, profile posts, likes, saves, and account discovery.
+- Added regression coverage for all new cursor transports and UI continuation state.
+
+### Repositories and deployment order
+
+- `inkfig-user-system`: adds missing notification, relationship, and administration cursors.
+- `inkfig-user-FE`: consumes the new page contracts.
+- `inkfig-main-system`: audited only; all growing work collections were already paginated.
+- Deploy `inkfig-user-system` before `inkfig-user-FE`.
+
+### API, database, permissions, and SnapStart
+
+- Consumes cursor-aware notifications, followers, following, and administration endpoints.
+- No database migration, permission, secret, or environment-variable changes.
+- Frontend changes have no Lambda SnapStart impact.
+
+### Verification
+
+- `[passed] npm.cmd test` - 58 tests passed.
+- `[passed] npm.cmd run build` - TypeScript and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Git
+
+- Branch: `feature/complete-list-pagination`
 - Commit, rebase, merge, and push: completed after final synchronization.

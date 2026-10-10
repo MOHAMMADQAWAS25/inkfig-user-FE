@@ -28,6 +28,7 @@ export type ProfileSearchPage = {
   items: ProfileSearchResult[];
   next_cursor: number | null;
 };
+export type ProfileAccountPage = { items: ProfileAccount[]; next_cursor: number | null };
 
 export async function searchProfilesPage(
   query: string,
@@ -56,14 +57,16 @@ export async function getPublicProfile(userId: string): Promise<PublicProfile> {
 export async function getProfileConnections(
   userId: string,
   kind: "followers" | "following",
-): Promise<ProfileAccount[]> {
+  cursor?: number,
+): Promise<ProfileAccountPage> {
+  const query=new URLSearchParams({limit:"50"});if(cursor!==undefined)query.set("cursor",String(cursor));
   return (
-    await requestJson<{ items: ProfileAccount[] }>(
+    await requestJson<ProfileAccountPage>(
       userApiBaseUrl,
       "GET",
-      `/profiles/${userId}/${kind}`,
+      `/profiles/${userId}/${kind}?${query.toString()}`,
     )
-  ).data.items;
+  ).data;
 }
 
 export async function setProfileFollow(userId: string, following: boolean): Promise<void> {

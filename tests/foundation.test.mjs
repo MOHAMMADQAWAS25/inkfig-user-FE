@@ -60,7 +60,9 @@ test("provides a permission-driven system administrator workspace", () => {
   assert.match(adminUsersPage, /admin-filters/);
   assert.match(adminUsersPage, /PAGE_SIZE=10/);
   assert.match(adminUsersPage, /role="alertdialog"/);
-  assert.match(administrationApi, /GET","\/admin\/users/);
+  assert.match(administrationApi, /GET",`\/admin\/users\?\$\{query\.toString\(\)\}`/);
+  assert.match(administrationApi, /query\.set\("cursor",String\(cursor\)\)/);
+  assert.match(administrationApi, /while\(cursor!==undefined\)/);
   assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/role`/);
   assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/status`/);
   assert.match(styles, /\.admin-dialog-backdrop/);
@@ -516,7 +518,8 @@ test("smoothly opens account and notification panels from the navigation rail", 
 });
 
 test("provides persistent responsive social notifications and refined hover feedback", () => {
-  assert.match(notificationApi, /\/notifications\?limit=50/);
+  assert.match(notificationApi, /URLSearchParams\(\{limit:"50"\}\)/);
+  assert.match(notificationApi, /query\.set\("cursor",String\(cursor\)\)/);
   assert.match(notificationApi, /\/notifications\/read/);
   assert.match(appSidebar, /notification-badge/);
   assert.doesNotMatch(appSidebar, /setInterval\([^]*30000/);
@@ -529,6 +532,17 @@ test("provides persistent responsive social notifications and refined hover feed
   assert.match(styles, /\.notification-badge/);
   assert.match(styles, /transition: opacity 120ms ease 300ms/);
   assert.match(styles, /\.gallery-search:hover[^}]*255 253 240/);
+});
+
+test("paginates notifications, profile connections, and administration results", () => {
+  assert.match(notificationApi, /next_cursor:number\|null/);
+  assert.match(appSidebar, /notificationsCursor/);
+  assert.match(appSidebar, /loadMoreNotifications/);
+  assert.match(profileApi, /ProfileAccountPage/);
+  assert.match(profileApi, /\/\$\{kind\}\?\$\{query\.toString\(\)\}/);
+  assert.match(profilePage, /connectionsCursor/);
+  assert.match(profilePage, /loadMoreConnections/);
+  assert.match(administrationApi, /ManagedUserPage/);
 });
 
 test("receives live notification invalidations over an authenticated websocket", () => {
