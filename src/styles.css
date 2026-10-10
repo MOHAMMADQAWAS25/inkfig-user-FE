@@ -582,7 +582,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pagination-load-more:hover:not(:disabled) { transform: translateY(-1px); background: #526b24; }
 .pagination-load-more:disabled { opacity: .62; cursor: wait; }
 .pagination-error { margin: 12px auto 0; color: #982824; text-align: center; }
+.pagination-error p { margin: 0 0 10px; }
+.gallery-scroll-sentinel { display: grid; min-height: 64px; place-items: center; color: #667044; font-size: .86rem; font-weight: 800; }
+.gallery-scroll-sentinel span::before { display: inline-block; width: 15px; height: 15px; margin-inline-end: 8px; border: 2px solid rgb(97 125 43 / .28); border-top-color: #617d2b; border-radius: 50%; vertical-align: -2px; content: ""; animation: gallery-scroll-spin 700ms linear infinite; }
+@keyframes gallery-scroll-spin { to { transform: rotate(360deg); } }
 :root[data-theme="dark"] .pagination-load-more { border-color: #a9b65f; background: #779439; }
+:root[data-theme="dark"] .gallery-scroll-sentinel { color: #b7b59a; }
 .profile-empty p { margin: 0; }
 .profile-state { width: min(1180px,calc(100% - 40px)); margin: 0 auto; }
 :root[data-theme="dark"] .profile-page { background: linear-gradient(rgb(16 20 12 / .88),rgb(16 20 12 / .96)),url("./assets/gallery-ivory-background.png") center/cover fixed; color: #f7f2d8; }

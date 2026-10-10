@@ -6971,3 +6971,46 @@ No migration required.
 ### Notes
 
 The cropper uses native browser canvas and pointer events, so no additional UI or image-processing dependency was introduced.
+
+## 2026-10-10 - Automatically continue the artwork gallery on scroll
+
+### Request
+
+Load additional gallery artwork automatically as the user scrolls down without requiring a manual Load more click.
+
+### Changes
+
+- Replaced the homepage gallery's normal Load more control with an `IntersectionObserver` sentinel.
+- Starts fetching the next cursor page when the sentinel approaches within 600 pixels of the viewport.
+- Supports chronological feeds, category filters, account-scoped feeds, and ranked semantic-search results.
+- Preserves duplicate protection, cursor ordering, loaded cards, and the localized loading state.
+- Stops automatic requests while loading or after an error; a manual button appears only as an explicit retry fallback when a continuation request fails.
+- Added a compact theme-aware loading indicator and regression coverage for observer setup, cleanup, and request guards.
+
+### Repositories
+
+- `inkfig-user-FE`: infinite-scroll interaction, presentation, tests, and this log.
+- `inkfig-main-system`: no changes; existing cursor pagination is reused.
+- `inkfig-user-system`: no changes.
+
+### API, database, permissions, and SnapStart
+
+- Reuses existing `GET /api/v1/works` timestamp cursors and `GET /api/v1/works/search` numeric cursors.
+- No API contract, database migration, permission, secret, environment-variable, or backend change is required.
+- No AWS Lambda SnapStart impact because this is a browser-only frontend change.
+
+### Verification
+
+- `[passed] npm.cmd test` - 57 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing Cloudflare workflow.
+- No backend deployment or migration ordering is required.
+
+### Git
+
+- Branch: `feature/gallery-infinite-scroll`
+- Commit, rebase, merge, and push: completed after final synchronization.

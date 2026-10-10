@@ -456,7 +456,12 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(worksApi, /query\.set\("before", cursor\)/);
   assert.match(worksApi, /query\.set\("cursor", String\(cursor\)\)/);
   assert.match(homePage, /async function loadMore/);
-  assert.match(homePage, /pagination-load-more/);
+  assert.match(homePage, /loadMoreSentinelRef/);
+  assert.match(homePage, /new IntersectionObserver/);
+  assert.match(homePage, /rootMargin:"600px 0px"/);
+  assert.match(homePage, /gallery-scroll-sentinel/);
+  assert.equal([...homePage.matchAll(/<button className="pagination-load-more"/g)].length, 1);
+  assert.match(homePage, /feedError&&<div className="pagination-error"[^]*pagination-load-more/);
   assert.match(profilePage, /type PageCursors = Record<Section,string\|null>/);
   assert.match(profilePage, /cursors\[section\]/);
   assert.match(profilePage, /pagination-load-more/);
@@ -474,6 +479,15 @@ test("builds a searchable icon-first homepage header", () => {
   for (const key of ["searchPlaceholder", "noSearchResults", "profileMenu", "viewProfile", "preferences"]) {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.${key}"`, "g"))].length, 2);
   }
+});
+
+test("automatically loads the next gallery page near the scroll boundary", () => {
+  assert.match(homePage, /observer\.observe\(sentinel\)/);
+  assert.match(homePage, /entries\.some\(entry=>entry\.isIntersecting\)/);
+  assert.match(homePage, /nextCursor===null\|\|loadingMore\|\|feedError/);
+  assert.match(homePage, /return\(\)=>observer\.disconnect\(\)/);
+  assert.match(styles, /\.gallery-scroll-sentinel \{[^}]*min-height: 64px/);
+  assert.match(styles, /@keyframes gallery-scroll-spin/);
 });
 test("opens a paginated live account search panel from the navigation rail", () => {
   assert.match(appSidebar, /app-sidebar-people-search/);
