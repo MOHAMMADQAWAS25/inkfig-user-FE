@@ -460,7 +460,7 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(homePage, /async function loadMore/);
   assert.match(homePage, /loadMoreSentinelRef/);
   assert.match(homePage, /new IntersectionObserver/);
-  assert.match(homePage, /rootMargin:"200px 0px"/);
+  assert.match(homePage, /rootMargin:"300px 0px"/);
   assert.match(homePage, /gallery-scroll-sentinel/);
   assert.equal([...homePage.matchAll(/<button className="pagination-load-more"/g)].length, 1);
   assert.match(homePage, /feedError&&<div className="pagination-error"[^]*pagination-load-more/);
