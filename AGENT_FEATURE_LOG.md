@@ -7545,3 +7545,31 @@ No video pipeline is included. DOM bounds and geometry are tested; physical-phon
 60fps and field CLS budgets are not certified. Task verification artifacts remain
 local under ignored `output/playwright` and `.playwright-cli`. Commit separately,
 pull/rebase main immediately before pushing, and verify deployment.
+## 2026-10-11 - Prevent page-level horizontal scrolling in Arabic
+
+### Request and scope
+
+Prevent the unwanted bottom scrollbar when changing from English to Arabic.
+Frontend-only change; both backend repositories were pulled and remain unchanged.
+
+### Changes and files
+
+- `src/styles.css`: explicitly disable root horizontal scrolling and clip body horizontal overflow without making the body a nested scroll container. Preserve root vertical scrolling, sticky header, natural artwork proportions and intentional category/filter scrollers.
+- `tests/foundation.test.mjs`: update the viewport assertion and add regression coverage for horizontal boundaries and preserved component scrolling.
+- `AGENT_FEATURE_LOG.md`: record this ticket.
+
+### API, database and permissions
+
+No API changes. No migration required. No permission, data-scope, environment or backend/SnapStart changes.
+
+### Verification
+
+- 61 foundation tests and 17 feed behavior tests passed; TypeScript checks and Vite production build passed.
+- Playwright checked English and Arabic at 320, 390, 820, 1440 and 1920px: all rendered cards stayed within the viewport, normal vertical scrolling worked, and category overflow remained auto. A synthetic off-screen transform confirmed the root horizontal scrollbar policy remains disabled in RTL.
+- The exact reported overflow was not reproduced in the guest production session; this change enforces the requested viewport boundary without changing gallery positioning.
+- Local browser checks proxied public feed reads to bypass localhost CORS; no production data was changed.
+- Initial sandboxed test/build launch was blocked by process permissions; rerun outside the process sandbox succeeded.
+
+### Deployment and Git
+
+Frontend deployment only through the existing main push workflow; no migration or backend deployment. Commit separately, pull/rebase origin main immediately before push, and verify deployment. Physical device/user-authenticated reproduction remains unverified.

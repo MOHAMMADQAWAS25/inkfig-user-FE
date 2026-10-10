@@ -820,7 +820,7 @@ test("refines and mirrors the gallery chrome for Arabic", () => {
 test("uses an edge scrollbar and aligns the compact avatar with gallery cards", () => {
   assert.match(styles, /html \{ overflow-y: scroll; scrollbar-gutter: stable/);
   assert.match(styles, /html::-webkit-scrollbar \{ width: 12px/);
-  assert.match(styles, /body \{ overflow: visible/);
+  assert.match(styles, /body \{ overflow-x: clip; overflow-y: visible/);
   assert.match(styles, /\.gallery-header \{ padding-right: 32px; padding-left: 32px/);
   assert.match(styles, /\.gallery-profile-menu > summary, \.gallery-guest-avatar \{ width: 34px; height: 34px/);
   assert.doesNotMatch(appSidebar, /app-sidebar-upload/);
@@ -856,4 +856,10 @@ test("adapts the complete interface across screen sizes without cropping artwork
   assert.match(styles, /content-visibility: auto/);
   assert.match(styles, /contain-intrinsic-size: 300px 420px/);
   assert.match(styles, /image-rendering: auto/);
+});
+test("viewport clips horizontal overflow without disabling vertical scrolling", () => {
+  const css = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(css, /body\s*\{\s*overflow-x:\s*clip;\s*overflow-y:\s*visible;\s*\}/);
+  assert.match(css, /html\s*\{[^}]*overflow-y:\s*scroll;[^}]*overflow-x:\s*hidden;/);
+  assert.match(css, /\.gallery-filters\s*\{[^}]*overflow-x:\s*auto/);
 });

@@ -814,11 +814,13 @@ html { scroll-behavior: smooth; }
 @media (max-width: 520px) { .app-sidebar-logo { width: 48px; height: 48px; } .app-sidebar-logo img { width: 42px; height: 42px; } .app-sidebar-nav { gap: 10px; margin-top: 10px; } .app-sidebar-nav a, .app-sidebar-settings { width: 44px; height: 44px; } .gallery-header { padding-right: 0; padding-left: 8px; } [dir="rtl"] .gallery-home, [dir="rtl"] .app-page-with-sidebar, [dir="rtl"] .app-feature-page { padding-right: 62px; padding-left: 0; } [dir="rtl"] .gallery-header { padding-right: 8px; padding-left: 0; } }
 
 /* Viewport scrollbar and card-edge header alignment */
-html { overflow-y: scroll; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: #617d2b #eee7bd; }
+html { overflow-y: scroll; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: #617d2b #eee7bd; overflow-x: hidden; }
 html::-webkit-scrollbar { width: 12px; }
 html::-webkit-scrollbar-track { background: #eee7bd; }
 html::-webkit-scrollbar-thumb { border: 3px solid #eee7bd; border-radius: 999px; background: #617d2b; }
-body { overflow: visible; }
+/* Clip incidental RTL/transform overflow without creating a nested scroll container.
+   Vertical page scrolling and intentional component scrollers remain unchanged. */
+body { overflow-x: clip; overflow-y: visible; }
 .gallery-header { padding-right: 32px; padding-left: 32px; }
 .gallery-header-actions { min-width: 34px; }
 .gallery-profile-menu > summary, .gallery-guest-avatar { width: 34px; height: 34px; }
