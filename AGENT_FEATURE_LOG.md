@@ -7407,3 +7407,31 @@ Keep the established homepage masonry appearance while appending infinite-scroll
 
 - Branch: `fix/stable-gallery-masonry`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Attach gallery sizing after artwork loads
+
+### Request
+
+Fix artwork appearing in a single vertical column and restore responsive masonry presentation.
+
+### Changes
+
+- Reattaches the gallery ResizeObserver after the conditional gallery mounts following initial loading or filter changes.
+- Retains existing card styling and stable append placement between pagination requests.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - TypeScript and Vite production build.
+- `[passed] git diff --check`
+- Browser visual verification remains pending.
+
+### Deployment
+
+- Frontend deployment only; no migration, API, permission, or SnapStart changes.
+
+### Git
+
+- Branch: `fix/gallery-observer-mount`
+- Commit: focused fix recorded in Git history.
+- Push and merge: synchronize, push branch, and fast-forward main under the user's standing authorization.
