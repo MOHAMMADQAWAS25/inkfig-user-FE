@@ -436,9 +436,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-filters { display: flex; gap: 9px; margin: 28px 0 36px; overflow-x: auto; padding-bottom: 4px; }
 .gallery-filters button { flex: 0 0 auto; padding: 9px 15px; border: 1px solid rgb(57 67 28 / 0.25); border-radius: 999px; background: rgb(255 253 240 / 0.62); color: #58613d; cursor: pointer; }
 .gallery-filters button.active, .gallery-filters button:hover { border-color: #617d2b; background: #617d2b; color: #fffdf0; }
-.artwork-masonry { display:flex; align-items:flex-start; gap:var(--artwork-column-gap,18px); }
-.artwork-masonry-column { display:flex; min-width:0; flex:1 1 0; flex-direction:column; gap:var(--artwork-column-gap,18px); }
-.artwork-masonry .artwork-card { width:100%; margin-bottom:0; }
+.artwork-batches { display:grid; gap:18px; }
 .artwork-grid { column-count: 4; column-gap: 18px; }
 .artwork-card { break-inside: avoid; margin: 0 0 22px; overflow: visible; border: 0; background: transparent; }
 .artwork-card-manageable { position: relative; padding-bottom: 36px; background: transparent; box-shadow: none; }

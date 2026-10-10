@@ -7346,3 +7346,30 @@ Remove the visual gap between infinite-scroll batches and let newly loaded artwo
 
 - Branch: `fix/continuous-gallery-masonry`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Roll back continuous gallery masonry
+
+### Request
+
+Roll back the continuous responsive-column gallery change.
+
+### Changes
+
+- Restored the immediately preceding page-batch masonry implementation.
+- Removed the `ResizeObserver`-driven persistent column layout.
+- Preserved infinite scrolling, duplicate filtering, and all artwork interactions.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+
+### Git
+
+- Branch: `revert/continuous-gallery-masonry`
+- Commit, rebase, merge, and push: completed after final synchronization.
