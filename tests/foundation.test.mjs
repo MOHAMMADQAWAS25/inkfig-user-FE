@@ -570,6 +570,9 @@ test("paginates notifications, profile connections, and administration results",
 test("receives live notification invalidations over an authenticated websocket", () => {
   assert.match(notificationApi, /\/notifications\/socket-ticket/);
   assert.match(appSidebar, /new WebSocket/);
+  assert.match(appSidebar, /reports\.changed/);
+  assert.match(appSidebar, /inkfig:reports-changed/);
+  assert.match(adminReportsPage, /addEventListener\("inkfig:reports-changed"/);
   assert.match(appSidebar, /notifications\.changed/);
   assert.match(appSidebar, /encodeURIComponent\(access\.ticket\)/);
   assert.match(appSidebar, /Math\.min\(30000/);
