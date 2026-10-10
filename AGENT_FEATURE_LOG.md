@@ -7214,3 +7214,67 @@ Let users report posts or accounts using standard reasons or their own explanati
 
 - Branch: `feature/content-reporting`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Refresh administrator reports from WebSocket events
+
+### Request
+
+Allow administrators to receive newly submitted reports live through the existing WebSocket connection.
+
+### Changes
+
+- Recognizes the backend `reports.changed` WebSocket event.
+- Dispatches an internal live-reports event without mixing reports into social notifications.
+- Automatically reloads the active administrator reports queue using its current status filter.
+- Preserved pagination, moderation actions, loading states, and ordinary notification behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: consumes live report invalidations and refreshes the reports page.
+- `inkfig-user-system`: emits permission-scoped `reports.changed` events.
+
+### Files
+
+- `src/features/navigation/AppSidebar.tsx`: recognizes and dispatches live report updates.
+- `src/features/admin/AdminReportsPage.tsx`: listens for report updates and reloads the current queue.
+- `tests/foundation.test.mjs`: verifies the WebSocket event and reports-page listener.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- The reports page remains restricted to `reports.manage`.
+- Only the backend decides which connected roles receive the WebSocket event.
+- Backend authorization remains required when the frontend reloads report data.
+
+### Frontend
+
+- Connected admins and system administrators see the report queue refresh automatically when a new report is submitted.
+- Existing localization, filters, pagination, loading, empty, and error states remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` — 60 tests passed
+- `[passed] npm.cmd run build` — TypeScript checks and Vite production build succeeded
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` and `inkfig-user-system`.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `a2d2db4`
+- Push: `successful`
+
+### Notes
+
+The frontend receives only an invalidation signal, then loads canonical report data from the permission-protected REST endpoint.
