@@ -258,7 +258,7 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(router, /path="\/:language" element=\{<HomePage \/>\}/);
   assert.match(router, /Navigate replace to="\/en"/);
   assert.match(i18nProvider, /=== "ar" \? "ar" : "en"/);
-  assert.match(homePage, /className="artwork-grid"/);
+  assert.match(homePage, /className="artwork-stable-masonry"/);
   assert.doesNotMatch(appSidebar, /gallery-guest-avatar|gallery-profile-menu|app-sidebar-account/);
   assert.match(homePage, /className="gallery-header-actions"/);
   assert.match(homePage, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar"/);
@@ -512,9 +512,11 @@ test("automatically loads the next gallery page near the scroll boundary", () =>
   assert.match(homePage, /return\(\)=>observer\.disconnect\(\)/);
   assert.match(styles, /\.gallery-scroll-sentinel \{[^}]*min-height: 64px/);
   assert.match(styles, /@keyframes gallery-scroll-spin/);
-    assert.match(homePage, /setWorkBatches\(current=>\[\.\.\.current,nextItems\.map/);
-    assert.match(homePage, /workBatches\.map\(\(batch,batchIndex\)=>/);
-    assert.match(styles, /\.artwork-batches \{[^}]*display:grid[^}]*gap:/);
+    assert.match(homePage, /new ResizeObserver/);
+    assert.match(homePage, /getBoundingClientRect\(\)\.height/);
+    assert.match(homePage, /if\(heights\[index\]<heights\[shortest\]\)shortest=index/);
+    assert.match(styles, /\.artwork-stable-masonry \{[^}]*display:flex[^}]*gap:/);
+    assert.match(styles, /\.artwork-stable-column \{[^}]*flex-direction:column/);
 });
 test("opens a paginated live account search panel from the navigation rail", () => {
   assert.match(appSidebar, /app-sidebar-people-search/);

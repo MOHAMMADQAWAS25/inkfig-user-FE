@@ -7373,3 +7373,37 @@ Roll back the continuous responsive-column gallery change.
 
 - Branch: `revert/continuous-gallery-masonry`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Stable gap-free homepage masonry trial
+
+### Request
+
+Keep the established homepage masonry appearance while appending infinite-scroll results without a batch gap or moving new artwork to the top.
+
+### Changes
+
+- Preserved the existing artwork cards, image proportions, spacing, hover controls, filters, and infinite-scroll behavior.
+- Measures existing column heights before placing a new page and assigns new cards to the shortest columns.
+- Keeps already displayed cards fixed during pagination instead of asking CSS columns to rebalance the complete feed.
+- Adapts the column count to the available gallery width and only redistributes when that width changes.
+- Keeps moderation deletion synchronized with the stable column assignments.
+
+### API, database, permissions, and SnapStart
+
+- Reuses the existing cursor-based work and search endpoints without contract changes.
+- No migration, backend, permission, secret, environment-variable, or SnapStart change is required.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+
+### Git
+
+- Branch: `fix/stable-gallery-masonry`
+- Commit, rebase, merge, and push: completed after final synchronization.
