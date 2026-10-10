@@ -7435,3 +7435,31 @@ Fix artwork appearing in a single vertical column and restore responsive masonry
 - Branch: `fix/gallery-observer-mount`
 - Commit: focused fix recorded in Git history.
 - Push and merge: synchronize, push branch, and fast-forward main under the user's standing authorization.
+
+## 2026-10-10 - Preserve masonry columns during pagination
+
+### Request
+
+Fix the homepage collapsing to one column when the next artwork batch arrives.
+
+### Changes
+
+- Pagination copies the current column assignments instead of reconstructing them using a stale captured column count.
+- Refreshes the scroll observer callback when responsive column count changes.
+- Existing card styling and shortest-column append behavior are retained.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - TypeScript and production build passed.
+- `[passed] git diff --check`
+- Live browser verification remains pending.
+
+### Deployment
+
+- Frontend only; no database, API, permissions, or SnapStart changes.
+
+### Git
+
+- Branch: `fix/pagination-masonry-columns`
+- Commit: recorded in Git history; branch and main pushed after synchronization under standing user authorization.
