@@ -7312,3 +7312,37 @@ Ensure newly loaded homepage feed artwork appears below the final work from the 
 
 - Branch: `fix/gallery-batch-order`
 - Commit, rebase, merge, and push: completed after final synchronization.
+
+## 2026-10-10 - Continuous responsive gallery masonry
+
+### Request
+
+Remove the visual gap between infinite-scroll batches and let newly loaded artwork flow continuously with the existing homepage gallery.
+
+### Changes
+
+- Replaced isolated page-level masonry containers with persistent responsive columns.
+- Appends every new artwork beneath existing artwork in its assigned column without rebalancing older cards to the top.
+- Uses `ResizeObserver` to adapt the column count from one to six based on the actual gallery width.
+- Preserves cursor pagination, duplicate filtering, likes, saves, moderation, search, category filters, and detail views.
+- Updated gallery regression coverage for responsive column construction and continuous layout styling.
+
+### API, database, permissions, and SnapStart
+
+- Reuses existing works pagination without API or database changes.
+- No permission, secret, environment-variable, backend, or SnapStart change is required.
+
+### Verification
+
+- `[passed] npm.cmd test` - 60 tests passed.
+- `[passed] npm.cmd run build` - strict TypeScript checks and Vite production build succeeded.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through the existing frontend workflow.
+
+### Git
+
+- Branch: `fix/continuous-gallery-masonry`
+- Commit, rebase, merge, and push: completed after final synchronization.

@@ -43,24 +43,27 @@ export function HomePage() {
   const [activeSuggestion,setActiveSuggestion]=useState(0);
   const [mentionQuery,setMentionQuery]=useState<string|null>(null);
   const [works,setWorks]=useState<Work[]>([]); const [loading,setLoading]=useState(true); const [feedError,setFeedError]=useState(false);
-  const [workBatches,setWorkBatches]=useState<string[][]>([]);
+  const [masonryColumnCount,setMasonryColumnCount]=useState(1);
   const [nextCursor,setNextCursor]=useState<string|number|null>(null); const [loadingMore,setLoadingMore]=useState(false);
   const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
   const [deepLinkedWork,setDeepLinkedWork]=useState<Work|null>(null);
   const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const searchRef=useRef<HTMLFormElement>(null);
   const loadMoreSentinelRef=useRef<HTMLDivElement>(null);
+  const masonryRef=useRef<HTMLDivElement>(null);
   const [profileAvatar,setProfileAvatar]=useState<string|null>(null);
   const selectedWork=works.find(work=>work.work_id===selectedWorkId)??(deepLinkedWork?.work_id===selectedWorkId?deepLinkedWork:null);
   const normalizedSearch=submittedSearch.trim();
   function artworkQuery(value:string, account:ProfileSearchResult|null){return account?value.replace(`@${account.full_name}`," ").replace(/\s+/g," ").trim():value.trim();}
   const normalizedArtworkSearch=artworkQuery(normalizedSearch,submittedAccount);
+  const masonryColumns=Array.from({length:masonryColumnCount},()=>[] as Work[]);
+  works.forEach((work,index)=>masonryColumns[index%masonryColumnCount].push(work));
   useEffect(()=>{
     let active=true;
     setLoading(true);setFeedError(false);
     const typeCode=activeCategory === "all" ? undefined : activeCategory;
     const request=normalizedArtworkSearch.length>=2?searchWorks(normalizedArtworkSearch,typeCode,undefined,submittedAccount?.user_id):getWorks(typeCode,undefined,submittedAccount?.user_id);
-    request.then(page=>{if(active){setWorks(page.items);setWorkBatches([page.items.map(work=>work.work_id)]);setNextCursor(page.next_cursor)}}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
+    request.then(page=>{if(active){setWorks(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active)setFeedError(true)}).finally(()=>{if(active)setLoading(false)});
     return()=>{active=false};
   },[activeCategory,normalizedArtworkSearch,submittedAccount,session]);
   useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
@@ -69,11 +72,12 @@ export function HomePage() {
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
   useEffect(()=>{const workId=searchParams.get("work");if(!workId)return;const loaded=works.find(work=>work.work_id===workId);if(loaded){setSelectedWorkId(workId);setDeepLinkedWork(null);return;}let active=true;getWork(workId).then(work=>{if(active){setDeepLinkedWork(work);setSelectedWorkId(work.work_id)}}).catch(()=>{if(active){const next=new URLSearchParams(searchParams);next.delete("work");setSearchParams(next,{replace:true})}});return()=>{active=false};},[searchParams,works,setSearchParams]);
   useEffect(()=>{const sentinel=loadMoreSentinelRef.current;if(!sentinel||nextCursor===null||loadingMore||feedError)return;const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting))void loadMore();},{rootMargin:"300px 0px"});observer.observe(sentinel);return()=>observer.disconnect();},[nextCursor,loadingMore,feedError,activeCategory,normalizedArtworkSearch,submittedAccount]);
+  useEffect(()=>{const masonry=masonryRef.current;if(!masonry)return;const observer=new ResizeObserver(([entry])=>{const width=entry.contentRect.width;const minimum=width<700?155:220;const gap=width<700?10:18;setMasonryColumnCount(Math.max(1,Math.min(6,Math.floor((width+gap)/(minimum+gap)))));});observer.observe(masonry);return()=>observer.disconnect();},[]);
   function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}setSubmittedSearch(searchQuery.trim());setSubmittedAccount(selectedAccount);setMentionQuery(null);}
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
   function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
-  async function loadMore(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedArtworkSearch.length>=2?await searchWorks(normalizedArtworkSearch,typeCode,Number(nextCursor),submittedAccount?.user_id):await getWorks(typeCode,String(nextCursor),submittedAccount?.user_id);const known=new Set(works.map(work=>work.work_id));const nextItems=page.items.filter(work=>!known.has(work.work_id));setWorks(current=>[...current,...nextItems]);if(nextItems.length)setWorkBatches(current=>[...current,nextItems.map(work=>work.work_id)]);setNextCursor(page.next_cursor);}catch{setFeedError(true);}finally{setLoadingMore(false)}}
+  async function loadMore(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setFeedError(false);const typeCode=activeCategory==="all"?undefined:activeCategory;try{const page=normalizedArtworkSearch.length>=2?await searchWorks(normalizedArtworkSearch,typeCode,Number(nextCursor),submittedAccount?.user_id):await getWorks(typeCode,String(nextCursor),submittedAccount?.user_id);setWorks(current=>{const known=new Set(current.map(work=>work.work_id));return [...current,...page.items.filter(work=>!known.has(work.work_id))];});setNextCursor(page.next_cursor);}catch{setFeedError(true);}finally{setLoadingMore(false)}}
   async function toggleLike(work:Work){if(!session || !hasPermission(session.permissions,"works.like"))return; const next=!work.liked_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,liked_by_me:next,like_count:item.like_count+(next?1:-1)}:item)); try{await setWorkLike(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
   async function toggleSave(work:Work){if(!session || !hasPermission(session.permissions,"works.save"))return; const next=!work.saved_by_me; setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item)); try{await setWorkSave(work.work_id,next);}catch{setWorks(current=>current.map(item=>item.work_id===work.work_id?work:item));}}
   async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));setSelectedWorkId(null);}
@@ -98,13 +102,13 @@ export function HomePage() {
             <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
           ))}
         </div>
-        {loading?<p className="gallery-state" aria-live="polite">{normalizedArtworkSearch.length>=2?t("home.searching"):t("works.loading")}</p>:feedError&&works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2?t("home.searchUnavailable"):t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2||submittedAccount?t("home.noSearchResults"):t("works.empty")}</p>:<><div className="artwork-batches">
-          {workBatches.map((batch,batchIndex)=><div className="artwork-grid" data-batch={batchIndex+1} key={`${activeCategory}-${normalizedArtworkSearch}-${submittedAccount?.user_id??"all"}-${batchIndex}`}>
-          {batch.map(workId=>{const work=works.find(item=>item.work_id===workId);return work?(
+        {loading?<p className="gallery-state" aria-live="polite">{normalizedArtworkSearch.length>=2?t("home.searching"):t("works.loading")}</p>:feedError&&works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2?t("home.searchUnavailable"):t("works.loadFailed")}</p>:works.length===0?<p className="gallery-state">{normalizedArtworkSearch.length>=2||submittedAccount?t("home.noSearchResults"):t("works.empty")}</p>:<><div className="artwork-masonry" ref={masonryRef}>
+          {masonryColumns.map((column,columnIndex)=><div className="artwork-masonry-column" key={columnIndex}>
+          {column.map(work=>(
             <article className="artwork-card" key={work.work_id}>
               <div className="artwork-pin-media"><button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>setSelectedWorkId(work.work_id)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy" /></button><span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span><Link className="artwork-artist-link" to={session?`/${language}/profile/${work.owner_user_id}`:`/${language}/login`}><UserRound size={15}/>{work.artist_name}</Link><button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!session} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>toggleLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>{session&&hasPermission(session.permissions,"works.save")&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} title={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>toggleSave(work)}><Bookmark aria-hidden="true" size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>
             </article>
-          ):null})}
+          ))}
         </div>)}</div>{nextCursor!==null&&<div className="gallery-scroll-sentinel" ref={loadMoreSentinelRef} aria-hidden={!loadingMore}>{loadingMore&&<span aria-live="polite">{t("works.loadingMore")}</span>}</div>}{feedError&&<div className="pagination-error" role="alert"><p>{t("works.loadFailed")}</p>{nextCursor!==null&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t("works.loadMore")}</button>}</div>}</>}
       </section>
 
