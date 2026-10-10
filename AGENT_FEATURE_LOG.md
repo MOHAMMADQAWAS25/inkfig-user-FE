@@ -5016,6 +5016,67 @@ No migration required.
 
 The next 20 works will load closer to the gallery boundary, reducing early background requests while preserving smooth infinite scrolling.
 
+## 2026-10-10 - Set home feed preload distance to 300px
+
+### Request
+
+Change the home-feed infinite-scroll preload distance from 200px to 300px.
+
+### Changes
+
+- Set the home gallery IntersectionObserver margin to 300px.
+- Updated the matching source-contract test.
+- Left batch sizes, cursor behavior, duplicate protection, and all other pagination unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: adjusted the home-feed preload threshold.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: changed the preload distance to 300px.
+- `tests/foundation.test.mjs`: verifies the 300px configuration.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permission changes.
+- The public feed remains accessible under its existing backend rules.
+- Authorization continues to be validated by the backend.
+
+### Frontend
+
+- The next 20 home-feed works now begin loading 300px before the gallery boundary reaches the viewport.
+- Existing loading and error-retry states remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` — 58 tests passed
+- `[passed] npm.cmd run build` — TypeScript checks and Vite production build succeeded
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions workflow.
+- No migrations or configuration changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `7a13b8f`
+- Push: `successful`
+
+### Notes
+
+None
+
 ## 2026-10-06 - Support both settings password reset methods
 
 ### Request
