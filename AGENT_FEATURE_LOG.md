@@ -4953,6 +4953,69 @@ Move the signed-in profile icon out of the top navigation and place it in the sh
 - Branch: `feature/sidebar-profile-control`
 - Commit, rebase, merge, and push: completed after final synchronization.
 
+## 2026-10-10 - Reduce home feed preload distance
+
+### Request
+
+Change the home feed so the next page begins loading when the gallery boundary is 200 pixels away instead of 600 pixels.
+
+### Changes
+
+- Changed the infinite-scroll observer margin from 600px to 200px.
+- Preserved the existing 20-work batches, cursor pagination, duplicate protection, loading state, and retry behavior.
+- Updated the frontend source-contract test to enforce the new distance.
+- Left all other feeds and pagination limits unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: changed the home-gallery infinite-scroll preload threshold.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: changed the IntersectionObserver root margin to 200px.
+- `tests/foundation.test.mjs`: updated the expected home-feed preload distance.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permission changes.
+- The public home feed remains available to viewers and authenticated roles.
+- Existing backend authorization remains unchanged.
+
+### Frontend
+
+- The home feed now requests the next page when its sentinel is within 200px of the viewport.
+- Existing responsive layout, localization, loading indicator, empty state, and error retry remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd test` — 58 tests passed
+- `[passed] npm.cmd run build` — TypeScript checks and Vite production build succeeded
+- `[passed] git diff --check`
+- `[failed] initial npm.cmd test — test still expected the previous 600px value; updated to the requested 200px and reran successfully`
+
+### Deployment
+
+- Deploy `inkfig-user-FE` through its existing GitHub Actions workflow.
+- No migrations or environment-variable changes are required.
+
+### Git
+
+- Branch: `main`
+- Commit: `5576656`
+- Push: `successful`
+
+### Notes
+
+The next 20 works will load closer to the gallery boundary, reducing early background requests while preserving smooth infinite scrolling.
+
 ## 2026-10-06 - Support both settings password reset methods
 
 ### Request
