@@ -98,6 +98,16 @@ export function ProfilePage() {
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
   useEffect(()=>{setAvatarError(false);setAvatarUploadError(false);setAvatarRemoveError(false);},[profileUserId]);
   useEffect(()=>{if(ownProfile)void getWorkTypes().then(setWorkTypes).catch(()=>setWorkTypes([]));},[ownProfile]);
+  useEffect(()=>{
+    const dismissMenus=(event:PointerEvent)=>{
+      if(!(event.target instanceof Node))return;
+      document.querySelectorAll<HTMLDetailsElement>(".profile-page .artwork-owner-menu[open]").forEach(menu=>{
+        if(!menu.contains(event.target as Node))menu.open=false;
+      });
+    };
+    document.addEventListener("pointerdown",dismissMenus,true);
+    return()=>document.removeEventListener("pointerdown",dismissMenus,true);
+  },[]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
   if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
 

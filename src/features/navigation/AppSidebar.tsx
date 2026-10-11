@@ -87,6 +87,16 @@ export function AppSidebar() {
   useEffect(()=>{setAccountsOpen(false);setNotificationsOpen(false);},[location.pathname,location.search]);
   useEffect(()=>{if(!accountsOpen&&!notificationsOpen)return;const close=(event:KeyboardEvent)=>{if(event.key==="Escape"){if(accountsOpen)closeAccounts();if(notificationsOpen)closeNotifications();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[accountsOpen,notificationsOpen]);
   function closeAccounts(){setAccountsOpen(false);}
+  useEffect(()=>{
+    if(!accountsOpen&&!notificationsOpen)return;
+    const dismissOutside=(event:PointerEvent)=>{
+      if(!(event.target instanceof Element))return;
+      if(accountsOpen&&!event.target.closest('#account-discovery-panel, [aria-controls="account-discovery-panel"]'))setAccountsOpen(false);
+      if(notificationsOpen&&!event.target.closest('#notifications-panel, [aria-controls="notifications-panel"]'))setNotificationsOpen(false);
+    };
+    document.addEventListener("pointerdown",dismissOutside,true);
+    return()=>document.removeEventListener("pointerdown",dismissOutside,true);
+  },[accountsOpen,notificationsOpen]);
   function closeNotifications(){setNotificationsOpen(false);}
   async function loadMoreAccounts(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setSearchFailed(false);try{const page=await searchProfilesPage(normalizedQuery,nextCursor);setAccounts(current=>{const known=new Set(current.map(account=>account.user_id));return [...current,...page.items.filter(account=>!known.has(account.user_id))];});setNextCursor(page.next_cursor);}catch{setSearchFailed(true);}finally{setLoadingMore(false)}}
   async function loadMoreNotifications(){if(notificationsCursor===null||notificationsLoadingMore)return;setNotificationsLoadingMore(true);try{const feed=await getNotifications(notificationsCursor);setNotifications(current=>{const known=new Set(current.map(item=>item.notification_id));return [...current,...feed.items.filter(item=>!known.has(item.notification_id))];});setNotificationsCursor(feed.next_cursor);setUnreadCount(feed.unread_count);}finally{setNotificationsLoadingMore(false)}}

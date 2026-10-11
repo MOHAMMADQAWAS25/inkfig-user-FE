@@ -7712,3 +7712,21 @@ All 104 tests passed (62 foundation, 42 component), including dismissal methods,
 ### Git
 
 Branch: `fix/smooth-artwork-close`. Fetch/rebase before branch push, then authorized fast-forward main merge and push. Commit hash, push and deployment outcome reported in handoff. No previous entries modified.
+
+## 2026-10-12 - Dismiss sidebar panels and post menus outside
+
+### Request and changes
+
+Close notifications, Find users, and profile post-management menus when clicking outside. Document-level pointer listeners cover the navigation rail and page content as well as existing backdrops. Panel contents and their matching toggle are exempt so normal interactions remain available; closing uses the existing animation. Profile menus close independently when a pointer interaction occurs outside each open menu. Listeners are removed on cleanup.
+
+### Repositories and scope
+
+Frontend only: AppSidebar, ProfilePage, component interaction tests and this log. No backend, API, migration, permission, configuration or SnapStart changes.
+
+### Verification and deployment
+
+All 106 tests passed (62 foundation and 44 component), including outside, inside and toggle interactions for both panels. TypeScript and Vite production build passed; git diff --check passed. Locked dependencies installed with npm ci to run the existing component suite. Deploy through the existing frontend main workflow; live browser inspection was not performed.
+
+### Git
+
+Branch: `fix/outside-click-dismissal`. Focused commit hash and push result reported in handoff. Fetch/rebase before push and authorized fast-forward merge into main. Previous entries preserved.

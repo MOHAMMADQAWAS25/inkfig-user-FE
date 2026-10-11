@@ -35,6 +35,19 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it.each(["Notifications","Find users"])("closes %s outside and keeps inside interaction open",async name=>{
+    const {container}=render(<MemoryRouter><AppSidebar/><button>Outside control</button></MemoryRouter>);
+    const trigger=screen.getByRole("button",{name,exact:true});
+    fireEvent.click(trigger);
+    const panel=container.querySelector(".account-discovery-panel")!;
+    fireEvent.pointerDown(panel);
+    expect(panel.classList.contains("sidebar-panel-exit")).toBe(false);
+    fireEvent.pointerDown(trigger);
+    expect(panel.classList.contains("sidebar-panel-exit")).toBe(false);
+    fireEvent.pointerDown(screen.getByRole("button",{name:"Outside control"}));
+    expect(panel.classList.contains("sidebar-panel-exit")).toBe(true);
+    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+  });
   it.each(["Home","InkFig"])("clears search, artist and category when clicking %s",async name=>{
     render(<MemoryRouter initialEntries={["/en?q=flowers&category=hand-art&artist=artist&artistName=Artist"]}><HomePage/></MemoryRouter>);
     await waitFor(()=>expect((screen.getByRole("combobox") as HTMLInputElement).value).toBe("flowers"));
