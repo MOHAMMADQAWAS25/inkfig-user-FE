@@ -1,6 +1,6 @@
 import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, ShieldAlert, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import type { Language, TranslationKey } from "../../i18n/resources";
 import type { Work } from "../works/worksApi";
@@ -24,6 +24,18 @@ type ArtworkDetailModalProps = {
 
 export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const navigate = useNavigate();
+  const [closing,setClosing]=useState(false);
+  const closeTimerRef=useRef<number|undefined>(undefined);
+  const onCloseRef=useRef(onClose);
+  onCloseRef.current=onClose;
+  function requestClose(afterClose?:()=>void){
+    if(closeTimerRef.current!==undefined)return;
+    setClosing(true);
+    const duration=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?0:240;
+    closeTimerRef.current=window.setTimeout(()=>{onCloseRef.current();afterClose?.();},duration);
+  }
+  useEffect(()=>()=>{if(closeTimerRef.current!==undefined)window.clearTimeout(closeTimerRef.current);},[]);
   const [moderating,setModerating]=useState(false);const [reason,setReason]=useState("");const [deleting,setDeleting]=useState(false);const [deleteError,setDeleteError]=useState(false);
   const [reporting,setReporting]=useState(false);
   const uploadedAt = relativeTime(work.created_at, language);
@@ -33,21 +45,21 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !event.defaultPrevented) requestClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, []);
 
   async function submitModeration(event:React.FormEvent){event.preventDefault();if(!onModerateDelete||reason.trim().length<10||deleting)return;setDeleting(true);setDeleteError(false);try{await onModerateDelete(work,reason.trim());}catch{setDeleteError(true);setDeleting(false);}}
 
   return (
-    <div className="artwork-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className={`artwork-modal-backdrop${closing?" artwork-modal-closing":""}`} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && requestClose()}>
       <section className="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="artwork-modal-title">
-        <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={onClose}>
+        <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
         <div className="artwork-modal-media">{work.mime_type.startsWith("video/")?<video src={work.image_url} controls playsInline preload="metadata"/>:<img src={work.image_url} alt={work.title} />}</div>
@@ -55,7 +67,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
           <div className="artwork-modal-meta">
-            <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={onClose}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>
+            <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>
             <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>
           </div>
           <div className="artwork-modal-description">

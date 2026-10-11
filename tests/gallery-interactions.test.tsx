@@ -8,6 +8,8 @@ import { AppSidebar } from "../src/features/navigation/AppSidebar";
 import { UploadWorkPage } from "../src/features/works/UploadWorkPage";
 import { HomePage } from "../src/features/home/HomePage";
 import { PostCard } from "../src/features/feed/PostCard";
+import { ArtworkDetailModal } from "../src/features/home/ArtworkDetailModal";
+import type { Work } from "../src/features/works/worksApi";
 import { getWorkTypes, type FeedWork } from "../src/features/works/worksApi";
 import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
 
@@ -98,6 +100,35 @@ describe("upload preview and card reset",()=>{
     expect(container.querySelector(".hover-reset")).toBeTruthy();
     fireEvent.pointerMove(container.querySelector(".artwork-pin-media")!);
     expect(container.querySelector(".hover-reset")).toBeNull();
+  });
+});
+
+describe("smooth artwork dismissal",()=>{
+  const work={work_id:"work",title:"Art",artist_name:"Artist",owner_user_id:"artist",type_name_en:"Digital art",type_name_ar:"Art",mime_type:"image/png",image_url:"/art.png",like_count:0,liked_by_me:false,saved_by_me:false,created_at:"2026-10-11T12:00:00Z",links:[]} as Work;
+  function modal(onClose:()=>void){return <MemoryRouter><ArtworkDetailModal language="en" work={work} canLike={false} canSave={false} onClose={onClose} onToggleLike={vi.fn()} onToggleSave={vi.fn()} t={key=>translations.en[key]}/></MemoryRouter>;}
+  it.each(["button","backdrop","Escape"])("animates before dismissing via %s",async trigger=>{
+    const onClose=vi.fn();const {container}=render(modal(onClose));
+    if(trigger==="button")fireEvent.click(screen.getByRole("button",{name:translations.en["works.closeDetails"]}));
+    else if(trigger==="backdrop")fireEvent.mouseDown(container.querySelector(".artwork-modal-backdrop")!);
+    else fireEvent.keyDown(document,{key:"Escape"});
+    expect(container.querySelector(".artwork-modal-closing")).toBeTruthy();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(document.body.style.overflow).toBe("hidden");
+    fireEvent.keyDown(document,{key:"Escape"});
+    await waitFor(()=>expect(onClose).toHaveBeenCalledTimes(1));
+  });
+  it("cancels pending dismissal on unmount",async()=>{
+    const onClose=vi.fn();const view=render(modal(onClose));
+    fireEvent.keyDown(document,{key:"Escape"});view.unmount();
+    await new Promise(resolve=>setTimeout(resolve,280));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(document.body.style.overflow).not.toBe("hidden");
+  });
+  it("does not wait for animation when reduced motion is preferred",async()=>{
+    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:true}));
+    const onClose=vi.fn();render(modal(onClose));
+    fireEvent.keyDown(document,{key:"Escape"});
+    await waitFor(()=>expect(onClose).toHaveBeenCalledTimes(1),{timeout:100});
   });
 });
 

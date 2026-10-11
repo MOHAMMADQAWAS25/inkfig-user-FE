@@ -7690,3 +7690,25 @@ Frontend tests and TypeScript/Vite build verified before commit; whitespace revi
 ### Git
 
 Branch: `fix/artwork-dialog-scrollbar`. Commit hash and push/deployment results reported in handoff. Fetch/rebase before branch push, followed by the authorized fast-forward main merge and push. No previous feature-log entries modified.
+
+## 2026-10-12 — Smooth artwork detail closing
+
+### Request and changes
+
+Animate card dismissal like the notifications and Find users panels. The shared Home/Profile artwork dialog now fades and scales out for 240ms before dismissal via its close button, backdrop or Escape. Artist navigation waits for dismissal. Repeated close requests are guarded, pending timers are cleaned up on unmount, body scrolling stays locked during exit, and reduced-motion preferences skip the animation delay.
+
+### Repositories and files
+
+All three repositories checked clean and synchronized with main before implementation. Frontend only: `src/features/home/ArtworkDetailModal.tsx`, `src/styles.css`, `tests/gallery-interactions.test.tsx`, and this log. Backends unchanged.
+
+### API, database and permissions
+
+No API, database, permissions, configuration, secrets or backend/SnapStart changes.
+
+### Verification and deployment
+
+All 104 tests passed (62 foundation, 42 component), including dismissal methods, repeated dismissal, timer cleanup and reduced motion. TypeScript checks and Vite production build passed; whitespace review passed. Existing frontend main deployment workflow applies. Live browser inspection remains unavailable due to the previously observed browser runtime sandbox failure.
+
+### Git
+
+Branch: `fix/smooth-artwork-close`. Fetch/rebase before branch push, then authorized fast-forward main merge and push. Commit hash, push and deployment outcome reported in handoff. No previous entries modified.

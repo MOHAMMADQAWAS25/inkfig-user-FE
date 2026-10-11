@@ -551,6 +551,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 560px) { .artwork-modal-moderate { width: 100%; margin-inline-start: 0; justify-content: center; }.moderation-dialog { padding: 26px 20px; }.moderation-dialog > div { flex-direction: column-reverse; }.moderation-dialog > div button { width: 100%; } }
 @keyframes artwork-backdrop-in { from { opacity: 0; } }
 @keyframes artwork-modal-in { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+.artwork-modal-backdrop.artwork-modal-closing { animation: artwork-backdrop-out 240ms ease-in-out both; pointer-events: none; }
+.artwork-modal-closing > .artwork-modal { animation: artwork-modal-out 240ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes artwork-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes artwork-modal-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(18px) scale(.97); } }
+@media (prefers-reduced-motion: reduce) { .artwork-modal-backdrop.artwork-modal-closing,.artwork-modal-closing > .artwork-modal { animation: none; } }
 :root[data-theme="dark"] .artwork-modal { border-color: #3b4828; background: #171d11; }
 :root[data-theme="dark"] .artwork-modal-content h2, :root[data-theme="dark"] .artwork-modal-description h3, :root[data-theme="dark"] .artwork-modal-links h3 { color: #f7f2d8; }
 :root[data-theme="dark"] .artwork-modal-meta, :root[data-theme="dark"] .artwork-modal-description p { color: #b7b59a; }
