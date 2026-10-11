@@ -7668,3 +7668,25 @@ Deploy frontend only through the existing Cloudflare workflow. Both backends req
 ### Notes
 
 Check all three repository states and synchronize clean main branches before future implementation tasks. Preserve this task's known local edits on its branch during interrupted work.
+
+## 2026-10-11 - Remove nested artwork dialog scrollbars
+
+### Request and changes
+
+Remove the up/down scrollbar inside opened artwork cards. Removed the dialog and details-column height caps and inner scrolling. Long details expand the card; the existing overlay scrolls the whole card when necessary. Safe centering keeps oversized dialogs reachable from the top. Natural artwork proportions, mobile layout and RTL remain supported.
+
+### Repositories and files
+
+Checked and synchronized all three repositories. Only `inkfig-user-FE/src/styles.css` and this feature log change; both backends remain unchanged.
+
+### API, database and permissions
+
+No API changes or migration. No permissions, secrets, configuration or backend/SnapStart changes.
+
+### Verification and deployment
+
+Frontend tests and TypeScript/Vite build verified before commit; whitespace review performed. Deploy frontend through its existing main workflow. Live browser inspection remains unavailable due to the previously observed browser runtime sandbox failure.
+
+### Git
+
+Branch: `fix/artwork-dialog-scrollbar`. Commit hash and push/deployment results reported in handoff. Fetch/rebase before branch push, followed by the authorized fast-forward main merge and push. No previous feature-log entries modified.
