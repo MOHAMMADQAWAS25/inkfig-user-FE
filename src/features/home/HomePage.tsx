@@ -1,5 +1,5 @@
 import { LogOut, Search, UserRound } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
@@ -35,6 +35,8 @@ const workCategories = [
 export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
+  const location = useLocation();
+
   const [searchParams,setSearchParams]=useSearchParams();
   const [activeCategory, setActiveCategory] = useState(searchParams.get("category") ?? "all");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
@@ -71,13 +73,19 @@ export function HomePage() {
     ...(loadedWork ? { like_count: loadedWork.like_count, liked_by_me: loadedWork.liked_by_me, saved_by_me: loadedWork.saved_by_me } : {}),
   } : null;
   useEffect(() => {
-    const next = new URLSearchParams(searchParams);
-    if (activeCategory === "all") next.delete("category"); else next.set("category", activeCategory);
-    if (submittedSearch) next.set("q", submittedSearch); else next.delete("q");
-    if (submittedAccount) { next.set("artist", submittedAccount.user_id); next.set("artistName", submittedAccount.full_name); }
-    else { next.delete("artist"); next.delete("artistName"); }
-    if (next.toString() !== searchParams.toString()) setSearchParams(next, {replace:true});
-  }, [activeCategory, submittedSearch, submittedAccount, searchParams, setSearchParams]);
+    const query=searchParams.get("q")??"";
+    const account=searchParams.get("artist")?{user_id:searchParams.get("artist")!,full_name:searchParams.get("artistName")??"",avatar_url:null}:null;
+    setActiveCategory(searchParams.get("category")??"all");
+    setSubmittedSearch(query);setSearchQuery(query);
+    setSubmittedAccount(account);setSelectedAccount(account);
+    setMentionQuery(null);setAccountSuggestions([]);
+    if(location.state?.resetHome)window.scrollTo({top:0,behavior:"smooth"});
+  }, [searchParams, location.key]);
+  function selectCategory(category:string){
+    const next=new URLSearchParams(searchParams);
+    if(category==="all")next.delete("category");else next.set("category",category);
+    setSearchParams(next);
+  }
   useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
   useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target))setMentionQuery(null);}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
@@ -106,7 +114,15 @@ export function HomePage() {
       document.querySelector<HTMLButtonElement>(`button[data-work-id="${CSS.escape(id ?? "")}"]`)?.focus({preventScroll:true});
     });
   }
-  function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}setSubmittedSearch(searchQuery.trim());setSubmittedAccount(selectedAccount);setMentionQuery(null);}
+  function submitSearch(event:FormEvent<HTMLFormElement>){
+    event.preventDefault();
+    if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}
+    const query=searchQuery.trim();const next=new URLSearchParams(searchParams);
+    if(query)next.set("q",query);else next.delete("q");
+    if(selectedAccount){next.set("artist",selectedAccount.user_id);next.set("artistName",selectedAccount.full_name);}
+    else{next.delete("artist");next.delete("artistName");}
+    next.delete("work");setSearchParams(next);setMentionQuery(null);
+  }
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
   function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
@@ -153,9 +169,9 @@ export function HomePage() {
 
       <section className="gallery-feed" aria-label={t("home.collectionTitle")}>
         <div className="gallery-filters" role="group" aria-label={t("home.filters")}>
-          <button className={activeCategory === "all" ? "active" : ""} type="button" aria-pressed={activeCategory === "all"} onClick={() => setActiveCategory("all")}>{t("home.filter.all")}</button>
+          <button className={activeCategory === "all" ? "active" : ""} type="button" aria-pressed={activeCategory === "all"} onClick={() => selectCategory("all")}>{t("home.filter.all")}</button>
           {workCategories.map((category) => (
-            <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => setActiveCategory(category.code)}>{t(category.label)}</button>
+            <button className={activeCategory === category.code ? "active" : ""} type="button" aria-pressed={activeCategory === category.code} key={category.code} onClick={() => selectCategory(category.code)}>{t(category.label)}</button>
           ))}
         </div>
         <Feed key={feed.cacheKey} cacheKey={feed.cacheKey} items={works} loading={feed.loading} loadingMore={feed.loadingMore}

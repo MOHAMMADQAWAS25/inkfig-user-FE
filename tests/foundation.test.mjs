@@ -307,7 +307,7 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(worksApi, /\/like/);
   assert.match(router, /\/:language\/upload/);
   assert.match(uploadWorkPage, /Navigate replace/);
-  assert.match(uploadWorkPage, /accept="image\/jpeg,image\/png,image\/webp,image\/gif"/);
+  assert.match(uploadWorkPage, /accept="image\/jpeg,image\/png,image\/webp,image\/gif,video\/mp4,video\/webm,video\/quicktime"/);
   assert.match(uploadWorkPage, /handleFileChange/);
   assert.match(uploadWorkPage, /works\.emptyFile/);
   assert.match(uploadWorkPage, /event\.target\.value=""/);
@@ -477,7 +477,7 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(feedQuery, /searchWorks\(scope.search, scope.category/);
   assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(searchParams.get\("q"\)/);
   assert.match(homePage, /onSubmit=\{submitSearch\}/);
-  assert.match(homePage, /setSubmittedSearch\(searchQuery\.trim\(\)\)/);
+  assert.match(homePage, /const query=searchQuery\.trim\(\)/);
   assert.match(homePage, /window\.setTimeout/);
   assert.match(feedLayout, /heights.indexOf\(Math.min\(\.\.\.heights\)\)/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
@@ -540,7 +540,7 @@ test("opens a paginated live account search panel from the navigation rail", () 
 test("smoothly opens account and notification panels from the navigation rail", () => {
   assert.match(appSidebar, /app-sidebar-panel-button/);
   assert.match(appSidebar, /aria-controls="notifications-panel"/);
-  assert.match(appSidebar, /className="account-discovery-panel notifications-panel sidebar-panel-enter"/);
+  assert.match(appSidebar, /account-discovery-panel notifications-panel sidebar-panel-enter/);
   assert.doesNotMatch(appSidebar, /to:\s*`\/\$\{language\}\/notifications`/);
   assert.match(appSidebar, /event\.key==="Escape"/);
   assert.match(styles, /@keyframes sidebar-panel-in/);
@@ -560,7 +560,7 @@ test("provides persistent responsive social notifications and refined hover feed
   assert.doesNotMatch(appSidebar, /addEventListener\("focus"/);
   assert.match(appSidebar, /closingPanel/);
   assert.match(appSidebar, /data-tooltip/);
-  assert.match(styles, /animation-direction: reverse/);
+  assert.match(styles, /@keyframes sidebar-panel-out/);
   assert.match(styles, /\.app-sidebar-logo:hover img/);
   assert.match(styles, /\.gallery-profile-menu > summary:hover/);
   assert.match(styles, /\.notification-badge/);

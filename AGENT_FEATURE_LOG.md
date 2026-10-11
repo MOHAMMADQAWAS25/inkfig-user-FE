@@ -7615,3 +7615,56 @@ No API changes. No migration required. No permission/data-scope/environment/back
 ### Verification and deployment
 
 62 foundation tests and 23 component/feed tests passed (85 total), with TypeScript checks and Vite production build. Git diff whitespace check passed. No new real-browser animation timing check was performed; regression is covered by CSS assertions. Deploy frontend only via the existing main workflow, after commit and pull/rebase immediately before push. Both backends need no tests or deployment for this CSS-only change.
+
+## 2026-10-11 - Refine gallery navigation, media previews and panel closing
+
+### Request
+
+Return to the unfiltered home gallery through Home/logo, preview selected artwork, simplify the upload form, close both sliders smoothly, reset card overlays after detail dismissal, and show natural-proportion artwork with relative publication dates.
+
+### Changes
+
+- Made URL search parameters authoritative for submitted search, artist and category; Home/logo navigation clears them and scrolls to the home start.
+- Added local image/video previews with preserved proportions, bounded display size and object-URL cleanup. Removed the upload Back to Home link and refined form spacing, corners and themed surfaces.
+- Kept video selection explicitly preview-only: the synchronized main backend accepts images, validates image content and produces image variants. Video publication is disabled with bilingual explanation; no unsupported publication request is sent.
+- Added separate exit animations for panels/backdrops in desktop LTR/RTL and mobile layouts. Timers are per panel, repeated dismissal retains the closing timer, reopening cancels stale closes, and link navigation waits for closing.
+- Suppressed card overlays after opening artwork until another pointer movement or keyboard action; preserved focus restoration for accessibility.
+- Replaced fixed black media canvases with natural-proportion image/video presentation constrained by viewport dimensions.
+- Added localized relative publication dates with the exact timestamp available in a semantic time element.
+
+### Repositories
+
+- `inkfig-user-FE`: implementation, localization, styles and verification.
+- `inkfig-main-system`: synchronized and inspected upload/storage/media processing; no changes.
+- `inkfig-user-system`: synchronized and reviewed current notifications/reporting work; no changes.
+
+### Files
+
+- HomePage, ArtworkDetailModal, AppSidebar, PostCard and UploadWorkPage implement the interactions.
+- `src/lib/relativeTime.ts`, resources and styles implement localized dates and presentation.
+- `tests/gallery-interactions.test.tsx` covers real rendered interactions; existing foundation assertions were updated for the new contracts.
+
+### API, database, permissions and SnapStart
+
+No API or database changes; no migration. Upload, notification, ownership and moderation permissions remain backend-enforced. Existing WebSocket notifications are preserved. Backend resources and SnapStart compatibility are unaffected.
+
+### Verification
+
+- Passed 62 foundation tests and 37 component/feed tests (99 total).
+- Passed strict TypeScript and Vite production build; Git whitespace validation performed before commit.
+- Browser runtime startup failed with the Windows sandbox helper lock error. Physical viewport appearance and animation timing could not be checked in a live browser.
+- Initial checks found stale source assertions and missing newly merged dependencies; updated assertions, installed the lockfile dependencies and reran successfully. A new navigation test used an incorrect translated label; corrected it and reran successfully.
+
+### Deployment
+
+Deploy frontend only through the existing Cloudflare workflow. Both backends require no deployment or migration. Video publication remains an existing backend limitation.
+
+### Git
+
+- Branch: `fix/gallery-interactions-media`.
+- Commit: focused gallery/media interaction commit; exact hash reported in handoff.
+- Fetch/rebase, branch push, authorized main merge/push and deployment verification follow final review.
+
+### Notes
+
+Check all three repository states and synchronize clean main branches before future implementation tasks. Preserve this task's known local edits on its branch during interrupted work.

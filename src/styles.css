@@ -876,7 +876,12 @@ img { max-width: 100%; image-rendering: auto; }
 @keyframes sidebar-backdrop-in { from { opacity: 0; } }
 @keyframes sidebar-panel-in { from { opacity: 0; transform: translateX(-28px); } }
 @keyframes sidebar-panel-in-rtl { from { opacity: 0; transform: translateX(28px); } }
-.app-sidebar.closing-notifications .account-discovery-backdrop,.app-sidebar.closing-notifications .notifications-panel,.app-sidebar.closing-accounts ~ .account-discovery-backdrop,.app-sidebar.closing-accounts ~ .account-discovery-panel { animation-direction: reverse; animation-timing-function: ease-in; }
+.account-discovery-backdrop.sidebar-panel-exit { animation: sidebar-backdrop-out 280ms ease-in-out both; pointer-events: none; }
+.account-discovery-panel.sidebar-panel-exit { animation: sidebar-panel-out 280ms cubic-bezier(.22,.8,.24,1) both; pointer-events: none; }
+[dir="rtl"] .account-discovery-panel.sidebar-panel-exit { animation-name: sidebar-panel-out-rtl; }
+@keyframes sidebar-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sidebar-panel-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-28px); } }
+@keyframes sidebar-panel-out-rtl { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(28px); } }
 [dir="rtl"] .account-discovery-panel { right: var(--app-rail-size); left: auto; border-right: 0; border-left: 1px solid rgb(57 67 28 / .18); box-shadow: -18px 0 42px rgb(28 36 16 / .16); }
 .account-discovery-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .account-discovery-panel h2 { margin: 0; color: #39431c; font-family: Georgia,"Times New Roman",serif; font-size: 1.45rem; }
@@ -1376,4 +1381,39 @@ img { max-width: 100%; image-rendering: auto; }
 @media (prefers-reduced-motion: reduce) {
   .artwork-virtual-feed .feed-image { transition: none; }
   .gallery-scroll-sentinel span::before { animation: none; }
+}
+
+/* Keep detail media at its natural proportions, without a fixed black canvas. */
+.artwork-modal { width: fit-content; max-width: 100%; grid-template-columns: minmax(0,auto) minmax(280px,360px); align-items: start; max-height: calc(100svh - 56px); overflow-y: auto; }
+.artwork-modal-media { min-height: 0; height: auto; max-height: none; background: transparent; align-self: start; }
+.artwork-modal-media img,.artwork-modal-media video { display: block; width: auto; height: auto; max-width: min(62vw,720px); max-height: calc(100svh - 56px); object-fit: contain; }
+.artwork-modal-content { max-height: calc(100svh - 56px); }
+.upload-card { width: min(740px,100%); box-shadow: 0 14px 40px rgb(57 67 28 / .08); }
+.upload-card h1 { margin-top: 0; font-size: clamp(1.8rem,3vw,2.3rem); }
+.upload-card > p { color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.upload-card .form-stack { gap: 22px; }
+.upload-card input,.upload-card select,.upload-card textarea { border-radius: 10px; }
+.work-file-field { display: grid; gap: 12px; min-width: 0; }
+.work-file-field > label { font-weight: 700; }
+.work-file-preview { display: grid; place-items: center; padding: 14px; min-height: 140px; border: 1px dashed var(--border); border-radius: 14px; background: rgb(97 125 43 / .05); overflow: hidden; }
+.work-file-preview img,.work-file-preview video { display: block; width: auto; height: auto; max-width: 100%; max-height: 280px; border-radius: 8px; object-fit: contain; }
+.work-file-preview > span { display: grid; justify-items: center; gap: 10px; color: var(--muted); }
+.work-file-name { overflow-wrap: anywhere; color: var(--muted); }
+:root[data-theme="dark"] .upload-card { background: var(--surface); border-color: var(--border); }
+:root[data-theme="dark"] .upload-card h1 { color: var(--text); }
+.artwork-pin-media.hover-reset::after { opacity: 0; }
+.artwork-pin-media.hover-reset .artwork-pin-like,.artwork-pin-media.hover-reset .artwork-pin-save,.artwork-pin-media.hover-reset .artwork-pin-save.saved,.artwork-pin-media.hover-reset .artwork-artist-link,.artwork-pin-media.hover-reset .artwork-card-type-tag { opacity: 0; pointer-events: none; transform: translateY(8px); }
+.artwork-virtual-feed .artwork-pin-media.hover-reset .feed-image { transform: none; }
+@media (max-width: 780px) {
+  .artwork-modal { width: fit-content; min-height: 0; grid-template-columns: minmax(0,1fr); max-height: none; }
+  .artwork-modal-media { height: auto; min-height: 0; max-height: none; }
+  .artwork-modal-media img,.artwork-modal-media video { width: auto; height: auto; max-width: 100%; max-height: 70svh; }
+  .artwork-modal-content { max-height: none; }
+}
+@media (max-width: 720px) {
+  .account-discovery-panel.sidebar-panel-exit,[dir="rtl"] .account-discovery-panel.sidebar-panel-exit { animation-name: sidebar-panel-out-mobile; }
+}
+@keyframes sidebar-panel-out-mobile { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(24px) scale(.985); } }
+@media (prefers-reduced-motion: reduce) {
+  .account-discovery-backdrop.sidebar-panel-exit,.account-discovery-panel.sidebar-panel-exit { animation-duration: 1ms; }
 }
