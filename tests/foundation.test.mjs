@@ -864,3 +864,9 @@ test("viewport clips horizontal overflow without disabling vertical scrolling", 
   assert.match(css, /html\s*\{[^}]*overflow-y:\s*scroll;[^}]*overflow-x:\s*hidden;/);
   assert.match(css, /\.gallery-filters\s*\{[^}]*overflow-x:\s*auto/);
 });
+
+test("feed images preserve smooth hover zoom and reduced-motion support", () => {
+  assert.match(styles, /\.artwork-virtual-feed \.feed-image \{[^}]*transition: opacity 160ms ease, transform 320ms ease;/);
+  assert.match(styles, /\.artwork-image-button:hover \.artwork-image,[^{]+\{ transform: scale\(1\.035\);/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\) \{\s*\.artwork-virtual-feed \.feed-image \{ transition: none; \}/);
+});

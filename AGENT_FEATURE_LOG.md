@@ -7599,3 +7599,19 @@ Uses existing POST /reports shape and reason codes; backend now rejects missing 
 ### Deployment
 
 Deploy user-system first, then frontend via existing main workflows; main-system is unchanged. Read/sync all repositories before changes, append affected logs, commit independently and pull/rebase main immediately before each push. No new database constraint is added for Other; backend enforces that conditional rule for new submissions.
+
+## 2026-10-11 - Restore smooth feed image hover zoom
+
+### Request and changes
+
+Restore the artwork hover transition that was overridden by the lazy-image fade-in rule. Frontend only; both backends synchronized and unchanged.
+`src/styles.css` now transitions opacity for 160ms and transform for 320ms on feed images. Existing 1.035 hover/focus zoom, image proportions, fade-in and reduced-motion transition suppression remain unchanged.
+`tests/foundation.test.mjs` adds regression assertions for both transitions, zoom and reduced-motion support; this feature log records the ticket.
+
+### Contracts and scope
+
+No API changes. No migration required. No permission/data-scope/environment/backend changes; no SnapStart impact.
+
+### Verification and deployment
+
+62 foundation tests and 23 component/feed tests passed (85 total), with TypeScript checks and Vite production build. Git diff whitespace check passed. No new real-browser animation timing check was performed; regression is covered by CSS assertions. Deploy frontend only via the existing main workflow, after commit and pull/rebase immediately before push. Both backends need no tests or deployment for this CSS-only change.
