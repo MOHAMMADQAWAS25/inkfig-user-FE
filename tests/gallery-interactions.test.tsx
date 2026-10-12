@@ -55,6 +55,11 @@ describe("home and panel interactions",()=>{
     fireEvent.submit(input.closest("form")!);
     await waitFor(()=>expect(vi.mocked(useInfiniteFeed).mock.lastCall?.[0]).toMatchObject({ownerId:"ahmad",search:"black"}));
     await waitFor(()=>expect(vi.mocked(requestJson).mock.calls.some(call=>call[1]==="POST"&&JSON.stringify(call[3]?.body).includes("@Ahmad Ishaq black"))).toBe(true));
+    fireEvent.click(screen.getByRole("button",{name:"Remove selected user"}));
+    expect(container.querySelector(".search-user-badge")).toBeNull();
+    expect((input as HTMLInputElement).value).toBe("black");
+    fireEvent.submit(input.closest("form")!);
+    await waitFor(()=>expect(vi.mocked(useInfiniteFeed).mock.lastCall?.[0]).toMatchObject({ownerId:undefined,search:"black"}));
     fireEvent.click(screen.getByRole("button",{name:"Clear search and selected user"}));
     expect(container.querySelector(".search-user-badge")).toBeNull();
     expect((input as HTMLInputElement).value).toBe("");

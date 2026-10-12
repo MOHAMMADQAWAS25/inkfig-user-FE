@@ -375,12 +375,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-search:focus-within { border-color: #779439; background: #fffdf0; box-shadow: 0 0 0 3px rgb(119 148 57 / 0.14); }
 .gallery-search input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: #39431c; font: inherit; }
 .gallery-search input::placeholder { color: #7a805f; opacity: 1; }
-.gallery-search input::-webkit-search-cancel-button { cursor: pointer; }
+.gallery-search input::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; display:none; }
 .gallery-search { position: relative; }
 .search-user-badge { display:inline-flex; align-items:center; gap:8px; flex:0 1 auto; min-width:0; max-width:48%; padding:3px 10px 3px 4px; border:1px solid #617d2b; border-radius:999px; background:rgb(97 125 43 / .1); color:#39431c; }
 .search-user-badge img,.search-user-initial { width:28px; height:28px; flex:0 0 28px; border-radius:50%; object-fit:cover; }
 .search-user-initial { display:grid; place-items:center; background:#617d2b; color:#fffdf0; font-weight:800; }
 .search-user-badge strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.88rem; font-weight:700; }
+.search-user-remove { display:grid; place-items:center; flex:0 0 22px; width:22px; height:22px; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; opacity:0; cursor:pointer; }
+.search-user-badge:hover .search-user-remove,.search-user-badge:focus-within .search-user-remove { opacity:1; }
+.search-user-remove:hover { background:rgb(97 125 43 / .18); }
+.search-user-remove:focus-visible { outline:2px solid #617d2b; outline-offset:1px; }
 .gallery-search > input { flex:1 1 0; min-width:0; }
 .search-clear-selection { display:grid; place-items:center; width:30px; height:30px; flex:0 0 30px; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; cursor:pointer; }
 .search-clear-selection:hover { background:rgb(97 125 43 / .12); }

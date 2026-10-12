@@ -7806,3 +7806,17 @@ Frontend only: HomePage, styles, localization and interaction tests. No API cont
 ### Git
 
 Branch: feature/search-user-badge. Fetch/rebase before push, then authorized fast-forward main merge/push. Commit and push outcomes reported in handoff. Prior entries preserved.
+
+## 2026-10-12 - Separate chip removal from search clearing
+
+### Request and changes
+
+Retained the main clear-all X and suppressed the native browser search-input cancel X. Added a theme-matched X inside the selected user's chip border, revealed on hover or keyboard focus. Chip removal retains the displayed keywords and clears only the pending artist selection, returning input focus. Existing search submission remains required to update results. No changes to search bar design, API, database, permissions or SnapStart.
+
+### Verification and deployment
+
+113 tests passed, including chip removal preserving black and subsequent submission searching globally, followed by clear-all behavior. TypeScript/Vite build and git diff --check passed. Frontend deployment only; live browser visual verification not performed.
+
+### Git
+
+Branch: fix/search-chip-remove. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcome reported in handoff; prior log entries preserved.

@@ -78,6 +78,7 @@ export function HomePage() {
     return()=>{active=false;};
   },[selectedAccount?.user_id]);
   function clearSearch(){setSearchQuery("");setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
+  function removeSelectedUser(){setSearchQuery(displayedSearch);setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
   const feed = useInfiniteFeed({
     category: activeCategory === "all" ? undefined : activeCategory,
     search: normalizedArtworkSearch.length >= 2 ? normalizedArtworkSearch : undefined,
@@ -196,7 +197,7 @@ export function HomePage() {
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef}>
           <Search aria-hidden="true" size={19} />
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>
-          {selectedAccount&&<span className="search-user-badge">{selectedAccount.avatar_url?<img src={selectedAccount.avatar_url} alt=""/>:<span className="search-user-initial" aria-hidden="true">{selectedAccount.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span>}<strong>{selectedAccount.full_name}</strong></span>}
+          {selectedAccount&&<span className="search-user-badge">{selectedAccount.avatar_url?<img src={selectedAccount.avatar_url} alt=""/>:<span className="search-user-initial" aria-hidden="true">{selectedAccount.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span>}<strong>{selectedAccount.full_name}</strong><button className="search-user-remove" type="button" aria-label={t("home.removeSelectedUser")} title={t("home.removeSelectedUser")} onClick={removeSelectedUser}><X size={14} aria-hidden="true"/></button></span>}
           <input id="gallery-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded={mentionQuery!==null||showHistory} aria-controls={showHistory?"recent-searches":"account-search-suggestions"} aria-activedescendant={showHistory&&historyIndex>=0?`recent-search-${historyIndex}`:undefined} value={displayedSearch} placeholder={t("home.searchPlaceholder")} onFocus={openHistory} onClick={()=>{if(!historyOpen)openHistory();}} onBlur={event=>{if(!event.currentTarget.form?.contains(event.relatedTarget as Node|null))setHistoryOpen(false);}} onChange={updateSearch} onKeyDown={handleSearchKeyDown} />
           {(selectedAccount||searchQuery)&&<button className="search-clear-selection" type="button" aria-label={t("home.clearSearch")} title={t("home.clearSearch")} onClick={clearSearch}><X size={19} aria-hidden="true"/></button>}
           {showHistory&&<RecentSearches items={historyItems} loading={history.loading} error={history.error} activeIndex={historyIndex} onSelect={selectRecent} onRemove={history.remove} onClear={history.clear} t={t}/>}
