@@ -377,12 +377,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-search input::placeholder { color: #7a805f; opacity: 1; }
 .gallery-search input::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; display:none; }
 .gallery-search { position: relative; }
-.search-user-badge { display:inline-flex; align-items:center; gap:8px; flex:0 1 auto; min-width:0; max-width:48%; padding:3px 10px 3px 4px; border:1px solid #617d2b; border-radius:999px; background:rgb(97 125 43 / .1); color:#39431c; }
+.search-user-badge { --chip-gap:8px; display:inline-flex; align-items:center; gap:var(--chip-gap); flex:0 1 auto; min-width:0; max-width:48%; padding:3px 10px 3px 4px; border:1px solid #617d2b; border-radius:999px; background:rgb(97 125 43 / .1); color:#39431c; }
 .search-user-badge img,.search-user-initial { width:28px; height:28px; flex:0 0 28px; border-radius:50%; object-fit:cover; }
 .search-user-initial { display:grid; place-items:center; background:#617d2b; color:#fffdf0; font-weight:800; }
 .search-user-badge strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.88rem; font-weight:700; }
-.search-user-remove { display:grid; place-items:center; flex:0 0 22px; width:22px; height:22px; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; opacity:0; cursor:pointer; }
-.search-user-badge:hover .search-user-remove,.search-user-badge:focus-within .search-user-remove { opacity:1; }
+.search-user-remove { display:grid; place-items:center; flex:0 0 auto; width:0; height:22px; margin-inline-start:calc(-1 * var(--chip-gap)); padding:0; overflow:hidden; border:0; border-radius:50%; background:transparent; color:inherit; opacity:0; pointer-events:none; cursor:pointer; transition:width 180ms ease,margin-inline-start 180ms ease,opacity 180ms ease; }
+.search-user-badge:hover .search-user-remove,.search-user-badge:focus-within .search-user-remove { width:22px; margin-inline-start:0; opacity:1; pointer-events:auto; }
 .search-user-remove:hover { background:rgb(97 125 43 / .18); }
 .search-user-remove:focus-visible { outline:2px solid #617d2b; outline-offset:1px; }
 .gallery-search > input { flex:1 1 0; min-width:0; }
@@ -390,7 +390,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .search-clear-selection:hover { background:rgb(97 125 43 / .12); }
 .search-clear-selection:focus-visible { outline:2px solid #617d2b; }
 :root[data-theme="dark"] .search-user-badge { color:#f7f2d8; background:rgb(97 125 43 / .12); }
-@media(max-width:520px){.search-user-badge { gap:5px; padding-inline:3px 7px; max-width:50%; }.search-user-badge strong{font-size:.75rem}.search-user-badge img,.search-user-initial { width:24px; height:24px; flex-basis:24px; }.gallery-search { gap:6px; }}
+@media(max-width:520px){.search-user-badge { --chip-gap:5px; padding-inline:3px 7px; max-width:50%; }.search-user-badge strong{font-size:.75rem}.search-user-badge img,.search-user-initial { width:24px; height:24px; flex-basis:24px; }.gallery-search { gap:6px; }}
+@media(prefers-reduced-motion:reduce){.search-user-remove { transition:none; }}
 .recent-searches { position:absolute; inset-inline:0; top:calc(100% + 8px); z-index:45; padding:10px; border:1px solid rgb(57 67 28 / .2); border-radius:14px; background:#fffdf0; color:#39431c; box-shadow:0 12px 28px rgb(28 36 16 / .16); }
 .recent-searches header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 9px 10px; font-size:.88rem; }
 .recent-searches button { border:0; background:transparent; color:inherit; font:inherit; cursor:pointer; }

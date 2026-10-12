@@ -7848,3 +7848,17 @@ New regression failed with missing image before the fix and passes afterward. Al
 ### Git
 
 Branch: fix/history-search-avatar. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff; prior entries preserved.
+
+## 2026-10-12 - Animate selected-user chip expansion
+
+### Request and changes
+
+Kept the rounded chip border continuously visible. Chip removal button now collapses to zero width with its gap removed, expands over 180ms on hover or keyboard focus inside the existing border, and contracts on exit. Existing colors, alignment, clear-all button and keyword-preserving chip removal retained. Responsive gap uses a shared CSS variable; reduced motion disables the transition.
+
+### Verification and deployment
+
+114 existing tests and TypeScript/Vite production build passed; git diff --check passed. CSS-only frontend change; no backend, migration, API, permissions or SnapStart impact. Live browser visual verification not performed.
+
+### Git
+
+Branch: fix/search-chip-hover-expansion. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push results reported in handoff. Prior entries preserved.
