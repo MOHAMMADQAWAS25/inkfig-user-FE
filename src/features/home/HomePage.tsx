@@ -1,4 +1,4 @@
-import { LogOut, Search, UserRound } from "lucide-react";
+import { LogOut, Search, UserRound, X } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -70,6 +70,14 @@ export function HomePage() {
   const normalizedSearch=submittedSearch.trim();
   function artworkQuery(value:string, account:ProfileSearchResult|null){return account?value.replace(`@${account.full_name}`," ").replace(/\s+/g," ").trim():value.trim();}
   const normalizedArtworkSearch=artworkQuery(normalizedSearch,submittedAccount);
+  const displayedSearch=selectedAccount?searchQuery.replace(`@${selectedAccount.full_name}`,"").replace(/^\s+/,""):searchQuery;
+  useEffect(()=>{
+    if(!selectedAccount||selectedAccount.avatar_url)return;
+    let active=true;const userId=selectedAccount.user_id;
+    getPublicProfile(userId).then(profile=>{if(active)setSelectedAccount(current=>current?.user_id===userId?{...current,avatar_url:profile.avatar_url}:current);}).catch(()=>undefined);
+    return()=>{active=false;};
+  },[selectedAccount?.user_id]);
+  function clearSearch(){setSearchQuery("");setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
   const feed = useInfiniteFeed({
     category: activeCategory === "all" ? undefined : activeCategory,
     search: normalizedArtworkSearch.length >= 2 ? normalizedArtworkSearch : undefined,
@@ -150,7 +158,7 @@ export function HomePage() {
     }
     setSelectedAccount(account);executeSearch(query,account);
   }
-  function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
+  function updateSearch(event:ChangeEvent<HTMLInputElement>){const typed=event.target.value;if(selectedAccount){setSearchQuery(`@${selectedAccount.full_name}${typed?` ${typed}`:""}`);setMentionQuery(null);setAccountSuggestions([]);return;}setSearchQuery(typed);const at=typed.lastIndexOf("@");if(at<0){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(typed.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
   function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(event.key==="Escape"){event.preventDefault();setHistoryOpen(false);setMentionQuery(null);return;}if(showHistory&&historyItems.length){if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();setHistoryIndex(index=>index<0?(event.key==="ArrowDown"?0:historyItems.length-1):(index+(event.key==="ArrowDown"?1:-1)+historyItems.length)%historyItems.length);return;}if(event.key==="Enter"&&historyIndex>=0){event.preventDefault();selectRecent(historyItems[historyIndex]);return;}}if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
   async function toggleLike(work:Work){
@@ -188,7 +196,9 @@ export function HomePage() {
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef}>
           <Search aria-hidden="true" size={19} />
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>
-          <input id="gallery-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded={mentionQuery!==null||showHistory} aria-controls={showHistory?"recent-searches":"account-search-suggestions"} aria-activedescendant={showHistory&&historyIndex>=0?`recent-search-${historyIndex}`:undefined} value={searchQuery} placeholder={t("home.searchPlaceholder")} onFocus={openHistory} onClick={()=>{if(!historyOpen)openHistory();}} onBlur={event=>{if(!event.currentTarget.form?.contains(event.relatedTarget as Node|null))setHistoryOpen(false);}} onChange={updateSearch} onKeyDown={handleSearchKeyDown} />
+          {selectedAccount&&<span className="search-user-badge">{selectedAccount.avatar_url?<img src={selectedAccount.avatar_url} alt=""/>:<span className="search-user-initial" aria-hidden="true">{selectedAccount.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span>}<strong>{selectedAccount.full_name}</strong></span>}
+          <input id="gallery-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded={mentionQuery!==null||showHistory} aria-controls={showHistory?"recent-searches":"account-search-suggestions"} aria-activedescendant={showHistory&&historyIndex>=0?`recent-search-${historyIndex}`:undefined} value={displayedSearch} placeholder={t("home.searchPlaceholder")} onFocus={openHistory} onClick={()=>{if(!historyOpen)openHistory();}} onBlur={event=>{if(!event.currentTarget.form?.contains(event.relatedTarget as Node|null))setHistoryOpen(false);}} onChange={updateSearch} onKeyDown={handleSearchKeyDown} />
+          {(selectedAccount||searchQuery)&&<button className="search-clear-selection" type="button" aria-label={t("home.clearSearch")} title={t("home.clearSearch")} onClick={clearSearch}><X size={19} aria-hidden="true"/></button>}
           {showHistory&&<RecentSearches items={historyItems} loading={history.loading} error={history.error} activeIndex={historyIndex} onSelect={selectRecent} onRemove={history.remove} onClear={history.clear} t={t}/>}
           {mentionQuery!==null&&<div className="account-search-suggestions" id="account-search-suggestions" role="listbox">{mentionQuery.length===0?<p>{t("home.accountSearchHint")}</p>:accountSearchLoading?<p>{t("home.searchingAccounts")}</p>:accountSuggestions.length===0?<p>{t("home.noAccountsFound")}</p>:accountSuggestions.map((account,index)=><button className={index===activeSuggestion?"active":""} type="button" role="option" aria-selected={index===activeSuggestion} key={account.user_id} onPointerDown={event=>event.preventDefault()} onClick={()=>selectAccount(account)}><span>{account.avatar_url?<img src={account.avatar_url} alt=""/>:account.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span><strong>{account.full_name}</strong></button>)}</div>}
         </form>

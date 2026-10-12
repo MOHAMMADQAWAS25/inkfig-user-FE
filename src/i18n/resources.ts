@@ -1,6 +1,7 @@
 export type Language = "ar" | "en";
 
 const en = {
+  "home.clearSearch": "Clear search and selected user",
   "searchHistory.title": "Recent Searches",
   "searchHistory.clear": "Clear All",
   "searchHistory.remove": "Remove search",
@@ -381,6 +382,7 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
+  "home.clearSearch": "مسح البحث والمستخدم المحدد",
   "searchHistory.title": "عمليات البحث الأخيرة",
   "searchHistory.clear": "مسح الكل",
   "searchHistory.remove": "حذف البحث",

@@ -13,6 +13,7 @@ import type { Work } from "../src/features/works/worksApi";
 import { getWorkTypes, type FeedWork } from "../src/features/works/worksApi";
 import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
 import { requestJson } from "../src/api/httpClient";
+import { searchProfiles } from "../src/features/profile/profileApi";
 vi.mock("../src/api/httpClient",()=>({userApiBaseUrl:"api",requestJson:vi.fn()}));
 
 vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:"en",t:(key:keyof typeof translations.en)=>translations.en[key]})}));
@@ -28,6 +29,7 @@ vi.mock("../src/theme/ThemeToggle",()=>({ThemeToggle:()=>null}));
 
 beforeEach(()=>{
   vi.clearAllMocks();
+  vi.mocked(searchProfiles).mockResolvedValue([]);
   vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
   vi.stubGlobal("URL",Object.assign(URL,{createObjectURL:vi.fn().mockReturnValue("blob:preview"),revokeObjectURL:vi.fn()}));
   vi.mocked(getWorkTypes).mockResolvedValue([{type_id:"art",code:"digital-art",name_en:"Digital art",name_ar:"فن رقمي"}]);
@@ -37,6 +39,26 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("shows the selected user badge and searches their artwork with typed keywords",async()=>{
+    vi.mocked(searchProfiles).mockResolvedValue([{user_id:"ahmad",full_name:"Ahmad Ishaq",avatar_url:"https://example.com/avatar.png"}]);
+    vi.mocked(requestJson).mockResolvedValue({data:[],status:200});
+    const {container}=render(<MemoryRouter><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox");
+    fireEvent.change(input,{target:{value:"@ahmad"}});
+    await screen.findByRole("option",{name:"Ahmad Ishaq"});
+    fireEvent.keyDown(input,{key:"Enter"});
+    const badge=container.querySelector(".search-user-badge")!;
+    expect(badge.textContent).toBe("Ahmad Ishaq");
+    expect(badge.querySelector("img")?.getAttribute("src")).toBe("https://example.com/avatar.png");
+    expect((input as HTMLInputElement).value).toBe("");
+    fireEvent.change(input,{target:{value:"black"}});
+    fireEvent.submit(input.closest("form")!);
+    await waitFor(()=>expect(vi.mocked(useInfiniteFeed).mock.lastCall?.[0]).toMatchObject({ownerId:"ahmad",search:"black"}));
+    await waitFor(()=>expect(vi.mocked(requestJson).mock.calls.some(call=>call[1]==="POST"&&JSON.stringify(call[3]?.body).includes("@Ahmad Ishaq black"))).toBe(true));
+    fireEvent.click(screen.getByRole("button",{name:"Clear search and selected user"}));
+    expect(container.querySelector(".search-user-badge")).toBeNull();
+    expect((input as HTMLInputElement).value).toBe("");
+  });
   it("restores the saved artist after clearing the input and selecting history",async()=>{
     const item={query:"@Ahmad Ishaq black",normalized_query:"@ahmad ishaq black",search_history_id:"entry",last_searched_at:new Date().toISOString(),artist_user_id:"ahmad-id",artist_name:"Ahmad Ishaq"};
     vi.mocked(requestJson).mockResolvedValue({data:[item],status:200});

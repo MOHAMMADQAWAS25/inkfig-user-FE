@@ -7788,3 +7788,21 @@ Apply user-system migration 20261012_020_add_search_history_artist.sql and deplo
 ### Git
 
 Branch: fix/search-history-artist-filter. Commit/push outcomes reported in handoff; fetch/rebase before push, authorized fast-forward main merge. Prior entries preserved.
+
+## 2026-10-12 - Selected user badge inside search bar
+
+### Request and changes
+
+Display the selected user's circular profile picture and name in a rounded inline badge like the supplied reference image after Enter/click selection. Input displays only artwork keywords while the internal full query retains the selected mention for existing submission, URLs and history. The clear control removes selection and input text, returning focus. History/URL-restored artists load their profile avatar through the existing endpoint, with initials fallback. Styling uses existing theme colors and responsive sizing with RTL-compatible positioning.
+
+### Scope and deployment
+
+Frontend only: HomePage, styles, localization and interaction tests. No API contract, migration, backend authorization, secrets or SnapStart changes. Deploy frontend via existing main workflow.
+
+### Verification
+
+113 tests passed (62 foundation, 51 component), including keyboard user selection, avatar/name badge, keyword owner filter, history payload and clear behavior. TypeScript and Vite production build passed; git diff --check passed. Reference image inspected; live browser visual verification not performed.
+
+### Git
+
+Branch: feature/search-user-badge. Fetch/rebase before push, then authorized fast-forward main merge/push. Commit and push outcomes reported in handoff. Prior entries preserved.
