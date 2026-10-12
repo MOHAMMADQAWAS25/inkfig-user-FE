@@ -29,7 +29,8 @@ export async function requestJson<TData>(
     || path.startsWith("/settings")
     || path.startsWith("/admin")
     || path.startsWith("/notifications")
-    || path.startsWith("/search-history");
+    || path.startsWith("/search-history")
+    || path.startsWith("/reports");
   if (
     response.status === 401
     && (normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) || authenticatedUserPath)

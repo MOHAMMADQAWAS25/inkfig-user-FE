@@ -7862,3 +7862,23 @@ Kept the rounded chip border continuously visible. Chip removal button now colla
 ### Git
 
 Branch: fix/search-chip-hover-expansion. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push results reported in handoff. Prior entries preserved.
+
+## 2026-10-13 - Reports dashboard table and detail layout
+
+### Request and changes
+
+Restyled the content below the existing Reports queue hero using the supplied dashboard reference. Added rounded All/Post/User tabs with loaded counts, reason/status/sort controls, compact report table with real artwork/profile thumbnails, reporter links, reason badges, timestamps and status pills. Selecting a row opens a side detail panel with real preview, owner/category information, report message and existing review/dismiss/delete/suspend actions. Detail actions honor corresponding permissions. Mobile layout stacks the detail panel below the horizontally scrollable table. Existing server status filtering, live invalidation and continuation loading retained. Type/reason filters, sort and counts explicitly describe loaded records; no fake totals, metrics or unsupported warn-user actions introduced.
+
+Also added reports endpoints to the existing cookie-refresh/retry handling, correcting the previously identified missing refresh behavior on 401.
+
+### Scope
+
+Frontend only: AdminReportsPage, httpClient, translations and CSS. No backend, database, permission or SnapStart changes. Reference image inspected as a visual asset.
+
+### Verification and deployment
+
+114 existing tests passed; strict TypeScript/Vite production build and git diff --check passed. Live browser visual verification not performed. Existing frontend deployment workflow applies.
+
+### Git
+
+Branch: feature/reports-dashboard-layout. Fetch/rebase before push and authorized fast-forward main merge/push. Commit and push results reported in handoff. Prior log entries preserved.
