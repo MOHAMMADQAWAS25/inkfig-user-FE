@@ -61,7 +61,7 @@ export function HomePage() {
   const [historyOpen,setHistoryOpen]=useState(false);
   const [historyIndex,setHistoryIndex]=useState(-1);
   const historyItems=visibleSearchHistory(history.items,searchQuery);
-  const showHistory=historyOpen&&mentionQuery===null&&(!searchQuery.trim()||historyItems.length>0);
+  const showHistory=historyOpen&&mentionQuery===null&&!history.loading&&historyItems.length>0;
   function openHistory(){setHistoryOpen(true);setHistoryIndex(-1);void history.refresh();}
   useEffect(()=>{setHistoryIndex(-1);},[searchQuery]);
   useEffect(()=>{setHistoryOpen(false);},[session?.userId]);

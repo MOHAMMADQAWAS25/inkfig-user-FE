@@ -7752,3 +7752,21 @@ Deploy user-system migration/API before frontend. No new frontend environment va
 ### Git
 
 Branch: feature/recent-search-history. Commit hashes and push outcomes reported in handoff; fetch/rebase before branch pushes and authorized fast-forward main merges. Earlier log entries preserved.
+
+## 2026-10-12 - Hide empty recent search history
+
+### Request and changes
+
+Render the history dropdown only after loading finishes and visible history contains at least one entry. Empty history and pending requests render no dropdown container, heading, actions, empty message or shadow. Optimistic Clear All and last-entry removal immediately hide the dropdown. Existing four-entry and normalized exact-match filtering are retained.
+
+### Verification
+
+111 frontend tests passed; TypeScript and Vite production build passed. git diff --check passed. Live browser verification was not performed.
+
+### Deployment and scope
+
+Frontend only; no backend, migration, API, permissions or SnapStart changes. Deploy via existing frontend workflow.
+
+### Git
+
+Branch: fix/hide-empty-search-history. Focused commit and push result reported in handoff; fetch/rebase before push and authorized fast-forward main merge. Earlier entries preserved.
