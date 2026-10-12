@@ -7820,3 +7820,17 @@ Retained the main clear-all X and suppressed the native browser search-input can
 ### Git
 
 Branch: fix/search-chip-remove. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcome reported in handoff; prior log entries preserved.
+
+## 2026-10-12 - Preserve selected search avatar on submission
+
+### Request and changes
+
+Fixed the URL synchronization effect rebuilding the selected artist with avatar_url=null after Enter submission. When the artist ID is unchanged, the existing avatar is preserved. Profile hydration also retains an already available avatar instead of overwriting it with an empty response. Different artists still receive their own profile data.
+
+### Verification and deployment
+
+113 tests passed, including the selected image remaining after submitting artwork keywords. TypeScript/Vite build and git diff --check passed. Frontend deployment only; no API, migration, backend, permission or SnapStart changes. Live browser visual verification not performed.
+
+### Git
+
+Branch: fix/preserve-search-avatar. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff. Prior entries preserved.

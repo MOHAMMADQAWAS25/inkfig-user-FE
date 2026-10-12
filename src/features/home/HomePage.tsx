@@ -74,7 +74,7 @@ export function HomePage() {
   useEffect(()=>{
     if(!selectedAccount||selectedAccount.avatar_url)return;
     let active=true;const userId=selectedAccount.user_id;
-    getPublicProfile(userId).then(profile=>{if(active)setSelectedAccount(current=>current?.user_id===userId?{...current,avatar_url:profile.avatar_url}:current);}).catch(()=>undefined);
+    getPublicProfile(userId).then(profile=>{if(active)setSelectedAccount(current=>current?.user_id===userId?{...current,avatar_url:current.avatar_url??profile.avatar_url}:current);}).catch(()=>undefined);
     return()=>{active=false;};
   },[selectedAccount?.user_id]);
   function clearSearch(){setSearchQuery("");setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
@@ -96,7 +96,8 @@ export function HomePage() {
     const account=searchParams.get("artist")?{user_id:searchParams.get("artist")!,full_name:searchParams.get("artistName")??"",avatar_url:null}:null;
     setActiveCategory(searchParams.get("category")??"all");
     setSubmittedSearch(query);setSearchQuery(query);
-    setSubmittedAccount(account);setSelectedAccount(account);
+    setSubmittedAccount(account);
+    setSelectedAccount(current=>account&&current?.user_id===account.user_id?{...account,avatar_url:current.avatar_url}:account);
     setMentionQuery(null);setAccountSuggestions([]);
     if(location.state?.resetHome)window.scrollTo({top:0,behavior:"smooth"});
   }, [searchParams, location.key]);
