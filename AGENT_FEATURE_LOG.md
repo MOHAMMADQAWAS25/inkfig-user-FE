@@ -7730,3 +7730,25 @@ All 106 tests passed (62 foundation and 44 component), including outside, inside
 ### Git
 
 Branch: `fix/outside-click-dismissal`. Focused commit hash and push result reported in handoff. Fetch/rebase before push and authorized fast-forward merge into main. Previous entries preserved.
+
+## 2026-10-12 - Recent search history dropdown
+
+### Request and changes
+
+Added recent search history to the existing homepage search bar. Empty focused input displays the latest four real entries; typing hides history except for one entire normalized exact match. All 20 retained entries are checked, with trim and case-insensitive comparison. Search submission and selection share a single execution function, preserving URL navigation and recording only executed nonempty queries. Repeated queries update recency, individual removal is immediate, Clear All deletes history, and reopening refreshes canonical data. Includes arrows/Enter, Escape, outside dismissal, accessible remove labels, loading/error/empty states and Arabic/English light/dark styling. Guest history is isolated in browser local storage and never merged into account history. Account switches clear visible state; queued writes and revision checks guard stale responses. Existing search dimensions and gallery layout are retained.
+
+### Repositories, API and database
+
+Frontend and user-system use matching branches; main-system unchanged. Consumes authenticated /search-history endpoints with cookie refresh support. User-system migration 20261012_019_create_search_history.sql provides user-scoped unique records and 20-entry retention. Browser-only changes have no SnapStart effect.
+
+### Verification
+
+111 tests passed (62 foundation, 49 component), including exact versus partial matches, deduplication, retention, guest storage, account switching, selected-query single submission and remove-button isolation. Strict TypeScript and Vite production build passed; git diff --check passed. Live browser visual inspection was not performed. Backend pytest/mypy require CI because local Python is unavailable.
+
+### Deployment
+
+Deploy user-system migration/API before frontend. No new frontend environment variables or secrets.
+
+### Git
+
+Branch: feature/recent-search-history. Commit hashes and push outcomes reported in handoff; fetch/rebase before branch pushes and authorized fast-forward main merges. Earlier log entries preserved.

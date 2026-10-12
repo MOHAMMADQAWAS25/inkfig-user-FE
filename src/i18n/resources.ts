@@ -1,6 +1,12 @@
 export type Language = "ar" | "en";
 
 const en = {
+  "searchHistory.title": "Recent Searches",
+  "searchHistory.clear": "Clear All",
+  "searchHistory.remove": "Remove search",
+  "searchHistory.loading": "Loading recent searches...",
+  "searchHistory.empty": "No recent searches yet.",
+  "searchHistory.failed": "Recent searches are unavailable. Try reopening the search bar.",
   "feed.retry": "Retry",
   "feed.end": "You're all caught up",
   "feed.loaded": "artworks loaded",
@@ -375,6 +381,12 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
+  "searchHistory.title": "عمليات البحث الأخيرة",
+  "searchHistory.clear": "مسح الكل",
+  "searchHistory.remove": "حذف البحث",
+  "searchHistory.loading": "جارٍ تحميل عمليات البحث الأخيرة...",
+  "searchHistory.empty": "لا توجد عمليات بحث سابقة.",
+  "searchHistory.failed": "تعذر تحميل سجل البحث. حاول فتح شريط البحث مجدداً.",
   "feed.retry": "إعادة المحاولة",
   "feed.end": "لقد شاهدت جميع الأعمال",
   "feed.loaded": "عمل فني تم تحميله",

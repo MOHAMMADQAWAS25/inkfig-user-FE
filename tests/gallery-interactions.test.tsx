@@ -12,6 +12,8 @@ import { ArtworkDetailModal } from "../src/features/home/ArtworkDetailModal";
 import type { Work } from "../src/features/works/worksApi";
 import { getWorkTypes, type FeedWork } from "../src/features/works/worksApi";
 import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
+import { requestJson } from "../src/api/httpClient";
+vi.mock("../src/api/httpClient",()=>({userApiBaseUrl:"api",requestJson:vi.fn()}));
 
 vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:"en",t:(key:keyof typeof translations.en)=>translations.en[key]})}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"viewer",role:"student",permissions:["works.upload","works.like","works.save"],fullName:"Viewer",email:"viewer@example.com"},signOut:vi.fn()})}));
@@ -35,6 +37,34 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("shows exact history only while typing and executes a selected search once",async()=>{
+    const items=["Anime Art","Flowers","Sketch","Painting","Older"].map(query=>({query,normalized_query:query.toLowerCase(),search_history_id:query,last_searched_at:new Date().toISOString()}));
+    vi.mocked(requestJson).mockResolvedValue({data:items,status:200});
+    render(<MemoryRouter><HomePage/><RouteProbe/></MemoryRouter>);
+    const input=screen.getByRole("combobox");fireEvent.focus(input);
+    await screen.findByRole("option",{name:"Anime Art"});
+    expect(screen.getAllByRole("option")).toHaveLength(4);
+    fireEvent.change(input,{target:{value:"Anime"}});
+    expect(screen.queryByRole("option",{name:"Anime Art"})).toBeNull();
+    fireEvent.change(input,{target:{value:" ANIME ART "}});
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("option",{name:"Anime Art"}));
+    await waitFor(()=>expect(vi.mocked(requestJson).mock.calls.filter(call=>call[1]==="POST")).toHaveLength(1));
+    expect((input as HTMLInputElement).value).toBe("Anime Art");
+  });
+  it("does not record focus, typing or remove-button clicks",async()=>{
+    const item={query:"Anime Art",normalized_query:"anime art",search_history_id:"entry",last_searched_at:new Date().toISOString()};
+    vi.mocked(requestJson).mockResolvedValue({data:[item],status:200});
+    render(<MemoryRouter><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox");fireEvent.focus(input);
+    await screen.findByRole("option",{name:"Anime Art"});
+    fireEvent.click(screen.getByRole("button",{name:"Remove search: Anime Art"}));
+    expect(screen.queryByRole("option",{name:"Anime Art"})).toBeNull();
+    await waitFor(()=>expect(vi.mocked(requestJson).mock.calls.some(call=>call[1]==="DELETE")).toBe(true));
+    expect(vi.mocked(requestJson).mock.calls.some(call=>call[1]==="POST")).toBe(false);
+    fireEvent.keyDown(input,{key:"Escape"});
+    expect(screen.queryByRole("region",{name:"Recent Searches"})).toBeNull();
+  });
   it.each(["Notifications","Find users"])("closes %s outside and keeps inside interaction open",async name=>{
     const {container}=render(<MemoryRouter><AppSidebar/><button>Outside control</button></MemoryRouter>);
     const trigger=screen.getByRole("button",{name,exact:true});

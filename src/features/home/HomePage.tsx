@@ -19,6 +19,8 @@ import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getPublicProfile, searchProfiles } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
+import { useSearchHistory, visibleSearchHistory } from "./useSearchHistory";
+import { RecentSearches } from "./RecentSearches";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -55,6 +57,14 @@ export function HomePage() {
   const [deepLinkedWork,setDeepLinkedWork]=useState<Work|null>(null);
   const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const searchRef=useRef<HTMLFormElement>(null);
+  const history=useSearchHistory(session?.userId);
+  const [historyOpen,setHistoryOpen]=useState(false);
+  const [historyIndex,setHistoryIndex]=useState(-1);
+  const historyItems=visibleSearchHistory(history.items,searchQuery);
+  const showHistory=historyOpen&&mentionQuery===null&&(!searchQuery.trim()||historyItems.length>0);
+  function openHistory(){setHistoryOpen(true);setHistoryIndex(-1);void history.refresh();}
+  useEffect(()=>{setHistoryIndex(-1);},[searchQuery]);
+  useEffect(()=>{setHistoryOpen(false);},[session?.userId]);
   const interactionRequests=useRef(new Set<string>());
   const [profileAvatar,setProfileAvatar]=useState<string|null>(null);
   const normalizedSearch=submittedSearch.trim();
@@ -87,7 +97,7 @@ export function HomePage() {
     setSearchParams(next);
   }
   useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
-  useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target))setMentionQuery(null);}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
+  useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target)){setMentionQuery(null);setHistoryOpen(false);}}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
   const detailWorkId = searchParams.get("work");
@@ -117,15 +127,27 @@ export function HomePage() {
   function submitSearch(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
     if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}
-    const query=searchQuery.trim();const next=new URLSearchParams(searchParams);
+    executeSearch(searchQuery,selectedAccount);
+  }
+  function executeSearch(value:string,account:ProfileSearchResult|null){
+    const query=value.trim();const next=new URLSearchParams(searchParams);
+    history.record(query);setHistoryOpen(false);setHistoryIndex(-1);setSearchQuery(query);
     if(query)next.set("q",query);else next.delete("q");
-    if(selectedAccount){next.set("artist",selectedAccount.user_id);next.set("artistName",selectedAccount.full_name);}
+    if(account){next.set("artist",account.user_id);next.set("artistName",account.full_name);}
     else{next.delete("artist");next.delete("artistName");}
     next.delete("work");setSearchParams(next);setMentionQuery(null);
   }
+  async function selectRecent(query:string){
+    let account=selectedAccount&&query.includes(`@${selectedAccount.full_name}`)?selectedAccount:null;
+    if(!account&&query.includes("@")){
+      const name=query.slice(query.lastIndexOf("@")+1).trim();
+      try{account=(await searchProfiles(name)).find(item=>item.full_name.toLowerCase()===name.toLowerCase())??null;}catch{/* Text search remains available. */}
+    }
+    setSelectedAccount(account);executeSearch(query,account);
+  }
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
-  function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
+  function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(event.key==="Escape"){event.preventDefault();setHistoryOpen(false);setMentionQuery(null);return;}if(showHistory&&historyItems.length){if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();setHistoryIndex(index=>index<0?(event.key==="ArrowDown"?0:historyItems.length-1):(index+(event.key==="ArrowDown"?1:-1)+historyItems.length)%historyItems.length);return;}if(event.key==="Enter"&&historyIndex>=0){event.preventDefault();selectRecent(historyItems[historyIndex].query);return;}}if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
   async function toggleLike(work:Work){
     const key=`like:${work.work_id}`;
     if(!session || !hasPermission(session.permissions,"works.like") || interactionRequests.current.has(key))return;
@@ -161,7 +183,8 @@ export function HomePage() {
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef}>
           <Search aria-hidden="true" size={19} />
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>
-          <input id="gallery-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded={mentionQuery!==null} aria-controls="account-search-suggestions" value={searchQuery} placeholder={t("home.searchPlaceholder")} onChange={updateSearch} onKeyDown={handleSearchKeyDown} />
+          <input id="gallery-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded={mentionQuery!==null||showHistory} aria-controls={showHistory?"recent-searches":"account-search-suggestions"} aria-activedescendant={showHistory&&historyIndex>=0?`recent-search-${historyIndex}`:undefined} value={searchQuery} placeholder={t("home.searchPlaceholder")} onFocus={openHistory} onClick={()=>{if(!historyOpen)openHistory();}} onBlur={event=>{if(!event.currentTarget.form?.contains(event.relatedTarget as Node|null))setHistoryOpen(false);}} onChange={updateSearch} onKeyDown={handleSearchKeyDown} />
+          {showHistory&&<RecentSearches items={historyItems} loading={history.loading} error={history.error} activeIndex={historyIndex} onSelect={selectRecent} onRemove={history.remove} onClear={history.clear} t={t}/>}
           {mentionQuery!==null&&<div className="account-search-suggestions" id="account-search-suggestions" role="listbox">{mentionQuery.length===0?<p>{t("home.accountSearchHint")}</p>:accountSearchLoading?<p>{t("home.searchingAccounts")}</p>:accountSuggestions.length===0?<p>{t("home.noAccountsFound")}</p>:accountSuggestions.map((account,index)=><button className={index===activeSuggestion?"active":""} type="button" role="option" aria-selected={index===activeSuggestion} key={account.user_id} onPointerDown={event=>event.preventDefault()} onClick={()=>selectAccount(account)}><span>{account.avatar_url?<img src={account.avatar_url} alt=""/>:account.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span><strong>{account.full_name}</strong></button>)}</div>}
         </form>
         <div className="gallery-header-actions">{session?<details className="gallery-profile-menu" ref={profileMenuRef}><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}>{profileAvatar?<img src={profileAvatar} alt=""/>:<span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span>}</summary><div className="gallery-profile-popover"><Link className="gallery-profile-identity" to={`/${language}/profile`}>{profileAvatar?<img src={profileAvatar} alt=""/>:<span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span>}<div><strong>{session.fullName}</strong><small>{session.email}</small></div></Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle/><ThemeToggle/></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18}/>{t("nav.logout")}</button></div></details>:<Link className="gallery-guest-avatar" to={`/${language}/login`} aria-label={t("auth.signIn")} title={t("auth.signIn")}><UserRound aria-hidden="true" size={20}/></Link>}</div>

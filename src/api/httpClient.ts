@@ -28,7 +28,8 @@ export async function requestJson<TData>(
   const authenticatedUserPath = path.startsWith("/profiles")
     || path.startsWith("/settings")
     || path.startsWith("/admin")
-    || path.startsWith("/notifications");
+    || path.startsWith("/notifications")
+    || path.startsWith("/search-history");
   if (
     response.status === 401
     && (normalizeBaseUrl(baseUrl) === normalizeBaseUrl(mainApiBaseUrl) || authenticatedUserPath)

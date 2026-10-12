@@ -477,7 +477,7 @@ test("builds a searchable icon-first homepage header", () => {
   assert.match(feedQuery, /searchWorks\(scope.search, scope.category/);
   assert.match(homePage, /const \[submittedSearch, setSubmittedSearch\] = useState\(searchParams.get\("q"\)/);
   assert.match(homePage, /onSubmit=\{submitSearch\}/);
-  assert.match(homePage, /const query=searchQuery\.trim\(\)/);
+  assert.match(homePage, /const query=value\.trim\(\)/);
   assert.match(homePage, /window\.setTimeout/);
   assert.match(feedLayout, /heights.indexOf\(Math.min\(\.\.\.heights\)\)/);
   assert.match(worksApi, /\/works\/search\?\$\{query\.toString\(\)\}/);
