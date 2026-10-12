@@ -7834,3 +7834,17 @@ Fixed the URL synchronization effect rebuilding the selected artist with avatar_
 ### Git
 
 Branch: fix/preserve-search-avatar. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff. Prior entries preserved.
+
+## 2026-10-12 - Preserve avatars when Enter selects recent history
+
+### Request and changes
+
+Investigated the continuing selected-avatar loss. Reproduced Enter selecting an exact-match history entry for an already selected artist: selectRecent rebuilt the artist with avatar_url=null before navigation. It now reuses the known avatar for the matching user. Avatar hydration observes avatar_url as well as user ID so missing-image transitions can reload profile data. Existing URL synchronization and appearance retained.
+
+### Verification and deployment
+
+New regression failed with missing image before the fix and passes afterward. All 114 tests passed; TypeScript/Vite build and git diff --check passed. Frontend deployment only; no backend, database, permission or SnapStart changes. Live production/browser verification remains pending.
+
+### Git
+
+Branch: fix/history-search-avatar. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff; prior entries preserved.

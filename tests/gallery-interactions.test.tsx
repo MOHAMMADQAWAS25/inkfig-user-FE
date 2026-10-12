@@ -39,6 +39,21 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("preserves a known avatar when Enter selects history for the same artist",async()=>{
+    vi.mocked(searchProfiles).mockResolvedValue([{user_id:"ahmad",full_name:"Ahmad Ishaq",avatar_url:"https://example.com/avatar.png"}]);
+    vi.mocked(requestJson).mockResolvedValue({data:[{query:"@Ahmad Ishaq black",normalized_query:"@ahmad ishaq black",search_history_id:"entry",artist_user_id:"ahmad",artist_name:"Ahmad Ishaq",last_searched_at:new Date().toISOString()}],status:200});
+    const {container}=render(<MemoryRouter><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox");
+    fireEvent.change(input,{target:{value:"@ahmad"}});
+    await screen.findByRole("option",{name:"Ahmad Ishaq"});
+    fireEvent.keyDown(input,{key:"Enter"});
+    fireEvent.change(input,{target:{value:"black"}});
+    fireEvent.focus(input);
+    await screen.findByRole("option",{name:"@Ahmad Ishaq black"});
+    fireEvent.keyDown(input,{key:"ArrowDown"});fireEvent.keyDown(input,{key:"Enter"});
+    await waitFor(()=>expect(vi.mocked(useInfiniteFeed).mock.lastCall?.[0]).toMatchObject({ownerId:"ahmad",search:"black"}));
+    expect(container.querySelector(".search-user-badge img")?.getAttribute("src")).toBe("https://example.com/avatar.png");
+  });
   it("shows the selected user badge and searches their artwork with typed keywords",async()=>{
     vi.mocked(searchProfiles).mockResolvedValue([{user_id:"ahmad",full_name:"Ahmad Ishaq",avatar_url:"https://example.com/avatar.png"}]);
     vi.mocked(requestJson).mockResolvedValue({data:[],status:200});

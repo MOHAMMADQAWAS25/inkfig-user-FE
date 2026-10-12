@@ -76,7 +76,7 @@ export function HomePage() {
     let active=true;const userId=selectedAccount.user_id;
     getPublicProfile(userId).then(profile=>{if(active)setSelectedAccount(current=>current?.user_id===userId?{...current,avatar_url:current.avatar_url??profile.avatar_url}:current);}).catch(()=>undefined);
     return()=>{active=false;};
-  },[selectedAccount?.user_id]);
+  },[selectedAccount?.user_id,selectedAccount?.avatar_url]);
   function clearSearch(){setSearchQuery("");setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
   function removeSelectedUser(){setSearchQuery(displayedSearch);setSelectedAccount(null);setMentionQuery(null);setAccountSuggestions([]);setHistoryOpen(false);document.getElementById("gallery-search-input")?.focus();}
   const feed = useInfiniteFeed({
@@ -150,7 +150,7 @@ export function HomePage() {
   async function selectRecent(entry:SearchEntry){
     const query=entry.query;
     if(entry.artist_user_id&&entry.artist_name){
-      const account={user_id:entry.artist_user_id,full_name:entry.artist_name,avatar_url:null};
+      const account={user_id:entry.artist_user_id,full_name:entry.artist_name,avatar_url:selectedAccount?.user_id===entry.artist_user_id?selectedAccount.avatar_url:null};
       setSelectedAccount(account);executeSearch(query,account);return;
     }
     let account=selectedAccount&&query.includes(`@${selectedAccount.full_name}`)?selectedAccount:null;
