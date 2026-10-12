@@ -1494,6 +1494,36 @@ img { max-width: 100%; image-rendering: auto; }
   .account-discovery-panel.sidebar-panel-exit,[dir="rtl"] .account-discovery-panel.sidebar-panel-exit { animation-name: sidebar-panel-out-mobile; }
 }
 @keyframes sidebar-panel-out-mobile { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(24px) scale(.985); } }
+/* Reports-only spacing: equal gutters around the content area beside the rail. */
+.reports-admin-page.app-page-with-sidebar { --reports-gutter:var(--page-gutter,20px); padding-left:calc(var(--app-rail-size) + var(--reports-gutter)); padding-right:var(--reports-gutter); }
+[dir="rtl"] .reports-admin-page.app-page-with-sidebar { padding-right:calc(var(--app-rail-size) + var(--reports-gutter)); padding-left:var(--reports-gutter); }
+.reports-admin-page .admin-shell { width:100%; max-width:none; min-width:0; }
+.reports-admin-page .admin-hero { gap:24px; }
+.reports-admin-page .admin-hero > div { min-width:0; }
+.reports-admin-page .admin-refresh { flex-shrink:0; }
+.reports-admin-page .moderation-dashboard { margin-top:24px; }
+.reports-admin-page .moderation-toolbar { gap:16px 24px; align-items:center; margin-bottom:20px; }
+.reports-admin-page .moderation-tabs { gap:8px; }
+.reports-admin-page .moderation-tabs button { min-height:40px; }
+.reports-admin-page .moderation-filters { display:grid; grid-template-columns:repeat(3,minmax(130px,1fr)); gap:10px; }
+.reports-admin-page .moderation-filters select { width:100%; max-width:none; min-width:0; }
+.reports-admin-page .moderation-layout { gap:20px; }
+.reports-admin-page .moderation-table-panel,.reports-admin-page .moderation-detail { min-width:0; }
+.reports-admin-page .moderation-table { min-width:820px; }
+.reports-admin-page .moderation-table th,.reports-admin-page .moderation-table td { padding:16px; }
+.reports-admin-page .moderation-target { padding:0; }
+.reports-admin-page .moderation-target > span:last-child { max-width:230px; overflow-wrap:anywhere; }
+.reports-admin-page .moderation-table-footer { min-height:68px; padding:16px; flex-wrap:wrap; }
+.reports-admin-page .moderation-detail { padding:20px; gap:16px; }
+.reports-admin-page .moderation-detail-close { margin-block-end:-8px; }
+.reports-admin-page .moderation-detail-box { padding:16px; gap:14px; }
+.reports-admin-page .moderation-detail dl > div { min-width:0; }
+.reports-admin-page .moderation-detail dd { overflow-wrap:anywhere; }
+.reports-admin-page .moderation-detail .moderation-reason { white-space:normal; line-height:1.4; }
+.reports-admin-page .moderation-actions button,.reports-admin-page .moderation-view-links a { min-height:42px; padding:9px; }
+.reports-admin-page .moderation-scope-note { margin:12px 0 0; }
+@media(max-width:1100px){.reports-admin-page .moderation-toolbar { align-items:stretch; }.reports-admin-page .moderation-filters { flex:1 1 100%; }}
+@media(max-width:600px){.reports-admin-page .moderation-toolbar { gap:12px; }.reports-admin-page .moderation-tabs { gap:6px; }.reports-admin-page .moderation-tabs button { padding-inline:9px; }.reports-admin-page .moderation-filters { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.reports-admin-page .moderation-filters select:last-child { grid-column:1 / -1; }.reports-admin-page .moderation-detail { padding:16px; }}
 @media (prefers-reduced-motion: reduce) {
   .account-discovery-backdrop.sidebar-panel-exit,.account-discovery-panel.sidebar-panel-exit { animation-duration: 1ms; }
 }

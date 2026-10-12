@@ -7882,3 +7882,17 @@ Frontend only: AdminReportsPage, httpClient, translations and CSS. No backend, d
 ### Git
 
 Branch: feature/reports-dashboard-layout. Fetch/rebase before push and authorized fast-forward main merge/push. Commit and push results reported in handoff. Prior log entries preserved.
+
+## 2026-10-13 - Balance Reports page gutters and spacing
+
+### Request and changes
+
+Reports-only CSS adjustments preserve existing colors, fonts, components, navigation and behavior. Outer padding now reserves sidebar width plus the same content gutter used at the scrollbar side, with mirrored Arabic layout and mobile rail sizing. Removed the Reports content width cap to maintain equal side gutters. Aligned toolbar controls, standardized table cell/footer padding and detail-panel spacing, contained long names/reasons inside their columns, and kept table overflow inside its scroll container. Small-screen filters align into a compact grid.
+
+### Verification and deployment
+
+114 tests and strict TypeScript/Vite production build passed; git diff --check passed. Frontend CSS deployment only; no backend, database, API, permissions or SnapStart changes. Live visual browser verification not performed.
+
+### Git
+
+Branch: fix/reports-page-spacing. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff; prior entries preserved.
