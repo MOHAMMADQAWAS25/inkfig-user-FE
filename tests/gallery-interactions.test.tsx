@@ -37,6 +37,19 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("restores the saved artist after clearing the input and selecting history",async()=>{
+    const item={query:"@Ahmad Ishaq black",normalized_query:"@ahmad ishaq black",search_history_id:"entry",last_searched_at:new Date().toISOString(),artist_user_id:"ahmad-id",artist_name:"Ahmad Ishaq"};
+    vi.mocked(requestJson).mockResolvedValue({data:[item],status:200});
+    render(<MemoryRouter initialEntries={["/en?q=old"]}><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox");
+    fireEvent.change(input,{target:{value:""}});fireEvent.focus(input);
+    await screen.findByRole("option",{name:"@Ahmad Ishaq black"});
+    fireEvent.click(screen.getByRole("option",{name:"@Ahmad Ishaq black"}));
+    await waitFor(()=>expect(vi.mocked(useInfiniteFeed).mock.lastCall?.[0]).toMatchObject({ownerId:"ahmad-id",search:"black"}));
+    await waitFor(()=>expect(vi.mocked(requestJson).mock.calls.filter(call=>call[1]==="POST")).toHaveLength(1));
+    const submitted=vi.mocked(requestJson).mock.calls.find(call=>call[1]==="POST");
+    expect(submitted?.[3]?.body).toEqual({query:"@Ahmad Ishaq black",artist_user_id:"ahmad-id"});
+  });
   it("shows exact history only while typing and executes a selected search once",async()=>{
     const items=["Anime Art","Flowers","Sketch","Painting","Older"].map(query=>({query,normalized_query:query.toLowerCase(),search_history_id:query,last_searched_at:new Date().toISOString()}));
     vi.mocked(requestJson).mockResolvedValue({data:items,status:200});

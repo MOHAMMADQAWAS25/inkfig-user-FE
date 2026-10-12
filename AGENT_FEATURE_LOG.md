@@ -7770,3 +7770,21 @@ Frontend only; no backend, migration, API, permissions or SnapStart changes. Dep
 ### Git
 
 Branch: fix/hide-empty-search-history. Focused commit and push result reported in handoff; fetch/rebase before push and authorized fast-forward main merge. Earlier entries preserved.
+
+## 2026-10-12 - Restore selected artists from recent searches
+
+### Request and changes
+
+Recent searches now persist the selected user's ID and name with the display query, including guest local history. Dropdown click and keyboard selection pass the complete entry rather than query text alone. Selecting a saved artist entry restores the existing artist URL filter and extracts the artwork keywords with the original search flow, so @Ahmad Ishaq black searches Ahmad's black artworks even after clearing the input. Unique query handling and single submission remain intact. Legacy text fallback retained; backend migration recovers unambiguous old mentions.
+
+### Verification
+
+112 tests passed, including cleared-input history selection restoring ownerId=ahmad-id and search=black with one POST. TypeScript and Vite production build passed; git diff --check passed. Backend pytest/mypy require CI because local Python is absent. Live browser inspection not performed.
+
+### Deployment and scope
+
+Apply user-system migration 20261012_020_add_search_history_artist.sql and deploy backend before frontend. No main-system, secret, permission or SnapStart changes.
+
+### Git
+
+Branch: fix/search-history-artist-filter. Commit/push outcomes reported in handoff; fetch/rebase before push, authorized fast-forward main merge. Prior entries preserved.

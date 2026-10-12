@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
-export type SearchEntry={search_history_id:string;query:string;normalized_query:string;last_searched_at:string};
+export type SearchEntry={search_history_id:string;query:string;normalized_query:string;last_searched_at:string;artist_user_id?:string|null;artist_name?:string|null};
 const guestKey="inkfig:guest-search-history";
 export const normalizeSearch=(query:string)=>query.trim().toLowerCase();
 export function visibleSearchHistory(items:SearchEntry[],query:string){const normalized=normalizeSearch(query);return normalized?items.filter(item=>item.normalized_query===normalized).slice(0,1):items.slice(0,4);}
@@ -13,17 +13,17 @@ export function useSearchHistory(userId:string|undefined){
  const owner=useRef(userId);owner.current=userId;const revision=useRef(0);const queue=useRef<Promise<unknown>>(Promise.resolve());
  useEffect(()=>{revision.current+=1;setItems([]);setError(false);setLoading(false);},[userId]);
  async function refresh(){const currentOwner=userId;const version=++revision.current;setLoading(true);setError(false);try{await queue.current;const next=currentOwner?(await requestJson<SearchEntry[]>(userApiBaseUrl,"GET","/search-history")).data:guestHistory();if(owner.current===currentOwner&&revision.current===version)setItems(next);}catch{if(owner.current===currentOwner&&revision.current===version)setError(true);}finally{if(owner.current===currentOwner&&revision.current===version)setLoading(false);}}
- function mutate(action:"record"|"remove"|"clear",value?:string){const currentOwner=userId;const version=++revision.current;setError(false);
+ function mutate(action:"record"|"remove"|"clear",value?:string,artist?:{user_id:string;full_name:string}|null){const currentOwner=userId;const version=++revision.current;setError(false);
   // Hide deleted rows immediately; refresh restores canonical state on failure.
   if(action==="clear")setItems([]);else if(action==="remove")setItems(current=>current.filter(item=>item.search_history_id!==value));
   const operation=queue.current.catch(()=>undefined).then(async()=>{
    if(owner.current!==currentOwner)return;
    let next:SearchEntry[];
-   if(currentOwner){if(action==="record")next=(await requestJson<SearchEntry[]>(userApiBaseUrl,"POST","/search-history",{body:{query:value}})).data;else{await requestJson<null>(userApiBaseUrl,"DELETE",action==="clear"?"/search-history":`/search-history/${encodeURIComponent(value!)}`);next=(await requestJson<SearchEntry[]>(userApiBaseUrl,"GET","/search-history")).data;}}
-   else{next=guestHistory();if(action==="clear")next=[];else if(action==="remove")next=next.filter(item=>item.search_history_id!==value);else{const query=value!.trim();const normalized_query=normalizeSearch(query);next=[{search_history_id:normalized_query,query,normalized_query,last_searched_at:new Date().toISOString()},...next.filter(item=>item.normalized_query!==normalized_query)].slice(0,20);}saveGuest(next);}
+   if(currentOwner){if(action==="record")next=(await requestJson<SearchEntry[]>(userApiBaseUrl,"POST","/search-history",{body:{query:value,artist_user_id:artist?.user_id??null}})).data;else{await requestJson<null>(userApiBaseUrl,"DELETE",action==="clear"?"/search-history":`/search-history/${encodeURIComponent(value!)}`);next=(await requestJson<SearchEntry[]>(userApiBaseUrl,"GET","/search-history")).data;}}
+   else{next=guestHistory();if(action==="clear")next=[];else if(action==="remove")next=next.filter(item=>item.search_history_id!==value);else{const query=value!.trim();const normalized_query=normalizeSearch(query);next=[{search_history_id:normalized_query,query,normalized_query,last_searched_at:new Date().toISOString(),artist_user_id:artist?.user_id??null,artist_name:artist?.full_name??null},...next.filter(item=>item.normalized_query!==normalized_query)].slice(0,20);}saveGuest(next);}
    if(owner.current===currentOwner&&revision.current===version)setItems(next);
   }).catch(()=>{if(owner.current===currentOwner){setError(true);void refresh();}});
   queue.current=operation;
  }
- return {items,loading,error,refresh,record:(query:string)=>{const trimmed=query.trim();if(trimmed&&trimmed.length<=500)mutate("record",trimmed);},remove:(id:string)=>mutate("remove",id),clear:()=>mutate("clear")};
+ return {items,loading,error,refresh,record:(query:string,artist?:{user_id:string;full_name:string}|null)=>{const trimmed=query.trim();if(trimmed&&trimmed.length<=500)mutate("record",trimmed,artist);},remove:(id:string)=>mutate("remove",id),clear:()=>mutate("clear")};
 }

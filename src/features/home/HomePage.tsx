@@ -19,7 +19,7 @@ import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getPublicProfile, searchProfiles } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
-import { useSearchHistory, visibleSearchHistory } from "./useSearchHistory";
+import { useSearchHistory, visibleSearchHistory, type SearchEntry } from "./useSearchHistory";
 import { RecentSearches } from "./RecentSearches";
 
 const workCategories = [
@@ -131,13 +131,18 @@ export function HomePage() {
   }
   function executeSearch(value:string,account:ProfileSearchResult|null){
     const query=value.trim();const next=new URLSearchParams(searchParams);
-    history.record(query);setHistoryOpen(false);setHistoryIndex(-1);setSearchQuery(query);
+    history.record(query,account);setHistoryOpen(false);setHistoryIndex(-1);setSearchQuery(query);
     if(query)next.set("q",query);else next.delete("q");
     if(account){next.set("artist",account.user_id);next.set("artistName",account.full_name);}
     else{next.delete("artist");next.delete("artistName");}
     next.delete("work");setSearchParams(next);setMentionQuery(null);
   }
-  async function selectRecent(query:string){
+  async function selectRecent(entry:SearchEntry){
+    const query=entry.query;
+    if(entry.artist_user_id&&entry.artist_name){
+      const account={user_id:entry.artist_user_id,full_name:entry.artist_name,avatar_url:null};
+      setSelectedAccount(account);executeSearch(query,account);return;
+    }
     let account=selectedAccount&&query.includes(`@${selectedAccount.full_name}`)?selectedAccount:null;
     if(!account&&query.includes("@")){
       const name=query.slice(query.lastIndexOf("@")+1).trim();
@@ -147,7 +152,7 @@ export function HomePage() {
   }
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const value=event.target.value;setSearchQuery(value);let account=selectedAccount;if(account&&!value.includes(`@${account.full_name}`)){account=null;setSelectedAccount(null);}const at=value.lastIndexOf("@");if(at<0||account&&value.includes(`@${account.full_name}`)){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(value.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
-  function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(event.key==="Escape"){event.preventDefault();setHistoryOpen(false);setMentionQuery(null);return;}if(showHistory&&historyItems.length){if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();setHistoryIndex(index=>index<0?(event.key==="ArrowDown"?0:historyItems.length-1):(index+(event.key==="ArrowDown"?1:-1)+historyItems.length)%historyItems.length);return;}if(event.key==="Enter"&&historyIndex>=0){event.preventDefault();selectRecent(historyItems[historyIndex].query);return;}}if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
+  function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(event.key==="Escape"){event.preventDefault();setHistoryOpen(false);setMentionQuery(null);return;}if(showHistory&&historyItems.length){if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();setHistoryIndex(index=>index<0?(event.key==="ArrowDown"?0:historyItems.length-1):(index+(event.key==="ArrowDown"?1:-1)+historyItems.length)%historyItems.length);return;}if(event.key==="Enter"&&historyIndex>=0){event.preventDefault();selectRecent(historyItems[historyIndex]);return;}}if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
   async function toggleLike(work:Work){
     const key=`like:${work.work_id}`;
     if(!session || !hasPermission(session.permissions,"works.like") || interactionRequests.current.has(key))return;
