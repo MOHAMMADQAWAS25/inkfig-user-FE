@@ -7981,3 +7981,49 @@ Frontend only through the existing main Cloudflare workflow. Deployment outcome 
 ### Git
 
 Branch: fix/mobile-profile-cream. Exact commit and push outcomes reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous feature-log entries preserved.
+
+## 2026-10-14 - Improve logout, artwork interactions, upload and profile controls
+
+### Request
+
+Route logout to sign-in; restore normal card hovering after closing or reacting; use the upload preview as the file picker with a change-file option; use icon profile tabs with counts; bring the camera badge to desktop and expand logout on hover; enlarge navigation branding and keep a compact footer fixed across pages.
+
+### Changes
+
+- Shared AuthProvider signOut clears local session/cache, retains the backend logout request and replaces the route with the current language's sign-in page.
+- Added shared CardMedia for gallery/profile cards. Pointer interactions no longer qualify for keyboard focus-within overlays, and leaving a pointer-reacted card blurs its focused control. Keyboard interactions keep focus-driven accessibility. Removed the earlier hover-reset suppression so closed cards follow normal hover rules.
+- Artwork preview is an accessible file-picker button showing the selected image/video preview and a localized Change the file option. Native file control is visually hidden. Replacement revokes old object URLs; cancelling retains the previous selection. Existing publishing validation and image-only backend capability remain unchanged; video remains preview-only.
+- Profile tabs show 28px posts/saved/likes icons with existing counts and localized accessible names/tooltips. Camera badge is available on desktop without the hover overlay, preserving crop/upload/removal actions. Desktop logout expands on hover or keyboard focus; reduced-motion preferences are respected.
+- Slightly enlarged desktop rail and phone header logos. Added shared SiteFooter at the router level, replacing the homepage-only footer. Compact fixed footer reserves content space, clears the desktop rail and sits above phone navigation; authentication pages use full-width footer positioning.
+
+### Repositories and files
+
+All three repositories checked clean and synchronized with main. Frontend only: AppRouter, AuthContext, CardMedia, PostCard, HomePage, ProfilePage, UploadWorkPage, SiteFooter, translations, styles, foundation/gallery/profile tests, new logout-footer/shared-controls tests and this log. Both backends unchanged.
+
+### API
+
+Existing logout, artwork, avatar and profile endpoints retained; no API contract changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+Existing authentication, artwork ownership, save/like permissions and backend authorization remain unchanged. No credentials, configuration or backend/SnapStart changes.
+
+### Frontend
+
+Arabic/English labels and directions, mobile card overlay suppression, desktop hover interactions, natural media proportions, fixed phone navigation and existing smooth dialogs remain supported. Actual branded homepage footer is now shared across all routes; the bottom navigation itself remains separate.
+
+### Verification
+
+136 tests passed (69 foundation/layout, 67 component/feed), including real logout session/cache clearing and localized routing, file-picker replacement/cancel/URL cleanup, pointer versus keyboard focus, icon counters, camera operations, shared footer route clearance and desktop control styling. Strict TypeScript and Vite production build passed; git diff --check passed. Updated the source assertion for profile cards to verify shared CardMedia. Live browser/physical-device visual inspection not performed.
+
+### Deployment
+
+Frontend only through the existing Cloudflare main deployment workflow; no backend deployment or migration. Deployment result reported in handoff.
+
+### Git
+
+Branch: feature/artwork-profile-controls. Exact commit hash and push outcome reported in handoff. Fetch/rebase before branch push and authorized fast-forward main merge/push. Earlier feature-log entries preserved.

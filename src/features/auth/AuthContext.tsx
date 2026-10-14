@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useI18n } from "../../i18n/I18nProvider";
 
 import type { AuthSession } from "../../shared/types";
 import { logoutUser } from "./authenticationApi";
@@ -16,6 +18,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { language } = useI18n();
   const [session, setSessionState] = useState<AuthSession | null>(loadSession);
   useEffect(() => {
     const expire = () => { queryClient.clear(); localStorage.removeItem(SESSION_KEY); setSessionState(null); };
@@ -35,9 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void logoutUser().catch(() => undefined);
         localStorage.removeItem(SESSION_KEY);
         setSessionState(null);
+        navigate(`/${language}/login`, { replace: true });
       },
     }),
-    [session, queryClient],
+    [session, queryClient, language, navigate],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -225,7 +225,7 @@ export function HomePage() {
       {detailWorkId&&!selectedWork&&<div className="artwork-modal-backdrop"><section className="moderation-dialog" role="dialog" aria-modal="true" aria-label={t("works.viewDetails")}><p role="status">{t(detailLoading?"works.loading":"works.loadFailed")}</p>{detailError&&<button type="button" onClick={()=>setDetailAttempt(current=>current+1)}>{t("feed.retry")}</button>}<button type="button" onClick={closeWork}>{t("works.closeDetails")}</button></section></div>}
       {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canReport={Boolean(session&&session.userId!==selectedWork.owner_user_id&&hasPermission(session.permissions,"reports.create"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={closeWork} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
 
-      <footer className="gallery-footer"><img src={inkfigLogo} alt={t("app.name")} /><p>{t("home.footer")}</p></footer>
+
     </main>
   );
 }

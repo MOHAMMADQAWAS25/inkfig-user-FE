@@ -25,6 +25,12 @@ describe("mobile profile controls",()=>{
   it("keeps avatar upload and removal accessible through the camera menu",async()=>{
     const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
     await screen.findByRole("heading",{name:"Viewer"});
+    for(const [key,count] of [["profile.posts","1"],["profile.saved","0"],["profile.likes","0"]] as const){
+      const tab=screen.getByRole("tab",{name:translations.en[key]});
+      expect(tab.querySelector("svg")?.getAttribute("width")).toBe("28");
+      expect(tab.querySelector("span")?.textContent).toBe(count);
+      expect(tab.textContent).toBe(count);
+    }
     const camera=container.querySelector<HTMLDetailsElement>(".profile-avatar-camera")!;
     fireEvent.click(camera.querySelector("summary")!);expect(camera.open).toBe(true);
     const input=container.querySelector<HTMLInputElement>('input[type="file"]')!;

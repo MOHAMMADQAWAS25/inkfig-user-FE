@@ -371,7 +371,7 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(worksApi, /`\/works\/likes\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(styles, /\.profile-artwork-grid/);
   assert.match(profilePage, /artwork-card-manageable/);
-  assert.match(profilePage, /className="artwork-pin-media"/);
+  assert.match(profilePage, /<CardMedia>/);
   assert.match(profilePage, /className="artwork-image-button"/);
   assert.match(profilePage, /className=\{`artwork-pin-like/);
   assert.match(profilePage, /className=\{`artwork-pin-save/);

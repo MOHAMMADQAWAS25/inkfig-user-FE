@@ -11,10 +11,11 @@ import { AdminUsersPage } from "../features/admin/AdminUsersPage";
 import { AdminReportsPage } from "../features/admin/AdminReportsPage";
 import { FeaturePlaceholderPage } from "../features/navigation/FeaturePlaceholderPage";
 import { SettingsPage } from "../features/settings/SettingsPage";
+import { SiteFooter } from "../features/layout/SiteFooter";
 
 export function AppRouter() {
   return (
-    <Routes>
+    <><div className="site-content"><Routes>
       <Route path="/:language" element={<HomePage />} />
       <Route path="/:language/login" element={<LoginPage />} />
       <Route path="/:language/signup" element={<SignupPage />} />
@@ -29,6 +30,6 @@ export function AppRouter() {
       <Route path="/:language/admin/users" element={<AdminUsersPage />} />
       <Route path="/:language/admin/reports" element={<AdminReportsPage />} />
       <Route path="*" element={<Navigate replace to="/en" />} />
-    </Routes>
+    </Routes></div><SiteFooter/></>
   );
 }

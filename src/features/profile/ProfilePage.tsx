@@ -1,4 +1,4 @@
-import { Bookmark, Camera, Flag, Heart, Image, LogOut, MoreHorizontal, Pencil, Trash2, UserRound, X } from "lucide-react";
+import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -6,6 +6,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import type { TranslationKey } from "../../i18n/resources";
 import { hasPermission } from "../../lib/permissions";
 import { useAuth } from "../auth/AuthContext";
+import { CardMedia } from "../feed/CardMedia";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { ReportDialog } from "../reports/ReportDialog";
@@ -32,13 +33,13 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
 }) {
   if (!works.length) return <div className="profile-empty"><Image size={30}/><p>{empty}</p></div>;
   return <div className="profile-artwork-grid">{works.map(work=>
-    <article className={`artwork-card ${canManage?"artwork-card-manageable":""}`} key={work.work_id}><div className="artwork-pin-media">
+    <article className={`artwork-card ${canManage?"artwork-card-manageable":""}`} key={work.work_id}><CardMedia>
       <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>onSelect(work)}><img className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></button>
       <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>
       <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
       {canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onSave(work)}><Bookmark size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}
-    </div>{canManage&&<details className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div><button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></details>}</article>)}</div>;
+    </CardMedia>{canManage&&<details className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div><button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></details>}</article>)}</div>;
 }
 
 export function ProfilePage() {
@@ -158,9 +159,9 @@ export function ProfilePage() {
         <div><strong>{profile.like_count}</strong><span>{t("profile.totalLikes")}</span></div>
       </div></div>{ownProfile?<button className="profile-logout" type="button" aria-label={t("nav.logout")} onClick={signOut}><LogOut aria-hidden="true" size={18}/><span>{t("nav.logout")}</span></button>:<div className="profile-actions"><button className={`profile-follow-button ${profile.is_following?"following":""}`} disabled={followBusy===profile.user_id} type="button" onClick={toggleProfileFollow}>{t(profile.is_following?"profile.unfollow":"profile.follow")}</button>{hasPermission(session.permissions,"reports.create")&&<button className="profile-report-button" type="button" onClick={()=>setReportingUser(true)}><Flag size={17}/>{t("reports.reportUser")}</button>}</div>}</section>
       {ownProfile&&<nav className="profile-tabs" role="tablist" aria-label={t("profile.navigation")}>
-        <button role="tab" type="button" aria-selected={section==="posts"} className={section==="posts"?"active":""} onClick={()=>selectSection("posts")}>{t("profile.posts")}<span>{posts.length}</span></button>
-        <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} onClick={()=>selectSection("saved")}><Bookmark size={16}/>{t("profile.saved")}<span>{saved.length}</span></button>
-        <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} onClick={()=>selectSection("likes")}>{t("profile.likes")}<span>{likes.length}</span></button>
+        <button role="tab" type="button" aria-selected={section==="posts"} className={section==="posts"?"active":""} aria-label={t("profile.posts")} title={t("profile.posts")} onClick={()=>selectSection("posts")}><Grid2X2 aria-hidden="true" size={28}/><span>{posts.length}</span></button>
+        <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} aria-label={t("profile.saved")} title={t("profile.saved")} onClick={()=>selectSection("saved")}><Bookmark aria-hidden="true" size={28}/><span>{saved.length}</span></button>
+        <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} aria-label={t("profile.likes")} title={t("profile.likes")} onClick={()=>selectSection("likes")}><Heart aria-hidden="true" size={28}/><span>{likes.length}</span></button>
       </nav>}
       <div className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canManage={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onEdit={beginEdit} onDelete={work=>void removeWork(work)} onLike={toggleLike} onSave={toggleSave} t={t}/>{mutationError&&<p className="pagination-error" role="alert">{t("works.changeFailed")}</p>}{cursors[section]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</div>
     </>}

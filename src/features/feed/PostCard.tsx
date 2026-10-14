@@ -6,7 +6,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { useAuth } from "../auth/AuthContext";
 import { hasPermission } from "../../lib/permissions";
 import { LazyImage } from "./LazyImage";
-import { useState } from "react";
+import { CardMedia } from "./CardMedia";
 
 export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
   work: FeedWork; width: number; priority: boolean;
@@ -14,10 +14,9 @@ export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
 }) {
   const { session } = useAuth();
   const { language, t } = useI18n();
-  const [hoverReset, setHoverReset] = useState(false);
-  return <div className={`artwork-pin-media${hoverReset ? " hover-reset" : ""}`} onPointerMove={()=>setHoverReset(false)} onKeyDown={()=>setHoverReset(false)}>
+  return <CardMedia>
     <button className="artwork-image-button" type="button" data-work-id={work.work_id}
-      aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={() => {setHoverReset(true); onOpen(work);}}>
+      aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={() => onOpen(work)}>
       <LazyImage work={work} width={width} priority={priority} failureLabel={t("feed.imageFailed")} />
     </button>
     <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
@@ -30,5 +29,5 @@ export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
       aria-label={t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")} aria-pressed={work.saved_by_me} type="button" onClick={() => onSave(work)}>
       <Bookmark aria-hidden="true" size={21} fill={work.saved_by_me ? "currentColor" : "none"} />
     </button>}
-  </div>;
+  </CardMedia>;
 }

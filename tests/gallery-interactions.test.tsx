@@ -196,16 +196,34 @@ describe("upload preview and card reset",()=>{
     expect(screen.getByText(translations.en["works.videoPreviewOnly"])).toBeTruthy();
     expect((container.querySelector('button[type="submit"]') as HTMLButtonElement).disabled).toBe(true);
   });
-  it("suppresses a card's overlay until the pointer moves again or a keyboard action",()=>{
+  it("releases pointer focus and returns closed cards to normal hover behavior",()=>{
     const work={work_id:"work",title:"Art",artist_name:"Artist",owner_user_id:"artist",type_name_en:"Digital art",type_name_ar:"فن",mime_type:"image/png",image_url:"/art.png",like_count:0,liked_by_me:false,saved_by_me:false} as FeedWork;
     const onOpen=vi.fn();const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={onOpen} onLike={vi.fn()} onSave={vi.fn()}/></MemoryRouter>);
-    fireEvent.click(container.querySelector(".artwork-image-button")!);
+    const media=container.querySelector(".artwork-pin-media")!;
+    const image=container.querySelector<HTMLButtonElement>(".artwork-image-button")!;
+    fireEvent.pointerDown(image);image.focus();fireEvent.click(image);
     expect(onOpen).toHaveBeenCalledWith(work);
-    expect(container.querySelector(".hover-reset")).toBeTruthy();
-    fireEvent.pointerEnter(container.querySelector(".artwork-pin-media")!);
-    expect(container.querySelector(".hover-reset")).toBeTruthy();
-    fireEvent.pointerMove(container.querySelector(".artwork-pin-media")!);
+    expect(media.getAttribute("data-focus-mode")).toBe("pointer");
+    fireEvent.pointerLeave(media);expect(document.activeElement).not.toBe(image);
     expect(container.querySelector(".hover-reset")).toBeNull();
+    const save=screen.getByRole("button",{name:translations.en["home.saveWork"]});
+    fireEvent.pointerDown(save);save.focus();fireEvent.click(save);fireEvent.pointerLeave(media);
+    expect(document.activeElement).not.toBe(save);
+    fireEvent.keyDown(image,{key:"Tab"});image.focus();
+    expect(media.getAttribute("data-focus-mode")).toBe("keyboard");
+    fireEvent.pointerLeave(media);expect(document.activeElement).toBe(image);
+  });
+  it("opens the picker from the preview and replaces the selected file",async()=>{
+    render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);
+    const input=await screen.findByLabelText<HTMLInputElement>("Artwork image");
+    const picker=vi.spyOn(input,"click");
+    fireEvent.click(screen.getByRole("button",{name:translations.en["works.chooseFile"]}));expect(picker).toHaveBeenCalledTimes(1);
+    fireEvent.change(input,{target:{files:[new File(["first"],"first.png",{type:"image/png"})]}});
+    const change=await screen.findByRole("button",{name:"Change the file: first.png"});
+    fireEvent.click(change);expect(picker).toHaveBeenCalledTimes(2);
+    fireEvent.change(input,{target:{files:[]}});expect(screen.getByRole("img",{name:"first.png"})).toBeTruthy();
+    fireEvent.change(input,{target:{files:[new File(["second"],"second.png",{type:"image/png"})]}});
+    expect(await screen.findByRole("img",{name:"second.png"})).toBeTruthy();expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:preview");
   });
 });
 
