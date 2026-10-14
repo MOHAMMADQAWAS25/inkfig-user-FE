@@ -195,6 +195,7 @@ export function HomePage() {
     <main className="gallery-home">
       <AppSidebar />
       <header className="gallery-header">
+        <Link className="mobile-home-logo" to={`/${language}`} state={{resetHome:true}} aria-label={`${t("app.name")} — ${t("nav.home")}`}><img src={inkfigLogo} alt=""/></Link>
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef}>
           <Search aria-hidden="true" size={19} />
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>

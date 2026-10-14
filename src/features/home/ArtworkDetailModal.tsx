@@ -1,4 +1,4 @@
-import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, ShieldAlert, Trash2, UserRound, X } from "lucide-react";
+import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -19,11 +19,14 @@ type ArtworkDetailModalProps = {
   onToggleLike: (work: Work) => void;
   onToggleSave: (work: Work) => void;
   onModerateDelete?: (work: Work, reason: string) => Promise<void>;
+  onEditOwnWork?: (work: Work) => void;
+  onDeleteOwnWork?: (work: Work) => void;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [closing,setClosing]=useState(false);
   const closeTimerRef=useRef<number|undefined>(undefined);
@@ -42,15 +45,42 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
+    const mobile = Boolean(window.matchMedia?.("(max-width: 720px)").matches);
+    const scrollY = window.scrollY;
+    const previousBody = { position: document.body.style.position, top: document.body.style.top, width: document.body.style.width };
+    const previousRootOverflow = document.documentElement.style.overflow;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.body.style.overflow = "hidden";
+    if (mobile) {
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.documentElement.style.overflow = "hidden";
+    }
     closeButtonRef.current?.focus();
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !event.defaultPrevented) requestClose();
+      if (!mobile || event.key !== "Tab") return;
+      const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>("*") ?? []).filter(element => element.matches('button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), video[controls], [tabindex="0"]'));
+      const first = controls[0]; const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    const containFocus = (event: FocusEvent) => {
+      if (mobile && event.target instanceof Node && !dialogRef.current?.contains(event.target) && !document.querySelector('.report-dialog-backdrop, .moderation-dialog-backdrop')) closeButtonRef.current?.focus();
     };
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("focusin", containFocus);
     return () => {
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("focusin", containFocus);
+      document.body.style.overflow = previousOverflow;
+      if (mobile) {
+        Object.assign(document.body.style, previousBody);
+        document.documentElement.style.overflow = previousRootOverflow;
+        window.scrollTo({ top: scrollY, behavior: "instant" });
+        if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+      }
     };
   }, []);
 
@@ -58,7 +88,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
 
   return (
     <div className={`artwork-modal-backdrop${closing?" artwork-modal-closing":""}`} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && requestClose()}>
-      <section className="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="artwork-modal-title">
+      <section ref={dialogRef} className="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="artwork-modal-title">
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
@@ -79,6 +109,10 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
             <div>{work.links.map((link, index) => <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
           <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count} {t("home.likes")}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>
+          {(onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
+            {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
+            {onDeleteOwnWork && <button type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}
+          </div>}
         </div>
       </section>
       {moderating&&<div className="moderation-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!deleting&&setModerating(false)}><form className="moderation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="moderation-title" onSubmit={submitModeration}><button className="moderation-dialog-close" type="button" disabled={deleting} aria-label={t("works.cancelModeration")} onClick={()=>setModerating(false)}><X size={19}/></button><span><ShieldAlert size={25}/></span><h2 id="moderation-title">{t("works.moderateDeleteTitle")}</h2><p>{t("works.moderateDeleteDescription")}</p><label>{t("works.deletionReason")}<textarea required minLength={10} maxLength={1000} value={reason} placeholder={t("works.deletionReasonPlaceholder")} onChange={event=>setReason(event.target.value)}/><small>{t("works.deletionReasonHint")}</small></label>{deleteError&&<p className="error-message" role="alert">{t("works.moderateDeleteFailed")}</p>}<div><button type="button" disabled={deleting} onClick={()=>setModerating(false)}>{t("works.cancelModeration")}</button><button className="danger-button" type="submit" disabled={deleting||reason.trim().length<10}>{t(deleting?"works.deletingModerated":"works.confirmModerateDelete")}</button></div></form></div>}

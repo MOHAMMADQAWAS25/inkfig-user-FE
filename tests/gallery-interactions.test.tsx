@@ -39,6 +39,13 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it.each(["Notifications","Find users"])("mounts %s outside the navigation bar",async name=>{
+    const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button",{name,exact:true}));
+    const panel=container.querySelector(".account-discovery-panel");
+    expect(panel).toBeTruthy();expect(panel?.closest("aside")).toBeNull();
+    expect(panel?.classList.contains("sidebar-panel-enter")).toBe(true);
+  });
   it("preserves a known avatar when Enter selects history for the same artist",async()=>{
     vi.mocked(searchProfiles).mockResolvedValue([{user_id:"ahmad",full_name:"Ahmad Ishaq",avatar_url:"https://example.com/avatar.png"}]);
     vi.mocked(requestJson).mockResolvedValue({data:[{query:"@Ahmad Ishaq black",normalized_query:"@ahmad ishaq black",search_history_id:"entry",artist_user_id:"ahmad",artist_name:"Ahmad Ishaq",last_searched_at:new Date().toISOString()}],status:200});
@@ -134,7 +141,7 @@ describe("home and panel interactions",()=>{
     expect(panel.classList.contains("sidebar-panel-exit")).toBe(true);
     await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
   });
-  it.each(["Home","InkFig"])("clears search, artist and category when clicking %s",async name=>{
+  it.each(["Home","InkFig","InkFig — Home"])("clears search, artist and category when clicking %s",async name=>{
     render(<MemoryRouter initialEntries={["/en?q=flowers&category=hand-art&artist=artist&artistName=Artist"]}><HomePage/></MemoryRouter>);
     await waitFor(()=>expect((screen.getByRole("combobox") as HTMLInputElement).value).toBe("flowers"));
     fireEvent.click(screen.getByRole("link",{name,exact:true}));
@@ -204,7 +211,31 @@ describe("upload preview and card reset",()=>{
 
 describe("smooth artwork dismissal",()=>{
   const work={work_id:"work",title:"Art",artist_name:"Artist",owner_user_id:"artist",type_name_en:"Digital art",type_name_ar:"Art",mime_type:"image/png",image_url:"/art.png",like_count:0,liked_by_me:false,saved_by_me:false,created_at:"2026-10-11T12:00:00Z",links:[]} as Work;
-  function modal(onClose:()=>void){return <MemoryRouter><ArtworkDetailModal language="en" work={work} canLike={false} canSave={false} onClose={onClose} onToggleLike={vi.fn()} onToggleSave={vi.fn()} t={key=>translations.en[key]}/></MemoryRouter>;}
+  function modal(onClose:()=>void,onSave=vi.fn()){return <MemoryRouter><ArtworkDetailModal language="en" work={work} canLike={false} canSave={true} onClose={onClose} onToggleLike={vi.fn()} onToggleSave={onSave} t={key=>translations.en[key]}/></MemoryRouter>;}
+  it("saves on the very first click inside opened artwork",()=>{
+    const onSave=vi.fn();render(modal(vi.fn(),onSave));
+    fireEvent.click(screen.getByRole("button",{name:translations.en["home.saveWork"]}));
+    expect(onSave).toHaveBeenCalledExactlyOnceWith(work);
+  });
+  it("locks phone scrolling, contains focus and restores scroll on close",()=>{
+    vi.stubGlobal("matchMedia",vi.fn((query:string)=>({matches:query.includes("max-width")})));
+    vi.stubGlobal("scrollY",375);
+    const outside=document.createElement("button");document.body.append(outside);outside.focus();
+    const view=render(modal(vi.fn()));
+    expect(document.body.style.position).toBe("fixed");expect(document.body.style.top).toBe("-375px");
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    const close=screen.getByRole("button",{name:translations.en["works.closeDetails"]});
+    const save=screen.getByRole("button",{name:translations.en["home.saveWork"]});
+    fireEvent.keyDown(close,{key:"Tab",shiftKey:true});expect(document.activeElement).toBe(save);
+    fireEvent.keyDown(save,{key:"Tab"});expect(document.activeElement).toBe(close);
+    outside.focus();expect(document.activeElement).toBe(close);
+    view.unmount();expect(document.body.style.position).toBe("");expect(document.documentElement.style.overflow).toBe("");
+    expect(window.scrollTo).toHaveBeenCalledWith({top:375,behavior:"instant"});expect(document.activeElement).toBe(outside);outside.remove();
+  });
+  it("does not fix the body position on desktop",()=>{
+    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:false}));render(modal(vi.fn()));
+    expect(document.body.style.position).toBe("");expect(document.documentElement.style.overflow).toBe("");
+  });
   it.each(["button","backdrop","Escape"])("animates before dismissing via %s",async trigger=>{
     const onClose=vi.fn();const {container}=render(modal(onClose));
     if(trigger==="button")fireEvent.click(screen.getByRole("button",{name:translations.en["works.closeDetails"]}));

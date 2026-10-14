@@ -7896,3 +7896,50 @@ Reports-only CSS adjustments preserve existing colors, fonts, components, naviga
 ### Git
 
 Branch: fix/reports-page-spacing. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit and push outcomes reported in handoff; prior entries preserved.
+
+## 2026-10-14 - Refine the mobile gallery, navigation and profile
+
+### Request
+
+Mobile-only smaller artwork filters, clean image cards, matching notification/user-search sheets, centered upload navigation, single-tap artwork and save interactions, focused artwork details, larger profile avatar with camera control, revised profile alignment and a home-linked top-left logo.
+
+### Changes
+
+- Scoped visual changes to the existing 720px phone breakpoint; retained desktop styles. Smaller category pills and hidden card overlays/owner menus prevent touch hover from exposing metadata or intercepting opening taps.
+- Added a mobile header logo using the existing home reset flow, clearing search/category/artist filters.
+- Centered upload with notifications immediately to its left; reserved additional centered slots for permission-gated administrative links. Added theme-matched bottom-bar surfaces and explicit full-width sizing, preserving safe-area padding.
+- Mounted notifications outside the navigation rail, matching Find users positioning/animations, dimensions and backdrop behavior; retained existing notification APIs and delayed link navigation.
+- Refined artwork details into a rounded, naturally proportioned mobile card. Save is expanded from the start, action buttons are placed before details, and direct click handlers retain first-tap saving. Added phone body/root scroll locking, scroll-position restoration, focus containment and focus restoration; existing smooth closing remains intact.
+- Enlarged the avatar, placed identity/stats beside it with logout at the far right, and replaced mobile photo overlays with a circular camera badge. Camera menu retains upload/crop/removal operations and outside dismissal. Owner edit/delete actions remain accessible inside opened profile artwork when mobile card menus are hidden.
+
+### Repositories and files
+
+Checked all three repositories clean and pulled main before implementation. Frontend only: HomePage, ArtworkDetailModal, AppSidebar, ProfilePage, styles, gallery interaction tests, new mobile-layout/mobile-profile tests and this log. Both backends unchanged.
+
+### API
+
+No API changes; existing artwork, avatar, notification and profile endpoints retained.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+Existing authentication, save, upload/ownership and administrative permission gates retained. No backend authorization, secrets, configuration or SnapStart changes.
+
+### Frontend
+
+Existing Arabic/English translations, themes, desktop layout, natural media proportions, reduced-motion animations and safe-area handling retained. Phone artwork details can scroll when long, but the underlying page stays locked.
+
+### Verification
+
+125 tests passed (65 foundation/layout and 60 component/feed), including mobile logo reset, sheet placement, first-click saving, phone scroll/focus lock/restoration, desktop body behavior, camera upload/removal and owner editing. Strict TypeScript/Vite production build and git diff --check passed. An initial focus test revealed grouped selector ordering in the test DOM; focusable controls now retain document traversal order and the complete suite passed. Browser skill connection failed with the Windows sandbox helper lock error; live phone visual verification was not performed.
+
+### Deployment
+
+Frontend only through the existing main Cloudflare workflow; no backend deploy or database migration. Production deployment result reported in handoff.
+
+### Git
+
+Branch: feature/mobile-gallery-profile. Focused commit hash and branch/main push results reported in handoff. Fetch/rebase before branch push, followed by the authorized fast-forward main merge/push. Prior log entries preserved.
