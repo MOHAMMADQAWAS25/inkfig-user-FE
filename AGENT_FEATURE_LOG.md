@@ -7943,3 +7943,41 @@ Frontend only through the existing main Cloudflare workflow; no backend deploy o
 ### Git
 
 Branch: feature/mobile-gallery-profile. Focused commit hash and branch/main push results reported in handoff. Fetch/rebase before branch push, followed by the authorized fast-forward main merge/push. Prior log entries preserved.
+
+## 2026-10-14 - Soften mobile navigation and reposition profile avatar
+
+### Request
+
+Make the phone navigation subtly creamier without matching the homepage background; put the profile avatar left of the account information and make its camera badge white and smaller.
+
+### Changes
+
+Mobile light navigation uses pale cream #faf5e5, distinct from the stronger homepage cream. Dark navigation remains unchanged. Swapped mobile profile grid columns so the avatar is on the left, identity/stats are beside it on the right, and logout remains at the far right. Camera badge is now 36px with a white surface and a 17px dark olive glyph for contrast; an expanded transparent hit area preserves comfortable touch targeting. Reanchored the camera menu to open toward the page interior after moving the avatar left.
+
+### Repositories and files
+
+All three repositories checked clean and synchronized with main. Frontend only: src/styles.css, tests/mobile-layout.test.mjs and this log. Both backends unchanged.
+
+### API and database
+
+No API changes or migration required.
+
+### Permissions and scope
+
+No authentication, authorization, permissions, secrets, configuration or backend/SnapStart changes.
+
+### Frontend
+
+CSS changes remain within the existing 720px mobile breakpoint. Desktop styling, Arabic/English text direction, avatar upload/crop/removal behavior, account controls and dark navigation are preserved.
+
+### Verification
+
+126 tests passed (66 foundation/layout and 60 component/feed). TypeScript checks, Vite production build and git diff --check passed. Added assertions for cream navigation, profile column placement, badge size/color and menu anchoring. No live phone visual inspection performed.
+
+### Deployment
+
+Frontend only through the existing main Cloudflare workflow. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: fix/mobile-profile-cream. Exact commit and push outcomes reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous feature-log entries preserved.

@@ -24,6 +24,18 @@ test("phone artwork and profile preserve natural media and camera controls",()=>
   assert.match(mobile, /max-height: 42svh/);
   assert.match(mobile, /overscroll-behavior: contain/);
   assert.match(mobile, /\.profile-intro \.profile-avatar-actions \{ display: none/);
-  assert.match(mobile, /\.profile-avatar-camera > summary[^}]*width: 44px; height: 44px/);
+  assert.match(mobile, /\.profile-avatar-camera > summary[^}]*width: 36px; height: 36px/);
+  assert.match(mobile, /\.profile-avatar-camera > summary::after[^}]*inset: -6px/);
   assert.match(mobile, /:root\[data-theme="dark"\] \.profile-avatar-camera/);
+});
+
+test("mobile cream bar and left avatar keep desktop styling untouched",()=>{
+  assert.match(mobile, /\.app-sidebar, \[dir="rtl"\] \.app-sidebar[^}]*background: #faf5e5/);
+  assert.match(mobile, /:root\[data-theme="dark"\] \.app-sidebar \{ background: #10140c/);
+  assert.match(mobile, /\.profile-intro \{[^}]*grid-template-columns: clamp\(92px,24vw,116px\) minmax\(0,1fr\) 44px/);
+  assert.match(mobile, /\.profile-intro \.profile-avatar \{ grid-column: 1/);
+  assert.match(mobile, /\.profile-identity \{ grid-column: 2/);
+  assert.match(mobile, /\.profile-avatar-camera > summary \{[^}]*background: #fff; color: #39431c/);
+  assert.match(mobile, /\.profile-avatar-camera > summary svg \{ width: 17px; height: 17px/);
+  assert.match(mobile, /\.profile-avatar-camera > div \{[^}]*right: auto; left: 0/);
 });
