@@ -39,6 +39,27 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it.each(["top","bottom","icon"])("focuses the input and opens history from the search bar %s",async area=>{
+    const entry={query:"Flowers",normalized_query:"flowers",search_history_id:"flowers",last_searched_at:new Date().toISOString()};
+    vi.mocked(requestJson).mockResolvedValue({data:[entry],status:200});
+    const {container}=render(<MemoryRouter><HomePage/></MemoryRouter>);
+    const form=screen.getByRole("search");const input=screen.getByRole("combobox");
+    fireEvent.click(area==="icon"?container.querySelector(".gallery-search > svg")!:form,{clientY:area==="top"?0:60});
+    expect(document.activeElement).toBe(input);
+    await screen.findByRole("option",{name:"Flowers"});
+    fireEvent.keyDown(input,{key:"Escape"});
+    expect(screen.queryByRole("option",{name:"Flowers"})).toBeNull();
+    fireEvent.click(form);await screen.findByRole("option",{name:"Flowers"});
+  });
+  it.each(["picture","name"])("opens a selected account profile from its %s",async target=>{
+    vi.mocked(searchProfiles).mockResolvedValue([{user_id:"ahmad",full_name:"Ahmad Ishaq",avatar_url:"https://example.com/avatar.png"}]);
+    const {container}=render(<MemoryRouter><HomePage/><RouteProbe/></MemoryRouter>);
+    const input=screen.getByRole("combobox");fireEvent.change(input,{target:{value:"@ahmad"}});
+    fireEvent.click(await screen.findByRole("option",{name:"Ahmad Ishaq"}));
+    const link=screen.getByRole("link",{name:"Ahmad Ishaq"});expect(link.getAttribute("href")).toBe("/en/profile/ahmad");
+    fireEvent.click(container.querySelector(target==="picture"?".search-user-profile img":".search-user-profile strong")!);
+    expect(screen.getByTestId("route").textContent).toBe("/en/profile/ahmad");
+  });
   it.each(["Notifications","Find users"])("mounts %s outside the navigation bar",async name=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name,exact:true}));

@@ -8069,3 +8069,41 @@ Frontend only via the existing Cloudflare main workflow; no backend deployment o
 ### Git
 
 Branch: fix/footer-smooth-controls. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push and authorized fast-forward main merge/push. Previous log entries preserved.
+
+## 2026-10-15 - Activate the full search surface and link selected profiles
+
+### Request
+
+Make clicks anywhere in the search bar, including top/bottom padding, functional. Let the selected account's picture and name open its profile.
+
+### Changes
+
+Search form background and icon clicks now focus the input and open recent history, including reopening it while the input is already focused. Input stretches through the bar height. Interactive buttons, links, suggestion lists and history controls are excluded from the surface handler so their existing actions remain independent. Selected account picture/initial and name share a localized-route profile Link; the removal control remains a separate button. Link styling preserves theme colors, chip sizing/truncation, RTL and keyboard focus indication.
+
+### Repositories and files
+
+All three repositories checked clean and synchronized with main. Frontend only: HomePage, styles, gallery-interactions tests and this log. Both backends unchanged.
+
+### API and database
+
+No API changes or database migration.
+
+### Permissions and scope
+
+Existing profile authorization, search/history behavior, authentication and permissions unchanged. No secrets, configuration or backend/SnapStart changes.
+
+### Frontend
+
+Existing smooth dropdown transitions, mobile/desktop layouts and Arabic/English routing preserved. Actual hover alone does not steal focus; clicking the full visible search surface activates it.
+
+### Verification
+
+145 tests passed (69 foundation/layout and 76 component/feed), including top/bottom/icon activation, reopening focused history and navigation from both selected picture and name. Existing search clearing/chip removal tests remain passing. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking Vite 500kB bundle warning remains; no checks bypassed. Live browser/physical-device visual inspection not performed.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Deployment result reported in handoff.
+
+### Git
+
+Branch: fix/search-surface-profile-link. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous log entries preserved.
