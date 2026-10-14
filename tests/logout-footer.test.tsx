@@ -19,7 +19,8 @@ it.each(["en","ar"])("logout clears account/cache and routes to %s sign-in",lang
   expect(screen.getByText(`/${language}/login:signed-out`)).toBeTruthy();expect(localStorage.getItem("inkfig.auth-session")).toBeNull();
   expect(client.getQueryData(["private"])).toBeUndefined();expect(logoutUser).toHaveBeenCalledTimes(1);
 });
-it.each([["/en"," site-footer-app"],["/en/profile"," site-footer-app"],["/ar/upload"," site-footer-app"],["/en/login",""]])("shows shared footer with correct navigation clearance on %s",(route,suffix)=>{
+it.each([["/en",true],["/ar",true],["/en/profile",false],["/ar/upload",false],["/en/login",false]])("shows footer only on the homepage: %s",(route,visible)=>{
   const {container}=render(<MemoryRouter initialEntries={[route]}><I18nProvider><SiteFooter/></I18nProvider></MemoryRouter>);
-  expect(container.querySelector("footer")?.className).toBe(`site-footer${suffix}`);expect(screen.getByRole("img",{name:"InkFig"})).toBeTruthy();
+  expect(Boolean(container.querySelector("footer"))).toBe(visible);
+  if(visible)expect(screen.getByRole("img",{name:"InkFig"})).toBeTruthy();
 });

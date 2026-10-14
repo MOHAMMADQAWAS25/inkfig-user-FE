@@ -268,7 +268,7 @@ test("serves a public localized artwork gallery as the default experience", () =
   assert.match(feed, /layout = "masonry"/);
   assert.doesNotMatch(appSidebar, /gallery-guest-avatar|gallery-profile-menu|app-sidebar-account/);
   assert.match(homePage, /className="gallery-header-actions"/);
-  assert.match(homePage, /session\?<details[\s\S]*:<Link className="gallery-guest-avatar"/);
+  assert.match(homePage, /session\?<SmoothDetails[\s\S]*:<Link className="gallery-guest-avatar"/);
   assert.doesNotMatch(router, /dashboard|welcome|RequireAuth|AppShell/);
   assert.match(styles, /gallery-ivory-background\.png/);
   assert.match(styles, /\.artwork-grid \{ column-count: 4; column-gap: 18px/);

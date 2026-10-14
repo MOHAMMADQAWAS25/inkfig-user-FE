@@ -4,12 +4,12 @@ import test from "node:test";
 const read=path=>readFileSync(new URL(`../src/${path}`,import.meta.url),"utf8");
 const css=read("styles.css");
 const shared=css.split("/* Shared footer and device-independent artwork/profile controls. */")[1];
-test("fixed shared footer reserves space and sits above phone navigation",()=>{
+test("homepage footer follows document flow and both themes",()=>{
   assert.match(read("app/AppRouter.tsx"), /<SiteFooter\/>/);
   assert.doesNotMatch(read("features/home/HomePage.tsx"), /<footer/);
-  assert.match(shared, /\.site-content \{ padding-bottom: calc\(var\(--site-footer-height\)/);
-  assert.match(shared, /\.site-footer \{ position: fixed;[^}]*bottom: 0/);
-  assert.match(shared, /\.site-footer-app \{ bottom: calc\(64px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(shared, /\.site-content \{ padding-bottom: 0/);
+  assert.match(shared, /\.site-footer \{ position: static;[^}]*min-height: 76px/);
+  assert.match(shared, /:root\[data-theme="dark"\] \.site-footer \{ background: #171d11/);
 });
 test("camera badge and hover-expanding logout are available on desktop",()=>{
   assert.match(shared, /\.profile-avatar-actions \{ display: none/);

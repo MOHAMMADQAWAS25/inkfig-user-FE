@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { Language, TranslationKey } from "../../i18n/resources";
 import type { Work } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
+import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { ReportDialog } from "../reports/ReportDialog";
 import { relativeTime } from "../../lib/relativeTime";
 
@@ -115,8 +116,8 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           </div>}
         </div>
       </section>
-      {moderating&&<div className="moderation-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!deleting&&setModerating(false)}><form className="moderation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="moderation-title" onSubmit={submitModeration}><button className="moderation-dialog-close" type="button" disabled={deleting} aria-label={t("works.cancelModeration")} onClick={()=>setModerating(false)}><X size={19}/></button><span><ShieldAlert size={25}/></span><h2 id="moderation-title">{t("works.moderateDeleteTitle")}</h2><p>{t("works.moderateDeleteDescription")}</p><label>{t("works.deletionReason")}<textarea required minLength={10} maxLength={1000} value={reason} placeholder={t("works.deletionReasonPlaceholder")} onChange={event=>setReason(event.target.value)}/><small>{t("works.deletionReasonHint")}</small></label>{deleteError&&<p className="error-message" role="alert">{t("works.moderateDeleteFailed")}</p>}<div><button type="button" disabled={deleting} onClick={()=>setModerating(false)}>{t("works.cancelModeration")}</button><button className="danger-button" type="submit" disabled={deleting||reason.trim().length<10}>{t(deleting?"works.deletingModerated":"works.confirmModerateDelete")}</button></div></form></div>}
-      {reporting&&<ReportDialog targetType="work" targetUserId={work.owner_user_id} targetWorkId={work.work_id} onClose={()=>setReporting(false)} t={t}/>}
+      <AnimatedPresence open={moderating}>{moderating&&<div className="moderation-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!deleting&&setModerating(false)}><form className="moderation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="moderation-title" onSubmit={submitModeration}><button className="moderation-dialog-close" type="button" disabled={deleting} aria-label={t("works.cancelModeration")} onClick={()=>setModerating(false)}><X size={19}/></button><span><ShieldAlert size={25}/></span><h2 id="moderation-title">{t("works.moderateDeleteTitle")}</h2><p>{t("works.moderateDeleteDescription")}</p><label>{t("works.deletionReason")}<textarea required minLength={10} maxLength={1000} value={reason} placeholder={t("works.deletionReasonPlaceholder")} onChange={event=>setReason(event.target.value)}/><small>{t("works.deletionReasonHint")}</small></label>{deleteError&&<p className="error-message" role="alert">{t("works.moderateDeleteFailed")}</p>}<div><button type="button" disabled={deleting} onClick={()=>setModerating(false)}>{t("works.cancelModeration")}</button><button className="danger-button" type="submit" disabled={deleting||reason.trim().length<10}>{t(deleting?"works.deletingModerated":"works.confirmModerateDelete")}</button></div></form></div>}</AnimatedPresence>
+      <AnimatedPresence open={reporting}>{reporting&&<ReportDialog targetType="work" targetUserId={work.owner_user_id} targetWorkId={work.work_id} onClose={()=>setReporting(false)} t={t}/>}</AnimatedPresence>
     </div>
   );
 }

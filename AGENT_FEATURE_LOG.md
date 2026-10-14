@@ -8027,3 +8027,45 @@ Frontend only through the existing Cloudflare main deployment workflow; no backe
 ### Git
 
 Branch: feature/artwork-profile-controls. Exact commit hash and push outcome reported in handoff. Fetch/rebase before branch push and authorized fast-forward main merge/push. Earlier feature-log entries preserved.
+
+## 2026-10-15 - Correct homepage footer and smooth expandable controls
+
+### Request
+
+Show a larger, theme-relative footer only at the bottom of the homepage, not fixed across pages. Smooth web controls opening/closing and page navigation, including recent searches and profile menus. Expand the report-user button like logout/save controls.
+
+### Changes
+
+- Footer renders only on English/Arabic home routes, follows normal document flow, and uses pale cream/deep olive surfaces for light/dark themes. Increased its size and removed global reserved footer spacing; phone footer still clears fixed navigation.
+- Added reusable AnimatedPresence to retain dropdown/dialog content through 180ms exit transitions, block closing content interaction, cancel stale closes on reopening and respect reduced motion. Applied to recent searches, account suggestions, profile connections/crop/edit/report dialogs and artwork moderation/report dialogs.
+- Added SmoothDetails for profile, camera and post menus. Native summary and outside/programmatic dismissal retain content through exit, Escape closes the menu, closing contents are inert and reopening cancels the timer. Observers/listeners/timers are cleaned up on unmount.
+- Added gentle page-entry fades on pathname changes without animating every search query update; profile tab content remounts its existing entry animation when switching sections. Existing notifications/Find users/artwork animations remain intact.
+- Report-user control shows an icon and expands its localized label on hover or keyboard focus, with responsive sizing and reduced-motion support.
+
+### Repositories and files
+
+All three repositories checked clean and pulled main before implementation. Frontend only: AppRouter, HomePage, ArtworkDetailModal, ProfilePage, SiteFooter, new AnimatedPresence/SmoothDetails helpers, styles and corresponding tests/log. Both backends unchanged.
+
+### API and database
+
+No API changes or database migration required.
+
+### Permissions and scope
+
+Existing authentication, reporting, artwork/profile permissions and backend enforcement unchanged. No secrets, environment configuration or backend/SnapStart changes. Native operating-system file pickers are not animated by the website.
+
+### Frontend
+
+Existing Arabic/English directions, light/dark themes, keyboard accessibility, mobile navigation, artwork proportions, upload and account functionality preserved. Footer is homepage-only; general web navigation gains entry transitions, while expandable controls gain entrance/exit transitions.
+
+### Verification
+
+140 tests passed (69 foundation/layout and 71 component/feed), covering homepage-only footer routes, theme/flow styling, exit retention, outside/summary/Escape dismissal, rapid reopening and reduced-motion timing. Strict TypeScript/Vite production build and git diff --check passed. Vite reports its non-blocking 500kB chunk warning; no limits or checks bypassed. Live browser/physical-device visual inspection not performed.
+
+### Deployment
+
+Frontend only via the existing Cloudflare main workflow; no backend deployment or migration. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: fix/footer-smooth-controls. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push and authorized fast-forward main merge/push. Previous log entries preserved.

@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { LoginPage } from "../features/auth/LoginPage";
 import { SignupPage } from "../features/auth/SignupPage";
@@ -14,8 +14,9 @@ import { SettingsPage } from "../features/settings/SettingsPage";
 import { SiteFooter } from "../features/layout/SiteFooter";
 
 export function AppRouter() {
+  const location = useLocation();
   return (
-    <><div className="site-content"><Routes>
+    <><div key={location.pathname} className="site-content"><Routes>
       <Route path="/:language" element={<HomePage />} />
       <Route path="/:language/login" element={<LoginPage />} />
       <Route path="/:language/signup" element={<SignupPage />} />
