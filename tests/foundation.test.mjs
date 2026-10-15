@@ -173,7 +173,7 @@ test("defines shared visual tokens and responsive RTL behavior", () => {
 
 test("uses the InkFig logo for application branding", () => {
   assert.match(indexHtml, /inkfig-logo\.svg/);
-  assert.match(homePage, /inkfig-logo\.svg/);
+  assert.match(appSidebar, /inkfig-logo\.svg/);
   assert.match(styles, /\.auth-logo/);
   assert.match(styles, /\.brand-logo/);
 });

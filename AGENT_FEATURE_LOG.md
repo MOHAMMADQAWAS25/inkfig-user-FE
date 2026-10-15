@@ -8107,3 +8107,33 @@ Frontend-only existing Cloudflare main workflow; no backend deployment or migrat
 ### Git
 
 Branch: fix/search-surface-profile-link. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous log entries preserved.
+
+## 2026-10-15 - Mobile glass navigation, scrolling header and profile swipes
+
+### Request and implementation
+
+Mobile bottom navigation now contains only Home, Upload and Profile, in that physical left-to-right order in both languages. Profile navigates directly to the profile (sign-in for guests). Rounded cream/dark-green translucent glass, blur, safe-area spacing and consistent icon sizing support both themes. Desktop navigation and profile menu remain unchanged.
+
+Replaced the mobile home logo with a hamburger and the search-side avatar with the existing unread-count notification bell. A smoothly entering/exiting icon drawer contains Exhibition, Find users, Saved, Settings, permission-gated administration/reports, theme, language and signed-in logout. Drawer actions wait for closing before navigation; keyboard focus is trapped/restored, Escape/backdrop dismiss, background scrolling is locked and timers cleaned up. Other pages retain access through a compact menu/bell row. Existing notification API, live updates and panel-closing navigation are reused.
+
+Home header hides smoothly on downward mobile scrolling and returns on upward scrolling or near the top, without hiding an actively used search input or open drawer. Own-profile artwork sections support left/right Posts/Saved/Likes swipes, clamped at the ends; vertical/multi-touch gestures are ignored and swipe-generated clicks suppressed. Reduced-motion preferences respected.
+
+### Repositories and files
+
+All three repositories checked clean and synchronized with main before implementation. Frontend only: HomePage, AppSidebar, ProfilePage, new mobile navigation/viewport/scroll/swipe modules, styles, mobile and regression tests, and this log. Both backend repositories unchanged.
+
+### API, database and permissions
+
+No API changes, migration, storage changes or backend/SnapStart changes. Existing authentication and permission checks preserved; administration icons remain permission-gated. No secrets, dependencies or generated build files committed.
+
+### Verification
+
+155 tests passed (69 foundation/layout and 86 component/feed). New coverage includes fixed English/Arabic link order, direct profile routing, header notification slots and unread badge, animated drawer dismissals, deferred language/Find users actions, scroll direction, bidirectional/clamped swipes, vertical/multi-touch rejection, desktop isolation and accidental-click suppression. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking 500kB bundle warning remains. No failed checks bypassed. Live browser/physical-device visual verification was not performed.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Deployment result reported in handoff.
+
+### Git
+
+Branch: feature/mobile-glass-navigation. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous log entries preserved; no unrelated work modified.

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
-import inkfigLogo from "../../assets/inkfig-logo.svg";
+import { useScrollHeader } from "./useScrollHeader";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { deleteWorkAsModerator, getWork, setWorkLike, setWorkSave } from "../works/worksApi";
@@ -37,6 +37,7 @@ const workCategories = [
 
 
 export function HomePage() {
+  const headerHidden = useScrollHeader();
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const location = useLocation();
@@ -196,8 +197,9 @@ export function HomePage() {
   return (
     <main className="gallery-home">
       <AppSidebar />
-      <header className="gallery-header">
-        <Link className="mobile-home-logo" to={`/${language}`} state={{resetHome:true}} aria-label={`${t("app.name")} — ${t("nav.home")}`}><img src={inkfigLogo} alt=""/></Link>
+      <header className={`gallery-header${headerHidden ? " mobile-header-hidden" : ""}`}>
+        <span className="mobile-header-menu" id="mobile-menu-slot" />
+        <span className="mobile-header-notifications" id="mobile-notifications-slot" />
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef} onClick={event=>{if(!(event.target instanceof Element)||event.target.closest('input, button, a, [role="listbox"], .recent-searches'))return;const input=event.currentTarget.querySelector<HTMLInputElement>("#gallery-search-input");if(document.activeElement===input)openHistory();else input?.focus();}}>
           <Search aria-hidden="true" size={19} />
           <label className="sr-only" htmlFor="gallery-search-input">{t("home.searchPlaceholder")}</label>

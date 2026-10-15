@@ -1,0 +1,101 @@
+import React from "react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { MobileNavigation } from "../src/features/navigation/MobileNavigation";
+import { useProfileSwipe } from "../src/features/profile/useProfileSwipe";
+import { useScrollHeader } from "../src/features/home/useScrollHeader";
+import { translations } from "../src/i18n/resources";
+
+const state = vi.hoisted(() => ({ language: "en", signOut: vi.fn(), setLanguage: vi.fn() }));
+vi.mock("../src/i18n/I18nProvider", () => ({ useI18n: () => ({ language: state.language, setLanguage: state.setLanguage, t: (key: keyof typeof translations.en) => translations.en[key] }) }));
+vi.mock("../src/features/auth/AuthContext", () => ({ useAuth: () => ({ session: { userId: "me" }, signOut: state.signOut }) }));
+vi.mock("../src/theme/ThemeToggle", () => ({ ThemeToggle: () => <button aria-label="Theme"><svg /></button> }));
+vi.mock("../src/i18n/LanguageToggle", () => ({ LanguageToggle: () => <button className="language-toggle" aria-label="Language" onClick={() => state.setLanguage("immediate")}><svg /></button> }));
+beforeEach(() => {
+  vi.useFakeTimers(); state.language = "en"; vi.clearAllMocks();
+  vi.stubGlobal("matchMedia", vi.fn((query: string) => ({ matches: query.includes("max-width"), addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+});
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+function Probe() { return <output>{useLocation().pathname}</output>; }
+const notifications = vi.fn(), accounts = vi.fn();
+function navigation() {
+  return render(<MemoryRouter initialEntries={[`/${state.language}`]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><Probe/></MemoryRouter>);
+}
+it.each(["en", "ar"])("keeps three bottom links in the same physical order in %s", language => {
+  state.language = language;
+  const { container } = navigation();
+  const nav = container.querySelector(".mobile-bottom-nav")!;
+  expect(nav.getAttribute("dir")).toBe("ltr");
+  expect(Array.from(nav.querySelectorAll("a")).map(link => link.getAttribute("href"))).toEqual([`/${language}`, `/${language}/upload`, `/${language}/profile`]);
+  fireEvent.click(nav.querySelectorAll("a")[2]);
+  expect(screen.getByRole("status").textContent).toBe(`/${language}/profile`);
+});
+it("portals hamburger and unread bell into the home header slots", () => {
+  const { container } = render(<MemoryRouter><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header></MemoryRouter>);
+  expect(container.querySelector("#mobile-menu-slot button")?.getAttribute("aria-label")).toBe("Menu");
+  expect(container.querySelector("#mobile-notifications-slot .notification-badge")?.textContent).toBe("2");
+  fireEvent.click(screen.getByRole("button", { name: "Notifications" })); expect(notifications).toHaveBeenCalledOnce();
+});
+it.each(["Escape", "backdrop", "close"])("retains the drawer during smooth %s dismissal and restores scrolling", method => {
+  navigation(); fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+  expect(document.body.style.overflow).toBe("hidden");
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  if (method === "Escape") fireEvent.keyDown(document, { key: "Escape" });
+  else fireEvent.click(screen.getAllByRole("button", { name: "Close menu" })[method === "backdrop" ? 0 : 1]);
+  expect(document.querySelector(".is-closing")).toBeTruthy();
+  act(() => vi.advanceTimersByTime(240));
+  expect(screen.queryByRole("dialog")).toBeNull(); expect(document.body.style.overflow).toBe("");
+});
+it("closes before opening Find users or changing language", () => {
+  navigation(); fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+  fireEvent.click(screen.getByRole("button", { name: "Find users" })); expect(accounts).not.toHaveBeenCalled();
+  act(() => vi.advanceTimersByTime(240)); expect(accounts).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+  fireEvent.click(screen.getByRole("button", { name: "Language" })); expect(state.setLanguage).not.toHaveBeenCalled();
+  act(() => vi.advanceTimersByTime(240)); expect(state.setLanguage).toHaveBeenCalledWith("ar");
+});
+function SwipeProbe() {
+  const [section, select] = React.useState<"posts" | "saved" | "likes">("posts");
+  return <div data-testid="swipe" {...useProfileSwipe(true, section, select)}>{section}</div>;
+}
+function swipe(node: HTMLElement, x: number, y = 0) {
+  fireEvent.touchStart(node, { touches: [{ clientX: 200, clientY: 100 }] });
+  fireEvent.touchEnd(node, { touches: [], changedTouches: [{ clientX: 200 + x, clientY: 100 + y }] });
+}
+it("swipes posts/saved/likes in both directions, clamps ends and ignores vertical gestures", () => {
+  render(<SwipeProbe/>); const area = screen.getByTestId("swipe");
+  swipe(area, 100); expect(area.textContent).toBe("posts");
+  swipe(area, -90, 140); expect(area.textContent).toBe("posts");
+  swipe(area, -100); expect(area.textContent).toBe("saved");
+  swipe(area, -100); expect(area.textContent).toBe("likes");
+  swipe(area, -100); expect(area.textContent).toBe("likes");
+  swipe(area, 100); expect(area.textContent).toBe("saved");
+  swipe(area, 100); expect(area.textContent).toBe("posts");
+});
+it("leaves desktop touch gestures unchanged", () => {
+  vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<SwipeProbe/>); const area = screen.getByTestId("swipe");
+  swipe(area, -100); expect(area.textContent).toBe("posts");
+});
+it("ignores multi-touch and prevents a swipe from opening an artwork", () => {
+  const click = vi.fn();
+  function Grid() { return <div data-testid="swipe" {...useProfileSwipe(true, "posts", vi.fn())}><button onClick={click}>Artwork</button></div>; }
+  render(<Grid/>); const area = screen.getByTestId("swipe");
+  fireEvent.touchStart(area, { touches: [{clientX:200,clientY:100}, {clientX:220,clientY:100}] });
+  fireEvent.touchEnd(area, { touches: [], changedTouches: [{clientX:50,clientY:100}] });
+  fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
+  swipe(area, -100);
+  fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
+});
+it("hides the mobile header scrolling down and reveals it scrolling up", () => {
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
+  vi.stubGlobal("cancelAnimationFrame", window.clearTimeout);
+  function Header() { return <header data-testid="header" data-hidden={useScrollHeader()}/>; }
+  render(<Header/>);
+  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 200 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
+  expect(screen.getByTestId("header").getAttribute("data-hidden")).toBe("true");
+  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 180 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
+  expect(screen.getByTestId("header").getAttribute("data-hidden")).toBe("false");
+  Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+});

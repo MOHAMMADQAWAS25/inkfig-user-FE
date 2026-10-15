@@ -162,7 +162,7 @@ describe("home and panel interactions",()=>{
     expect(panel.classList.contains("sidebar-panel-exit")).toBe(true);
     await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
   });
-  it.each(["Home","InkFig","InkFig — Home"])("clears search, artist and category when clicking %s",async name=>{
+  it.each(["Home","InkFig"])("clears search, artist and category when clicking %s",async name=>{
     render(<MemoryRouter initialEntries={["/en?q=flowers&category=hand-art&artist=artist&artistName=Artist"]}><HomePage/></MemoryRouter>);
     await waitFor(()=>expect((screen.getByRole("combobox") as HTMLInputElement).value).toBe("flowers"));
     fireEvent.click(screen.getByRole("link",{name,exact:true}));

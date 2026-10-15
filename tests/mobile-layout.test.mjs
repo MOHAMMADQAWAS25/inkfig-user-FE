@@ -11,13 +11,11 @@ test("new gallery and profile styling stays inside the phone breakpoint",()=>{
   assert.match(mobile, /\.gallery-filters button \{[^}]*font-size: \.78rem/);
   assert.match(mobile, /\.artwork-modal-save span[^}]*max-width: none; opacity: 1/);
 });
-test("phone upload stays centered and notifications stay immediately to its left",()=>{
-  assert.match(mobile, /\.app-sidebar, \[dir="rtl"\] \.app-sidebar \{ display: grid; width: auto/);
-  assert.match(mobile, /grid-template-columns: repeat\(7,minmax\(0,1fr\)\)/);
-  assert.match(mobile, /\.app-sidebar-panel-button \{ grid-column: 3/);
-  assert.match(mobile, /\.mobile-nav-upload \{ grid-column: 4/);
-  assert.match(mobile, /\.mobile-nav-upload \{ grid-column: 5/);
-  assert.match(mobile, /grid-template-columns: repeat\(9,minmax\(0,1fr\)\)/);
+test("phone has three fixed-order navigation slots and a header notification slot",()=>{
+  assert.match(mobile, /\.mobile-bottom-nav \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\); direction: ltr/);
+  assert.match(mobile, /\.mobile-header-menu \{ grid-column: 1/);
+  assert.match(mobile, /\.mobile-header-notifications \{ grid-column: 3/);
+  assert.match(mobile, /\.gallery-header, \[dir="rtl"\] \.gallery-header \{ grid-template-columns: 44px minmax\(0, 1fr\) 44px/);
   assert.match(mobile, /safe-area-inset-bottom/);
 });
 test("phone artwork and profile preserve natural media and camera controls",()=>{
@@ -29,9 +27,10 @@ test("phone artwork and profile preserve natural media and camera controls",()=>
   assert.match(mobile, /:root\[data-theme="dark"\] \.profile-avatar-camera/);
 });
 
-test("mobile cream bar and left avatar keep desktop styling untouched",()=>{
-  assert.match(mobile, /\.app-sidebar, \[dir="rtl"\] \.app-sidebar[^}]*background: #faf5e5/);
-  assert.match(mobile, /:root\[data-theme="dark"\] \.app-sidebar \{ background: #10140c/);
+test("mobile glass bar supports both themes and preserves the left avatar",()=>{
+  assert.match(mobile, /\.mobile-bottom-nav \{[^}]*border-radius: 25px; background: rgba\(250,245,225,\.78\)/);
+  assert.match(mobile, /backdrop-filter: blur\(22px\) saturate\(145%\)/);
+  assert.match(mobile, /\[data-theme="dark"\] \.mobile-bottom-nav[^}]*background: rgba\(23,29,17,\.82\)/);
   assert.match(mobile, /\.profile-intro \{[^}]*grid-template-columns: clamp\(92px,24vw,116px\) minmax\(0,1fr\) 44px/);
   assert.match(mobile, /\.profile-intro \.profile-avatar \{ grid-column: 1/);
   assert.match(mobile, /\.profile-identity \{ grid-column: 2/);
