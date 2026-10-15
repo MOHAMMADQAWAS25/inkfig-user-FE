@@ -2,7 +2,7 @@ import { Languages } from "lucide-react";
 
 import { useI18n } from "./I18nProvider";
 
-export function LanguageToggle() {
+export function LanguageToggle({ showLabel = false }: { showLabel?: boolean }) {
   const { language, setLanguage, t } = useI18n();
   const nextLanguage = language === "ar" ? "en" : "ar";
   const label = nextLanguage === "ar" ? t("language.useArabic") : t("language.useEnglish");
@@ -10,6 +10,7 @@ export function LanguageToggle() {
   return (
     <button aria-label={label} className="icon-button theme-toggle language-toggle" title={label} type="button" onClick={() => setLanguage(nextLanguage)}>
       <Languages aria-hidden="true" size={19} />
+      {showLabel && <span>{label}</span>}
     </button>
   );
 }

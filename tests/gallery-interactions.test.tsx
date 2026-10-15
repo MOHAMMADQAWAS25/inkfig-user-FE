@@ -39,6 +39,37 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("dismisses search without activating the underlying card on the same tap",async()=>{
+    const openCard=vi.fn();
+    vi.mocked(requestJson).mockResolvedValue({data:[{query:"Flowers",normalized_query:"flowers",search_history_id:"flowers",last_searched_at:new Date().toISOString()}],status:200});
+    render(<MemoryRouter initialEntries={["/en"]}><HomePage/><button onClick={openCard}>Artwork underneath</button></MemoryRouter>);
+    fireEvent.focus(screen.getByRole("combobox"));
+    await screen.findByRole("option",{name:"Flowers"});
+    const card=screen.getByRole("button",{name:"Artwork underneath"});
+    fireEvent.pointerDown(card);fireEvent.pointerUp(card);fireEvent.click(card);
+    expect(openCard).not.toHaveBeenCalled();
+    expect(screen.queryByRole("option",{name:"Flowers"})).toBeNull();
+    fireEvent.pointerDown(card);fireEvent.pointerUp(card);fireEvent.click(card);
+    expect(openCard).toHaveBeenCalledOnce();
+  });
+  it("toggles the mobile home notification panel from the same bell",async()=>{
+    vi.stubGlobal("matchMedia",(query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+    const {container}=render(<MemoryRouter initialEntries={["/en"]}><HomePage/></MemoryRouter>);
+    const bell=screen.getByRole("button",{name:"Notifications",exact:true});
+    fireEvent.click(bell);expect(container.querySelector(".notifications-panel")).toBeTruthy();
+    fireEvent.click(bell);expect(container.querySelector(".sidebar-panel-exit")).toBeTruthy();
+    await waitFor(()=>expect(container.querySelector(".notifications-panel")).toBeNull());
+  });
+  it.each(["Notifications","Find users"])("consumes outside taps while dismissing %s",async name=>{
+    const action=vi.fn();
+    const {container}=render(<MemoryRouter><AppSidebar/><button onClick={action}>Underlying action</button></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button",{name,exact:true}));
+    const outside=screen.getByRole("button",{name:"Underlying action"});
+    fireEvent.pointerDown(outside);fireEvent.pointerUp(outside);fireEvent.click(outside);
+    expect(action).not.toHaveBeenCalled();
+    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    fireEvent.click(outside);expect(action).toHaveBeenCalledOnce();
+  });
   it.each(["top","bottom","icon"])("focuses the input and opens history from the search bar %s",async area=>{
     const entry={query:"Flowers",normalized_query:"flowers",search_history_id:"flowers",last_searched_at:new Date().toISOString()};
     vi.mocked(requestJson).mockResolvedValue({data:[entry],status:200});
@@ -185,13 +216,16 @@ describe("home and panel interactions",()=>{
     expect(container.querySelector(".notifications-panel")).toBeTruthy();
     expect(container.querySelector(".sidebar-panel-exit")).toBeNull();
   });
-  it("waits for slider closing before navigating",async()=>{
+  it("uses the first outside navigation tap only to dismiss the slider",async()=>{
     const {container}=render(<MemoryRouter initialEntries={["/en"]}><AppSidebar/><RouteProbe/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name:"Find users",exact:true}));
     fireEvent.click(screen.getByRole("link",{name:"Upload",exact:true}));
     expect(screen.getByTestId("route").textContent).toBe("/en");
     expect(container.querySelector(".sidebar-panel-exit")).toBeTruthy();
-    await waitFor(()=>expect(screen.getByTestId("route").textContent).toBe("/en/upload"));
+    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    expect(screen.getByTestId("route").textContent).toBe("/en");
+    fireEvent.click(screen.getByRole("link",{name:"Upload",exact:true}));
+    expect(screen.getByTestId("route").textContent).toBe("/en/upload");
   });
   it("does not cancel the closing timer when Escape is pressed twice",async()=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);

@@ -9,33 +9,72 @@ import { translations } from "../src/i18n/resources";
 
 const state = vi.hoisted(() => ({ language: "en", signOut: vi.fn(), setLanguage: vi.fn() }));
 vi.mock("../src/i18n/I18nProvider", () => ({ useI18n: () => ({ language: state.language, setLanguage: state.setLanguage, t: (key: keyof typeof translations.en) => translations.en[key] }) }));
-vi.mock("../src/features/auth/AuthContext", () => ({ useAuth: () => ({ session: { userId: "me" }, signOut: state.signOut }) }));
+vi.mock("../src/features/auth/AuthContext", () => ({ useAuth: () => ({ session: { userId: "me", fullName: "Viewer" }, signOut: state.signOut }) }));
+vi.mock("../src/features/profile/profileApi", () => ({ getPublicProfile: vi.fn().mockResolvedValue({ avatar_url: "/avatar.png" }) }));
 vi.mock("../src/theme/ThemeToggle", () => ({ ThemeToggle: () => <button aria-label="Theme"><svg /></button> }));
 vi.mock("../src/i18n/LanguageToggle", () => ({ LanguageToggle: () => <button className="language-toggle" aria-label="Language" onClick={() => state.setLanguage("immediate")}><svg /></button> }));
 beforeEach(() => {
   vi.useFakeTimers(); state.language = "en"; vi.clearAllMocks();
+  vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
   vi.stubGlobal("matchMedia", vi.fn((query: string) => ({ matches: query.includes("max-width"), addEventListener: vi.fn(), removeEventListener: vi.fn() })));
 });
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 function Probe() { return <output>{useLocation().pathname}</output>; }
 const notifications = vi.fn(), accounts = vi.fn();
 function navigation() {
-  return render(<MemoryRouter initialEntries={[`/${state.language}`]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><Probe/></MemoryRouter>);
+  return render(<MemoryRouter initialEntries={[`/${state.language}`]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header><Probe/></MemoryRouter>);
 }
-it.each(["en", "ar"])("keeps three bottom links in the same physical order in %s", language => {
+it.each(["en", "ar"])("mirrors three bottom links with the language in %s", language => {
   state.language = language;
   const { container } = navigation();
   const nav = container.querySelector(".mobile-bottom-nav")!;
-  expect(nav.getAttribute("dir")).toBe("ltr");
+  expect(nav.getAttribute("dir")).toBe(language === "ar" ? "rtl" : "ltr");
   expect(Array.from(nav.querySelectorAll("a")).map(link => link.getAttribute("href"))).toEqual([`/${language}`, `/${language}/upload`, `/${language}/profile`]);
   fireEvent.click(nav.querySelectorAll("a")[2]);
   expect(screen.getByRole("status").textContent).toBe(`/${language}/profile`);
 });
 it("portals hamburger and unread bell into the home header slots", () => {
-  const { container } = render(<MemoryRouter><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header></MemoryRouter>);
+  const { container } = render(<MemoryRouter initialEntries={["/en"]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header></MemoryRouter>);
   expect(container.querySelector("#mobile-menu-slot button")?.getAttribute("aria-label")).toBe("Menu");
   expect(container.querySelector("#mobile-notifications-slot .notification-badge")?.textContent).toBe("2");
   fireEvent.click(screen.getByRole("button", { name: "Notifications" })); expect(notifications).toHaveBeenCalledOnce();
+});
+it("does not show menu or notification controls on pages without home header slots", () => {
+  render(<MemoryRouter initialEntries={["/en/profile"]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/></MemoryRouter>);
+  expect(screen.queryByRole("button", {name:"Menu"})).toBeNull();
+  expect(screen.queryByRole("button", {name:"Notifications"})).toBeNull();
+  expect(screen.getAllByRole("link")).toHaveLength(3);
+});
+it("uses the profile image and falls back to the user's initial if it fails", async () => {
+  const {container} = navigation();
+  await act(async () => {});
+  const image = container.querySelector<HTMLImageElement>(".mobile-nav-avatar img")!;
+  expect(image.getAttribute("src")).toBe("/avatar.png");
+  fireEvent.error(image);
+  expect(container.querySelector(".mobile-nav-avatar")?.textContent).toBe("V");
+});
+it("shows labeled drawer rows, restores Find users, and puts Settings before final logout", () => {
+  navigation(); fireEvent.click(screen.getByRole("button", {name:"Menu"}));
+  const rows = Array.from(document.querySelectorAll(".mobile-drawer-grid button"));
+  expect(rows.slice(-2).map(row => row.textContent)).toEqual(["Settings", "Log out"]);
+  const find = screen.getByRole("button", {name:"Find users"});
+  expect(find.textContent).toBe("Find users"); expect(find.querySelector(".mobile-find-users-icon")).toBeTruthy();
+  expect(document.body.style.position).toBe("fixed"); expect(document.documentElement.style.overflow).toBe("hidden");
+});
+it("consumes an outside gesture and restores the page scroll position after closing", () => {
+  const action=vi.fn();
+  Object.defineProperty(window,"scrollY",{configurable:true,value:350});
+  const {container}=render(<MemoryRouter initialEntries={["/en"]}><MobileNavigation unreadCount={0} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header><button onClick={action}>Artwork</button></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button",{name:"Menu"}));
+  expect(document.body.style.top).toBe("-350px");
+  const outside=screen.getByRole("button",{name:"Artwork"});
+  fireEvent.pointerDown(outside);fireEvent.pointerUp(outside);fireEvent.click(outside);
+  expect(action).not.toHaveBeenCalled();expect(document.querySelector(".is-closing")).toBeTruthy();
+  act(()=>vi.advanceTimersByTime(240));
+  expect(document.body.style.position).toBe("");expect(window.scrollTo).toHaveBeenCalledWith({top:350,behavior:"instant"});
+  fireEvent.click(outside);expect(action).toHaveBeenCalledOnce();
+  expect(container.querySelector(".mobile-drawer-layer")).toBeNull();
+  Object.defineProperty(window,"scrollY",{configurable:true,value:0});
 });
 it.each(["Escape", "backdrop", "close"])("retains the drawer during smooth %s dismissal and restores scrolling", method => {
   navigation(); fireEvent.click(screen.getByRole("button", { name: "Menu" }));
@@ -88,14 +127,29 @@ it("ignores multi-touch and prevents a swipe from opening an artwork", () => {
   swipe(area, -100);
   fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
 });
-it("hides the mobile header scrolling down and reveals it scrolling up", () => {
+it("moves the mobile header gradually with scroll distance in both directions", () => {
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
   vi.stubGlobal("cancelAnimationFrame", window.clearTimeout);
-  function Header() { return <header data-testid="header" data-hidden={useScrollHeader()}/>; }
+  function Header() { return <header data-testid="header" data-progress={useScrollHeader()}/>; }
   render(<Header/>);
+  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 80 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0.5");
   act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 200 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
-  expect(screen.getByTestId("header").getAttribute("data-hidden")).toBe("true");
-  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 180 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
-  expect(screen.getByTestId("header").getAttribute("data-hidden")).toBe("false");
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("1");
+  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 120 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0.5");
   Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+});
+it("does not interpret drawer scroll restoration as a downward gesture", () => {
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
+  vi.stubGlobal("cancelAnimationFrame", window.clearTimeout);
+  function Header() { return <output data-testid="progress">{useScrollHeader()}</output>; }
+  render(<Header/>);
+  const scroll = (y:number) => act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
+  scroll(200); expect(screen.getByTestId("progress").textContent).toBe("1");
+  document.body.style.position="fixed"; scroll(0);
+  document.body.style.position=""; scroll(200);
+  expect(screen.getByTestId("progress").textContent).toBe("0");
+  scroll(280); expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  Object.defineProperty(window,"scrollY",{configurable:true,value:0});
 });

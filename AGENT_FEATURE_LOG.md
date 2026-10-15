@@ -8137,3 +8137,34 @@ Frontend-only existing Cloudflare main workflow; no backend deployment or migrat
 ### Git
 
 Branch: feature/mobile-glass-navigation. Commit hash and push outcome reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Previous log entries preserved; no unrelated work modified.
+
+## 2026-10-15 - Refine mobile drawer, compact glass navigation and dismiss-only taps
+
+### Request and changes
+
+- Mobile hamburger and unread-notification controls render only in home header slots; removed the tools row from other pages. Notification-open header remains above the backdrop so tapping the same bell closes the panel.
+- Drawer now presents localized icon-and-name rows with consistent spacing and thin theme-relative separators. Restored the existing masked Find users asset. Permission-gated entries remain intact; Settings is immediately before the final signed-in Logout action. Theme/language controls optionally render their existing accessible action labels without changing other placements.
+- Drawer fixes the body/root to lock background scrolling, preserves/restores page position, retains focus trapping and smooth closing, and allows its own content to scroll. Cleanup restores original styles.
+- Bottom bar is centered, 48% wide (maximum 220px), 54px tall, and more translucent in both cream and dark-green themes while preserving 44px touch targets. Profile uses the fetched user avatar with initial fallback on missing/failed images. Arabic reverses the bottom navigation and mirrors mobile profile avatar, identity/stats, logout and camera-menu anchoring.
+- Home header follows scroll distance progressively across 160px with a slower 320ms easing rather than snapping after an 8px direction change. Drawer scroll locking/restoration is excluded from gesture tracking; active search/panels stay available. Reduced motion remains supported.
+- Shared dismiss-only gesture handling consumes outside pointer and click events for search/history/account suggestions, hamburger drawer, notifications and Find users. The first outside tap closes the layer without activating underlying artwork, search or navigation; subsequent intentional taps work normally. Inside controls and repeated bell toggling remain functional.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled before implementation. Frontend only: HomePage/scroll hook, AppSidebar/MobileNavigation, shared dismiss/scroll-lock hooks, optional theme/language labels, styles, mobile/gallery tests and this log. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+Existing public-profile lookup supplies navigation avatars. No API contracts, migration, database, storage, authentication, authorization or backend/SnapStart changes. Existing permission gates preserved. Visual navigation/profile changes remain mobile-only; shared search/panel dismiss-only behavior also protects desktop interactions. No secrets, dependencies or generated build output committed.
+
+### Verification
+
+164 tests passed (69 foundation/layout and 95 component/feed). Coverage includes home-only controls, avatar and failed-image fallback, RTL direction/compact translucent styling, labeled drawer order/original Find users icon, locked-body scroll restoration, gradual bidirectional header movement and restoration immunity, same-bell notification closing, and search/drawer/panel outside taps that do not activate underlying controls. Updated the previous navigation-on-outside-tap expectation to the explicitly requested dismiss-only behavior. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking 500kB bundle warning remains; no checks bypassed. Live browser/physical-phone visual verification not performed.
+
+### Deployment
+
+Frontend only through the existing Cloudflare main workflow; no backend deployment or migration. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: fix/mobile-drawer-glass-behavior. Commit hash and push outcome reported in handoff. Fetch/rebase before feature-branch push, then authorized fast-forward main merge/push. Prior log entries preserved; conflicts and merge/deployment status reported in handoff.

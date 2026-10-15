@@ -1,7 +1,7 @@
 import { LogOut, Search, UserRound, X } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
 import { useScrollHeader } from "./useScrollHeader";
@@ -23,6 +23,7 @@ import { useSearchHistory, visibleSearchHistory, type SearchEntry } from "./useS
 import { SmoothDetails } from "../layout/SmoothDetails";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { RecentSearches } from "./RecentSearches";
+import { useDismissOnly } from "../layout/useDismissOnly";
 
 const workCategories = [
   { code: "digital-art", label: "home.filter.digitalArt" },
@@ -37,7 +38,7 @@ const workCategories = [
 
 
 export function HomePage() {
-  const headerHidden = useScrollHeader();
+  const headerProgress = useScrollHeader();
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const location = useLocation();
@@ -110,7 +111,7 @@ export function HomePage() {
     setSearchParams(next);
   }
   useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
-  useEffect(()=>{function closeSuggestions(event:PointerEvent){if(event.target instanceof Node&&!searchRef.current?.contains(event.target)){setMentionQuery(null);setHistoryOpen(false);}}document.addEventListener("pointerdown",closeSuggestions);return()=>document.removeEventListener("pointerdown",closeSuggestions);},[]);
+  useDismissOnly(historyOpen || mentionQuery !== null, target => Boolean(searchRef.current?.contains(target)), () => { setMentionQuery(null); setHistoryOpen(false); searchRef.current?.querySelector<HTMLInputElement>("input")?.blur(); });
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
   const detailWorkId = searchParams.get("work");
@@ -197,7 +198,7 @@ export function HomePage() {
   return (
     <main className="gallery-home">
       <AppSidebar />
-      <header className={`gallery-header${headerHidden ? " mobile-header-hidden" : ""}`}>
+      <header className={`gallery-header${headerProgress >= 1 ? " mobile-header-hidden" : ""}`} style={{ "--mobile-header-progress": headerProgress } as CSSProperties}>
         <span className="mobile-header-menu" id="mobile-menu-slot" />
         <span className="mobile-header-notifications" id="mobile-notifications-slot" />
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef} onClick={event=>{if(!(event.target instanceof Element)||event.target.closest('input, button, a, [role="listbox"], .recent-searches'))return;const input=event.currentTarget.querySelector<HTMLInputElement>("#gallery-search-input");if(document.activeElement===input)openHistory();else input?.focus();}}>
