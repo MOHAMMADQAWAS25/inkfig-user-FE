@@ -13,6 +13,7 @@ import { FeaturePlaceholderPage } from "../features/navigation/FeaturePlaceholde
 import { SettingsPage } from "../features/settings/SettingsPage";
 import { SiteFooter } from "../features/layout/SiteFooter";
 import { ExhibitionsPage } from "../features/exhibitions/ExhibitionsPage";
+import { MyExhibitionSubmissionsPage } from "../features/exhibitions/MyExhibitionSubmissionsPage";
 
 export function AppRouter() {
   const location = useLocation();
@@ -28,6 +29,7 @@ export function AppRouter() {
       <Route path="/:language/profile/:userId" element={<ProfilePage />} />
       <Route path="/:language/exhibition" element={<ExhibitionsPage />} />
       <Route path="/:language/exhibition/:exhibitionId" element={<ExhibitionsPage />} />
+      <Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage />} />
       <Route path="/:language/notifications" element={<FeaturePlaceholderPage feature="notifications" />} />
       <Route path="/:language/settings" element={<SettingsPage />} />
       <Route path="/:language/admin/users" element={<AdminUsersPage />} />

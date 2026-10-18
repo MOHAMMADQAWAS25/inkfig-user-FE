@@ -10,6 +10,8 @@ import {
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
+import { AssignExhibitionDialog } from "../src/features/exhibitions/AssignExhibitionDialog";
+import { MyExhibitionSubmissionsPage } from "../src/features/exhibitions/MyExhibitionSubmissionsPage";
 import { ExhibitionCard } from "../src/features/exhibitions/ExhibitionCard";
 import * as api from "../src/features/exhibitions/exhibitionApi";
 import { translations, type TranslationKey } from "../src/i18n/resources";
@@ -37,6 +39,7 @@ vi.mock("../src/features/works/worksApi", () => ({
 }));
 vi.mock("../src/features/exhibitions/exhibitionApi", () => ({
   listExhibitions: vi.fn(),
+  getEligibleExhibitions: vi.fn(),
   getExhibition: vi.fn(),
   saveExhibition: vi.fn(),
   getSubmissions: vi.fn(),
@@ -74,6 +77,8 @@ function view(path = "/en/exhibition/event") {
 beforeEach(() => {
   vi.clearAllMocks();
   state.role = "user";
+  vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
+  vi.mocked(api.getEligibleExhibitions).mockResolvedValue({ items: [exhibition], next_cursor: null });
   vi.mocked(api.getExhibition).mockResolvedValue(exhibition);
   vi.mocked(api.listExhibitions).mockResolvedValue({
     items: [exhibition],
@@ -88,6 +93,40 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.restoreAllMocks());
+it("assigns one profile work to an eligible exhibition and shows pending confirmation", async () => {
+  render(<MemoryRouter><AssignExhibitionDialog workId="mine" onClose={vi.fn()}/></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("radio"));
+  fireEvent.click(screen.getByRole("button", { name: "Submit for approval" }));
+  await waitFor(() => expect(api.submitWork).toHaveBeenCalledWith("event", "mine"));
+  expect(api.getEligibleExhibitions).toHaveBeenCalledWith(0, "mine");
+  expect(await screen.findByText("Your work was submitted and is pending review.")).toBeTruthy();
+});
+it("shows an empty eligible list and disables assignment", async () => {
+  vi.mocked(api.getEligibleExhibitions).mockResolvedValue({ items: [], next_cursor: null });
+  render(<MemoryRouter><AssignExhibitionDialog workId="mine" onClose={vi.fn()}/></MemoryRouter>);
+  await screen.findByText(translations.en["exhibitions.noEligible"]);
+  expect((screen.getByRole("button", { name: "Submit for approval" }) as HTMLButtonElement).disabled).toBe(true);
+});
+it("does not allow blocked or full exhibitions to offer an upload link", async () => {
+  vi.mocked(api.getEligibleExhibitions).mockResolvedValue({ items: [], next_cursor: null });
+  view();
+  await screen.findByText("Spring collection");
+  expect(screen.queryByRole("link", { name: "Participate" })).toBeNull();
+  expect((screen.getByRole("button", { name: "Participate" }) as HTMLButtonElement).disabled).toBe(true);
+});
+it("loads approved and pending personal sections with independent status cursors", async () => {
+  vi.mocked(api.getSubmissions).mockImplementation(async (_id, _scope, cursor = 0, status) => ({
+    items: status === "pending" ? [{ submission_id: "pending", work_id: "work", user_id: "me", artist_name: "Me", title: "Pending painting", image_url: "/art.jpg", status: "pending", rejection_reason: null, created_at: "2026-10-18T12:00:00Z" }] : [],
+    next_cursor: status === "pending" && cursor === 0 ? 20 : null,
+  }));
+  render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
+  const pending = await screen.findByRole("region", { name: "Pending works" });
+  await within(pending).findByText("Pending painting");
+  expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "approved");
+  expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "pending");
+  fireEvent.click(within(pending).getByRole("button", { name: "Load more" }));
+  await waitFor(() => expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 20, "pending"));
+});
 it("layers a decorative blurred banner behind the uncropped original", () => {
   const { container } = render(
     <MemoryRouter>
@@ -154,20 +193,18 @@ it("shows both empty sections when no exhibitions are available", async () => {
   expect(await screen.findByText("No upcoming exhibitions yet.")).toBeTruthy();
   expect(screen.getByText("No past exhibitions yet.")).toBeTruthy();
 });
-it("submits an owned selected work and shows pending confirmation", async () => {
+it("opens a single-work exhibition upload and links to my submissions from the toolbar", async () => {
   view();
-  await screen.findByText("My painting");
-  fireEvent.change(screen.getByRole("combobox"), { target: { value: "mine" } });
-  fireEvent.click(screen.getByRole("button", { name: "Submit for approval" }));
-  await waitFor(() =>
-    expect(api.submitWork).toHaveBeenCalledWith("event", "mine"),
-  );
-  expect(await screen.findByRole("status")).toBeTruthy();
+  const participate = await screen.findByRole("link", { name: "Participate" });
+  expect(participate.getAttribute("href")).toBe("/en/upload?exhibition=event");
+  expect(participate.closest(".exhibition-toolbar")).toBeTruthy();
+  expect(screen.getByRole("link", { name: "My submissions" }).getAttribute("href")).toBe("/en/exhibition/event/submissions");
+  expect(screen.queryByRole("combobox")).toBeNull();
 });
 it("keeps exhibition details in the shared card and participation below it without a view action", async () => {
   vi.mocked(api.getExhibition).mockResolvedValue({ ...exhibition, banner_url: "/banner.jpg" });
   const { container } = view();
-  await screen.findByText("My painting");
+  await screen.findByText("Spring collection");
   const card = container.querySelector(".exhibition-detail-card") as HTMLElement;
   expect(card.tagName).toBe("SECTION");
   expect(card.querySelector(".exhibition-banner-original")?.getAttribute("src")).toBe("/banner.jpg");
@@ -176,18 +213,18 @@ it("keeps exhibition details in the shared card and participation below it witho
   expect(within(content).getByRole("timer")).toBeTruthy();
   expect(content.querySelectorAll("dl dt")).toHaveLength(3);
   expect(within(content).queryByRole("button", { name: "Submit for approval" })).toBeNull();
-  const submit = screen.getByRole("button", { name: "Submit for approval" });
-  expect(submit.closest(".exhibition-detail-card")).toBeNull();
-  expect(card.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  const participate = await screen.findByRole("link", { name: "Participate" });
+  expect(participate.closest(".exhibition-detail-card")).toBeNull();
   expect(card.querySelector(".exhibition-card-link")).toBeNull();
   expect(container.querySelector(".exhibition-hero-banner")).toBeNull();
 });
-it("keeps the manager edit action in the original page header", async () => {
+it("keeps the manager edit action without a plus in the blurred toolbar", async () => {
   state.role = "supervisor";
   const { container } = view();
   const edit = await screen.findByRole("button", { name: "Edit exhibition" });
   expect(edit.closest(".exhibition-card-content")).toBeNull();
-  expect(edit.closest(".exhibitions-heading")).toBeTruthy();
+  expect(edit.closest(".exhibition-toolbar")).toBeTruthy();
+  expect(edit.querySelector(".lucide-plus")).toBeNull();
   expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
 });
 it("gives supervisors controls for an exhibition created by someone else", async () => {
@@ -214,11 +251,11 @@ it("prevents participation when the window is closed", async () => {
     participation_open: false,
   });
   view();
-  await screen.findByText("My painting");
+  await screen.findByText("Spring collection");
   expect(
     (
       screen.getByRole("button", {
-        name: "Submit for approval",
+        name: "Participate",
       }) as HTMLButtonElement
     ).disabled,
   ).toBe(true);

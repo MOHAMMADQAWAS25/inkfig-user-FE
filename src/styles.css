@@ -1544,7 +1544,7 @@ img { max-width: 100%; image-rendering: auto; }
 
   .artwork-pin-media .artwork-card-type-tag, .artwork-pin-media .artwork-artist-link,
   .artwork-pin-media .artwork-pin-like, .artwork-pin-media .artwork-pin-save,
-  .profile-page .artwork-owner-menu { display: none; }
+  .profile-page .artwork-owner-menu { display: block; }
   .profile-page .artwork-card-manageable { padding-bottom: 0; }
   .artwork-pin-media::after { display: none; }
   .artwork-virtual-feed .artwork-pin-media:hover .feed-image { transform: none; }
@@ -1825,6 +1825,33 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 @media(prefers-reduced-motion:reduce) { .exhibition-overview-card,.exhibition-banner-original,.exhibition-card-link,.exhibition-card-link svg { transition:none; }.exhibition-overview-card:is(:hover,:focus-visible) { transform:none; }.exhibition-overview-card:is(:hover,:focus-visible) .exhibition-card-link svg { translate:none; } }
 .exhibition-upload-link { display:inline-flex; gap:8px; align-items:center; margin-top:20px; }
 .exhibition-detail-card { margin-block:20px 28px; }
+.exhibition-detail-card:hover,.exhibition-detail-card:focus-visible { transform:none; }
+.exhibition-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px; margin-block:16px 24px; border:1px solid rgb(97 125 43 / .25); border-radius:18px; background:rgb(255 253 242 / .78); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+.exhibition-toolbar>a,.exhibition-toolbar>button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:42px; padding:10px 16px; border-radius:12px; text-decoration:none; color:inherit; }
+.exhibition-toolbar>.primary-button { background:var(--primary); color:var(--primary-contrast,#fff); }
+.exhibition-toolbar>button:disabled { opacity:.5; cursor:not-allowed; }
+:root[data-theme=dark] .exhibition-toolbar { background:rgb(23 30 18 / .78); }
+.exhibition-assign-dialog { width:min(92vw,580px); max-block-size:85svh; overflow:auto; padding:24px; border:1px solid rgb(97 125 43 / .3); border-radius:20px; background:var(--surface,#fffdf2); color:var(--text,#39431c); }
+:root[data-theme=dark] .exhibition-assign-dialog { background:#171e12; color:#f7f2d8; }
+.exhibition-assign-dialog>header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.exhibition-assign-dialog h2 { font-size:1.25rem; margin:0; }
+.exhibition-choices { display:grid; gap:10px; border:0; padding:0; margin-block:20px; }
+.exhibition-choices legend { margin-block-end:12px; }
+.exhibition-choices>label { display:flex; align-items:center; gap:12px; padding:14px; border:1px solid rgb(97 125 43 / .25); border-radius:12px; cursor:pointer; }
+.exhibition-choices input { inline-size:18px; block-size:18px; flex-shrink:0; accent-color:var(--primary); }
+.exhibition-choices label:has(input:checked) { border-color:var(--primary); background:rgb(97 125 43 / .1); }
+.exhibition-choices span { display:grid; gap:6px; overflow-wrap:anywhere; }
+.exhibition-choices small { opacity:.75; }
+.exhibition-personal-section { margin-block:32px; }
+.exhibition-personal-grid { columns:3 240px; gap:20px; }
+.exhibition-personal-grid>.exhibition-card { break-inside:avoid; margin-block-end:20px; }
+.exhibition-personal-grid img { inline-size:100%; block-size:auto; display:block; }
+.exhibition-personal-grid .exhibition-card>div { padding:16px; }
+.exhibition-personal-grid h3 { margin-block:0 12px; overflow-wrap:anywhere; }
+.exhibition-rejected-history { margin-block:30px; }
+.exhibition-upload-context { padding:16px; margin-block:20px; border:1px solid rgb(97 125 43 / .3); border-radius:14px; }
+.profile-page .artwork-owner-menu>div { width:min(240px,calc(100vw - 32px)); }
+@media(max-width:720px) { .exhibition-toolbar>a,.exhibition-toolbar>button { flex:1 1 auto; font-size:.85rem; }.exhibition-personal-grid { columns:2 140px; gap:12px; } }
 .exhibition-detail-card .exhibition-card-content h2 { margin:0 0 16px; font-size:clamp(1.35rem,2.3vw,2rem); overflow-wrap:anywhere; }
 .exhibition-detail-card .exhibition-card-description { display:block; overflow:visible; white-space:pre-wrap; -webkit-line-clamp:unset; }
 .exhibition-detail-card .exhibition-summary { border:0; border-radius:0; background:transparent; padding:0; margin-block:22px 0; overflow:visible; }

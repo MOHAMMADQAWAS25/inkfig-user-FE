@@ -10,7 +10,8 @@ import { HomePage } from "../src/features/home/HomePage";
 import { PostCard } from "../src/features/feed/PostCard";
 import { ArtworkDetailModal } from "../src/features/home/ArtworkDetailModal";
 import type { Work } from "../src/features/works/worksApi";
-import { getWorkTypes, type FeedWork } from "../src/features/works/worksApi";
+import { getWorkTypes, uploadWork, type FeedWork } from "../src/features/works/worksApi";
+import { getEligibleExhibitions, submitWork } from "../src/features/exhibitions/exhibitionApi";
 import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
 import { requestJson } from "../src/api/httpClient";
 import { searchProfiles, searchProfilesPage } from "../src/features/profile/profileApi";
@@ -23,6 +24,7 @@ vi.mock("../src/features/profile/profileApi",()=>({getPublicProfile:vi.fn().mock
 vi.mock("../src/features/works/worksApi",()=>({getWorkTypes:vi.fn(),getWork:vi.fn(),uploadWork:vi.fn(),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWorkAsModerator:vi.fn(),isValidWorkUrl:()=>true,validateWorkFile:(file:File)=>file.type.startsWith("image/")?null:"unsupported"}));
 vi.mock("../src/features/feed/useInfiniteFeed",()=>({useInfiniteFeed:vi.fn()}));
 vi.mock("../src/features/feed/Feed",()=>({Feed:()=>null}));
+vi.mock("../src/features/exhibitions/exhibitionApi",()=>({getEligibleExhibitions:vi.fn().mockResolvedValue({items:[{name:"Spring exhibition"}],next_cursor:null}),submitWork:vi.fn().mockResolvedValue(undefined)}));
 vi.mock("../src/features/feed/LazyImage",()=>({LazyImage:()=> <img alt="Artwork"/>}));
 vi.mock("../src/i18n/LanguageToggle",()=>({LanguageToggle:()=>null}));
 vi.mock("../src/theme/ThemeToggle",()=>({ThemeToggle:()=>null}));
@@ -274,6 +276,24 @@ describe("home and panel interactions",()=>{
 });
 
 describe("upload preview and card reset",()=>{
+  it("uploads one work for an exhibition and retries membership without republishing",async()=>{
+    vi.mocked(uploadWork).mockResolvedValue("new-work");
+    vi.mocked(submitWork).mockRejectedValueOnce(new Error("Try membership again")).mockResolvedValueOnce(undefined);
+    const {container}=render(<MemoryRouter initialEntries={["/en/upload?exhibition=event"]}><UploadWorkPage/></MemoryRouter>);
+    await screen.findByText("Spring exhibition");
+    fireEvent.change(await screen.findByLabelText("Artwork image"),{target:{files:[new File(["image"],"art.png",{type:"image/png"})]}});
+    fireEvent.change(screen.getByLabelText(translations.en["works.title"]),{target:{value:"My painting"}});
+    fireEvent.change(screen.getByRole("combobox"),{target:{value:"art"}});
+    fireEvent.submit(container.querySelector("form")!);
+    await screen.findByText("Try membership again");
+    expect(uploadWork).toHaveBeenCalledTimes(1);
+    expect(submitWork).toHaveBeenCalledWith("event","new-work");
+    fireEvent.submit(container.querySelector("form")!);
+    await waitFor(()=>expect(submitWork).toHaveBeenCalledTimes(2));
+    expect(uploadWork).toHaveBeenCalledTimes(1);
+    expect(getEligibleExhibitions).toHaveBeenCalledWith(0,undefined,"event");
+    expect(container.querySelector('input[type="file"]')?.hasAttribute("multiple")).toBe(false);
+  });
   it("previews an image and revokes its object URL on unmount",async()=>{
     const view=render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);
     const input=await screen.findByLabelText("Artwork image");

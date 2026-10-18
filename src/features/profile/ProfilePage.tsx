@@ -1,4 +1,4 @@
-import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trash2, UserRound, X } from "lucide-react";
+import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trophy, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useProfileSwipe } from "./useProfileSwipe";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
@@ -18,6 +18,7 @@ import {
   setWorkSave, updateWork, type Work, type WorkLink, type WorkPage, type WorkType,
 } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
+import { AssignExhibitionDialog } from "../exhibitions/AssignExhibitionDialog";
 import { ProfileAvatarCropDialog } from "./ProfileAvatarCropDialog";
 import {
   getProfileConnections, getPublicProfile, setProfileFollow,
@@ -28,9 +29,9 @@ import { isValidProfileAvatarSource, PROFILE_AVATAR_ACCEPT, removeProfileAvatar,
 type Section = "posts" | "likes" | "saved";
 type PageCursors = Record<Section,string|null>;
 
-function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, onEdit, onLike, onSave, onSelect, t, works }: {
+function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, onEdit, onLike, onSave, onSelect, onAssign, t, works }: {
   canLike:boolean; canManage:boolean; canSave:boolean; empty:string; language:string;
-  onDelete:(work:Work)=>void; onEdit:(work:Work)=>void;
+  onDelete:(work:Work)=>void; onEdit:(work:Work)=>void; onAssign?: (work:Work)=>void;
   onLike:(work:Work)=>void; onSave:(work:Work)=>void; onSelect:(work:Work)=>void;
   t:(key:TranslationKey)=>string; works:Work[];
 }) {
@@ -42,7 +43,7 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>
       <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
       {canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onSave(work)}><Bookmark size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}
-    </CardMedia>{canManage&&<SmoothDetails className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div><button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></SmoothDetails>}</article>)}</div>;
+    </CardMedia>{canManage&&<SmoothDetails className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div>{onAssign&&<button type="button" onClick={()=>onAssign(work)}><Trophy size={16}/>{t("exhibitions.assign")}</button>}<button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></SmoothDetails>}</article>)}</div>;
 }
 
 export function ProfilePage() {
@@ -77,6 +78,7 @@ export function ProfilePage() {
   const [avatarCropFile,setAvatarCropFile]=useState<File|null>(null);
   const [workTypes,setWorkTypes]=useState<WorkType[]>([]);
   const [editing,setEditing]=useState<Work|null>(null);
+  const [assigning,setAssigning]=useState<Work|null>(null);
   const [editTitle,setEditTitle]=useState("");
   const [editDescription,setEditDescription]=useState("");
   const [editTypeId,setEditTypeId]=useState("");
@@ -167,9 +169,10 @@ export function ProfilePage() {
         <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} aria-label={t("profile.saved")} title={t("profile.saved")} onClick={()=>selectSection("saved")}><Bookmark aria-hidden="true" size={28}/><span>{saved.length}</span></button>
         <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} aria-label={t("profile.likes")} title={t("profile.likes")} onClick={()=>selectSection("likes")}><Heart aria-hidden="true" size={28}/><span>{likes.length}</span></button>
       </nav>}
-      <div className="profile-swipe-area" {...swipe}><div key={section} className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canManage={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onEdit={beginEdit} onDelete={work=>void removeWork(work)} onLike={toggleLike} onSave={toggleSave} t={t}/>{mutationError&&<p className="pagination-error" role="alert">{t("works.changeFailed")}</p>}{cursors[section]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</div></div>
+      <div className="profile-swipe-area" {...swipe}><div key={section} className="profile-sections"><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canManage={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")} canSave={hasPermission(session.permissions,"works.save")} empty={empty} language={language} works={activeWorks} onSelect={work=>setSelectedId(work.work_id)} onEdit={beginEdit} onAssign={ownProfile&&section==="posts"&&hasPermission(session.permissions,"exhibitions.participate")?setAssigning:undefined} onDelete={work=>void removeWork(work)} onLike={toggleLike} onSave={toggleSave} t={t}/>{mutationError&&<p className="pagination-error" role="alert">{t("works.changeFailed")}</p>}{cursors[section]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</div></div>
     </>}
     <AnimatedPresence open={Boolean(connectionKind)}>{connectionKind&&<div className="profile-connections-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&setConnectionKind(null)}><section className="profile-connections-dialog" role="dialog" aria-modal="true" aria-labelledby="connections-title"><header><h2 id="connections-title">{t(connectionKind==="followers"?"profile.followers":"profile.following")}</h2><button type="button" aria-label={t("profile.closeConnections")} onClick={()=>setConnectionKind(null)}><X size={20}/></button></header>{connectionsLoading?<p>{t("profile.loadingConnections")}</p>:!accounts.length?<p>{t("profile.noConnections")}</p>:<div className="profile-account-list">{accounts.map(account=><div className="profile-account-row" key={account.user_id}><Link to={`/${language}/profile/${account.user_id}`} onClick={()=>setConnectionKind(null)}><span>{account.full_name.charAt(0).toUpperCase()}</span><strong>{account.full_name}</strong></Link>{account.user_id!==session.userId&&<button type="button" disabled={followBusy===account.user_id} className={account.is_following?"following":""} onClick={()=>toggleAccountFollow(account)}>{t(account.is_following?"profile.unfollow":"profile.follow")}</button>}</div>)}{connectionsCursor!==null&&<button className="pagination-load-more" type="button" disabled={connectionsLoadingMore} onClick={()=>void loadMoreConnections()}>{t(connectionsLoadingMore?"works.loadingMore":"works.loadMore")}</button>}</div>}</section></div>}</AnimatedPresence>
+    {assigning&&<AssignExhibitionDialog workId={assigning.work_id} onClose={()=>setAssigning(null)}/>}
     <AnimatedPresence open={Boolean(avatarCropFile)}>{avatarCropFile&&<ProfileAvatarCropDialog busy={avatarBusy} file={avatarCropFile} onCancel={closeAvatarCrop} onSave={saveCroppedAvatar} t={t}/>}</AnimatedPresence>
     <AnimatedPresence open={Boolean(reportingUser&&profile)}>{reportingUser&&profile&&<ReportDialog targetType="user" targetUserId={profile.user_id} onClose={()=>setReportingUser(false)} t={t}/>}</AnimatedPresence>
     {selected&&<ArtworkDetailModal language={language} work={selected} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} canReport={session.userId!==selected.owner_user_id&&hasPermission(session.permissions,"reports.create")} canModerateDelete={hasPermission(session.permissions,"works.delete_any")} onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} onEditOwnWork={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")?beginEdit:undefined} onDeleteOwnWork={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")?work=>void removeWork(work):undefined} t={t}/>}

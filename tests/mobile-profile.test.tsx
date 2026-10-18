@@ -5,9 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProfilePage } from "../src/features/profile/ProfilePage";
 import { translations } from "../src/i18n/resources";
 import { removeProfileAvatar } from "../src/features/profile/profileAvatarUpload";
+import { getEligibleExhibitions } from "../src/features/exhibitions/exhibitionApi";
 
 const { session, signOut, artwork } = vi.hoisted(()=>({
-  session:{userId:"viewer",fullName:"Viewer",permissions:["profile.read_own","works.upload","works.like","works.save"]},
+  session:{userId:"viewer",fullName:"Viewer",permissions:["profile.read_own","works.upload","works.like","works.save","exhibitions.participate"]},
   signOut:vi.fn(),
   artwork:{work_id:"work",owner_user_id:"viewer",artist_name:"Viewer",title:"My artwork",description:"Art",type_id:"art",type_name_en:"Art",type_name_ar:"Art",image_url:"/art.png",mime_type:"image/png",created_at:"2026-10-14T12:00:00Z",links:[],like_count:0,liked_by_me:false,saved_by_me:false},
 }));
@@ -17,11 +18,22 @@ vi.mock("../src/features/navigation/AppSidebar",()=>({AppSidebar:()=>null}));
 vi.mock("../src/features/profile/profileApi",()=>({getPublicProfile:vi.fn().mockResolvedValue({user_id:"viewer",full_name:"Viewer",avatar_url:"/avatar.png",follower_count:12,following_count:7,like_count:4,is_self:true}),getProfileConnections:vi.fn(),setProfileFollow:vi.fn()}));
 vi.mock("../src/features/profile/profileAvatarUpload",()=>({PROFILE_AVATAR_ACCEPT:"image/*",isValidProfileAvatarSource:()=>true,removeProfileAvatar:vi.fn().mockResolvedValue(undefined),uploadProfileAvatar:vi.fn()}));
 vi.mock("../src/features/profile/ProfileAvatarCropDialog",()=>({ProfileAvatarCropDialog:()=>null}));
+vi.mock("../src/features/exhibitions/exhibitionApi",()=>({getEligibleExhibitions:vi.fn().mockResolvedValue({items:[],next_cursor:null}),submitWork:vi.fn()}));
 vi.mock("../src/features/works/worksApi",()=>({getUserWorks:vi.fn().mockResolvedValue({items:[artwork],next_cursor:null}),getLikedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getSavedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getWorkTypes:vi.fn().mockResolvedValue([]),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWork:vi.fn(),deleteWorkAsModerator:vi.fn(),updateWork:vi.fn()}));
 beforeEach(()=>{vi.clearAllMocks();vi.spyOn(window,"confirm").mockReturnValue(true);});
 afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
 
 describe("mobile profile controls",()=>{
+  it("opens exhibition assignment from the owner's three-dot menu",async()=>{
+    vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
+    const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
+    await screen.findByRole("heading",{name:"Viewer"});
+    const menu=container.querySelector<HTMLDetailsElement>(".artwork-owner-menu")!;
+    fireEvent.click(menu.querySelector("summary")!);
+    fireEvent.click(screen.getByRole("button",{name:"Assign to an exhibition"}));
+    expect(await screen.findByRole("dialog",{name:"Assign to an exhibition"})).toBeTruthy();
+    await waitFor(()=>expect(getEligibleExhibitions).toHaveBeenCalledWith(0,"work"));
+  });
   it("keeps avatar upload and removal accessible through the camera menu",async()=>{
     const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
     await screen.findByRole("heading",{name:"Viewer"});

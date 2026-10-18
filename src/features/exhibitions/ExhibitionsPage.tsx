@@ -5,7 +5,6 @@ import {
   CalendarDays,
   Plus,
   Trophy,
-  Upload,
   Check,
   X,
   Ban,
@@ -16,14 +15,13 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ExhibitionCard } from "./ExhibitionCard";
-import { getMyWorks } from "../works/worksApi";
-import type { Work } from "../works/worksApi";
+import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import {
   listExhibitions,
   getExhibition,
   saveExhibition,
   getSubmissions,
-  submitWork,
+  getEligibleExhibitions,
   reviewSubmission,
   blockParticipant,
   unblockParticipant,
@@ -62,9 +60,7 @@ export function ExhibitionsPage() {
   const [scope, setScope] = useState("public");
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [blockCursor, setBlockCursor] = useState<number | null>(null);
-  const [works, setWorks] = useState<Work[]>([]);
-  const [workCursor, setWorkCursor] = useState<string | null>(null);
-  const [workId, setWorkId] = useState("");
+  const [available, setAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -171,24 +167,14 @@ export function ExhibitionsPage() {
     };
   }, [exhibitionId, scope]);
   useEffect(() => {
+    setAvailable(false);
     if (!session || !exhibitionId) return;
     let active = true;
-    getMyWorks()
-      .then((page) => {
-        if (active) {
-          setWorks(page.items);
-          setWorkCursor(
-            page.next_cursor === null ? null : String(page.next_cursor),
-          );
-        }
-      })
-      .catch((cause) => {
-        if (active) failure(cause);
-      });
-    return () => {
-      active = false;
-    };
-  }, [session, exhibitionId]);
+    getEligibleExhibitions(0, undefined, exhibitionId).then(page => {
+      if (active) setAvailable(page.items.length > 0);
+    }).catch(cause => { if (active) failure(cause); });
+    return () => { active = false; };
+  }, [session, exhibitionId, selected?.participation_open]);
   useEffect(() => {
     if (!manage || !exhibitionId) return;
     let active = true;
@@ -320,13 +306,14 @@ export function ExhibitionsPage() {
             <Trophy aria-hidden="true" />
             <h1>{selected?.name ?? t("exhibitions.title")}</h1>
           </div>
-          {manage && (
+          {manage && !exhibitionId && (
             <button className="primary-button" disabled={busy} onClick={edit}>
               <Plus size={18} />
               {t(selected ? "exhibitions.edit" : "exhibitions.create")}
             </button>
           )}
         </header>
+        {selected && <ExhibitionToolbar id={selected.exhibition_id} manage={manage} signedIn={Boolean(session)} available={available && selected.participation_open} busy={busy} onEdit={edit}/>}
         {error && (
           <p className="form-message error-message" role="alert">
             {error}
@@ -443,72 +430,6 @@ export function ExhibitionsPage() {
                 </dl>
               </section>
               </ExhibitionCard>
-              {session ? (
-                <section className="exhibition-participation">
-                  <h2>{t("exhibitions.participate")}</h2>
-                  <p>{t("exhibitions.pendingHint")}</p>
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      void run(async () => {
-                        await submitWork(exhibitionId!, workId);
-                        setNotice(t("exhibitions.submitted"));
-                        setScope("mine");
-                        await refresh();
-                      });
-                    }}
-                  >
-                    <label>
-                      <span>{t("exhibitions.selectWork")}</span>
-                      <select
-                        required
-                        value={workId}
-                        onChange={(event) => setWorkId(event.target.value)}
-                      >
-                        <option value="">{t("exhibitions.selectWork")}</option>
-                        {works.map((work) => (
-                          <option key={work.work_id} value={work.work_id}>
-                            {work.title}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button
-                      className="primary-button"
-                      disabled={busy || !selected.participation_open || !workId}
-                    >
-                      {t("exhibitions.submit")}
-                    </button>
-                  </form>
-                  {workCursor && (
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          const page = await getMyWorks(workCursor);
-                          setWorks((current) => [...current, ...page.items]);
-                          setWorkCursor(
-                            page.next_cursor === null
-                              ? null
-                              : String(page.next_cursor),
-                          );
-                        })
-                      }
-                    >
-                      {t("exhibitions.moreWorks")}
-                    </button>
-                  )}
-                  <Link
-                    className="exhibition-upload-link"
-                    to={`/${language}/upload?exhibition=${selected.exhibition_id}`}
-                  >
-                    <Upload size={17} />
-                    {t("exhibitions.uploadNew")}
-                  </Link>
-                </section>
-              ) : (
-                <Link to={`/${language}/login`}>{t("exhibitions.login")}</Link>
-              )}
               <nav
                 className="exhibition-tabs"
                 aria-label={t("exhibitions.works")}
@@ -519,14 +440,6 @@ export function ExhibitionsPage() {
                 >
                   {t("exhibitions.approved")}
                 </button>
-                {session && (
-                  <button
-                    aria-pressed={scope === "mine"}
-                    onClick={() => setScope("mine")}
-                  >
-                    {t("exhibitions.mySubmissions")}
-                  </button>
-                )}
                 {manage && (
                   <button
                     aria-pressed={scope === "manage"}

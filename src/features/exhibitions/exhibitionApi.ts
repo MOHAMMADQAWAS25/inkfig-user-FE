@@ -54,12 +54,18 @@ export async function saveExhibition(data: ExhibitionInput, id?: string) {
     )
   ).data;
 }
-export async function getSubmissions(id: string, scope: string, cursor = 0) {
+export async function getEligibleExhibitions(cursor = 0, workId?: string, exhibitionId?: string) {
+  const query = new URLSearchParams({ cursor: String(cursor) });
+  if (workId) query.set("work_id", workId);
+  if (exhibitionId) query.set("exhibition_id", exhibitionId);
+  return (await requestJson<Page<Exhibition>>(mainApiBaseUrl, "GET", `/exhibitions/eligible?${query}`)).data;
+}
+export async function getSubmissions(id: string, scope: string, cursor = 0, status?: "approved" | "pending" | "rejected") {
   return (
     await requestJson<Page<Submission>>(
       mainApiBaseUrl,
       "GET",
-      `/exhibitions/${id}/submissions?scope=${scope}&cursor=${cursor}`,
+      `/exhibitions/${id}/submissions?scope=${scope}&cursor=${cursor}${status ? `&status=${status}` : ""}`,
     )
   ).data;
 }
