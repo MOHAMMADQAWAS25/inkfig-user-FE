@@ -8510,3 +8510,67 @@ No migration required.
 ### Notes
 
 Matches the approved layout concept using existing website typography and controls. Very short screens retain internal content scrolling so cards stay within viewport height.
+
+## 2026-10-18 - Blurred banner fill and exhibition hover transitions
+
+### Request
+
+Fill unused banner-column space with blurred image colors and add exhibition-card hover transitions.
+
+### Changes
+
+- Layered a decorative blurred cover image behind the original contained banner, filling side/top gaps without cropping the foreground.
+- Preserved card lift and added subtle brightness/action-arrow transitions with keyboard-focus parity and reduced-motion handling.
+- Left exhibition workflows, dimensions, pagination and original storage assets unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: banner presentation, hover styling and tests.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionCard.tsx`: decorative image layer and original banner class.
+- `src/styles.css`: clipped blur, brightness and direction-aware arrow transitions.
+- `tests/exhibitions.test.tsx`: banner layering and no-banner fallback regression tests.
+- `AGENT_FEATURE_LOG.md`: appended this entry.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions or scope changes; public exhibition cards retain existing visibility.
+- Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+- Existing exhibition overview route retains mobile stacking, RTL/LTR, both themes, empty/error/loading states and viewport bounds.
+- Original banner stays uncropped; background derives its colors directly from the same image.
+- Hover and keyboard-focus transitions honor reduced-motion preferences.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 9 tests.
+- `[passed] npm.cmd run build` - TypeScript and Vite production build.
+- `[passed] git diff --check`
+- `[not run] browser visual inspection - no browser session used for this ticket`
+
+### Deployment
+
+- Deploy frontend through the existing Cloudflare workflow; no environment changes.
+- No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `aa3282f`
+- Push: pending final synchronization; outcome reported in handoff.
+
+### Notes
+
+Existing non-blocking Vite large-chunk warning remains. The blur is decorative only and never modifies the uploaded image.
