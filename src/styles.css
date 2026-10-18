@@ -1795,15 +1795,15 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-period-heading p { margin-block:8px 0; opacity:.75; }
 .exhibition-section-empty { padding:28px; border:1px dashed rgb(97 125 43 / .3); border-radius:18px; }
 .exhibition-period-section>.exhibitions-grid { grid-template-columns:minmax(0,1fr); }
-.exhibition-overview-card { display:grid; grid-template-columns:minmax(0,45fr) minmax(0,55fr); grid-template-rows:minmax(0,1fr); block-size:min(500px,calc(100vh - 96px)); block-size:min(500px,calc(100svh - 96px)); max-block-size:calc(100svh - 32px); min-block-size:0; transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease; }
-.exhibition-overview-card:hover,.exhibition-overview-card:focus-visible { transform:translateY(-4px); border-color:#779439; box-shadow:0 12px 30px rgb(57 67 28 / .10); }
+.exhibition-overview-card { display:grid; grid-template-columns:minmax(0,45fr) minmax(0,55fr); grid-template-rows:minmax(0,1fr); block-size:min(500px,calc(100vh - 96px)); block-size:min(500px,calc(100svh - 96px)); max-block-size:calc(100svh - 32px); min-block-size:0; transition:transform 420ms cubic-bezier(.22,1,.36,1),border-color 420ms ease,box-shadow 420ms ease; }
+.exhibition-overview-card:hover,.exhibition-overview-card:focus-visible { transform:translateY(-6px); border-color:#779439; box-shadow:0 18px 42px rgb(57 67 28 / .18); }
 .exhibition-overview-card>.exhibition-card-media { position:relative; isolation:isolate; overflow:hidden; padding:0; min-block-size:0; background:linear-gradient(145deg,#e8e8d2,#f7f3df); }
 .exhibition-card-media>img { display:block; inline-size:100%; block-size:100%; object-fit:contain; }
 .exhibition-card-media>.exhibition-banner-blur { position:absolute; inset:0; z-index:-1; object-fit:cover; filter:blur(24px); transform:scale(1.14); opacity:.8; pointer-events:none; }
-.exhibition-card-media>.exhibition-banner-original { position:relative; transition:filter 300ms ease; }
+.exhibition-card-media>.exhibition-banner-original { position:relative; transition:filter 420ms ease; }
 .exhibition-overview-card:is(:hover,:focus-visible) .exhibition-banner-original { filter:brightness(1.04); }
-.exhibition-card-link { transition:filter 220ms ease; }
-.exhibition-card-link svg { transition:translate 220ms ease; }
+.exhibition-card-link { transition:filter 420ms ease; }
+.exhibition-card-link svg { transition:translate 420ms cubic-bezier(.22,1,.36,1); }
 .exhibition-overview-card:is(:hover,:focus-visible) .exhibition-card-link { filter:brightness(1.08); }
 .exhibition-overview-card:is(:hover,:focus-visible) .exhibition-card-link svg { translate:2px -2px; }
 .exhibition-overview-card:dir(rtl):is(:hover,:focus-visible) .exhibition-card-link svg { translate:-2px -2px; }
