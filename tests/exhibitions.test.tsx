@@ -10,6 +10,7 @@ import {
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
+import { ExhibitionCard } from "../src/features/exhibitions/ExhibitionCard";
 import * as api from "../src/features/exhibitions/exhibitionApi";
 import { translations, type TranslationKey } from "../src/i18n/resources";
 
@@ -87,6 +88,26 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.restoreAllMocks());
+it("layers a decorative blurred banner behind the uncropped original", () => {
+  const { container } = render(
+    <MemoryRouter>
+      <ExhibitionCard exhibition={{ ...exhibition, banner_url: "/banner.jpg" }} past={false} />
+    </MemoryRouter>,
+  );
+  const blur = container.querySelector(".exhibition-banner-blur");
+  const original = container.querySelector(".exhibition-banner-original");
+  expect(blur?.getAttribute("src")).toBe("/banner.jpg");
+  expect(blur?.getAttribute("aria-hidden")).toBe("true");
+  expect(original?.getAttribute("src")).toBe("/banner.jpg");
+  expect(container.querySelectorAll(".exhibition-card-media img")).toHaveLength(2);
+});
+it("keeps the fallback without blurred layers when no banner exists", () => {
+  const { container } = render(
+    <MemoryRouter><ExhibitionCard exhibition={exhibition} past={true} /></MemoryRouter>,
+  );
+  expect(container.querySelector(".exhibition-banner-fallback")).toBeTruthy();
+  expect(container.querySelector(".exhibition-banner-blur")).toBeNull();
+});
 it("separates upcoming and past exhibitions with independent pagination", async () => {
   vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-10-18T12:00:00Z"));
   const previous = {

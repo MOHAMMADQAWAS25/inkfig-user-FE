@@ -19,7 +19,10 @@ export function ExhibitionCard({
     >
       <div className="exhibition-card-media">
         {exhibition.banner_url ? (
-          <img src={exhibition.banner_url} alt="" loading="lazy" />
+          <>
+            <img className="exhibition-banner-blur" src={exhibition.banner_url} alt="" aria-hidden="true" loading="lazy" />
+            <img className="exhibition-banner-original" src={exhibition.banner_url} alt="" loading="lazy" />
+          </>
         ) : (
           <div className="exhibition-banner-fallback">
             <Trophy size={44} aria-hidden="true" />
