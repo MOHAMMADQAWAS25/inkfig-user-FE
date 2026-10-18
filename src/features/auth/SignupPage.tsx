@@ -97,6 +97,18 @@ export function SignupPage() {
           </header>
 
           <form className="form-stack signup-form-grid" onSubmit={submit}>
+            <fieldset className="signup-section signup-security-section">
+              <legend>{t("auth.accountSecurity")}</legend>
+              <div className="signup-section-fields">
+                <label className="signup-email-field">
+                  <span>{t("auth.email")}</span>
+                  <input required autoComplete="email" aria-describedby="signup-email-hint" dir="ltr" name="email" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
+                  <small id="signup-email-hint">{t("auth.emailHint")}</small>
+                </label>
+                <PasswordField autoComplete="new-password" label={t("auth.password")} name="password" value={form.password} onChange={(value) => updateField("password", value)} />
+                <PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={form.password_confirmation} onChange={(value) => updateField("password_confirmation", value)} />
+              </div>
+            </fieldset>
             <fieldset className="signup-section">
               <legend>{t("auth.personalDetails")}</legend>
               <div className="signup-section-fields signup-personal-fields">
@@ -117,18 +129,6 @@ export function SignupPage() {
                   </select>
                 </label>
                 <DateOfBirthField label={t("auth.dateOfBirth")} value={form.date_of_birth} onChange={(value) => updateField("date_of_birth", value)} />
-              </div>
-            </fieldset>
-            <fieldset className="signup-section signup-security-section">
-              <legend>{t("auth.accountSecurity")}</legend>
-              <div className="signup-section-fields">
-                <label className="signup-email-field">
-                  <span>{t("auth.email")}</span>
-                  <input required autoComplete="email" aria-describedby="signup-email-hint" dir="ltr" name="email" type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
-                  <small id="signup-email-hint">{t("auth.emailHint")}</small>
-                </label>
-                <PasswordField autoComplete="new-password" label={t("auth.password")} name="password" value={form.password} onChange={(value) => updateField("password", value)} />
-                <PasswordField autoComplete="new-password" label={t("auth.confirmPassword")} name="password_confirmation" value={form.password_confirmation} onChange={(value) => updateField("password_confirmation", value)} />
               </div>
             </fieldset>
             <div className="signup-submit-row">

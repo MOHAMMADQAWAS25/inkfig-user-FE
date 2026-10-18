@@ -319,14 +319,34 @@ describe("home and panel interactions",()=>{
 });
 
 describe("upload preview and card reset",()=>{
+  it("accepts dropped images, rejects unsupported replacements and keeps the selected file",async()=>{
+    const {container}=render(<MemoryRouter initialEntries={["/en/upload"]}><UploadWorkPage/></MemoryRouter>);
+    await screen.findByRole("radio",{name:"Digital art"});
+    const drop=container.querySelector(".work-file-field")!;
+    fireEvent.dragOver(drop);expect(drop.getAttribute("data-dragging")).toBe("true");
+    fireEvent.drop(drop,{dataTransfer:{files:[new File(["image"],"dropped.png",{type:"image/png"})]}});
+    expect(await screen.findByRole("img",{name:"dropped.png"})).toBeTruthy();
+    expect(drop.getAttribute("data-dragging")).toBe("false");
+    fireEvent.drop(drop,{dataTransfer:{files:[new File(["pdf"],"invalid.pdf",{type:"application/pdf"})]}});
+    expect(screen.getByRole("alert").textContent).toBe(translations.en["works.unsupportedFile"]);
+    expect(screen.getByRole("img",{name:"dropped.png"})).toBeTruthy();
+    expect(container.querySelector(".upload-details")?.contains(container.querySelector(".upload-actions"))).toBe(true);
+    expect(container.querySelector(".upload-media-panel")?.contains(drop)).toBe(true);
+  });
+  it.each(["/en/upload","/en/upload?exhibition=event"])("cancels %s back to its own context",async route=>{
+    render(<MemoryRouter initialEntries={[route]}><UploadWorkPage/><RouteProbe/></MemoryRouter>);
+    await screen.findByRole("radio",{name:"Digital art"});
+    fireEvent.click(screen.getByRole("button",{name:"Cancel"}));
+    expect(screen.getByTestId("route").textContent).toBe(route.includes("exhibition")?"/en/exhibition/event":"/en");
+  });
   it("uploads one work for an exhibition and retries membership without republishing",async()=>{
     vi.mocked(uploadWork).mockResolvedValue("new-work");
     vi.mocked(submitWork).mockRejectedValueOnce(new Error("Try membership again")).mockResolvedValueOnce(undefined);
     const {container}=render(<MemoryRouter initialEntries={["/en/upload?exhibition=event"]}><UploadWorkPage/></MemoryRouter>);
     await screen.findByText("Spring exhibition");
     fireEvent.change(await screen.findByLabelText("Artwork image"),{target:{files:[new File(["image"],"art.png",{type:"image/png"})]}});
-    fireEvent.change(screen.getByLabelText(translations.en["works.title"]),{target:{value:"My painting"}});
-    fireEvent.change(screen.getByRole("combobox"),{target:{value:"art"}});
+    fireEvent.change(screen.getByRole("textbox",{name:translations.en["works.title"]}),{target:{value:"My painting"}});
+    fireEvent.click(screen.getByRole("radio",{name:"Digital art"}));
     fireEvent.submit(container.querySelector("form")!);
     await screen.findByText("Try membership again");
     expect(uploadWork).toHaveBeenCalledTimes(1);

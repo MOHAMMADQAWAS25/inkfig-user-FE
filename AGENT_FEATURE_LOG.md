@@ -9438,3 +9438,57 @@ Apply main-system migration 20261018_016_add_other_work_category.sql before fron
 ### Git
 
 Branch: feature/other-artwork-category. Focused commit, fetch/rebase, branch push and authorized fast-forward main merge/push; exact hashes and outcomes reported in handoff. Earlier entries preserved.
+
+## 2026-10-18 - Polish auth sizing and redesign shared upload forms
+
+### Request
+
+Slightly enlarge sign-in, compact/reorder signup and lower its heading text, restyle normal/exhibition uploads using the supplied icon-led layout and work-type tiles without tips/art/background, and replace sliding search hints with quick fades.
+
+### Changes
+
+- Sign-in form grows from 620px to 660px maximum width; normal logo grows to 224px and short-screen logo to 140px. Existing stationary viewport and accessible short-screen overflow remain.
+- Signup uses a smaller 1040px maximum width, tighter padding/gaps and header, with heading text lowered 12px relative to its logo. Account-security fields precede personal details in DOM/keyboard order, placing security left and personal details right in English; Arabic follows the existing mirrored reading direction. Signup scrollbar track is hidden without blocking necessary scrolling on phones/short screens.
+- Normal artwork upload and exhibition participation upload share the same redesigned component: icon-led heading/title/description/links, real character counts retaining 160/2000 limits, separate dashed file picker/preview panel, contextual Cancel and upload/submit actions. No reference background, tips or decorative drawings added; flat surfaces use existing cream/deep-green theme tokens.
+- New WorkTypePicker renders every API-provided category, including Other, as an icon tile with a native required radio and visible selected/keyboard-focus states. English/Arabic names, RTL logical spacing and busy-disabled controls preserved. Responsive panels stack on small screens and category tiles adapt between two/three columns.
+- File panel supports actual drag/drop and click/change-file selection using shared validation, preserves previews/object-URL cleanup, and clearly states the existing image-only publishing/video-preview-only contract. Existing exhibition eligibility, approval/limit hints and retry-without-republishing behavior remain. Hidden file input is bounded to 1px inside its panel to prevent horizontal overflow. Desktop layout is compact; phone/extra-link content remains reachable by scrolling without a visible page track.
+- Search hints now use opacity-only 120ms fade-out/in phases in a four-second cycle, without translation. Existing focus/typing pause, reduced-motion fallback, stable accessible label and search/history/artist semantics retained.
+
+### Repositories
+
+All three repositories checked clean and main pulled before changes. Only inkfig-user-FE changed; incoming Other category work retained. Both backends unchanged.
+
+### Files
+
+SignupPage.tsx, UploadWorkPage.tsx, new WorkTypePicker.tsx, resources.ts, styles.css, auth/media tests, gallery interaction tests, new work-type-picker and upload-layout tests, and this log.
+
+### API
+
+No API contract changes. Work categories still load from the backend; upload and exhibition submission use existing endpoints and payloads.
+
+### Database
+
+No migration, database, storage, embedding or backend/SnapStart changes in this ticket.
+
+### Permissions and scope
+
+Existing works.upload and exhibition/backend authorization remain authoritative. No role/access changes, new dependencies, configuration, credentials or generated output committed. Preview identity/API responses were mocked only in temporary local review files, never production code.
+
+### Frontend
+
+Both upload routes support light/dark, English/Arabic and desktop/mobile through one shared layout. No navigation/header redesign or unrelated gallery/profile changes. Cancel returns to the relevant home/exhibition route and cannot interrupt an active upload.
+
+### Verification
+
+- 236 tests passed (78 source/layout and 158 component/feed), strict TypeScript/Vite production build and git diff --check passed. New coverage includes localized required radio selection, disabled group, drag/drop validation with retained valid preview, both cancel destinations, shared panel structure, hidden-input width, theme/rail/mobile styles and security-first order. Existing exhibition membership retry and file/image/video lifecycle tests passed.
+- Updated an exact CSS assertion for the expanded login width and changed the upload-title test to its stable accessible role/name after adding decorative counters/stars. Initial failures were corrected and complete checks rerun; no failed checks bypassed. Existing non-blocking bundle warning and jsdom scrollTo notices remain.
+- Headless Edge checked actual built auth routes: 1440x800 signup page has no overflow, 1038px inner card, security left/personal right; 1440x900 login has 658px inner card and 224px logo. Read-only local fixtures of the actual upload component/production CSS confirmed 1440x900 desktop page fits with actions visible and no page overflow, and 390px Arabic/light exhibition upload has no horizontal overflow. Initial visual review exposed hidden-input overflow; fixed and rechecked. Browser fixtures mocked identity/API reads and blocked writes; no live artwork published. Physical devices/live authenticated uploads not exercised.
+- Temporary review source/bundles/pages removed, isolated headless helpers and preview stopped. Final build contains only production assets.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment, migration or new configuration required. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: feature/upload-form-polish. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Exact commit, push, conflicts and deployment outcome reported in handoff. Prior feature-log entries preserved.

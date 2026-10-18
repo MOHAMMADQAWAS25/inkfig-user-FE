@@ -47,6 +47,7 @@ it("retains sign-in field semantics and required registration fields",()=>{
   expect(signup.container.querySelectorAll("input[required]").length).toBeGreaterThanOrEqual(5);
   expect(signup.container.querySelector('input[type="file"]')).toBeNull();
   expect(screen.getAllByRole("group")).toHaveLength(2);
+  expect(screen.getAllByRole("group")[0].querySelector("legend")?.textContent).toBe("Account security");
 });
 function SignupRouteProbe(){const location=useLocation();return <output data-testid="signup-route">{location.pathname}|{JSON.stringify(location.state)}</output>;}
 it("submits the existing required registration data without preparing or uploading an avatar",async()=>{
