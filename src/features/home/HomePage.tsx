@@ -5,6 +5,7 @@ import type { CSSProperties, FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
 import { useScrollHeader } from "./useScrollHeader";
+import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { deleteWorkAsModerator, getWork, setWorkLike, setWorkSave } from "../works/worksApi";
@@ -110,7 +111,7 @@ export function HomePage() {
     if(category==="all")next.delete("category");else next.set("category",category);
     setSearchParams(next);
   }
-  useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
+  useEffect(()=>{if(mentionQuery===null||mentionQuery.length<1){setAccountSuggestions([]);setAccountSearchLoading(false);return;}let active=true;setAccountSuggestions([]);setAccountSearchLoading(true);const timer=window.setTimeout(()=>{searchProfiles(mentionQuery).then(items=>{if(active){setAccountSuggestions(items);setActiveSuggestion(0)}}).catch(()=>{if(active)setAccountSuggestions([])}).finally(()=>{if(active)setAccountSearchLoading(false)});},SEARCH_DEBOUNCE_MS);return()=>{active=false;window.clearTimeout(timer)};},[mentionQuery]);
   useDismissOnly(historyOpen || mentionQuery !== null, target => Boolean(searchRef.current?.contains(target)), () => { setMentionQuery(null); setHistoryOpen(false); searchRef.current?.querySelector<HTMLInputElement>("input")?.blur(); });
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);

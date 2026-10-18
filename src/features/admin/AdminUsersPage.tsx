@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 
 import { useI18n } from "../../i18n/I18nProvider";
 import { hasPermission } from "../../lib/permissions";
+import { useDebouncedSearch } from "../../lib/useDebouncedSearch";
 import type { AuthSession } from "../../shared/types";
 import { useAuth } from "../auth/AuthContext";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -24,8 +25,9 @@ export function AdminUsersPage(){
  const canChangeRoles=Boolean(session&&hasPermission(session.permissions,"users.role.manage"));const canChangeStatus=Boolean(session&&hasPermission(session.permissions,"users.status.manage"));
  async function loadUsers(){setLoading(true);setError("");try{setUsers(await getManagedUsers());}catch{setError(t("admin.loadFailed"));}finally{setLoading(false)}}
  useEffect(()=>{if(canRead)void loadUsers();},[canRead]);
- useEffect(()=>setPage(1),[query,roleFilter,statusFilter]);
- const filteredUsers=useMemo(()=>{const normalized=query.trim().toLocaleLowerCase(language);return users.filter(user=>(!normalized||`${user.full_name} ${user.email}`.toLocaleLowerCase(language).includes(normalized))&&(roleFilter==="all"||user.role===roleFilter)&&(statusFilter==="all"||(statusFilter==="active"?user.is_active:!user.is_active)));},[language,query,roleFilter,statusFilter,users]);
+ const settledQuery=useDebouncedSearch(query);
+ useEffect(()=>setPage(1),[settledQuery,roleFilter,statusFilter]);
+ const filteredUsers=useMemo(()=>{const normalized=settledQuery.trim().toLocaleLowerCase(language);return users.filter(user=>(!normalized||`${user.full_name} ${user.email}`.toLocaleLowerCase(language).includes(normalized))&&(roleFilter==="all"||user.role===roleFilter)&&(statusFilter==="all"||(statusFilter==="active"?user.is_active:!user.is_active)));},[language,settledQuery,roleFilter,statusFilter,users]);
  const pageCount=Math.max(1,Math.ceil(filteredUsers.length/PAGE_SIZE));const visibleUsers=filteredUsers.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);const activeCount=users.filter(user=>user.is_active).length;const elevatedCount=users.filter(user=>user.role==="admin"||user.role==="system_administrator").length;
  if(!session)return <Navigate replace to={`/${language}/login`}/>;if(!canRead)return <Navigate replace to={`/${language}`}/>;
  const replaceUser=(next:ManagedUser)=>setUsers(current=>current.map(user=>user.user_id===next.user_id?next:user));

@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { translations } from "../src/i18n/resources";
@@ -13,7 +13,7 @@ import type { Work } from "../src/features/works/worksApi";
 import { getWorkTypes, type FeedWork } from "../src/features/works/worksApi";
 import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
 import { requestJson } from "../src/api/httpClient";
-import { searchProfiles } from "../src/features/profile/profileApi";
+import { searchProfiles, searchProfilesPage } from "../src/features/profile/profileApi";
 vi.mock("../src/api/httpClient",()=>({userApiBaseUrl:"api",requestJson:vi.fn()}));
 
 vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:"en",t:(key:keyof typeof translations.en)=>translations.en[key]})}));
@@ -39,6 +39,44 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("waits 500ms after the last edit before requesting mention suggestions",async()=>{
+    vi.useFakeTimers();
+    try {
+      render(<MemoryRouter><HomePage/></MemoryRouter>);
+      const input=screen.getByRole("combobox");
+      fireEvent.change(input,{target:{value:"@ah"}});
+      await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
+      expect(searchProfiles).not.toHaveBeenCalled();
+      fireEvent.change(input,{target:{value:"@ahmad"}});
+      await act(async()=>{await vi.advanceTimersByTimeAsync(499);});
+      expect(searchProfiles).not.toHaveBeenCalled();
+      await act(async()=>{await vi.advanceTimersByTimeAsync(1);});
+      expect(searchProfiles).toHaveBeenCalledExactlyOnceWith("ahmad");
+      fireEvent.change(input,{target:{value:"@other"}});
+      fireEvent.change(input,{target:{value:""}});
+      await act(async()=>{await vi.advanceTimersByTimeAsync(500);});
+      expect(searchProfiles).toHaveBeenCalledTimes(1);
+    } finally {cleanup();vi.useRealTimers();}
+  });
+  it("debounces account panel requests and cancels pending work on unmount",async()=>{
+    vi.useFakeTimers();
+    try {
+      const {container,unmount}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
+      fireEvent.click(screen.getByRole("button",{name:"Find users",exact:true}));
+      const input=container.querySelector("#account-discovery-panel input")!;
+      fireEvent.change(input,{target:{value:"a"}});
+      await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
+      fireEvent.change(input,{target:{value:"ahmad"}});
+      await act(async()=>{await vi.advanceTimersByTimeAsync(499);});
+      expect(searchProfilesPage).not.toHaveBeenCalled();
+      await act(async()=>{await vi.advanceTimersByTimeAsync(1);});
+      expect(searchProfilesPage).toHaveBeenCalledExactlyOnceWith("ahmad");
+      fireEvent.change(input,{target:{value:"another"}});
+      unmount();
+      await act(async()=>{await vi.advanceTimersByTimeAsync(500);});
+      expect(searchProfilesPage).toHaveBeenCalledTimes(1);
+    } finally {cleanup();vi.useRealTimers();}
+  });
   it("dismisses search without activating the underlying card on the same tap",async()=>{
     const openCard=vi.fn();
     vi.mocked(requestJson).mockResolvedValue({data:[{query:"Flowers",normalized_query:"flowers",search_history_id:"flowers",last_searched_at:new Date().toISOString()}],status:200});

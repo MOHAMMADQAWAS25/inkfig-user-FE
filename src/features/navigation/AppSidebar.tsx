@@ -10,6 +10,7 @@ import { getNotifications, getWebSocketTicket, markNotificationsRead, type Notif
 import { searchProfilesPage } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
 import { useMobileViewport } from "../../lib/useMobileViewport";
+import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { MobileNavigation } from "./MobileNavigation";
 import { useDismissOnly } from "../layout/useDismissOnly";
 
@@ -38,6 +39,7 @@ export function AppSidebar() {
   const [loadingMore,setLoadingMore]=useState(false);
   const [searchFailed,setSearchFailed]=useState(false);
   const searchInputRef=useRef<HTMLInputElement>(null);
+  const accountSearchGeneration=useRef(0);
   const knownNotificationIdsRef=useRef(new Set<string>());
   const liveNotificationTimersRef=useRef(new Map<string,number>());
   const savedActive = location.pathname === `/${language}/profile` && new URLSearchParams(location.search).get("section") === "saved";
@@ -87,7 +89,7 @@ export function AppSidebar() {
   useEffect(()=>{if(!session)return;let active=true;let socket:WebSocket|null=null;let retry:number|undefined;let attempts=0;const connect=async()=>{try{const access=await getWebSocketTicket();if(!active)return;socket=new WebSocket(`${access.websocket_url}?ticket=${encodeURIComponent(access.ticket)}`);socket.onopen=()=>{attempts=0};socket.onmessage=event=>{try{const type=JSON.parse(String(event.data)).type;if(type==="notifications.changed")void refreshNotifications(true);else if(type==="reports.changed")window.dispatchEvent(new Event("inkfig:reports-changed"));}catch{return;}};socket.onclose=()=>{if(active){attempts+=1;retry=window.setTimeout(()=>void connect(),Math.min(30000,1000*2**Math.min(attempts,5)));}};}catch{if(active){attempts+=1;retry=window.setTimeout(()=>void connect(),Math.min(30000,1000*2**Math.min(attempts,5)));}}};void connect();return()=>{active=false;if(retry!==undefined)window.clearTimeout(retry);socket?.close();};},[session]);
   useEffect(()=>{if(!notificationsOpen||!session)return;setNotificationsLoading(true);getNotifications().then(feed=>{setNotifications(feed.items);setNotificationsCursor(feed.next_cursor);setUnreadCount(feed.unread_count);if(feed.unread_count>0)return markNotificationsRead().then(()=>setUnreadCount(0));}).catch(()=>undefined).finally(()=>setNotificationsLoading(false));},[notificationsOpen,session]);
   useEffect(()=>{if(!accountsOpen){return;}window.setTimeout(()=>searchInputRef.current?.focus(),0);},[accountsOpen]);
-  useEffect(()=>{if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},250);return()=>{active=false;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery]);
+  useEffect(()=>{accountSearchGeneration.current+=1;setLoadingMore(false);if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setAccounts([]);setNextCursor(null);setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},SEARCH_DEBOUNCE_MS);return()=>{active=false;accountSearchGeneration.current+=1;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery,accountQuery]);
   useEffect(()=>{setAccountsOpen(false);setNotificationsOpen(false);},[location.pathname,location.search]);
   useEffect(()=>{if(!accountsOpen&&!notificationsOpen)return;const close=(event:KeyboardEvent)=>{if(event.key==="Escape"){if(accountsOpen)closeAccounts();if(notificationsOpen)closeNotifications();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[accountsOpen,notificationsOpen]);
   function closeAccounts(){setAccountsOpen(false);}
@@ -96,7 +98,7 @@ export function AppSidebar() {
     (notificationsOpen && target.closest('#notifications-panel, [aria-controls="notifications-panel"]'))
   ), () => { setAccountsOpen(false); setNotificationsOpen(false); });
   function closeNotifications(){setNotificationsOpen(false);}
-  async function loadMoreAccounts(){if(nextCursor===null||loadingMore)return;setLoadingMore(true);setSearchFailed(false);try{const page=await searchProfilesPage(normalizedQuery,nextCursor);setAccounts(current=>{const known=new Set(current.map(account=>account.user_id));return [...current,...page.items.filter(account=>!known.has(account.user_id))];});setNextCursor(page.next_cursor);}catch{setSearchFailed(true);}finally{setLoadingMore(false)}}
+  async function loadMoreAccounts(){if(nextCursor===null||loading||loadingMore)return;const generation=accountSearchGeneration.current;setLoadingMore(true);setSearchFailed(false);try{const page=await searchProfilesPage(normalizedQuery,nextCursor);if(generation!==accountSearchGeneration.current)return;setAccounts(current=>{const known=new Set(current.map(account=>account.user_id));return [...current,...page.items.filter(account=>!known.has(account.user_id))];});setNextCursor(page.next_cursor);}catch{if(generation===accountSearchGeneration.current)setSearchFailed(true);}finally{if(generation===accountSearchGeneration.current)setLoadingMore(false)}}
   async function loadMoreNotifications(){if(notificationsCursor===null||notificationsLoadingMore)return;setNotificationsLoadingMore(true);try{const feed=await getNotifications(notificationsCursor);setNotifications(current=>{const known=new Set(current.map(item=>item.notification_id));return [...current,...feed.items.filter(item=>!known.has(item.notification_id))];});setNotificationsCursor(feed.next_cursor);setUnreadCount(feed.unread_count);}finally{setNotificationsLoadingMore(false)}}
 
   return <>{mobile ? <MobileNavigation unreadCount={unreadCount} notificationsOpen={notificationsOpen} onNotifications={()=>{setAccountsOpen(false);setNotificationsOpen(open=>!open);}} onAccounts={()=>{setNotificationsOpen(false);setAccountsOpen(true);}} administration={Boolean(showSystemAdministration)} reports={showReportAdministration} onNavigateCapture={navigateAfterClosing}/> : <aside className="app-sidebar" onClickCapture={navigateAfterClosing} aria-label={t("nav.primary")}>
