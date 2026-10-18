@@ -160,6 +160,19 @@ it("lets managers approve a pending deletion request from the record list", asyn
   fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
   await waitFor(() => expect(api.reviewWithdrawal).toHaveBeenCalledWith("event", "entry", "approved", undefined));
 });
+it("opens the manager preview on the same page with only a close button and no social or navigation options", async () => {
+  state.role = "admin";
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ ...record, status: "rejected", rejection_reason: "Please follow the theme" }], next_cursor: null });
+  const { container } = render(<MemoryRouter initialEntries={["/en/exhibition/event/review"]}><Routes><Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button", { name: `${translations.en["works.viewDetails"]}: Painting` }));
+  const modal = await screen.findByRole("dialog", { name: "Painting" });
+  expect(within(modal).getByText("Please follow the theme")).toBeTruthy();
+  expect(modal.querySelector(".artwork-modal-actions")).toBeNull();
+  expect(within(modal).queryAllByRole("link")).toHaveLength(0);
+  expect(within(modal).getAllByRole("button")).toHaveLength(1);
+  expect(within(modal).getByRole("button", { name: translations.en["works.closeDetails"] })).toBeTruthy();
+  expect(container.querySelector(".exhibition-record-list")).toBeTruthy();
+});
 it("uses an accessible arrow back control and one main exhibition title inside the card", async () => {
   const { container } = view();
   const title = await screen.findByRole("heading", { level: 1, name: "Student exhibition" });

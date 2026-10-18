@@ -1862,6 +1862,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-record-chevron:dir(rtl) { transform:scaleX(-1); }
 .exhibition-submission-context { margin-block:16px; padding:16px; border:1px solid rgb(97 125 43 / .3); border-radius:12px; }
 .exhibition-submission-context p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.artwork-modal-readonly-link { display:block; padding-block:8px; overflow-wrap:anywhere; }
 @media(max-width:720px) { .exhibition-record-actions { inline-size:100%; }.exhibition-record-actions>button { flex:1; }.exhibition-record-open>img { inline-size:60px; block-size:60px; } }
 .exhibition-toolbar>a,.exhibition-toolbar>button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:42px; padding:10px 16px; border-radius:12px; text-decoration:none; color:inherit; }
 .exhibition-toolbar>.primary-button { background:var(--primary); color:var(--primary-contrast,#fff); }

@@ -24,10 +24,11 @@ type ArtworkDetailModalProps = {
   onEditOwnWork?: (work: Work) => void;
   onDeleteOwnWork?: (work: Work) => void;
   extraDetails?: ReactNode;
+  readOnly?: boolean;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, readOnly=false, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -95,13 +96,13 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
-        <div className="artwork-modal-media">{work.mime_type.startsWith("video/")?<video src={work.image_url} controls playsInline preload="metadata"/>:<img src={work.image_url} alt={work.title} />}</div>
+        <div className="artwork-modal-media">{work.mime_type.startsWith("video/")?<video src={work.image_url} controls={!readOnly} playsInline preload="metadata"/>:<img src={work.image_url} alt={work.title} />}</div>
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
           {extraDetails}
           <div className="artwork-modal-meta">
-            <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>
+            {readOnly ? <span className="artwork-modal-artist"><UserRound size={16}/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>}
             <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>
           </div>
           <div className="artwork-modal-description">
@@ -110,10 +111,10 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           </div>
           {work.links.length > 0 && <div className="artwork-modal-links">
             <h3><Link2 size={17} />{t("works.links")}</h3>
-            <div>{work.links.map((link, index) => <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
+            <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
-          <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count} {t("home.likes")}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>
-          {(onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
+          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count} {t("home.likes")}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
+          {!readOnly && (onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
             {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
             {onDeleteOwnWork && <button type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}
           </div>}
