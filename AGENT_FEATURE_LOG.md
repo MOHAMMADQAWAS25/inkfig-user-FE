@@ -8973,3 +8973,71 @@ No migration required.
 ### Notes
 
 Existing non-blocking Vite chunk-size warning remains.
+## 2026-10-18 - Exhibition back arrows and title hierarchy
+
+### Request
+
+Replace Back to exhibition text with an arrow control and improve exhibition title presentation.
+
+### Changes
+
+- Added reusable icon-only back links with accessible labels, native tooltips, keyboard focus styling and RTL-mirrored arrows.
+- Detail toolbar points back to exhibition discovery; personal submissions points back to its exhibition. Explicit destinations remain safe for direct visits.
+- Removed the duplicate outside title and promoted the card title to the page's single h1 with balanced responsive typography.
+- Preserved sticky blur, actions, details, viewport bounds and all participation/moderation behavior.
+
+### Repositories
+
+- `inkfig-user-FE`: navigation and title presentation.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionBackButton.tsx`: accessible shared arrow link.
+- `src/features/exhibitions/ExhibitionToolbar.tsx`: discovery back arrow.
+- `src/features/exhibitions/MyExhibitionSubmissionsPage.tsx`: exhibition back arrow.
+- `src/features/exhibitions/ExhibitionCard.tsx`: semantic main detail heading.
+- `src/features/exhibitions/ExhibitionsPage.tsx`: removes duplicate heading/back text.
+- `src/styles.css`: responsive title typography and arrow control states.
+- `tests/exhibitions.test.tsx`: icon-only destinations, labels and single-h1 regression coverage.
+- `AGENT_FEATURE_LOG.md`: appended ticket record.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permission, role or visibility changes; backend authorization remains unchanged.
+
+### Frontend
+
+- Exhibition detail title appears once prominently beside its banner.
+- Both exhibition and personal-submission sticky toolbars use accessible arrow navigation instead of visible back text.
+- Existing English/Arabic strings reused; mobile touch target, RTL direction, both themes and focus feedback supported.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 16 tests.
+- `[passed] node --test tests/exhibition-layout.test.mjs` - sticky regression test.
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+- `[failed] initial build - removed-header condition narrowed selected to null; simplified listing heading and final build passed.
+- `[not run] real-browser visual inspection - component tests and responsive CSS used`
+
+### Deployment
+
+- Frontend-only deployment through existing Cloudflare workflow. No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `f258aff`
+- Push: pending synchronization; outcome reported in handoff.
+
+### Notes
+
+Back controls use known parent routes rather than browser history, avoiding accidental navigation outside InkFig after direct links. Existing non-blocking Vite chunk warning remains.
