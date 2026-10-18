@@ -395,7 +395,7 @@ test("orders profile tabs across the divider with an animated red underline", ()
 });
 
 test("filters the homepage by all canonical artwork categories", () => {
-  for (const code of ["digital-art", "hand-art", "video", "audio", "animation", "games", "interactive", "vr-ar"]) {
+  for (const code of ["digital-art", "hand-art", "video", "audio", "animation", "games", "interactive", "vr-ar", "other"]) {
     assert.ok(homePage.includes(`code: "${code}"`));
   }
   assert.match(homePage, /className="gallery-filters"/);
@@ -403,7 +403,7 @@ test("filters the homepage by all canonical artwork categories", () => {
   assert.match(homePage, /setActiveCategory/);
   assert.match(worksApi, /query\.set\("type_code", typeCode\)/);
   assert.match(styles, /:root\[data-theme="dark"\] \.gallery-filters button/);
-  for (const key of ["digitalArt", "handArt", "video", "audio", "animation", "games", "interactive", "vrAr"]) {
+  for (const key of ["digitalArt", "handArt", "video", "audio", "animation", "games", "interactive", "vrAr", "other"]) {
     assert.equal([...resources.matchAll(new RegExp(`"home\\.filter\\.${key}"`, "g"))].length, 2);
   }
 });

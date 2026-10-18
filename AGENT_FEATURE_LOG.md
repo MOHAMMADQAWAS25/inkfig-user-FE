@@ -9416,3 +9416,25 @@ Frontend-only existing Cloudflare main workflow; no backend deployment, migratio
 ### Git
 
 Branch: feature/auth-layout-search-hints. Fetch/rebase before branch push, followed by the authorized fast-forward main merge/push. Commit hash, push/merge status, conflicts and deployment outcome reported in handoff. All previous feature-log entries preserved.
+
+## 2026-10-18 - Add Other artwork category filter
+
+### Request and changes
+
+Added Other / أخرى to the existing homepage category filters with code other. Preserved search, masonry, pagination, styling, permissions and existing category behavior. Upload categories already load dynamically from the main API.
+
+### Repositories and files
+
+inkfig-user-FE: HomePage.tsx, resources.ts, foundation.test.mjs and this log. Matching main-system branch seeds the new database category. No user-system changes.
+
+### Verification
+
+228 tests passed (76 source/layout and 152 component). Strict TypeScript/Vite production build and git diff --check passed; existing non-blocking bundle warning remains. Initial sandboxed test/build could not load esbuild configuration; identical commands passed with required permissions. Live browser not exercised.
+
+### Deployment
+
+Apply main-system migration 20261018_016_add_other_work_category.sql before frontend deployment through the existing Cloudflare workflow. No API contract, authorization, environment or SnapStart changes. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: feature/other-artwork-category. Focused commit, fetch/rebase, branch push and authorized fast-forward main merge/push; exact hashes and outcomes reported in handoff. Earlier entries preserved.

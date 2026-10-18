@@ -36,6 +36,7 @@ const workCategories = [
   { code: "games", label: "home.filter.games" },
   { code: "interactive", label: "home.filter.interactive" },
   { code: "vr-ar", label: "home.filter.vrAr" },
+  { code: "other", label: "home.filter.other" },
 ] as const;
 
 
