@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
 import { ArrowUpRight, CalendarDays, Trophy } from "lucide-react";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ExhibitionCountdown } from "./ExhibitionCountdown";
@@ -7,16 +8,18 @@ import type { Exhibition } from "./exhibitionApi";
 export function ExhibitionCard({
   exhibition,
   past,
+  detail = false,
+  children,
 }: {
   exhibition: Exhibition;
   past: boolean;
+  detail?: boolean;
+  children?: ReactNode;
 }) {
   const { language, t } = useI18n();
-  return (
-    <Link
-      className={`exhibition-card exhibition-overview-card${past ? " is-past" : ""}`}
-      to={`/${language}/exhibition/${exhibition.exhibition_id}`}
-    >
+  const Heading = detail ? "h2" : "h3";
+  const content = (
+    <>
       <div className="exhibition-card-media">
         {exhibition.banner_url ? (
           <>
@@ -41,9 +44,9 @@ export function ExhibitionCard({
                 : "exhibitions.closed",
           )}
         </span>
-        <h3>{exhibition.name}</h3>
+        <Heading>{exhibition.name}</Heading>
         <p className="exhibition-card-description">{exhibition.description}</p>
-        <small className="exhibition-card-date">
+        {!detail && <small className="exhibition-card-date">
           <CalendarDays size={16} aria-hidden="true" />
           <time dateTime={exhibition.event_at}>
             {new Intl.DateTimeFormat(language, {
@@ -51,13 +54,18 @@ export function ExhibitionCard({
               timeStyle: "short",
             }).format(new Date(exhibition.event_at))}
           </time>
-        </small>
-        {!past && <ExhibitionCountdown eventAt={exhibition.event_at} />}
-        <span className="exhibition-card-link">
+        </small>}
+        {(!past || detail) && <ExhibitionCountdown eventAt={exhibition.event_at} />}
+        {children}
+        {!detail && <span className="exhibition-card-link">
           {t("exhibitions.view")}
           <ArrowUpRight size={18} aria-hidden="true" />
-        </span>
+        </span>}
       </div>
-    </Link>
+    </>
+  );
+  const className = `exhibition-card exhibition-overview-card${past ? " is-past" : ""}${detail ? " exhibition-detail-card" : ""}`;
+  return detail ? <section className={className} aria-label={exhibition.name}>{content}</section> : (
+    <Link className={className} to={`/${language}/exhibition/${exhibition.exhibition_id}`}>{content}</Link>
   );
 }

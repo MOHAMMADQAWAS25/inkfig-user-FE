@@ -16,7 +16,6 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ExhibitionCard } from "./ExhibitionCard";
-import { ExhibitionCountdown } from "./ExhibitionCountdown";
 import { getMyWorks } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import {
@@ -321,7 +320,7 @@ export function ExhibitionsPage() {
             <Trophy aria-hidden="true" />
             <h1>{selected?.name ?? t("exhibitions.title")}</h1>
           </div>
-          {manage && (
+          {manage && !selected && (
             <button className="primary-button" disabled={busy} onClick={edit}>
               <Plus size={18} />
               {t(selected ? "exhibitions.edit" : "exhibitions.create")}
@@ -426,16 +425,8 @@ export function ExhibitionsPage() {
               <Link to={`/${language}/exhibition`}>
                 {t("exhibitions.back")}
               </Link>
-              {selected.banner_url && (
-                <img
-                  className="exhibition-hero-banner"
-                  src={selected.banner_url}
-                  alt={selected.name}
-                />
-              )}
+              <ExhibitionCard exhibition={selected} past={Date.parse(selected.event_at) <= Date.now()} detail>
               <section className="exhibition-summary">
-                <ExhibitionCountdown eventAt={selected.event_at} />
-                <p>{selected.description}</p>
                 <dl>
                   <div>
                     <dt>{t("exhibitions.eventDate")}</dt>
@@ -450,15 +441,9 @@ export function ExhibitionsPage() {
                     <dd>{date(selected.participation_closes_at)}</dd>
                   </div>
                 </dl>
-                <span
-                  className={`exhibition-status ${selected.participation_open ? "open" : ""}`}
-                >
-                  {t(
-                    selected.participation_open
-                      ? "exhibitions.open"
-                      : "exhibitions.closed",
-                  )}
-                </span>
+                {manage && <button className="primary-button" disabled={busy} onClick={edit}>
+                  <Plus size={18} aria-hidden="true" />{t("exhibitions.edit")}
+                </button>}
               </section>
               {session ? (
                 <section className="exhibition-participation">
@@ -526,6 +511,7 @@ export function ExhibitionsPage() {
               ) : (
                 <Link to={`/${language}/login`}>{t("exhibitions.login")}</Link>
               )}
+              </ExhibitionCard>
               <nav
                 className="exhibition-tabs"
                 aria-label={t("exhibitions.works")}

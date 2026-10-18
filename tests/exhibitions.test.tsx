@@ -164,6 +164,28 @@ it("submits an owned selected work and shows pending confirmation", async () => 
   );
   expect(await screen.findByRole("status")).toBeTruthy();
 });
+it("places all exhibition details and participation in the shared card without a view action", async () => {
+  vi.mocked(api.getExhibition).mockResolvedValue({ ...exhibition, banner_url: "/banner.jpg" });
+  const { container } = view();
+  await screen.findByText("My painting");
+  const card = container.querySelector(".exhibition-detail-card") as HTMLElement;
+  expect(card.tagName).toBe("SECTION");
+  expect(card.querySelector(".exhibition-banner-original")?.getAttribute("src")).toBe("/banner.jpg");
+  const content = card.querySelector(".exhibition-card-content") as HTMLElement;
+  expect(within(content).getByText("Spring collection")).toBeTruthy();
+  expect(within(content).getByRole("timer")).toBeTruthy();
+  expect(content.querySelectorAll("dl dt")).toHaveLength(3);
+  expect(within(content).getByRole("button", { name: "Submit for approval" })).toBeTruthy();
+  expect(card.querySelector(".exhibition-card-link")).toBeNull();
+  expect(container.querySelector(".exhibition-hero-banner")).toBeNull();
+});
+it("keeps the manager edit action in the card information column", async () => {
+  state.role = "supervisor";
+  const { container } = view();
+  const edit = await screen.findByRole("button", { name: "Edit exhibition" });
+  expect(edit.closest(".exhibition-card-content")).toBeTruthy();
+  expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
+});
 it("gives supervisors controls for an exhibition created by someone else", async () => {
   state.role = "supervisor";
   view();
