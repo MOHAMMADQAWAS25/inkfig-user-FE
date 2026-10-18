@@ -9350,3 +9350,17 @@ Gallery card hover now exposes only the existing Save icon at the physical top-r
 ### Git
 
 Branch: fix/card-save-only-hover. Fetch/rebase before push and authorized fast-forward main merge/push. Commit/push results reported in handoff; earlier entries preserved.
+
+## 2026-10-18 - Match profile card Save-only hover
+
+### Request and changes
+
+Applied gallery Save-only hover presentation to profile artwork grids, including posts, likes and saved collections. Hides like/category/creator overlays and positions the existing authorized Save control at the physical top-right. Post-management menus, detail controls, masonry and mobile behavior remain unchanged.
+
+### Verification and deployment
+
+219 existing tests, strict TypeScript/Vite build and git diff --check passed; existing bundle-size warning remains. CSS-only frontend deployment; no backend, database, API, permission or SnapStart changes. Live browser visual verification not performed.
+
+### Git
+
+Branch: fix/profile-save-only-hover. Fetch/rebase before push and authorized fast-forward main merge/push. Commit and push results reported in handoff; prior entries preserved.
