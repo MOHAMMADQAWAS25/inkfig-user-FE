@@ -46,10 +46,6 @@ export function UploadWorkPage() {
        <label className="upload-field"><span><Type size={18} aria-hidden="true"/>{t("works.title")} <span aria-hidden="true">*</span></span><input required maxLength={160} value={title} disabled={busy} onChange={event=>setTitle(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{title.length}/160</small></label>
        {types.length ? <WorkTypePicker types={types} value={typeId} onChange={setTypeId} disabled={busy}/> : <p className="form-message error-message" role="status">{t("works.noTypes")}</p>}
        <label className="upload-field"><span><FileText size={18} aria-hidden="true"/>{t("works.description")}</span><textarea maxLength={2000} value={description} disabled={busy} onChange={event=>setDescription(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{description.length}/2000</small></label>
-       <fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>
-         {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
-         {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
-       </fieldset>
        {error&&<p className="form-message error-message" role="alert">{error}</p>}
        <footer className="upload-actions"><button className="upload-cancel" type="button" disabled={busy} onClick={()=>navigate(exhibitionId?`/${language}/exhibition/${exhibitionId}`:`/${language}`)}><X size={17} aria-hidden="true"/>{t("works.cancelUpload")}</button><button className="primary-button" disabled={busy||!file||!typeId||Boolean(exhibitionId&&!exhibitionReady)} type="submit"><CloudUpload size={18} aria-hidden="true"/>{busy?t("works.uploading"):t(exhibitionId?"exhibitions.submit":"works.publish")}</button></footer>
      </section>
@@ -64,6 +60,10 @@ export function UploadWorkPage() {
          <small id="upload-file-hint">{t("works.fileFormats")}</small>
          {previewFile&&<small className="work-file-name">{previewFile.name} · {(previewFile.size/1024/1024).toFixed(1)} MB</small>}
        </div>
+       <fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>
+         {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
+         {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
+       </fieldset>
        {exhibitionId&&<div className="exhibition-upload-context"><strong>{exhibitionName||t("exhibitions.loading")}</strong><p>{t("exhibitions.limitHint")}</p><p>{t("exhibitions.pendingHint")}</p></div>}
      </aside>
    </form>

@@ -9544,3 +9544,47 @@ Consumes optional show_backup_email_prompt from successful login only. Transport
 ### Deployment and Git
 
 Apply user-system migration 20261018_022_track_first_login.sql and deploy backend first, then existing Cloudflare frontend workflow. Matching branch: feature/first-login-backup-reminder. Fetch/rebase before branch push and authorized fast-forward main merge/push; exact hashes, conflict and deployment outcomes reported in handoff. All previous entries preserved.
+
+## 2026-10-18 - Refine layouts, focused sliders and exhibition review identities
+
+### Request and changes
+
+- Lifted signup by reducing its top page padding 20px, preserving reachable content on genuinely small/short screens. Existing registration fields, backup-email recovery work and authentication behavior unchanged.
+- Moved related links beneath the artwork file picker in the upload side panel; the shared normal/exhibition form still owns the same link state, validation, ten-link bound, previews and publication/submission retry behavior. Reduced Share your work heading size to align with its icon.
+- Extracted canonical work-category order into shared workCategories.ts for home filters and non-mutating upload tile sorting: digital, hand art, video, audio, animation, games, interactive, VR/AR, Other. Unknown future API categories remain visible after these, rather than being dropped.
+- Notifications/Find users are modal slider dialogs with keyboard focus containment/restoration, Escape/outside-dismiss behavior and page scroll lock retained through their closing animation. Navigation rail, mobile bottom bar and home header blur while either slider is mounted. Shared usePageScrollLock now counts nested owners so mobile-menu/slider transitions cannot prematurely unlock or lose the original scroll position.
+- Search hints retain fading but use a ten-second two-hint cycle, approximately five seconds per hint. Existing typing/focus pause, accessible label and reduced-motion behavior retained.
+- Home feed creator avatar and username now show together without hover, with long-name truncation and existing profile links/avatar fallbacks. Kept the 40px identity row height, masonry geometry and card hover behavior unchanged.
+- Exhibition manager records display thumbnail, title, artist avatar/name and status horizontally on desktop, with responsive wrapping on phones. Conditional image-derived colorful blur fills only non-square thumbnails' contain margins; square photos have no backdrop, originals are unchanged, failures show an icon. Approve/reject/block controls use accessible green/yellow/red light/dark palettes while retaining labels/icons and all existing reason/confirmation/authorization behavior. Read-only detail previews and owner withdrawal flows preserved. Corrected record-page rail spacing and narrow-screen min-width bounds exposed during visual review.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled before edits; incoming backup-email work preserved. Matching feature/layout-review-refinements branches in main-system and user-FE; user-system unchanged. Frontend changes: shared categories/WorkTypePicker/HomePage, UploadWorkPage, AppSidebar/usePageScrollLock, submission API/record page/new SubmissionIdentity, scoped styles and related tests, plus this log.
+
+### API
+
+Consumes optional artist_avatar_url on exhibition submissions from companion main-system commit 6f3a9ba. Missing/broken avatars fall back to initials, so older responses remain compatible. Existing query scopes, category IDs, actions and payloads unchanged; no per-card profile request added.
+
+### Database, permissions and scope
+
+No frontend migration, dependency, configuration, credential, storage, embedding or backend/SnapStart changes. Backend remains authoritative for manager/owner permissions and status transitions. No real submissions/reviews/uploads performed during visual checks.
+
+### Verification
+
+- 252 frontend tests passed (79 source/layout, 173 component/feed), strict TypeScript/Vite build and git diff --check passed. New checks cover canonical order without API-array mutation, both sliders' focus containment/Tab wrapping/scroll lock through close, nested lock restoration, links placement, review action hooks/avatar, non-square versus square blur and failed-image/avatar fallbacks. Existing review read-only, withdrawal, upload retry, mobile navigation and backup-email tests passed.
+- Initial focus test exposed selector-list control ordering; the focus trap now explicitly sorts by DOM order and complete checks passed. Existing non-blocking Vite chunk-size warning and jsdom scrollTo notices remain. No failed checks bypassed.
+- Headless Edge reviewed actual built signup at 1440x768 without overflow and isolated read-only fixtures of actual upload/review/sidebar components with production CSS. Upload at 1440x900 fits all controls with links below the file picker. Desktop dark review showed horizontal metadata and green/yellow/red controls with colorful contain margins; 390px Arabic/light review fits without horizontal overflow. Initial visual rail overlap/min-width clipping corrected and rechecked: desktop record starts after rail, phone record stays within content width. Slider check confirmed body fixed, nav filter blur(3px), focus inside dialog. Physical devices/live authenticated moderation not exercised.
+- Companion backend: 85 tests passed, one opt-in database integration skipped; mypy on 71 files passed. Backend deployment 39145283911 succeeded before frontend publication. No migration needed.
+- Temporary fixture source/pages/bundles removed, preview stopped and final build regenerated; no test identity or generated output committed.
+
+### Deployment
+
+Main-system avatar metadata deployed first, then frontend through existing Cloudflare main workflow. No user-system deployment, new migration/configuration/IAM required. Frontend deployment outcome reported in handoff.
+
+### Git
+
+Branch: feature/layout-review-refinements in both affected repositories. Fetch/rebase before branch push and authorized fast-forward main merge/push; exact hashes, push/conflict and deployment outcomes reported in handoff. Previous log entries preserved.
+
+### Post-synchronization verification
+
+Rebased over 5e50a6d first-login reminder. Resolved only the adjacent HomePage imports and log append-point conflicts by retaining both imports/features and both complete log entries. Scoped incoming native-dialog styles preserved. Slider focus/Tab/Escape/outside-dismiss now yield to an open native dialog above them, with a regression ensuring the first-login popup cannot lose focus to a lower slider. Final combined checks: 263 tests passed (79 source/layout, 184 component), TypeScript/Vite build and git diff --check passed. Backend deployment remains successful; no prior feature-log text rewritten.

@@ -19,6 +19,7 @@ export type Submission = {
   work_id: string;
   user_id: string;
   artist_name: string;
+  artist_avatar_url?: string | null;
   title: string;
   image_url: string;
   status: string;

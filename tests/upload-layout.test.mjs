@@ -15,3 +15,8 @@ test("hidden file input cannot widen the upload page and type tiles expose keybo
   assert.match(css,/:has\(input:focus-visible\) \{ outline: 2px solid var\(--primary\)/);
   assert.match(css,/@media \(prefers-reduced-motion:reduce\)[^}]*transition: none/);
 });
+test("review records respect the rail and cannot force a narrow page wider",()=>{
+  assert.match(css,/\.exhibition-records-page\.app-page-with-sidebar \{ padding-inline-start: calc\(var\(--app-rail-size\) \+ 24px\)/);
+  assert.match(css,/\.exhibition-records-page \.exhibitions-shell \{ width: 100%; min-width: 0/);
+  assert.match(css,/\.exhibition-records-page \.exhibition-record-actions \{ min-width: 0; max-width: 100%/);
+});

@@ -1,6 +1,7 @@
 import { Bell, Bookmark, Flag, House, Plus, Search, Settings, ShieldCheck, Trophy, X } from "lucide-react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState, type SetStateAction, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type SetStateAction, type MouseEvent } from "react";
+import { usePageScrollLock } from "../layout/usePageScrollLock";
 
 import inkfigLogo from "../../assets/inkfig-logo.svg";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -51,6 +52,32 @@ export function AppSidebar() {
   const showSystemAdministration=session?.role==="system_administrator"&&hasPermission(session.permissions,"users.read");
   const showReportAdministration=Boolean(session&&hasPermission(session.permissions,"reports.manage"));
   const normalizedQuery=accountQuery.trim();
+  const activePanel = accountsOpen ? "account-discovery-panel" : notificationsOpen ? "notifications-panel" : null;
+  usePageScrollLock(activePanel !== null);
+  useLayoutEffect(() => {
+    if (!activePanel) return;
+    const panel = document.getElementById(activePanel);
+    if (!panel) return;
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "true");
+    const previous = document.activeElement as HTMLElement | null;
+    const controls = () => Array.from(panel.querySelectorAll<HTMLElement>('input,button:not(:disabled),a[href],[tabindex="0"]'))
+      .sort((a,b) => a === b ? 0 : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+    if (!document.querySelector('dialog[open]')) (panel.querySelector<HTMLInputElement>('input') ?? controls()[0])?.focus({ preventScroll: true });
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || document.querySelector('dialog[open]')) return;
+      const nodes = controls(), first = nodes[0], last = nodes[nodes.length - 1];
+      if (!panel.contains(document.activeElement) || (event.shiftKey && document.activeElement === first)) { event.preventDefault(); (event.shiftKey ? last : first)?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    const focus = (event: FocusEvent) => {
+      if (document.querySelector('dialog[open]')) return;
+      if (event.target instanceof Element && !panel.contains(event.target) && !event.target.closest(`[aria-controls="${activePanel}"]`)) controls()[0]?.focus({ preventScroll: true });
+    };
+    document.addEventListener("keydown", keydown, true);
+    document.addEventListener("focusin", focus);
+    return () => { document.removeEventListener("keydown", keydown, true); document.removeEventListener("focusin", focus); panel.removeAttribute("role"); panel.removeAttribute("aria-modal"); if (previous?.isConnected && !document.querySelector('dialog[open]')) previous.focus({ preventScroll: true }); };
+  }, [activePanel]);
   function transitionPanel(kind:"accounts"|"notifications",value:SetStateAction<boolean>){
     const current=panelStateRef.current[kind];
     const next=typeof value==="function"?value(current):value;
@@ -91,9 +118,10 @@ export function AppSidebar() {
   useEffect(()=>{if(!accountsOpen){return;}window.setTimeout(()=>searchInputRef.current?.focus(),0);},[accountsOpen]);
   useEffect(()=>{accountSearchGeneration.current+=1;setLoadingMore(false);if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setAccounts([]);setNextCursor(null);setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},SEARCH_DEBOUNCE_MS);return()=>{active=false;accountSearchGeneration.current+=1;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery,accountQuery]);
   useEffect(()=>{setAccountsOpen(false);setNotificationsOpen(false);},[location.pathname,location.search]);
-  useEffect(()=>{if(!accountsOpen&&!notificationsOpen)return;const close=(event:KeyboardEvent)=>{if(event.key==="Escape"){if(accountsOpen)closeAccounts();if(notificationsOpen)closeNotifications();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[accountsOpen,notificationsOpen]);
+  useEffect(()=>{if(!accountsOpen&&!notificationsOpen)return;const close=(event:KeyboardEvent)=>{if(event.key==="Escape"&&!document.querySelector('dialog[open]')){if(accountsOpen)closeAccounts();if(notificationsOpen)closeNotifications();}};window.addEventListener("keydown",close);return()=>window.removeEventListener("keydown",close);},[accountsOpen,notificationsOpen]);
   function closeAccounts(){setAccountsOpen(false);}
   useDismissOnly(accountsOpen || notificationsOpen, target => Boolean(
+    target.closest('dialog[open]') ||
     (accountsOpen && target.closest('#account-discovery-panel, [aria-controls="account-discovery-panel"]')) ||
     (notificationsOpen && target.closest('#notifications-panel, [aria-controls="notifications-panel"]'))
   ), () => { setAccountsOpen(false); setNotificationsOpen(false); });

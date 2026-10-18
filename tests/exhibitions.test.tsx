@@ -173,6 +173,18 @@ it("opens the manager preview on the same page with only a close button and no s
   expect(within(modal).getByRole("button", { name: translations.en["works.closeDetails"] })).toBeTruthy();
   expect(container.querySelector(".exhibition-record-list")).toBeTruthy();
 });
+it("renders a horizontal review identity with avatar and distinct action color hooks",async()=>{
+  state.role="admin";
+  vi.mocked(api.getSubmissions).mockResolvedValue({items:[{...record,status:"pending",artist_avatar_url:"/artist.png"}],next_cursor:null});
+  const {container}=view("/en/exhibition/event/review");
+  await screen.findByRole("button",{name:"Approve"});
+  expect(screen.getByRole("button",{name:"Approve"}).className).toBe("review-approve");
+  expect(screen.getByRole("button",{name:"Reject"}).className).toBe("review-reject");
+  expect(screen.getByRole("button",{name:"Block participant"}).className).toBe("review-block");
+  expect(container.querySelector(".exhibition-record-info")?.getAttribute("data-review")).toBe("true");
+  expect(container.querySelector(".exhibition-record-artist img")?.getAttribute("src")).toBe("/artist.png");
+  expect(container.querySelector(".exhibition-record-thumbnail")).toBeTruthy();
+});
 it("uses an accessible arrow back control and one main exhibition title inside the card", async () => {
   const { container } = view();
   const title = await screen.findByRole("heading", { level: 1, name: "Student exhibition" });

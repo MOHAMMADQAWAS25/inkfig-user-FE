@@ -4,8 +4,14 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, expect, it } from "vitest";
 import { I18nProvider } from "../src/i18n/I18nProvider";
 import { WorkTypePicker } from "../src/features/works/WorkTypePicker";
+import { sortWorkTypes, workCategories } from "../src/features/works/workCategories";
 
 afterEach(cleanup);
+it("matches home category order without mutating API results",()=>{
+  const source=[...workCategories].reverse();const original=source.map(type=>type.code);
+  expect(sortWorkTypes(source).map(type=>type.code)).toEqual(workCategories.map(type=>type.code));
+  expect(source.map(type=>type.code)).toEqual(original);
+});
 const types=[{type_id:"digital",code:"digital-art",name_en:"Digital Art",name_ar:"فن رقمي"},{type_id:"other",code:"other",name_en:"Other",name_ar:"أخرى"}];
 function Picker({disabled=false}:{disabled?:boolean}){const [value,setValue]=useState("");return <WorkTypePicker types={types} value={value} onChange={setValue} disabled={disabled}/>;}
 it.each(["en","ar"])("selects exactly one localized work type using native required radios (%s)",language=>{

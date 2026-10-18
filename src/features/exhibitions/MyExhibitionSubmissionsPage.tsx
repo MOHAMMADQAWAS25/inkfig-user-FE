@@ -10,6 +10,7 @@ import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi";
 import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { ExhibitionNavbar } from "./ExhibitionNavbar";
+import { SubmissionArtist, SubmissionThumbnail } from "./SubmissionIdentity";
 import { getExhibition, getSubmissions, reviewSubmission, withdrawSubmission, reviewWithdrawal, blockParticipant, getBlocks, unblockParticipant, type Block, type Exhibition, type Submission } from "./exhibitionApi";
 
 type Status = "all" | "approved" | "pending" | "rejected";
@@ -126,21 +127,21 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   }
   if (!session) return <Navigate replace to={`/${language}/login`}/>;
   if (!authorized) return <Navigate replace to={`/${language}/exhibition/${exhibitionId}`}/>;
-  return <main className="exhibitions-page app-page-with-sidebar"><AppSidebar/><div className="exhibitions-shell">
+  return <main className="exhibitions-page app-page-with-sidebar exhibition-records-page"><AppSidebar/><div className="exhibitions-shell">
     <ExhibitionNavbar label={t("exhibitions.actions")}><ExhibitionBackButton to={`/${language}/exhibition/${exhibitionId}`} label={t("exhibitions.backToExhibition")}/><strong>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</strong></ExhibitionNavbar>
     <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><label>{t("exhibitions.filterStatus")}<select value={filter} disabled={busy} onChange={event => { setFilter(event.target.value as Status); setSelected(null); }}>{(["all","approved","rejected","pending"] as const).map(status => <option key={status} value={status}>{status === "all" ? t("exhibitions.allStatuses") : label(status)}</option>)}</select></label></header>
     {error && <p className="error-message" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     {loading ? <p role="status">{t("exhibitions.loading")}</p> : <section className="exhibition-record-list" aria-label={t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}>
       {!items.length && <p className="exhibition-section-empty">{t("exhibitions.noSubmissions")}</p>}
-      {items.map(item => <article className="exhibition-submission-record" key={item.submission_id}>
+      {items.map(item => <article className="exhibition-submission-record" data-review={manage} key={item.submission_id}>
         <button className="exhibition-record-open" onClick={() => { setSelected(item); setError(""); }} aria-label={`${t("works.viewDetails")}: ${item.title}`}>
-          <img src={item.image_url} alt="" loading="lazy"/><span className="exhibition-record-info"><strong>{item.title}</strong>{manage && <small>{item.artist_name}</small>}<span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>{item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}</span><ChevronRight className="exhibition-record-chevron" size={18} aria-hidden="true"/>
+          <SubmissionThumbnail url={item.image_url}/><span className="exhibition-record-info" data-review={manage}><strong>{item.title}</strong>{manage && <SubmissionArtist name={item.artist_name} avatar={item.artist_avatar_url} language={language}/>}<span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>{item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}</span><ChevronRight className="exhibition-record-chevron" size={18} aria-hidden="true"/>
         </button>
         <div className="exhibition-record-actions">
           {manage ? <>
-            {item.status !== "approved" && <button disabled={busy} onClick={() => void run(() => reviewSubmission(exhibitionId,item.submission_id,"approved"))}><Check size={16}/>{t("exhibitions.approve")}</button>}
-            {item.status !== "rejected" && <button disabled={busy} onClick={() => ask(item,"reject")}><X size={16}/>{t("exhibitions.reject")}</button>}
-            <button disabled={busy} onClick={() => ask(item,"block")}><Ban size={16}/>{t("exhibitions.block")}</button>
+            {item.status !== "approved" && <button className="review-approve" disabled={busy} onClick={() => void run(() => reviewSubmission(exhibitionId,item.submission_id,"approved"))}><Check size={16}/>{t("exhibitions.approve")}</button>}
+            {item.status !== "rejected" && <button className="review-reject" disabled={busy} onClick={() => ask(item,"reject")}><X size={16}/>{t("exhibitions.reject")}</button>}
+            <button className="review-block" disabled={busy} onClick={() => ask(item,"block")}><Ban size={16}/>{t("exhibitions.block")}</button>
             {item.withdrawal_status === "pending" && <><button className="danger" disabled={busy} onClick={() => ask(item,"approveWithdrawal")}><Trash2 size={16}/>{t("exhibitions.approveDeletion")}</button><button disabled={busy} onClick={() => ask(item,"rejectWithdrawal")}>{t("exhibitions.rejectDeletion")}</button></>}
           </> : <>
             {item.status === "pending" && <button className="danger" disabled={busy} onClick={() => ask(item,"pendingWithdraw")}><Trash2 size={16}/>{t("exhibitions.removeSubmission")}</button>}

@@ -41,6 +41,37 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("yields focus and dismissal to a native dialog opened above a slider",()=>{
+    const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button",{name:"Notifications",exact:true}));
+    const modal=document.createElement("dialog"),button=document.createElement("button");modal.open=true;modal.append(button);document.body.append(modal);
+    try {
+      button.focus();expect(document.activeElement).toBe(button);
+      expect(fireEvent.keyDown(button,{key:"Tab"})).toBe(true);
+      fireEvent.click(button);fireEvent.keyDown(button,{key:"Escape"});
+      expect(container.querySelector(".account-discovery-panel")?.classList.contains("sidebar-panel-exit")).toBe(false);
+    } finally {modal.remove();}
+  });
+  it.each(["Find users","Notifications"])("locks page scroll and contains focus in the %s slider until its closing animation ends",async name=>{
+    const {container}=render(<MemoryRouter><AppSidebar/><button>Behind</button></MemoryRouter>);
+    const trigger=screen.getByRole("button",{name,exact:true});
+    fireEvent.click(trigger);
+    const panel=screen.getByRole("dialog");
+    expect(panel.getAttribute("aria-modal")).toBe("true");
+    expect(document.body.style.position).toBe("fixed");expect(document.documentElement.style.overflow).toBe("hidden");
+    expect(panel.contains(document.activeElement)).toBe(true);
+    screen.getByRole("button",{name:"Behind"}).focus();
+    expect(panel.contains(document.activeElement)).toBe(true);
+    const controls=panel.querySelectorAll<HTMLElement>('button,input,a[href]');
+    const focusLast=vi.spyOn(controls[controls.length-1],"focus");
+    controls[0].focus();expect(document.activeElement).toBe(controls[0]);fireEvent.keyDown(document,{key:"Tab",shiftKey:true});
+    expect(focusLast).toHaveBeenCalled();
+    expect(document.activeElement).toBe(controls[controls.length-1]);
+    fireEvent.click(trigger);
+    expect(document.body.style.position).toBe("fixed");
+    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    expect(document.body.style.position).not.toBe("fixed");
+  });
   it("keeps the animated search area clickable and hides decorative hints when typing",()=>{
     const {container}=render(<MemoryRouter initialEntries={["/en"]}><HomePage/></MemoryRouter>);
     const input=screen.getByRole("combobox") as HTMLInputElement;
@@ -332,6 +363,7 @@ describe("upload preview and card reset",()=>{
     expect(screen.getByRole("img",{name:"dropped.png"})).toBeTruthy();
     expect(container.querySelector(".upload-details")?.contains(container.querySelector(".upload-actions"))).toBe(true);
     expect(container.querySelector(".upload-media-panel")?.contains(drop)).toBe(true);
+    expect(drop.nextElementSibling?.classList.contains("work-links-field")).toBe(true);
   });
   it.each(["/en/upload","/en/upload?exhibition=event"])("cancels %s back to its own context",async route=>{
     render(<MemoryRouter initialEntries={[route]}><UploadWorkPage/><RouteProbe/></MemoryRouter>);

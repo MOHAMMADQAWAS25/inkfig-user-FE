@@ -7,6 +7,7 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 import { useScrollHeader } from "./useScrollHeader";
 import { SearchHints } from "./SearchHints";
 import { FirstLoginBackupPrompt } from "./FirstLoginBackupPrompt";
+import { workCategories } from "../works/workCategories";
 import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -27,18 +28,6 @@ import { SmoothDetails } from "../layout/SmoothDetails";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { RecentSearches } from "./RecentSearches";
 import { useDismissOnly } from "../layout/useDismissOnly";
-
-const workCategories = [
-  { code: "digital-art", label: "home.filter.digitalArt" },
-  { code: "hand-art", label: "home.filter.handArt" },
-  { code: "video", label: "home.filter.video" },
-  { code: "audio", label: "home.filter.audio" },
-  { code: "animation", label: "home.filter.animation" },
-  { code: "games", label: "home.filter.games" },
-  { code: "interactive", label: "home.filter.interactive" },
-  { code: "vr-ar", label: "home.filter.vrAr" },
-  { code: "other", label: "home.filter.other" },
-] as const;
 
 
 export function HomePage() {

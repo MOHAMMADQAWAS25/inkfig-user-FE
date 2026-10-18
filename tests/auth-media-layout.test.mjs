@@ -40,7 +40,7 @@ test("search hints quickly fade without moving or intercepting input, with a red
   assert.match(design,/\.search-hints \{[^}]*pointer-events: none/);
   assert.match(design,/@keyframes search-hint-first/);
   assert.match(design,/@keyframes search-hint-second/);
-  assert.match(design,/animation: search-hint-first 4s ease-in-out infinite/);
+  assert.match(design,/animation: search-hint-first 10s ease-in-out infinite/);
   assert.doesNotMatch(design.match(/@keyframes search-hint-first \{[\s\S]*?@media \(prefers-reduced-motion:reduce\)/)?.[0]??"",/translateY/);
   assert.match(design,/focus-within \.search-hints > span \{ animation-play-state: paused/);
   assert.match(design,/@media \(prefers-reduced-motion:reduce\) \{[^}]*\}[^}]*animation: none/);

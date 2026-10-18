@@ -396,7 +396,7 @@ test("orders profile tabs across the divider with an animated red underline", ()
 
 test("filters the homepage by all canonical artwork categories", () => {
   for (const code of ["digital-art", "hand-art", "video", "audio", "animation", "games", "interactive", "vr-ar", "other"]) {
-    assert.ok(homePage.includes(`code: "${code}"`));
+    assert.ok(readFileSync(new URL("../src/features/works/workCategories.ts", import.meta.url), "utf8").includes(`code: "${code}"`));
   }
   assert.match(homePage, /className="gallery-filters"/);
   assert.match(homePage, /aria-pressed/);
