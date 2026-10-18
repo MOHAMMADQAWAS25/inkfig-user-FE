@@ -8252,3 +8252,66 @@ Enable exhibitions created/edited by supervisors, admins and system administrato
 ### Notes
 
 Newly uploaded works are ordinary public profile works; pending approval controls their exhibition membership only. A rejected entry is retained and can be reconsidered by managers. Blocking is exhibition-specific and hides approved membership until unblocked. Existing non-blocking Vite 500kB chunk warning remains. Exhibition WebSocket updates are not included in this release.
+
+## 2026-10-18 - Live countdown on exhibition cards
+
+### Request
+
+Display a countdown on exhibition cards.
+
+### Changes
+
+- Shows days, hours, minutes and seconds until the exhibition event date.
+- Updates every second, recalculates after tab visibility changes and stops when the event begins.
+- Displays Exhibition started after reaching zero; cleans up timers and listeners on unmount.
+- Preserves participation windows and existing exhibition workflows.
+
+### Repositories
+
+- `inkfig-user-FE`: live localized exhibition countdowns.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionCountdown.tsx`: countdown component.
+- `src/features/exhibitions/ExhibitionsPage.tsx`: renders countdown on exhibition cards.
+- `src/i18n/resources.ts`: Arabic/English time units and status labels.
+- `src/styles.css`: compact themed countdown layout.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Countdown is public alongside exhibition cards.
+- Existing backend authorization is unchanged and remains authoritative.
+
+### Frontend
+
+- Exhibition list cards display four time units with localized numbers, RTL support, light/dark styling and stable-width digits.
+- Timer uses existing event_at; no additional network requests.
+
+### Verification
+
+- `[passed] npm.cmd run build` — TypeScript and Vite build.
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` — 5 tests.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Deploy frontend through the existing Cloudflare workflow.
+- No configuration changes or backend deployment required.
+
+### Git
+
+- Branch: `main`
+- Commit: `2e18798`
+- Push: included in final synchronization and reported in handoff.
+
+### Notes
+
+Countdown targets the exhibition start, not the participation deadline. Browser clock drives the display; backend database time continues to enforce participation windows.
