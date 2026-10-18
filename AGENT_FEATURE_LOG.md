@@ -9322,3 +9322,17 @@ Headless Edge checked the actual component with production CSS: a 400x650 image 
 ### Deployment and Git
 
 Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: fix/conditional-artwork-blur. Fetch/rebase before branch push, followed by authorized fast-forward main merge/push. Exact commit, push, conflicts and deployment results reported in handoff; all previous feature-log entries preserved.
+
+## 2026-10-18 - Reveal creator names beside avatars on hover
+
+### Request and changes
+
+Creator identity rows below gallery cards show only the circular avatar at rest. Hovering the avatar/link or keyboard-focusing it expands a softly tinted name pill with a subtle fade and horizontal reveal. Names collapse when hover/focus ends. The fixed 40px row height and existing masonry geometry are unchanged; long names truncate within card width. Arabic reveal direction is mirrored and reduced-motion preferences disable transitions. Existing accessible creator labels and profile links retained.
+
+### Verification and deployment
+
+219 tests passed (74 source/layout and 145 component/feed). TypeScript/Vite production build passed with the existing chunk-size warning; git diff --check passed. CSS-only frontend deployment; no backend, database, API, permissions or SnapStart changes. Live browser visual verification not performed.
+
+### Git
+
+Branch: fix/creator-avatar-hover-name. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit/push outcomes reported in handoff; prior entries preserved.

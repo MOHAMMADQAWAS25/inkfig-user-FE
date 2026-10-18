@@ -1451,11 +1451,15 @@ img { max-width: 100%; image-rendering: auto; }
 .artwork-virtual-feed { position: relative; width: 100%; overflow-anchor: none; }
 .feed-post-card { display:grid; grid-template-rows:minmax(0,1fr) 40px; width:100%; height:100%; min-width:0; }
 .artwork-virtual-feed .feed-post-card > .artwork-pin-media { min-height:0; }
-.feed-creator { display:flex; align-items:center; gap:8px; min-width:0; height:40px; padding-block:8px 4px; color:#39431c; text-decoration:none; font-size:.85rem; line-height:1.2; }
+.feed-creator { display:flex; align-items:center; gap:0; width:fit-content; max-width:100%; min-width:0; height:40px; padding-block:8px 4px; color:#39431c; text-decoration:none; font-size:.85rem; line-height:1.2; transition:gap 180ms ease; }
 .feed-creator img,.feed-creator-initial { display:grid; place-items:center; flex:0 0 28px; width:28px; height:28px; border-radius:50%; object-fit:cover; }
 .feed-creator-initial { background:#617d2b; color:#fffdf0; font-weight:700; }
-.feed-creator-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.feed-creator:hover .feed-creator-name { text-decoration:underline; text-underline-offset:3px; }
+.feed-creator-name { min-width:0; max-width:0; padding:5px 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:999px; background:rgb(97 125 43 / .09); opacity:0; transform:translateX(-5px); transition:max-width 220ms ease,padding 220ms ease,opacity 180ms ease,transform 220ms ease; }
+.feed-creator:hover,.feed-creator:focus-visible { gap:6px; }
+.feed-creator:hover .feed-creator-name,.feed-creator:focus-visible .feed-creator-name { max-width:240px; padding-inline:9px; opacity:1; transform:translateX(0); }
+[dir="rtl"] .feed-creator-name { transform:translateX(5px); }
+[dir="rtl"] .feed-creator:hover .feed-creator-name,[dir="rtl"] .feed-creator:focus-visible .feed-creator-name { transform:translateX(0); }
+@media(prefers-reduced-motion:reduce){.feed-creator,.feed-creator-name { transition:none; }}
 :root[data-theme="dark"] .feed-creator { color:#f7f2d8; }
 .artwork-virtual-feed .feed-position { position: absolute; top: 0; left: 0; margin: 0; contain: layout style; }
 .artwork-virtual-feed .artwork-pin-media,
