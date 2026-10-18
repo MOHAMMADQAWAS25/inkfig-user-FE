@@ -8387,3 +8387,64 @@ No migration required.
 ### Notes
 
 Past is based on scheduled start because no end date exists. Very short viewports allow internal preview scrolling; full descriptions remain on exhibition details. Existing Vite large-chunk warning is non-blocking.
+
+## 2026-10-18 - Countdown on exhibition details
+
+### Request
+
+Show the live countdown inside an exhibition's details page and confirm participation is blocked outside its configured window.
+
+### Changes
+
+- Reused the existing localized live countdown above the exhibition description.
+- Added bounded summary styling for desktop/mobile.
+- Verified existing backend date enforcement; no participation logic changed.
+
+### Repositories
+
+- `inkfig-user-FE`: details-page countdown.
+- `inkfig-main-system`: inspected only; existing database-time participation checks remain authoritative.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionsPage.tsx`: renders the countdown in details.
+- `src/styles.css`: sizes and spaces the details countdown.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Countdown remains public with exhibition details.
+- Backend continues enforcing participation_opens_at <= database now() < participation_closes_at on every submission, returning 409 outside that window.
+- Existing ownership, block and active-account checks remain enforced by the backend.
+
+### Frontend
+
+- Exhibition details now show days/hours/minutes/seconds until the event, or Exhibition started afterward, in both languages/themes.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` — 7 tests.
+- `[passed] npm.cmd run build` — TypeScript and production build.
+- `[passed] git diff --check`
+- `[passed] inspected backend submit date predicate and 409 handling`
+
+### Deployment
+
+- Frontend-only deployment through existing workflow. No configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `41124e7`
+- Push: final synchronization and push reported in handoff.
+
+### Notes
+
+Countdown targets event start, while participation eligibility uses the separate opening/closing dates and is enforced server-side.
