@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 
-import inkfigLogo from "../../assets/inkfig-logo.svg";
+import { AuthLogo } from "./AuthLogo";
 import { useAuth } from "./AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
@@ -50,7 +50,7 @@ export function LoginPage() {
       <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <div className="auth-form-column login-form-column auth-enter-from-start">
         <section className="auth-card login-card" aria-labelledby="login-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
+        <AuthLogo />
         <h1 id="login-title">{t("auth.welcome")}</h1>
         <p className="muted-text">{t("app.tagline")}</p>
         <form className="form-stack" onSubmit={submit}>

@@ -9,6 +9,7 @@ import { workTypeTone } from "../works/workTypePresentation";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { ReportDialog } from "../reports/ReportDialog";
 import { relativeTime } from "../../lib/relativeTime";
+import { ArtworkMedia } from "./ArtworkMedia";
 
 type ArtworkDetailModalProps = {
   language: Language;
@@ -96,7 +97,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
-        <div className="artwork-modal-media">{work.mime_type.startsWith("video/")?<video src={work.image_url} controls={!readOnly} playsInline preload="metadata"/>:<img src={work.image_url} alt={work.title} />}</div>
+        <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>

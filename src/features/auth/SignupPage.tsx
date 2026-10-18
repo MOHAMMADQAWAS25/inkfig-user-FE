@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
-import inkfigLogo from "../../assets/inkfig-logo.svg";
+import { AuthLogo } from "./AuthLogo";
 import { useI18n } from "../../i18n/I18nProvider";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
@@ -93,7 +93,7 @@ export function SignupPage() {
       <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <div className="auth-form-column signup-form-column auth-enter-from-end">
         <section className="auth-card signup-card" aria-labelledby="signup-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
+        <AuthLogo />
         <h1 id="signup-title">{t("auth.createAccount")}</h1>
         <p className="muted-text">{t("auth.hebronOnly")}</p>
 

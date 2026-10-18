@@ -9222,3 +9222,34 @@ No migration required for the read-only popup. Companion migration `20261018_015
 ### Notes
 
 Preserved incoming commit `2c02204` mobile improvements and all prior exhibition work. Existing non-blocking Vite chunk warning and jsdom scrollTo notices remain.
+
+## 2026-10-18 - Watercolor authentication themes and centered artwork blur
+
+### Request and changes
+
+- Applied the supplied watercolor/glass direction across sign-in, sign-up/create-account, forgot/reset-password stages and email verification on desktop, tablet and phone. Cream/light and deep-green/dark surfaces use readable theme-specific text, inputs and buttons, thin olive borders, subtle blur and no multicolor top stripe. Kept theme/language controls physically top-right with existing RTL forms and reduced-motion behavior. Long registration flows scroll with the page, and full-name/date rows align with paired password fields.
+- Created two background-only watercolor assets using the built-in image-generation skill. No text/forms/logo baked into assets. Optimized final JPEGs total 608,642 bytes without resizing; existing scenic assets and canonical logo were not overwritten. Saved prompts, provenance and paths in docs/auth-watercolor-design.md.
+- Shared AuthLogo renders only the trusted bundled official SVG, preserving geometry and fig. Auth-scoped CSS gives the pen nib deep-olive/cream theme contrast and adjusts the dark leaf tint. No user-provided markup is injected. Verification now shares the same logo/background/header controls and removes redundant branding/language controls.
+- Shared ArtworkMedia centers the sharp original horizontally and vertically within the full available media column, preserving natural proportions and contain sizing. A decorative, clipped, image-derived 24px blur at low opacity fills only spare space behind the foreground. Originals are bounded by the actual column on desktop/tablet/mobile; no cropping/stretching or file/storage changes. Transparent foregrounds retain a neutral theme surface. Image failures show existing localized feedback; videos retain a single player and read-only controls behavior.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled before implementation; incoming exhibition/read-only preview work retained. Frontend only: auth pages/new AuthLogo, ArtworkDetailModal/new ArtworkMedia, styles, two JPEG assets, asset documentation, auth/media tests, updated branding checks and this log. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, database, storage, embedding, authentication/authorization, dependency or backend/SnapStart changes. Registration fields (including optional avatar), validation, verification/reset stages, resend limits, role/owner permissions and manager read-only preview semantics preserved. No credentials, generated build output or unrelated local configuration committed.
+
+### Verification
+
+213 tests passed (73 foundation/layout and 140 component/feed), including exhibition review and read-only previews. New checks cover all auth page shells in English/Arabic, trusted logo theme hooks, input/registration semantics, decorative versus accessible foreground images, failed-image recovery, single-player/read-only video behavior, centered contain layout and responsive bounds. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking large-bundle warning and jsdom scrollTo notices remain; no failed checks bypassed.
+
+Headless Edge visual review completed for desktop light/dark login, Arabic registration, true 390px iframe login/reset layouts and a wide-image/taller-info artwork fixture showing equal top/bottom blur margins. Interactive browser helper failed with the Windows sandbox lock error; headless rendering used instead. Physical devices and live authenticated artwork were not visually tested. Temporary fixtures/server stopped and excluded from production/commit.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: feature/auth-watercolor-artwork-framing. Commit/push/deployment outcomes reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Earlier log entries and concurrent exhibition work preserved; conflicts reported in handoff.

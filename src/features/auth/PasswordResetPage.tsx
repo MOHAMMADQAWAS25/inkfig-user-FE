@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
-import inkfigLogo from "../../assets/inkfig-logo.svg";
+import { AuthLogo } from "./AuthLogo";
 import { useI18n } from "../../i18n/I18nProvider";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { ThemeToggle } from "../../theme/ThemeToggle";
@@ -113,7 +113,7 @@ export function PasswordResetPage() {
     <main className="auth-layout auth-photo-background">
       <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <section className="auth-card login-card auth-enter-from-end" aria-labelledby="reset-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
+        <AuthLogo />
         <h1 id="reset-title">{t("auth.resetPassword")}</h1>
         {stage === "complete" ? (
           <div className="success-panel" role="status">

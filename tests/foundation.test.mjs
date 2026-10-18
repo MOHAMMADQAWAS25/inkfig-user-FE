@@ -184,7 +184,7 @@ test("keeps the InkFig brand name untranslated in every locale", () => {
   assert.doesNotMatch(resources, /إنكفِغ/);
   assert.doesNotMatch(loginPage, /className="eyebrow brand-name"/);
   assert.doesNotMatch(signup, /className="eyebrow brand-name"/);
-  assert.match(verifyEmailPage, /className="eyebrow brand-name"/);
+  assert.match(verifyEmailPage, /<AuthLogo/);
   assert.match(styles, /\.brand-name\s*\{[^}]*text-transform:\s*none/);
 });
 
@@ -210,13 +210,13 @@ test("provides Palestine-time defaults and persistent manual themes", () => {
 test("harmonizes light authentication cards while preserving dark cards", () => {
   assert.match(styles, /--card-background:\s*linear-gradient\(145deg, rgb\(255 253 240/);
   assert.match(styles, /\.auth-card\s*\{[\s\S]*--text:\s*#283014/);
-  assert.match(styles, /\.auth-card::before[\s\S]*var\(--brand-fig\)/);
+  assert.match(styles, /\.auth-photo-background \.auth-card::before \{ content: none/);
   assert.match(styles, /:root\[data-theme="dark"\] \.auth-card\s*\{[\s\S]*--text:\s*#f7f2d8/);
 });
-test("softens only the light-theme login card from the dark palette", () => {
+test("uses a cream glass authentication surface with a separate dark counterpart", () => {
   assert.ok(loginPage.includes('className="auth-card login-card"'));
-  assert.ok(styles.includes("rgb(57 67 28 / 0.78)"));
-  assert.ok(styles.includes("--input-background: rgb(16 20 12 / 0.46)"));
+  assert.ok(styles.includes("background: rgb(255 253 235 / .55)"));
+  assert.ok(styles.includes("--input-background:rgb(255 253 240 / .46)"));
   assert.ok(styles.includes(':root[data-theme="dark"] .login-card'));
   assert.ok(styles.includes("background: var(--card-background)"));
 });
@@ -236,8 +236,8 @@ test("places the language control opposite the reading origin without outer form
 });
 
 test("centers the logo inside both forms and themes their scrollbars", () => {
-  assert.match(loginPage, /<section className="auth-card login-card"[\s\S]*<img className="auth-logo"/);
-  assert.match(signup, /<section className="auth-card signup-card"[\s\S]*<img className="auth-logo"/);
+  assert.match(loginPage, /<section className="auth-card login-card"[\s\S]*<AuthLogo/);
+  assert.match(signup, /<section className="auth-card signup-card"[\s\S]*<AuthLogo/);
   assert.match(styles, /\.auth-logo \{[^}]*margin-inline:\s*auto/);
   assert.match(styles, /\.login-card \.auth-logo \{[^}]*width:\s*min\(180px, 54%\)/);
   assert.match(styles, /scrollbar-color:\s*var\(--auth-scrollbar-thumb\) var\(--auth-scrollbar-track\)/);
@@ -253,8 +253,8 @@ test("uses the supplied responsive background on login and signup", () => {
   assert.ok(signup.includes("auth-enter-from-end"));
   assert.doesNotMatch(loginPage, /auth-form-logo/);
   assert.doesNotMatch(signup, /auth-form-logo/);
-  assert.match(styles, /\.auth-photo-background::before\s*\{[\s\S]*auth-background-light-hd\.png/);
-  assert.match(styles, /\.auth-photo-background::after\s*\{[\s\S]*auth-background-dark-hd\.png/);
+  assert.match(styles, /\.auth-photo-background::before\s*\{[\s\S]*auth-watercolor-light\.jpg/);
+  assert.match(styles, /\.auth-photo-background::after\s*\{[\s\S]*auth-watercolor-dark\.jpg/);
   assert.match(styles, /\.auth-form-column\s*\{[^}]*max-height:\s*calc\(100svh - 40px\)[^}]*margin-inline:\s*auto/);
   assert.match(styles, /\.auth-form-column \.auth-card \{[^}]*overflow-y:\s*auto/);
   assert.match(styles, /\.auth-photo-background\s*\{[^}]*overflow:\s*hidden/);

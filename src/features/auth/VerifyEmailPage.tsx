@@ -3,7 +3,8 @@ import type { FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
-import inkfigLogo from "../../assets/inkfig-logo.svg";
+import { AuthLogo } from "./AuthLogo";
+import { LanguageToggle } from "../../i18n/LanguageToggle";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { useAuth } from "./AuthContext";
@@ -18,7 +19,7 @@ interface VerificationLocationState {
 
 export function VerifyEmailPage() {
   const { session } = useAuth();
-  const { language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const location = useLocation();
   const state = location.state as VerificationLocationState | null;
   const [email, setEmail] = useState(state?.email ?? "");
@@ -76,11 +77,10 @@ export function VerifyEmailPage() {
   }
 
   return (
-    <main className="auth-layout">
-      <div className="auth-theme-control"><ThemeToggle /></div>
-      <section className="auth-card" aria-labelledby="verify-title">
-        <img className="auth-logo" src={inkfigLogo} alt={t("app.name")} />
-        <p className="eyebrow brand-name">{t("app.name")}</p>
+    <main className="auth-layout auth-photo-background">
+      <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
+      <section className="auth-card login-card auth-enter-from-end" aria-labelledby="verify-title">
+        <AuthLogo />
         <h1 id="verify-title">{t("auth.verifyEmail")}</h1>
         <p className="muted-text">{t("auth.codeSent")}</p>
         {success ? (
@@ -100,7 +100,6 @@ export function VerifyEmailPage() {
             </button>
           </form>
         )}
-        <button className="text-button" type="button" onClick={() => setLanguage(language === "ar" ? "en" : "ar")}>{language === "ar" ? "English" : "العربية"}</button>
       </section>
     </main>
   );
