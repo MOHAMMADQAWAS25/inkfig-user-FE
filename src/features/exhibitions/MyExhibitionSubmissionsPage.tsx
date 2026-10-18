@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { useI18n } from "../../i18n/I18nProvider";
+import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { getExhibition, getSubmissions, type Exhibition, type Submission } from "./exhibitionApi";
 
 function SubmissionSection({ id, status }: { id: string; status: "approved" | "pending" | "rejected" }) {
@@ -52,5 +53,5 @@ export function MyExhibitionSubmissionsPage() {
     return () => { active = false; };
   }, [exhibitionId, session?.userId, language]);
   if (!session) return <Navigate replace to={`/${language}/login`}/>;
-  return <main className="exhibitions-page app-page-with-sidebar"><AppSidebar/><div className="exhibitions-shell"><nav className="exhibition-toolbar"><Link to={`/${language}/exhibition/${exhibitionId}`}>{t("exhibitions.backToExhibition")}</Link></nav><header className="exhibitions-heading"><h1>{t("exhibitions.mySubmissions")}{exhibition && ` — ${exhibition.name}`}</h1></header>{error && <p role="alert">{error}</p>}<p>{t("exhibitions.limitHint")}</p><SubmissionSection id={exhibitionId} status="approved"/><SubmissionSection id={exhibitionId} status="pending"/><details className="exhibition-rejected-history"><summary>{t("exhibitions.rejected")}</summary><SubmissionSection id={exhibitionId} status="rejected"/></details></div></main>;
+  return <main className="exhibitions-page app-page-with-sidebar"><AppSidebar/><div className="exhibitions-shell"><nav className="exhibition-toolbar"><ExhibitionBackButton to={`/${language}/exhibition/${exhibitionId}`} label={t("exhibitions.backToExhibition")}/></nav><header className="exhibitions-heading"><h1>{t("exhibitions.mySubmissions")}{exhibition && ` — ${exhibition.name}`}</h1></header>{error && <p role="alert">{error}</p>}<p>{t("exhibitions.limitHint")}</p><SubmissionSection id={exhibitionId} status="approved"/><SubmissionSection id={exhibitionId} status="pending"/><details className="exhibition-rejected-history"><summary>{t("exhibitions.rejected")}</summary><SubmissionSection id={exhibitionId} status="rejected"/></details></div></main>;
 }

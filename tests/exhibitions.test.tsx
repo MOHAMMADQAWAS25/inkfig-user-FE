@@ -93,6 +93,17 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.restoreAllMocks());
+it("uses an accessible arrow back control and one main exhibition title inside the card", async () => {
+  const { container } = view();
+  const title = await screen.findByRole("heading", { level: 1, name: "Student exhibition" });
+  expect(title.closest(".exhibition-detail-card")).toBeTruthy();
+  expect(container.querySelectorAll("h1")).toHaveLength(1);
+  const back = screen.getByRole("link", { name: translations.en["exhibitions.back"] });
+  expect(back.getAttribute("href")).toBe("/en/exhibition");
+  expect(back.textContent).toBe("");
+  expect(back.querySelector("svg")).toBeTruthy();
+  expect(back.getAttribute("title")).toBe(translations.en["exhibitions.back"]);
+});
 it("assigns one profile work to an eligible exhibition and shows pending confirmation", async () => {
   render(<MemoryRouter><AssignExhibitionDialog workId="mine" onClose={vi.fn()}/></MemoryRouter>);
   fireEvent.click(await screen.findByRole("radio"));
@@ -121,6 +132,9 @@ it("loads approved and pending personal sections with independent status cursors
   }));
   render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
   const pending = await screen.findByRole("region", { name: "Pending works" });
+  const back = screen.getByRole("link", { name: "Back to exhibition" });
+  expect(back.getAttribute("href")).toBe("/en/exhibition/event");
+  expect(back.textContent).toBe("");
   await within(pending).findByText("Pending painting");
   expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "approved");
   expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "pending");

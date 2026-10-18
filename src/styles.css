@@ -1852,7 +1852,11 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-upload-context { padding:16px; margin-block:20px; border:1px solid rgb(97 125 43 / .3); border-radius:14px; }
 .profile-page .artwork-owner-menu>div { width:min(240px,calc(100vw - 32px)); }
 @media(max-width:720px) { .exhibition-toolbar>a,.exhibition-toolbar>button { flex:1 1 auto; font-size:.85rem; }.exhibition-personal-grid { columns:2 140px; gap:12px; } }
-.exhibition-detail-card .exhibition-card-content h2 { margin:0 0 16px; font-size:clamp(1.35rem,2.3vw,2rem); overflow-wrap:anywhere; }
+.exhibition-detail-card .exhibition-card-content h1 { margin:0 0 18px; font-size:clamp(1.6rem,3vw,2.5rem); font-weight:800; line-height:1.2; letter-spacing:-.02em; overflow-wrap:anywhere; text-wrap:balance; }
+.exhibition-toolbar>.exhibition-back-button { flex:0 0 44px; inline-size:44px; block-size:44px; padding:0; border:1px solid rgb(97 125 43 / .3); background:rgb(97 125 43 / .08); transition:background-color 180ms ease,border-color 180ms ease; }
+.exhibition-back-button:hover,.exhibition-back-button:focus-visible { background:rgb(97 125 43 / .2); border-color:var(--primary); }
+.exhibition-back-button:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+.exhibition-back-button:dir(rtl) svg { transform:scaleX(-1); }
 .exhibition-detail-card .exhibition-card-description { display:block; overflow:visible; white-space:pre-wrap; -webkit-line-clamp:unset; }
 .exhibition-detail-card .exhibition-summary { border:0; border-radius:0; background:transparent; padding:0; margin-block:22px 0; overflow:visible; }
 .exhibition-detail-card .exhibition-summary dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-block:0 18px; }

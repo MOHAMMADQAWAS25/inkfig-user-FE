@@ -301,10 +301,10 @@ export function ExhibitionsPage() {
     <main className="exhibitions-page app-page-with-sidebar">
       <AppSidebar />
       <div className="exhibitions-shell">
-        <header className="exhibitions-heading">
+        {!selected && <header className="exhibitions-heading">
           <div>
             <Trophy aria-hidden="true" />
-            <h1>{selected?.name ?? t("exhibitions.title")}</h1>
+            <h1>{t("exhibitions.title")}</h1>
           </div>
           {manage && !exhibitionId && (
             <button className="primary-button" disabled={busy} onClick={edit}>
@@ -312,7 +312,7 @@ export function ExhibitionsPage() {
               {t(selected ? "exhibitions.edit" : "exhibitions.create")}
             </button>
           )}
-        </header>
+        </header>}
         {selected && <ExhibitionToolbar id={selected.exhibition_id} manage={manage} signedIn={Boolean(session)} available={available && selected.participation_open} busy={busy} onEdit={edit}/>}
         {error && (
           <p className="form-message error-message" role="alert">
@@ -409,9 +409,6 @@ export function ExhibitionsPage() {
         ) : (
           selected && (
             <>
-              <Link to={`/${language}/exhibition`}>
-                {t("exhibitions.back")}
-              </Link>
               <ExhibitionCard exhibition={selected} past={Date.parse(selected.event_at) <= Date.now()} detail>
               <section className="exhibition-summary">
                 <dl>

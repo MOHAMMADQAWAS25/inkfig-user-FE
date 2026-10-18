@@ -17,7 +17,7 @@ export function ExhibitionCard({
   children?: ReactNode;
 }) {
   const { language, t } = useI18n();
-  const Heading = detail ? "h2" : "h3";
+  const Heading = detail ? "h1" : "h3";
   const content = (
     <>
       <div className="exhibition-card-media">
