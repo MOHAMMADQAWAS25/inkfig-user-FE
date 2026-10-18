@@ -8315,3 +8315,75 @@ No migration required.
 ### Notes
 
 Countdown targets the exhibition start, not the participation deadline. Browser clock drives the display; backend database time continues to enforce participation windows.
+
+## 2026-10-18 - Upcoming and Past Exhibitions with viewport-sized cards
+
+### Request
+
+Separate exhibitions into Upcoming Exhibitions and Past Exhibitions and decorate cards while keeping each within the visible screen height.
+
+### Changes
+
+- Added independently paginated upcoming/past sections with localized headings and empty states.
+- Upcoming cards retain live countdowns; past cards use a Past exhibition badge.
+- Added reusable overview cards with uncropped contained banners, two-line name/description previews, date and a View exhibition action.
+- Bounded overview-card height by the small viewport unit svh, with vh fallback; on unusually short screens the card's bounded content can scroll without enlarging the card.
+- Cards update classification when the scheduled event starts; duplicate-safe continuation keeps each section independently loadable.
+- Preserved submission artwork cards, exhibition detail information, moderation, uploads and participation rules.
+
+### Repositories
+
+- `inkfig-user-FE`: section layout, period requests and bounded overview cards.
+- `inkfig-main-system`: period filters with independent ordering/pagination.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionsPage.tsx`: separate sections, cursors, date classification and empty states.
+- `src/features/exhibitions/ExhibitionCard.tsx`: themed reusable exhibition overview card.
+- `src/features/exhibitions/exhibitionApi.ts`: sends optional period query.
+- `src/i18n/resources.ts`: English/Arabic headings, badges and descriptions.
+- `src/styles.css`: viewport card dimensions, banner containment, limited text, themed hover/focus, RTL and reduced motion.
+- `tests/exhibitions.test.tsx`: section separation, countdown visibility, independent continuation and empty states.
+
+### API
+
+- Consumes `GET /api/v1/exhibitions?period=upcoming|past&cursor={cursor}` independently for each section.
+- Existing response fields and limit defaults retained.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Exhibition sections remain public.
+- Existing management and participation UI rules remain; backend continues enforcing authorization.
+
+### Frontend
+
+- Route `/:language/exhibition` shows Upcoming Exhibitions followed by Past Exhibitions.
+- Upcoming sorts soonest first; past sorts most recent first.
+- Cards fit desktop/mobile viewport height, preserve banner proportions, and link to complete details.
+- Arabic/English, RTL, both themes, loading/error/empty states and reduced-motion preferences supported.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` — 7 tests.
+- `[passed] npm.cmd run build` — TypeScript and production build.
+- `[passed] git diff --check`
+- `[passed] companion backend tests/type checks and rolled-back Supabase period verification`
+- `[not run] real-browser viewport measurement — bounded geometry verified in CSS; no browser tool available in this session`
+
+### Deployment
+
+- Deploy main backend first, then frontend. No migration or configuration change.
+
+### Git
+
+- Branch: `main`
+- Commit: `ea027ca`
+- Push: final synchronization and push reported in handoff.
+
+### Notes
+
+Past is based on scheduled start because no end date exists. Very short viewports allow internal preview scrolling; full descriptions remain on exhibition details. Existing Vite large-chunk warning is non-blocking.
