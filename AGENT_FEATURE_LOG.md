@@ -9041,3 +9041,86 @@ No migration required.
 ### Notes
 
 Back controls use known parent routes rather than browser history, avoiding accidental navigation outside InkFig after direct links. Existing non-blocking Vite chunk warning remains.
+## 2026-10-18 - Fixed exhibition navigation and unified submission records
+
+### Request
+
+Fix the action navbar, move review into it, hide content below the banner before launch and modernize owner/admin submissions as one filtered record list with reviewed deletion behavior.
+
+### Changes
+
+- Replaced sticky with fixed navigation aligned to the page container by measured bounds; resize observation reserves wrapped toolbar height and supports RTL/mobile safe areas.
+- Added navbar Review submissions link and dedicated manager review route, moving approval/rejection/block/unblock controls out of exhibition details.
+- Exhibition details show no public works/empty state before start; loaded pages update at launch and then fetch the public gallery.
+- Replaced separated personal sections with one thumbnail/title/status record list, All plus Approved/Rejected/Pending dropdown and bounded server-filtered pagination. Manager review uses the same layout.
+- Record clicks load the full artwork modal; added optional contextual content to show submission rejection and deletion-request reasons without changing other modal consumers.
+- Added confirmed pending withdrawal, required-reason approved-deletion request, manager deletion decisions and pending-request badges. Original profile works remain intact.
+- Retained manager block/unblock pagination, original artwork interactions, upload workflow, quota and existing backend authorization rules.
+
+### Repositories
+
+- `inkfig-user-FE`: navigation, records, filters, modals and decisions.
+- `inkfig-main-system`: launch gating, withdrawal APIs, audit history and owner-deletion bypass guard.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionNavbar.tsx`: fixed geometry/height alignment and resize cleanup.
+- `src/features/exhibitions/ExhibitionToolbar.tsx`: review navigation in fixed bar.
+- `src/features/exhibitions/ExhibitionsPage.tsx`: launch-only public content and removed inline review controls.
+- `src/features/exhibitions/MyExhibitionSubmissionsPage.tsx`: shared owner/manager record view and action dialogs.
+- `src/features/exhibitions/exhibitionApi.ts`: withdrawal response fields and mutation helpers.
+- `src/features/home/ArtworkDetailModal.tsx`: optional submission context inside standard full artwork card.
+- `src/app/AppRouter.tsx`: manager review route.
+- `src/i18n/resources.ts`: bilingual status/filter/deletion/reason labels.
+- `src/styles.css`: fixed bar, responsive records, thumbnails and context presentation.
+- `tests/exhibitions.test.tsx`, `tests/exhibition-layout.test.mjs`: launch visibility, geometry resize, filters, opening rejected cards and withdrawal/decision checks.
+
+### API
+
+- Consumes owner `POST /api/v1/exhibitions/{id}/submissions/{submission_id}/withdrawal` and manager `PATCH` on the same path.
+- Uses existing mine/manage status-filtered submission pagination, full work details, likes/saves and block/unblock APIs.
+- Approved withdrawal requires reason and does not remove the record while waiting. Backend errors preserve data and show feedback.
+
+### Database
+
+- Migration: `20261018_015_exhibition_withdrawal_requests.sql` in main backend, applied successfully.
+- Adds nullable request metadata and protected decision audit history. No frontend-owned schema or deletion of original works/storage.
+
+### Permissions and scope
+
+- Personal page requires sign-in and backend checks current owner participation permission.
+- Review route/UI is supervisor/admin/system-administrator scoped; backend independently verifies current management permission.
+- Pending own entries may be withdrawn immediately; approved membership removal needs management approval and a user-entered reason.
+- Owner profile deletion is backend-blocked while approved exhibition memberships remain, preventing bypass.
+
+### Frontend
+
+- Routes `/:language/exhibition/:exhibitionId/submissions` and new `/:language/exhibition/:exhibitionId/review` show shared records with status dropdown, independent continuation, loading/error/empty/success states.
+- Thumbnail/title/status open the artwork card, including explicit rejection reason and private deletion context.
+- Fixed toolbar remains at top regardless of scroll; container width/offset and placeholder height update with responsive wrapping.
+- Reason dialogs support confirmation, disabled busy actions, focus containment, Escape, backdrop close and scroll lock.
+- Arabic/English, RTL arrows/layout, light/dark, uncropped thumbnails and existing interactions preserved.
+
+### Verification
+
+- `[passed] npm.cmd test` - 70 source/layout checks and 120 component tests before final added resize-geometry regression.
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 22 tests after final additions.
+- `[passed] npm.cmd run build` - strict TypeScript and Vite production build.
+- `[passed] companion backend tests, mypy and real rolled-back Supabase lifecycle`
+- `[passed] git diff --check`
+- `[failed] initial updated UI tests - obsolete detail label and synchronous filter-list lookup; corrected expectations and awaited loading, reruns passed.
+- `[not run] physical browser visual verification - mocked geometry and component behavior tested`
+
+### Deployment
+
+- Deploy main backend after migration015, then frontend through existing Cloudflare workflow. No environment changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `df4790b`
+- Push: pending final synchronization; outcome reported in handoff.
+
+### Notes
+
+Deletion removes only exhibition membership. Approved entries stay visible after launch while deletion awaits review; rejected deletion requests leave membership approved. Pending approved-deletion requests are included with approved records and visibly badged. Existing non-blocking Vite chunk warning and no exhibition realtime updates remain.
