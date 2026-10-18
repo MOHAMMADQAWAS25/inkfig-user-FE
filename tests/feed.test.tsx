@@ -45,6 +45,14 @@ beforeEach(() => {
 afterEach(() => { cleanup(); clients.forEach(client => client.clear()); clients.length = 0; vi.unstubAllGlobals(); });
 
 describe("precomputed masonry", () => {
+  it("reserves creator rows without moving existing cards on page append",()=>{
+    const engine=new FeedLayout();const initial=[work(1,400,800),work(2,400,400),work(3,400,200)];
+    const first=engine.compute(initial,400,"masonry",false,470,40);
+    expect(first.positions[0].height).toBe(first.positions[0].width*2+40);
+    const next=engine.compute([...initial,work(4)],400,"masonry",false,470,40);
+    expect(next.positions.slice(0,3)).toEqual(first.positions);
+    for(const column of next.columns)for(let i=1;i<column.length;i++)expect(column[i].y).toBeGreaterThanOrEqual(column[i-1].y+column[i-1].height+12);
+  });
   it("places the next card in the shortest column with no overlap", () => {
     const result = new FeedLayout().compute([work(1, 400, 800), work(2, 400, 400), work(3, 400, 200)], 400, "masonry");
     expect(result.positions.map(p => p.column)).toEqual([0, 1, 1]);

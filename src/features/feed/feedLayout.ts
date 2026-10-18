@@ -1,6 +1,7 @@
 export type LayoutItem = { work_id: string; media?: { width: number; height: number } | null };
 export type Position = { id: string; index: number; x: number; y: number; width: number; height: number; column: number };
 export type LayoutResult = { positions: Position[]; columns: Position[][]; height: number };
+export const CREATOR_ROW_HEIGHT = 40;
 
 export function columnCount(width: number): number {
   if (width < 600) return width < 240 ? 1 : 2;
@@ -17,11 +18,11 @@ export class FeedLayout {
   private signature = "";
   private ratios: number[] = [];
   private result: LayoutResult = { positions: [], columns: [], height: 0 };
-  compute(items: LayoutItem[], width: number, layout: "list" | "masonry", rtl = false, maxListWidth = 470): LayoutResult {
+  compute(items: LayoutItem[], width: number, layout: "list" | "masonry", rtl = false, maxListWidth = 470, footerHeight = 0): LayoutResult {
     const count = layout === "list" ? 1 : columnCount(width);
     const gap = width < 600 ? 12 : 18;
     const cardWidth = layout === "list" ? Math.min(maxListWidth, width) : Math.max(1, (width - gap * (count - 1)) / count);
-    const signature = `${width}:${count}:${rtl}:${layout}:${maxListWidth}`;
+    const signature = `${width}:${count}:${rtl}:${layout}:${maxListWidth}:${footerHeight}`;
     const unchanged = this.signature === signature && this.result.positions.length <= items.length &&
       this.result.positions.every((position, i) => position.id === items[i].work_id && this.ratios[i] === imageRatio(items[i]));
     const positions = unchanged ? [...this.result.positions] : [];
@@ -29,7 +30,7 @@ export class FeedLayout {
     const heights = columns.map(column => column.length ? column[column.length - 1].y + column[column.length - 1].height + gap : 0);
     for (let index = positions.length; index < items.length; index++) {
       const shortest = heights.indexOf(Math.min(...heights));
-      const height = cardWidth * imageRatio(items[index]);
+      const height = cardWidth * imageRatio(items[index]) + footerHeight;
       const x = layout === "list" ? (width - cardWidth) / 2 : (rtl ? count - 1 - shortest : shortest) * (cardWidth + gap);
       const position = { id: items[index].work_id, index, x, y: heights[shortest], width: cardWidth, height, column: shortest };
       positions.push(position); columns[shortest].push(position); heights[shortest] += height + gap;

@@ -3,7 +3,7 @@ import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
 export type ImageMedia = { url: string; width: number; height: number; dominantColor: string; sizes: { w: number; url: string }[] };
-export type Work = { work_id: string; owner_user_id: string; artist_name: string; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
+export type Work = { work_id: string; owner_user_id: string; artist_name: string; artist_avatar_url?: string | null; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
 export type FeedWork = Work & { media?: ImageMedia | null };
 export type WorkPage = { items: FeedWork[]; next_cursor: string | number | null };
 export type InfiniteFeedPage = { items: FeedWork[]; nextCursor: string | number | null; hasNextPage: boolean };

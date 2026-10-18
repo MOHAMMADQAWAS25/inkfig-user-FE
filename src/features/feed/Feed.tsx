@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { FeedWork } from "../works/worksApi";
 import { useI18n } from "../../i18n/I18nProvider";
-import { FeedLayout, visiblePositions, type LayoutResult, type Position } from "./feedLayout";
+import { CREATOR_ROW_HEIGHT, FeedLayout, visiblePositions, type LayoutResult, type Position } from "./feedLayout";
 import { useFeedSentinel } from "./useFeedSentinel";
 
 const scrollMemory = new Map<string, number>();
@@ -21,7 +21,7 @@ export function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, 
   const [range, setRange] = useState({ top: 0, bottom: window.innerHeight * 3 });
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const skeletons = useMemo(() => Array.from({ length: 12 }, (_, index) => ({ work_id: `skeleton-${index}`, media: { width: 4, height: index % 3 + 3 } })), []);
-  const positions = useMemo(() => calculator.current.compute(loading ? skeletons : items, width, layout, language === "ar", listMaxWidth),
+  const positions = useMemo(() => calculator.current.compute(loading ? skeletons : items, width, layout, language === "ar", listMaxWidth, CREATOR_ROW_HEIGHT),
     [items, width, layout, language, listMaxWidth, loading, skeletons]);
   const previousLayout = useRef<LayoutResult | null>(null);
   const previousWidth = useRef(0);

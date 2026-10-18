@@ -9280,3 +9280,21 @@ Headless Edge sign-in render reviewed without hiding browser scrollbars; confirm
 ### Deployment and Git
 
 Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: fix/signin-fields-artwork-spacing. Fetch/rebase before branch push, followed by authorized fast-forward main merge/push. Exact commit, conflicts, push and deployment outcomes reported in handoff. Previous feature-log entries preserved.
+
+## 2026-10-18 - Creator identity below masonry artwork cards
+
+### Request and changes
+
+Added an always-visible circular creator avatar and artist name beneath each homepage gallery card using the supplied visual concept. The identity row links through the existing creator-profile/login route and uses initials only when no avatar is available or its image fails. Theme colors and RTL alignment follow existing conventions. Infinite scrolling and incremental shortest-column masonry remain intact: the precomputed layout reserves 40px per creator row, preserving image aspect ratios and preventing card overlap or batch repositioning.
+
+### Repositories and deployment
+
+Matching feature/gallery-creator-rows branches in main-system and user-FE. Deploy main-system first to provide optional artist_avatar_url in feed, work and search responses, then frontend. No database migration, new permissions, environment variables or SnapStart state.
+
+### Verification
+
+216 tests passed (74 foundation, 142 component), including creator profile/avatar rendering, image-failure fallback and unchanged masonry positions after appending a batch with creator-row height. Strict TypeScript and Vite production build passed with its existing chunk-size warning; git diff --check passed. Backend Python tests/mypy could not execute locally because Python is unavailable. Live browser visual verification not performed.
+
+### Git
+
+Branch: feature/gallery-creator-rows. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit hashes and push results reported in handoff; previous entries preserved.

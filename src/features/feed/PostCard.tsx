@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { hasPermission } from "../../lib/permissions";
 import { LazyImage } from "./LazyImage";
 import { CardMedia } from "./CardMedia";
+import { useState } from "react";
 
 export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
   work: FeedWork; width: number; priority: boolean;
@@ -14,7 +15,9 @@ export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
 }) {
   const { session } = useAuth();
   const { language, t } = useI18n();
-  return <CardMedia>
+  const [failedAvatar,setFailedAvatar]=useState<string|null>(null);
+  const profileHref=session ? `/${language}/profile/${work.owner_user_id}` : `/${language}/login`;
+  return <div className="feed-post-card"><CardMedia>
     <button className="artwork-image-button" type="button" data-work-id={work.work_id}
       aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={() => onOpen(work)}>
       <LazyImage work={work} width={width} priority={priority} failureLabel={t("feed.imageFailed")} />
@@ -29,5 +32,8 @@ export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
       aria-label={t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")} aria-pressed={work.saved_by_me} type="button" onClick={() => onSave(work)}>
       <Bookmark aria-hidden="true" size={21} fill={work.saved_by_me ? "currentColor" : "none"} />
     </button>}
-  </CardMedia>;
+  </CardMedia><Link className="feed-creator" to={profileHref} aria-label={work.artist_name}>
+    {work.artist_avatar_url&&failedAvatar!==work.artist_avatar_url?<img src={work.artist_avatar_url} alt="" width={28} height={28} loading="lazy" decoding="async" onError={()=>setFailedAvatar(work.artist_avatar_url??null)}/>:<span className="feed-creator-initial" aria-hidden="true">{work.artist_name.trim().charAt(0).toLocaleUpperCase(language)||"I"}</span>}
+    <span className="feed-creator-name">{work.artist_name}</span>
+  </Link></div>;
 }
