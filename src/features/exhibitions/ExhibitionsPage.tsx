@@ -5,15 +5,11 @@ import {
   CalendarDays,
   Plus,
   Trophy,
-  Check,
-  X,
-  Ban,
 } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
-import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ExhibitionCard } from "./ExhibitionCard";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import {
@@ -22,17 +18,12 @@ import {
   saveExhibition,
   getSubmissions,
   getEligibleExhibitions,
-  reviewSubmission,
-  blockParticipant,
-  unblockParticipant,
-  getBlocks,
   uploadBanner,
 } from "./exhibitionApi";
 import type {
   Exhibition,
   ExhibitionInput,
   Submission,
-  Block,
 } from "./exhibitionApi";
 
 function localDate(value: string) {
@@ -57,9 +48,7 @@ export function ExhibitionsPage() {
   const [now, setNow] = useState(() => Date.now());
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [subCursor, setSubCursor] = useState<number | null>(null);
-  const [scope, setScope] = useState("public");
-  const [blocks, setBlocks] = useState<Block[]>([]);
-  const [blockCursor, setBlockCursor] = useState<number | null>(null);
+  const scope = "public";
   const [available, setAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -75,12 +64,7 @@ export function ExhibitionsPage() {
   });
   const [banner, setBanner] = useState<File | null>(null);
   const [createdId, setCreatedId] = useState<string | undefined>();
-  const [action, setAction] = useState<{
-    kind: "reject" | "block";
-    item: Submission;
-  } | null>(null);
-  const [reason, setReason] = useState("");
-  usePageScrollLock(action !== null);
+  const started = Boolean(selected && Date.parse(selected.event_at) <= now);
   useEffect(() => {
     if (editing)
       document
@@ -109,7 +93,6 @@ export function ExhibitionsPage() {
     };
   }
   useEffect(() => {
-    if (exhibitionId) return;
     const tick = () => setNow(Date.now());
     tick();
     const timer = window.setInterval(tick, 1000);
@@ -148,7 +131,7 @@ export function ExhibitionsPage() {
     };
   }, [exhibitionId]);
   useEffect(() => {
-    if (!exhibitionId) return;
+    if (!exhibitionId || !started) return;
     let active = true;
     setSubmissions([]);
     setSubCursor(null);
@@ -165,7 +148,7 @@ export function ExhibitionsPage() {
     return () => {
       active = false;
     };
-  }, [exhibitionId, scope]);
+  }, [exhibitionId, scope, started]);
   useEffect(() => {
     setAvailable(false);
     if (!session || !exhibitionId) return;
@@ -175,23 +158,6 @@ export function ExhibitionsPage() {
     }).catch(cause => { if (active) failure(cause); });
     return () => { active = false; };
   }, [session, exhibitionId, selected?.participation_open]);
-  useEffect(() => {
-    if (!manage || !exhibitionId) return;
-    let active = true;
-    getBlocks(exhibitionId)
-      .then((page) => {
-        if (active) {
-          setBlocks(page.items);
-          setBlockCursor(page.next_cursor);
-        }
-      })
-      .catch((cause) => {
-        if (active) failure(cause);
-      });
-    return () => {
-      active = false;
-    };
-  }, [manage, exhibitionId]);
   async function run(task: () => Promise<void>) {
     setBusy(true);
     setError("");
@@ -269,28 +235,6 @@ export function ExhibitionsPage() {
           },
     );
     setEditing(true);
-  }
-  async function performAction(event: FormEvent) {
-    event.preventDefault();
-    if (!action || !exhibitionId) return;
-    await run(async () => {
-      if (action.kind === "reject")
-        await reviewSubmission(
-          exhibitionId,
-          action.item.submission_id,
-          "rejected",
-          reason,
-        );
-      else {
-        await blockParticipant(exhibitionId, action.item.user_id, reason);
-        const page = await getBlocks(exhibitionId);
-        setBlocks(page.items);
-        setBlockCursor(page.next_cursor);
-      }
-      setAction(null);
-      setReason("");
-      await refresh();
-    });
   }
   const date = (value: string) =>
     new Intl.DateTimeFormat(language, {
@@ -427,25 +371,7 @@ export function ExhibitionsPage() {
                 </dl>
               </section>
               </ExhibitionCard>
-              <nav
-                className="exhibition-tabs"
-                aria-label={t("exhibitions.works")}
-              >
-                <button
-                  aria-pressed={scope === "public"}
-                  onClick={() => setScope("public")}
-                >
-                  {t("exhibitions.approved")}
-                </button>
-                {manage && (
-                  <button
-                    aria-pressed={scope === "manage"}
-                    onClick={() => setScope("manage")}
-                  >
-                    {t("exhibitions.reviewQueue")}
-                  </button>
-                )}
-              </nav>
+              {Date.parse(selected.event_at) <= now && <section className="exhibition-public-works" aria-label={t("exhibitions.works")}>
               <div className="exhibitions-grid">
                 {submissions.map((item) => (
                   <article className="exhibition-card" key={item.submission_id}>
@@ -471,46 +397,6 @@ export function ExhibitionsPage() {
                         )}
                       </p>
                       {item.rejection_reason && <p>{item.rejection_reason}</p>}
-                      {manage && scope === "manage" && (
-                        <footer>
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              void run(async () => {
-                                await reviewSubmission(
-                                  exhibitionId!,
-                                  item.submission_id,
-                                  "approved",
-                                );
-                                await refresh();
-                              })
-                            }
-                          >
-                            <Check size={16} />
-                            {t("exhibitions.approve")}
-                          </button>
-                          <button
-                            disabled={busy}
-                            onClick={() => {
-                              setReason("");
-                              setAction({ kind: "reject", item });
-                            }}
-                          >
-                            <X size={16} />
-                            {t("exhibitions.reject")}
-                          </button>
-                          <button
-                            disabled={busy}
-                            onClick={() => {
-                              setReason("");
-                              setAction({ kind: "block", item });
-                            }}
-                          >
-                            <Ban size={16} />
-                            {t("exhibitions.block")}
-                          </button>
-                        </footer>
-                      )}
                     </div>
                   </article>
                 ))}
@@ -535,54 +421,7 @@ export function ExhibitionsPage() {
                   {t("exhibitions.more")}
                 </button>
               )}
-              {manage && (
-                <section className="exhibition-blocks">
-                  <h2>{t("exhibitions.blocked")}</h2>
-                  {blocks.map((item) => (
-                    <div key={item.user_id}>
-                      <Link to={`/${language}/profile/${item.user_id}`}>
-                        {item.full_name}
-                      </Link>
-                      <p>{item.reason}</p>
-                      <button
-                        disabled={busy}
-                        onClick={() =>
-                          void run(async () => {
-                            await unblockParticipant(
-                              exhibitionId!,
-                              item.user_id,
-                            );
-                            const page = await getBlocks(exhibitionId!);
-                            setBlocks(page.items);
-                            setBlockCursor(page.next_cursor);
-                            await refresh();
-                          })
-                        }
-                      >
-                        {t("exhibitions.unblock")}
-                      </button>
-                    </div>
-                  ))}
-                  {!blocks.length && <p>{t("exhibitions.noBlocks")}</p>}
-                  {blockCursor !== null && (
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          const page = await getBlocks(
-                            exhibitionId!,
-                            blockCursor,
-                          );
-                          setBlocks((current) => [...current, ...page.items]);
-                          setBlockCursor(page.next_cursor);
-                        })
-                      }
-                    >
-                      {t("exhibitions.more")}
-                    </button>
-                  )}
-                </section>
-              )}
+              </section>}
             </>
           )
         )}
@@ -662,63 +501,6 @@ export function ExhibitionsPage() {
               </div>
             </form>
           </section>
-        )}
-        {action && (
-          <div
-            className="profile-connections-backdrop"
-            onClick={(event) => {
-              if (event.target === event.currentTarget && !busy)
-                setAction(null);
-            }}
-          >
-            <section
-              className="exhibition-action-dialog"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="exhibition-action-title"
-            >
-              <h2 id="exhibition-action-title">
-                {t(
-                  action.kind === "reject"
-                    ? "exhibitions.reject"
-                    : "exhibitions.block",
-                )}
-              </h2>
-              <form
-                className="form-stack"
-                onSubmit={(event) => void performAction(event)}
-              >
-                <label>
-                  {t("exhibitions.reason")}
-                  <textarea
-                    autoFocus
-                    required
-                    maxLength={2000}
-                    value={reason}
-                    onChange={(event) => setReason(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Escape" && !busy) setAction(null);
-                    }}
-                  />
-                </label>
-                <div className="exhibition-actions">
-                  <button
-                    className="primary-button"
-                    disabled={busy || !reason.trim()}
-                  >
-                    {t("exhibitions.confirm")}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => setAction(null)}
-                  >
-                    {t("exhibitions.cancel")}
-                  </button>
-                </div>
-              </form>
-            </section>
-          </div>
         )}
       </div>
     </main>

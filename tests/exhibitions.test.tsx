@@ -11,8 +11,10 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
 import { AssignExhibitionDialog } from "../src/features/exhibitions/AssignExhibitionDialog";
-import { MyExhibitionSubmissionsPage } from "../src/features/exhibitions/MyExhibitionSubmissionsPage";
+import { MyExhibitionSubmissionsPage, ReviewExhibitionSubmissionsPage } from "../src/features/exhibitions/MyExhibitionSubmissionsPage";
 import { ExhibitionCard } from "../src/features/exhibitions/ExhibitionCard";
+import { ExhibitionNavbar } from "../src/features/exhibitions/ExhibitionNavbar";
+import { getWork } from "../src/features/works/worksApi";
 import * as api from "../src/features/exhibitions/exhibitionApi";
 import { translations, type TranslationKey } from "../src/i18n/resources";
 
@@ -32,6 +34,7 @@ vi.mock("../src/features/navigation/AppSidebar", () => ({
   AppSidebar: () => null,
 }));
 vi.mock("../src/features/works/worksApi", () => ({
+  getWork: vi.fn(), setWorkLike: vi.fn(), setWorkSave: vi.fn(),
   getMyWorks: vi.fn().mockResolvedValue({
     items: [{ work_id: "mine", title: "My painting" }],
     next_cursor: null,
@@ -45,6 +48,7 @@ vi.mock("../src/features/exhibitions/exhibitionApi", () => ({
   getSubmissions: vi.fn(),
   submitWork: vi.fn(),
   reviewSubmission: vi.fn(),
+  withdrawSubmission: vi.fn(), reviewWithdrawal: vi.fn(),
   blockParticipant: vi.fn(),
   unblockParticipant: vi.fn(),
   getBlocks: vi.fn(),
@@ -70,6 +74,7 @@ function view(path = "/en/exhibition/event") {
           path="/:language/exhibition/:exhibitionId?"
           element={<ExhibitionsPage />}
         />
+        <Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/>
       </Routes>
     </MemoryRouter>,
   );
@@ -77,6 +82,9 @@ function view(path = "/en/exhibition/event") {
 beforeEach(() => {
   vi.clearAllMocks();
   state.role = "user";
+  vi.mocked(getWork).mockResolvedValue({ work_id: "work", title: "Painting", owner_user_id: "me", artist_name: "Me", description: "Artwork detail", image_url: "/art.jpg", mime_type: "image/jpeg", links: [], created_at: "2026-10-18T12:00:00Z", like_count: 0, liked_by_me: false, saved_by_me: false, type_id: "art", type_name_en: "Art", type_name_ar: "Art" });
+  vi.mocked(api.withdrawSubmission).mockResolvedValue(undefined);
+  vi.mocked(api.reviewWithdrawal).mockResolvedValue(undefined);
   vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
   vi.mocked(api.getEligibleExhibitions).mockResolvedValue({ items: [exhibition], next_cursor: null });
   vi.mocked(api.getExhibition).mockResolvedValue(exhibition);
@@ -93,6 +101,65 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.restoreAllMocks());
+it("keeps the fixed navbar aligned with its container and reserves wrapped height on resize", () => {
+  let width = 1000, height = 68;
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function(this: HTMLElement) {
+    return { left: 180, width, height: this.classList.contains("exhibition-toolbar") ? height : 76 } as DOMRect;
+  });
+  const { container } = render(<ExhibitionNavbar label="Actions"><button>Action</button></ExhibitionNavbar>);
+  const nav = screen.getByRole("navigation", { name: "Actions" });
+  expect(nav.style.left).toBe("180px");
+  expect(nav.style.width).toBe("1000px");
+  expect((container.querySelector(".exhibition-toolbar-slot") as HTMLElement).style.height).toBe("68px");
+  width = 600; height = 120;
+  fireEvent.resize(window);
+  expect(nav.style.width).toBe("600px");
+  expect((container.querySelector(".exhibition-toolbar-slot") as HTMLElement).style.height).toBe("120px");
+});
+it("shows nothing below the exhibition card before its scheduled start", async () => {
+  const { container } = view();
+  await screen.findByText("Spring collection");
+  expect(container.querySelector(".exhibition-public-works")).toBeNull();
+  expect(screen.queryByText("No works in this section yet.")).toBeNull();
+  expect(api.getSubmissions).not.toHaveBeenCalled();
+});
+function personalView() {
+  return render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
+}
+const record = { submission_id: "entry", work_id: "work", user_id: "me", artist_name: "Me", title: "Painting", image_url: "/art.jpg", status: "pending", rejection_reason: null, created_at: "2026-10-18T12:00:00Z" };
+it("deletes a pending membership only after confirmation", async () => {
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [record], next_cursor: null });
+  personalView();
+  fireEvent.click(await screen.findByRole("button", { name: "Delete submission" }));
+  fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+  await waitFor(() => expect(api.withdrawSubmission).toHaveBeenCalledWith("event", "entry", undefined));
+});
+it("requires a reason to request deletion of approved membership", async () => {
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ ...record, status: "approved" }], next_cursor: null });
+  personalView();
+  fireEvent.click(await screen.findByRole("button", { name: "Request deletion" }));
+  expect((screen.getByRole("button", { name: "Confirm" }) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.change(screen.getByRole("textbox", { name: "Reason (required)" }), { target: { value: "I want to replace this work" } });
+  fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+  await waitFor(() => expect(api.withdrawSubmission).toHaveBeenCalledWith("event", "entry", "I want to replace this work"));
+});
+it("opens the full artwork card and displays the rejection reason", async () => {
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ ...record, status: "rejected", rejection_reason: "Does not match the theme" }], next_cursor: null });
+  personalView();
+  fireEvent.click(await screen.findByRole("button", { name: `${translations.en["works.viewDetails"]}: Painting` }));
+  const modal = await screen.findByRole("dialog", { name: "Painting" });
+  expect(within(modal).getByText("Does not match the theme")).toBeTruthy();
+  expect(within(modal).getByText("Artwork detail")).toBeTruthy();
+});
+it("lets managers approve a pending deletion request from the record list", async () => {
+  state.role = "supervisor";
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ ...record, status: "approved", withdrawal_status: "pending", withdrawal_reason: "Replace this work" }], next_cursor: null });
+  render(<MemoryRouter initialEntries={["/en/exhibition/event/review"]}><Routes><Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button", { name: "Approve deletion" }));
+  expect(screen.getByText("Replace this work")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+  await waitFor(() => expect(api.reviewWithdrawal).toHaveBeenCalledWith("event", "entry", "approved", undefined));
+});
 it("uses an accessible arrow back control and one main exhibition title inside the card", async () => {
   const { container } = view();
   const title = await screen.findByRole("heading", { level: 1, name: "Student exhibition" });
@@ -125,18 +192,20 @@ it("does not allow blocked or full exhibitions to offer an upload link", async (
   expect(screen.queryByRole("link", { name: "Participate" })).toBeNull();
   expect((screen.getByRole("button", { name: "Participate" }) as HTMLButtonElement).disabled).toBe(true);
 });
-it("loads approved and pending personal sections with independent status cursors", async () => {
+it("filters one personal record list with server-side status pagination", async () => {
   vi.mocked(api.getSubmissions).mockImplementation(async (_id, _scope, cursor = 0, status) => ({
     items: status === "pending" ? [{ submission_id: "pending", work_id: "work", user_id: "me", artist_name: "Me", title: "Pending painting", image_url: "/art.jpg", status: "pending", rejection_reason: null, created_at: "2026-10-18T12:00:00Z" }] : [],
     next_cursor: status === "pending" && cursor === 0 ? 20 : null,
   }));
   render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
-  const pending = await screen.findByRole("region", { name: "Pending works" });
+  await screen.findByRole("combobox", { name: "Status" });
+  fireEvent.change(screen.getByRole("combobox", { name: "Status" }), { target: { value: "pending" } });
+  const pending = await screen.findByRole("region", { name: "My submissions" });
   const back = screen.getByRole("link", { name: "Back to exhibition" });
   expect(back.getAttribute("href")).toBe("/en/exhibition/event");
   expect(back.textContent).toBe("");
   await within(pending).findByText("Pending painting");
-  expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "approved");
+  expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, undefined);
   expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 0, "pending");
   fireEvent.click(within(pending).getByRole("button", { name: "Load more" }));
   await waitFor(() => expect(api.getSubmissions).toHaveBeenCalledWith("event", "mine", 20, "pending"));
@@ -248,7 +317,7 @@ it("gives supervisors controls for an exhibition created by someone else", async
     await screen.findByRole("button", { name: "Edit exhibition" }),
   ).toBeTruthy();
   expect(
-    screen.getByRole("button", { name: "Review submissions" }),
+    screen.getByRole("link", { name: "Review submissions" }),
   ).toBeTruthy();
 });
 it("hides manager controls from students", async () => {
@@ -256,7 +325,7 @@ it("hides manager controls from students", async () => {
   await screen.findByText("Spring collection");
   expect(screen.queryByRole("button", { name: "Edit exhibition" })).toBeNull();
   expect(
-    screen.queryByRole("button", { name: "Review submissions" }),
+    screen.queryByRole("link", { name: "Review submissions" }),
   ).toBeNull();
 });
 it("prevents participation when the window is closed", async () => {
@@ -295,7 +364,7 @@ it("requires a reason in the supervisor rejection dialog and sends the decision"
   vi.mocked(api.reviewSubmission).mockResolvedValue(undefined);
   view();
   fireEvent.click(
-    await screen.findByRole("button", { name: "Review submissions" }),
+    await screen.findByRole("link", { name: "Review submissions" }),
   );
   fireEvent.click(await screen.findByRole("button", { name: "Reject" }));
   expect(

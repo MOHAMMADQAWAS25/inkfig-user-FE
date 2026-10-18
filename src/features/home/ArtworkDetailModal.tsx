@@ -1,5 +1,6 @@
 import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import type { Language, TranslationKey } from "../../i18n/resources";
@@ -22,10 +23,11 @@ type ArtworkDetailModalProps = {
   onModerateDelete?: (work: Work, reason: string) => Promise<void>;
   onEditOwnWork?: (work: Work) => void;
   onDeleteOwnWork?: (work: Work) => void;
+  extraDetails?: ReactNode;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -97,6 +99,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
+          {extraDetails}
           <div className="artwork-modal-meta">
             <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>
             <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>

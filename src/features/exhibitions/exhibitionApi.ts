@@ -23,6 +23,9 @@ export type Submission = {
   image_url: string;
   status: string;
   rejection_reason: string | null;
+  withdrawal_status?: "pending" | "rejected" | null;
+  withdrawal_reason?: string | null;
+  withdrawal_review_reason?: string | null;
   created_at: string;
 };
 export type Block = { user_id: string; full_name: string; reason: string };
@@ -73,6 +76,12 @@ export async function submitWork(id: string, workId: string) {
   await requestJson(mainApiBaseUrl, "POST", `/exhibitions/${id}/submissions`, {
     body: { work_id: workId },
   });
+}
+export async function withdrawSubmission(id: string, submissionId: string, reason?: string) {
+  await requestJson(mainApiBaseUrl, "POST", `/exhibitions/${id}/submissions/${submissionId}/withdrawal`, { body: { reason } });
+}
+export async function reviewWithdrawal(id: string, submissionId: string, status: "approved" | "rejected", reason?: string) {
+  await requestJson(mainApiBaseUrl, "PATCH", `/exhibitions/${id}/submissions/${submissionId}/withdrawal`, { body: { status, reason } });
 }
 export async function reviewSubmission(
   id: string,
