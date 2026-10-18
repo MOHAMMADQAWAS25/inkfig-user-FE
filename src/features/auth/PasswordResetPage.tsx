@@ -14,14 +14,17 @@ import {
   verifyPasswordResetCode,
 } from "./passwordResetApi";
 import { PasswordField } from "./PasswordField";
+import { ResetDestinationFields } from "./ResetDestinationFields";
+import type { ResetDestination } from "./passwordResetApi";
 
-type Stage = "email" | "code" | "password" | "complete";
+type Stage = "email" | "destination" | "code" | "password" | "complete";
 
 export function PasswordResetPage() {
   const { session } = useAuth();
   const { language, t } = useI18n();
   const [stage, setStage] = useState<Stage>("email");
   const [email, setEmail] = useState("");
+  const [destination, setDestination] = useState<ResetDestination>();
   const [code, setCode] = useState("");
   const [resetToken, setResetToken] = useState("");
   const [password, setPassword] = useState("");
@@ -44,10 +47,15 @@ export function PasswordResetPage() {
 
   async function submitEmail(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setDestination(undefined);
     setError("");
     setIsSubmitting(true);
     try {
       const response = await requestPasswordReset(email.trim().toLowerCase());
+      if (response.destination_required) {
+        setStage("destination");
+        return;
+      }
       setCooldown(response.resend_after_seconds);
       setHourlyLimitReached(response.hourly_limit_reached);
       setStage("code");
@@ -62,10 +70,16 @@ export function PasswordResetPage() {
     setError("");
     setIsSubmitting(true);
     try {
-      const response = await requestPasswordReset(email.trim().toLowerCase());
+      const response = await requestPasswordReset(email.trim().toLowerCase(), destination);
+      if (response.destination_required) {
+        setDestination(undefined);
+        setStage("destination");
+        return;
+      }
       setCooldown(response.resend_after_seconds);
       setHourlyLimitReached(response.hourly_limit_reached);
       setCode("");
+      setStage("code");
     } catch (requestError) {
       setError(requestError instanceof ApiError && requestError.status === 423 ? t("auth.adminSuspended") : t("auth.resetRequestFailed"));
     } finally {
@@ -126,6 +140,12 @@ export function PasswordResetPage() {
             <label><span>{t("auth.email")}</span><input required autoComplete="email" dir="ltr" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label>
             {error && <p className="form-message error-message" role="alert">{error}</p>}
             <button className="primary-button" disabled={isSubmitting} type="submit">{isSubmitting ? t("auth.sendingResetCode") : t("auth.sendResetCode")}</button>
+          </form>
+        ) : stage === "destination" ? (
+          <form className="form-stack" onSubmit={event => { event.preventDefault(); if (destination) void resendCode(); }}>
+            <ResetDestinationFields value={destination} onChange={setDestination} disabled={isSubmitting} />
+            {error && <p className="form-message error-message" role="alert">{error}</p>}
+            <button className="primary-button" disabled={isSubmitting || !destination} type="submit">{isSubmitting ? t("auth.sendingResetCode") : t("auth.sendResetCode")}</button>
           </form>
         ) : stage === "code" ? (
           <form className="form-stack" onSubmit={submitCode}>

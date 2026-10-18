@@ -1,6 +1,7 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
 interface PasswordResetRequestResponse {
+  destination_required?: boolean;
   message: string;
   expires_in_seconds: number;
   resend_after_seconds: number;
@@ -12,12 +13,14 @@ interface PasswordResetVerifyResponse {
   expires_in_seconds: number;
 }
 
-export async function requestPasswordReset(email: string): Promise<PasswordResetRequestResponse> {
+export type ResetDestination = "primary" | "backup";
+
+export async function requestPasswordReset(email: string, destination?: ResetDestination): Promise<PasswordResetRequestResponse> {
   const response = await requestJson<PasswordResetRequestResponse>(
     userApiBaseUrl,
     "POST",
     "/auth/password-reset/request",
-    { body: { email } },
+    { body: { email, ...(destination ? { destination } : {}) } },
   );
   return response.data;
 }

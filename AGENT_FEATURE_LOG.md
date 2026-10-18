@@ -9492,3 +9492,33 @@ Frontend-only existing Cloudflare main workflow; no backend deployment, migratio
 ### Git
 
 Branch: feature/upload-form-polish. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Exact commit, push, conflicts and deployment outcome reported in handoff. Prior feature-log entries preserved.
+
+## 2026-10-18 - Backup email Security settings and reset destination choice
+
+### Request and changes
+
+Added Security / الأمان to Settings with optional Backup email / البريد الإلكتروني الاحتياطي. Matching Gmail fields plus current-password proof support save/change/removal without mailbox verification. A warning icon/reminder persists while the saved address is empty, disappears only after successful save and returns immediately after removal. Loading does not flash a missing-email warning. Clear unverified-address/no-login notices, normalized validation, error/success states and explicit removal confirmation included.
+
+### Repositories and files
+
+inkfig-user-FE: new BackupEmailSettings and ResetDestinationFields, SettingsPage/settingsApi, PasswordResetPage/passwordResetApi, Arabic/English resources, scoped styles, backup-email component tests and this log. Matching user-system branch owns private persistence and authoritative security; main-system unchanged.
+
+### API, database, permissions and scope
+
+GET /settings/profile consumes optional backup_email; PUT /settings/backup-email sends matching fields and current_password. Existing password-reset request accepts primary/backup destination and returns destination_required. Both public and Settings forgot-password flows wait for explicit unselected radio choice when required, then send once; resends retain that choice and reopening clears it. No backup retains automatic university delivery. No private recipient address is exposed in public recovery UI. University login, signup verification, existing limits, suspension rules, masonry and unrelated styling remain unchanged. No new permissions, secrets, dependencies or SnapStart changes.
+
+### Verification
+
+234 tests passed (76 source/layout, 158 component); strict TypeScript/Vite production build and git diff --check passed. New tests cover choice/no-preselection, no-backup behavior, selected-destination resends, fresh Settings choices, matching Gmail entries/no-verification stage, loading warning suppression and save/removal warning updates, plus Arabic labels. Initial test fixtures lacked ThemeProvider and used incorrect translated labels; corrected fixtures and full rerun passed. Backend 109 tests and mypy on 120 files passed. Existing non-blocking bundle-size warning and jsdom notices remain. Live browser/email delivery not exercised.
+
+### Deployment
+
+Apply user-system migration 20261018_021_add_backup_email.sql and deploy user-system first, then deploy this frontend through existing Cloudflare workflow. No frontend environment changes. Production outcomes reported separately.
+
+### Git
+
+Branch: feature/backup-email in both repositories. Focused commits, fetch/rebase before branch push and authorized fast-forward main merge/push; exact hashes/conflicts/push outcomes in handoff. Previous entries preserved.
+
+### Post-synchronization verification
+
+Rebased over concurrent upload-form polish e53aa4f. Only the append-only feature log conflicted; preserved the complete incoming entry followed by this ticket, without dropping either agent's work. Resources and scoped styles merged automatically. Full combined verification passed: 242 tests (78 source/layout, 164 component) and strict TypeScript/Vite build. Backend remains 109 passing tests with clean mypy. Branch/main push results reported in handoff.

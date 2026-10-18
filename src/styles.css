@@ -2117,6 +2117,12 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibition-detail-card .exhibition-summary dt { font-size:.78rem; opacity:.75; }
 .exhibition-detail-card .exhibition-summary dd { font-size:.88rem; margin-block:6px 0; overflow-wrap:anywhere; }
 @media(max-width:720px) { .exhibition-detail-card .exhibition-summary dl { grid-template-columns:minmax(0,1fr); } }
+.backup-warning { display:flex; align-items:flex-start; gap:8px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--text); }
+.backup-warning svg, .backup-warning-icon { flex-shrink:0; color:var(--primary); }
+.reset-destinations { display:grid; gap:12px; min-width:0; margin:0; padding:16px; border:1px solid var(--border); border-radius:10px; }
+.reset-destinations legend { padding-inline:5px; color:var(--text); font-weight:650; }
+.reset-destinations label { display:flex !important; align-items:center; gap:10px; margin:0 !important; cursor:pointer; }
+.reset-destinations input[type="radio"] { flex:0 0 18px; width:18px !important; height:18px; min-height:0 !important; margin:0; padding:0; accent-color:var(--primary); }
 .exhibition-blocks>div { border-bottom:1px solid #b6bd9e; padding:16px 0; }
 .exhibition-action-dialog { width:min(92vw,520px); padding:28px; border-radius:20px; background:#fffdf2; color:#39431c; }
 :root[data-theme=dark] .exhibition-card,:root[data-theme=dark] .exhibition-summary,:root[data-theme=dark] .exhibition-participation,:root[data-theme=dark] .exhibition-editor,:root[data-theme=dark] .exhibition-blocks,:root[data-theme=dark] .exhibition-action-dialog { background:#171e12; color:#f7f2d8; border-color:#39452b; }
