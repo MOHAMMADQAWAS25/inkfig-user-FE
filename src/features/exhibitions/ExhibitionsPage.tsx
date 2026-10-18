@@ -15,7 +15,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
-import { ExhibitionCountdown } from "./ExhibitionCountdown";
+import { ExhibitionCard } from "./ExhibitionCard";
 import { getMyWorks } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import {
@@ -55,6 +55,8 @@ export function ExhibitionsPage() {
   const [items, setItems] = useState<Exhibition[]>([]);
   const [selected, setSelected] = useState<Exhibition | null>(null);
   const [cursor, setCursor] = useState<number | null>(null);
+  const [pastCursor, setPastCursor] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [subCursor, setSubCursor] = useState<number | null>(null);
   const [scope, setScope] = useState("public");
@@ -92,6 +94,35 @@ export function ExhibitionsPage() {
   function failure(cause: unknown) {
     setError(cause instanceof Error ? cause.message : t("exhibitions.failed"));
   }
+  async function loadSections() {
+    const [upcoming, past] = await Promise.all([
+      listExhibitions(0, "upcoming"),
+      listExhibitions(0, "past"),
+    ]);
+    return {
+      items: [
+        ...new Map(
+          [...upcoming.items, ...past.items].map((item) => [
+            item.exhibition_id,
+            item,
+          ]),
+        ).values(),
+      ],
+      upcomingCursor: upcoming.next_cursor,
+      pastCursor: past.next_cursor,
+    };
+  }
+  useEffect(() => {
+    if (exhibitionId) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [exhibitionId]);
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -102,10 +133,11 @@ export function ExhibitionsPage() {
       ? getExhibition(exhibitionId).then((value) => {
           if (active) setSelected(value);
         })
-      : listExhibitions().then((page) => {
+      : loadSections().then((page) => {
           if (active) {
             setItems(page.items);
-            setCursor(page.next_cursor);
+            setCursor(page.upcomingCursor);
+            setPastCursor(page.pastCursor);
           }
         });
     request
@@ -221,9 +253,10 @@ export function ExhibitionsPage() {
       setNotice(t("exhibitions.saved"));
       if (exhibitionId) await refresh();
       else {
-        const page = await listExhibitions();
+        const page = await loadSections();
         setItems(page.items);
-        setCursor(page.next_cursor);
+        setCursor(page.upcomingCursor);
+        setPastCursor(page.pastCursor);
       }
     });
   }
@@ -305,57 +338,86 @@ export function ExhibitionsPage() {
         ) : !selected && !exhibitionId ? (
           <>
             <p>{t("exhibitions.intro")}</p>
-            <div className="exhibitions-grid">
-              {items.map((item) => (
-                <Link
-                  className="exhibition-card"
-                  to={`/${language}/exhibition/${item.exhibition_id}`}
-                  key={item.exhibition_id}
+            {(["upcoming", "past"] as const).map((period) => {
+              const past = period === "past";
+              const entries = items
+                .filter(
+                  (item) => new Date(item.event_at).getTime() <= now === past,
+                )
+                .sort((a, b) =>
+                  past
+                    ? Date.parse(b.event_at) - Date.parse(a.event_at)
+                    : Date.parse(a.event_at) - Date.parse(b.event_at),
+                );
+              const next = past ? pastCursor : cursor;
+              return (
+                <section
+                  className="exhibition-period-section"
+                  key={period}
+                  aria-labelledby={`exhibition-${period}-title`}
                 >
-                  {item.banner_url ? (
-                    <img src={item.banner_url} alt="" loading="lazy" />
-                  ) : (
-                    <div className="exhibition-banner-fallback">
-                      <Trophy size={44} />
-                    </div>
-                  )}
-                  <div>
-                    <span
-                      className={`exhibition-status ${item.participation_open ? "open" : ""}`}
-                    >
-                      {t(
-                        item.participation_open
-                          ? "exhibitions.open"
-                          : "exhibitions.closed",
-                      )}
+                  <header className="exhibition-period-heading">
+                    <span>
+                      <CalendarDays size={20} aria-hidden="true" />
+                      <h2 id={`exhibition-${period}-title`}>
+                        {t(past ? "exhibitions.past" : "exhibitions.upcoming")}
+                      </h2>
                     </span>
-                    <h2>{item.name}</h2>
-                    <p>{item.description}</p>
-                    <small>
-                      <CalendarDays size={16} />
-                      {date(item.event_at)}
-                    </small>
-                    <ExhibitionCountdown eventAt={item.event_at} />
+                    <p>
+                      {t(
+                        past
+                          ? "exhibitions.pastHint"
+                          : "exhibitions.upcomingHint",
+                      )}
+                    </p>
+                  </header>
+                  <div className="exhibitions-grid">
+                    {entries.map((item) => (
+                      <ExhibitionCard
+                        key={item.exhibition_id}
+                        exhibition={item}
+                        past={past}
+                      />
+                    ))}
                   </div>
-                </Link>
-              ))}
-            </div>
-            {!items.length && <p>{t("exhibitions.empty")}</p>}
-            {cursor !== null && (
-              <button
-                disabled={busy}
-                className="pagination-load-more"
-                onClick={() =>
-                  void run(async () => {
-                    const page = await listExhibitions(cursor);
-                    setItems((current) => [...current, ...page.items]);
-                    setCursor(page.next_cursor);
-                  })
-                }
-              >
-                {t("exhibitions.more")}
-              </button>
-            )}
+                  {!entries.length && (
+                    <p className="exhibition-section-empty">
+                      {t(
+                        past ? "exhibitions.noPast" : "exhibitions.noUpcoming",
+                      )}
+                    </p>
+                  )}
+                  {next !== null && (
+                    <button
+                      disabled={busy}
+                      className="pagination-load-more"
+                      aria-label={t(
+                        past
+                          ? "exhibitions.morePast"
+                          : "exhibitions.moreUpcoming",
+                      )}
+                      onClick={() =>
+                        void run(async () => {
+                          const page = await listExhibitions(next, period);
+                          setItems((current) => [
+                            ...new Map(
+                              [...current, ...page.items].map((item) => [
+                                item.exhibition_id,
+                                item,
+                              ]),
+                            ).values(),
+                          ]);
+                          if (past) setPastCursor(page.next_cursor);
+                          else setCursor(page.next_cursor);
+                        })
+                      }
+                    >
+                      {t("exhibitions.more")}
+                    </button>
+                  )}
+                </section>
+              );
+            })}
           </>
         ) : (
           selected && (

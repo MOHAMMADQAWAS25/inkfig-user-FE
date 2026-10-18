@@ -4,6 +4,7 @@ import {
   fireEvent,
   render,
   screen,
+  within,
   waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -28,12 +29,10 @@ vi.mock("../src/features/navigation/AppSidebar", () => ({
   AppSidebar: () => null,
 }));
 vi.mock("../src/features/works/worksApi", () => ({
-  getMyWorks: vi
-    .fn()
-    .mockResolvedValue({
-      items: [{ work_id: "mine", title: "My painting" }],
-      next_cursor: null,
-    }),
+  getMyWorks: vi.fn().mockResolvedValue({
+    items: [{ work_id: "mine", title: "My painting" }],
+    next_cursor: null,
+  }),
 }));
 vi.mock("../src/features/exhibitions/exhibitionApi", () => ({
   listExhibitions: vi.fn(),
@@ -87,6 +86,53 @@ beforeEach(() => {
   vi.mocked(api.submitWork).mockResolvedValue(undefined);
 });
 afterEach(cleanup);
+afterEach(() => vi.restoreAllMocks());
+it("separates upcoming and past exhibitions with independent pagination", async () => {
+  vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-10-18T12:00:00Z"));
+  const previous = {
+    ...exhibition,
+    exhibition_id: "past",
+    name: "Previous collection",
+    event_at: "2026-09-01T12:00:00Z",
+    participation_open: false,
+  };
+  vi.mocked(api.listExhibitions).mockImplementation(
+    async (cursor = 0, period = "all") => ({
+      items:
+        period === "past" ? (cursor === 0 ? [previous] : []) : [exhibition],
+      next_cursor: period === "past" && cursor === 0 ? 20 : null,
+    }),
+  );
+  view("/en/exhibition");
+  const upcoming = await screen.findByRole("region", {
+    name: "Upcoming Exhibitions",
+  });
+  const past = screen.getByRole("region", { name: "Past Exhibitions" });
+  expect(
+    within(upcoming).getByRole("heading", { name: "Student exhibition" }),
+  ).toBeTruthy();
+  expect(within(upcoming).queryByText("Previous collection")).toBeNull();
+  expect(
+    within(past).getByRole("heading", { name: "Previous collection" }),
+  ).toBeTruthy();
+  expect(within(past).queryByRole("timer")).toBeNull();
+  expect(within(upcoming).getByRole("timer")).toBeTruthy();
+  fireEvent.click(
+    screen.getByRole("button", { name: "Load more past exhibitions" }),
+  );
+  await waitFor(() =>
+    expect(api.listExhibitions).toHaveBeenCalledWith(20, "past"),
+  );
+});
+it("shows both empty sections when no exhibitions are available", async () => {
+  vi.mocked(api.listExhibitions).mockResolvedValue({
+    items: [],
+    next_cursor: null,
+  });
+  view("/en/exhibition");
+  expect(await screen.findByText("No upcoming exhibitions yet.")).toBeTruthy();
+  expect(screen.getByText("No past exhibitions yet.")).toBeTruthy();
+});
 it("submits an owned selected work and shows pending confirmation", async () => {
   view();
   await screen.findByText("My painting");

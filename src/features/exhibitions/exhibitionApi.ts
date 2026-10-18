@@ -27,12 +27,15 @@ export type Submission = {
 };
 export type Block = { user_id: string; full_name: string; reason: string };
 export type Page<T> = { items: T[]; next_cursor: number | null };
-export async function listExhibitions(cursor = 0) {
+export async function listExhibitions(
+  cursor = 0,
+  period: "all" | "upcoming" | "past" = "all",
+) {
   return (
     await requestJson<Page<Exhibition>>(
       mainApiBaseUrl,
       "GET",
-      `/exhibitions?cursor=${cursor}`,
+      `/exhibitions?cursor=${cursor}&period=${period}`,
     )
   ).data;
 }
