@@ -9,6 +9,7 @@ import { ThemeToggle } from "../../theme/ThemeToggle";
 import { getPublicProfile } from "../profile/profileApi";
 import { useDismissOnly } from "../layout/useDismissOnly";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
+import inkfigLogo from "../../assets/inkfig-logo.svg";
 
 interface Props {
   unreadCount: number;
@@ -82,6 +83,12 @@ export function MobileNavigation({ unreadCount, notificationsOpen, onNotificatio
   const menu = <button ref={menuButton} className="mobile-tool" type="button" aria-label={menuLabel} aria-expanded={drawer && !closing} aria-controls="mobile-menu" onClick={() => { if (drawer) close(); else setDrawer(true); }}><Menu aria-hidden="true" /></button>;
   const notifications = <button className="mobile-tool app-sidebar-panel-button" type="button" aria-label={t("nav.notifications")} aria-controls="notifications-panel" aria-expanded={notificationsOpen} onClick={onNotifications}><Bell aria-hidden="true" />{unreadCount > 0 && <span className="notification-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>}</button>;
   function go(path: string) { close(() => navigate(`/${language}/${path}`)); }
+  function handlePreferences(event: MouseEvent<HTMLElement>) {
+    if ((event.target as Element).closest(".language-toggle")) {
+      event.preventDefault(); event.stopPropagation();
+      close(() => setLanguage(language === "ar" ? "en" : "ar"));
+    }
+  }
   return <>
     {slots && <>{createPortal(menu, slots.menu)}{createPortal(notifications, slots.notifications)}</>}
     <nav className="mobile-bottom-nav" dir={language === "ar" ? "rtl" : "ltr"} aria-label={t("nav.primary")} onClickCapture={onNavigateCapture}>
@@ -92,22 +99,17 @@ export function MobileNavigation({ unreadCount, notificationsOpen, onNotificatio
     {drawer && createPortal(<div className={`mobile-drawer-layer${closing ? " is-closing" : ""}`}>
       <button className="mobile-drawer-backdrop" type="button" aria-label={closeLabel} onClick={() => close()} tabIndex={-1} />
       <section ref={dialog} className="mobile-drawer" id="mobile-menu" role="dialog" aria-modal="true" aria-label={menuLabel} dir={language === "ar" ? "rtl" : "ltr"}>
-        <button className="mobile-drawer-close" type="button" aria-label={closeLabel} onClick={() => close()}><X aria-hidden="true" /></button>
-        <div className="mobile-drawer-grid" onClickCapture={event => {
-          if ((event.target as Element).closest(".language-toggle")) {
-            event.preventDefault(); event.stopPropagation();
-            close(() => setLanguage(language === "ar" ? "en" : "ar"));
-          }
-        }}>
+        <header className="mobile-drawer-header" dir="ltr"><img src={inkfigLogo} alt={t("app.name")}/><button className="mobile-drawer-close" type="button" aria-label={closeLabel} onClick={() => close()}><X aria-hidden="true" /></button></header>
+        <div className="mobile-drawer-grid">
           <button type="button" aria-label={t("nav.exhibition")} onClick={() => go("exhibition")}><Trophy aria-hidden="true" /><span>{t("nav.exhibition")}</span></button>
           <button type="button" aria-label={t("accounts.findUsers")} onClick={() => close(onAccounts)}><span className="mobile-find-users-icon" aria-hidden="true"/><span>{t("accounts.findUsers")}</span></button>
           <button type="button" aria-label={t("nav.saved")} onClick={() => go("profile?section=saved")}><Bookmark aria-hidden="true" /><span>{t("nav.saved")}</span></button>
           {administration && <button type="button" aria-label={t("nav.administration")} onClick={() => go("admin/users")}><ShieldCheck aria-hidden="true" /><span>{t("nav.administration")}</span></button>}
           {reports && <button type="button" aria-label={t("nav.reports")} onClick={() => go("admin/reports")}><Flag aria-hidden="true" /><span>{t("nav.reports")}</span></button>}
-          <ThemeToggle showLabel/><LanguageToggle showLabel/>
           <button type="button" aria-label={t("nav.settings")} onClick={() => go("settings")}><Settings aria-hidden="true" /><span>{t("nav.settings")}</span></button>
           {session && <button type="button" aria-label={t("nav.logout")} onClick={() => close(signOut)}><LogOut aria-hidden="true" /><span>{t("nav.logout")}</span></button>}
         </div>
+        <div className="mobile-drawer-preferences" dir="ltr" onClickCapture={handlePreferences}><ThemeToggle/><LanguageToggle/></div>
       </section>
     </div>, document.body)}
   </>;

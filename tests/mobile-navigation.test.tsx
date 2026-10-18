@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MobileNavigation } from "../src/features/navigation/MobileNavigation";
 import { useProfileSwipe } from "../src/features/profile/useProfileSwipe";
 import { useScrollHeader } from "../src/features/home/useScrollHeader";
+import { ProfilePager } from "../src/features/profile/ProfilePager";
 import { translations } from "../src/i18n/resources";
 
 const state = vi.hoisted(() => ({ language: "en", signOut: vi.fn(), setLanguage: vi.fn() }));
@@ -59,7 +60,41 @@ it("shows labeled drawer rows, restores Find users, and puts Settings before fin
   expect(rows.slice(-2).map(row => row.textContent)).toEqual(["Settings", "Log out"]);
   const find = screen.getByRole("button", {name:"Find users"});
   expect(find.textContent).toBe("Find users"); expect(find.querySelector(".mobile-find-users-icon")).toBeTruthy();
+  const header=document.querySelector(".mobile-drawer-header")!;
+  expect(header.querySelector("img")?.getAttribute("src")).toContain("inkfig-logo");
+  expect(header.querySelector(".mobile-drawer-close")).toBeTruthy();
+  const preferences=document.querySelector(".mobile-drawer-preferences")!;
+  expect(preferences.querySelectorAll("button")).toHaveLength(2);
+  expect(preferences.textContent).toBe("");
   expect(document.body.style.position).toBe("fixed"); expect(document.documentElement.style.overflow).toBe("hidden");
+});
+it("moves profile content with the finger, settles on the next page and keeps inactive pages inert",()=>{
+  function Pager(){const [section,select]=React.useState<"posts"|"saved"|"likes">("posts");return <ProfilePager section={section} select={select} enabled>{page=><p>{page}</p>}</ProfilePager>;}
+  const {container}=render(<Pager/>);
+  const area=container.querySelector<HTMLElement>(".profile-swipe-area")!;
+  fireEvent.touchStart(area,{touches:[{clientX:220,clientY:100}]});
+  fireEvent.touchMove(area,{touches:[{clientX:100,clientY:102}]});
+  expect(area.style.getPropertyValue("--profile-drag")).toBe("-120px");
+  expect(area.getAttribute("data-dragging")).toBe("true");
+  expect(container.querySelector('.profile-swipe-slide[data-active="true"]')?.textContent).toBe("posts");
+  fireEvent.touchEnd(area,{touches:[],changedTouches:[{clientX:100,clientY:102}]});
+  expect(area.style.getPropertyValue("--profile-index")).toBe("1");
+  expect(area.getAttribute("data-dragging")).toBeNull();
+  expect(container.querySelector('.profile-swipe-slide[data-active="true"]')?.textContent).toBe("saved");
+  expect(container.querySelectorAll('.profile-swipe-slide[inert]')).toHaveLength(2);
+});
+it("cancels short profile drags and leaves the next deliberate tap usable after scrolling",()=>{
+  const click=vi.fn();
+  function Pager(){const [section,select]=React.useState<"posts"|"saved"|"likes">("posts");return <ProfilePager section={section} select={select} enabled>{page=><button className="artwork-image-button" onClick={click}>{page}</button>}</ProfilePager>;}
+  const {container}=render(<Pager/>); const area=container.querySelector<HTMLElement>(".profile-swipe-area")!;
+  fireEvent.touchStart(area,{touches:[{clientX:220,clientY:100}]});fireEvent.touchMove(area,{touches:[{clientX:200,clientY:100}]});
+  fireEvent.touchEnd(area,{touches:[],changedTouches:[{clientX:200,clientY:100}]});
+  expect(area.style.getPropertyValue("--profile-index")).toBe("0");
+  fireEvent.touchStart(area,{touches:[{clientX:200,clientY:100}]});fireEvent.touchMove(area,{touches:[{clientX:198,clientY:220}]});
+  fireEvent.touchEnd(area,{touches:[],changedTouches:[{clientX:198,clientY:220}]});
+  const button=screen.getByRole("button",{name:"posts"});
+  fireEvent.touchStart(button,{touches:[{clientX:190,clientY:120}]});fireEvent.touchEnd(button,{touches:[],changedTouches:[{clientX:190,clientY:120}]});fireEvent.click(button);
+  expect(click).toHaveBeenCalledOnce();
 });
 it("consumes an outside gesture and restores the page scroll position after closing", () => {
   const action=vi.fn();
@@ -152,4 +187,34 @@ it("does not interpret drawer scroll restoration as a downward gesture", () => {
   expect(screen.getByTestId("progress").textContent).toBe("0");
   scroll(280); expect(screen.getByTestId("progress").textContent).toBe("0.5");
   Object.defineProperty(window,"scrollY",{configurable:true,value:0});
+});
+it.each(["notifications-panel","account-discovery-panel"])("resumes header tracking after %s closes, even with focus on a header button",id=>{
+  vi.stubGlobal("requestAnimationFrame",(callback:FrameRequestCallback)=>window.setTimeout(callback,0));
+  vi.stubGlobal("cancelAnimationFrame",window.clearTimeout);
+  function Header({open}:{open:boolean}){return <><header className="gallery-header"><button>Header control</button><output data-testid="progress">{useScrollHeader()}</output></header>{open&&<div id={id}/>}</>;}
+  const view=render(<Header open/>);
+  const scroll=(y:number)=>act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
+  scroll(200);expect(screen.getByTestId("progress").textContent).toBe("0");
+  view.rerender(<Header open={false}/>);screen.getByRole("button",{name:"Header control"}).focus();
+  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  Object.defineProperty(window,"scrollY",{configurable:true,value:0});
+});
+it.each(["resize","pageshow","keyboard resize"])("rebases header tracking after %s and responds to the next gesture",event=>{
+  vi.stubGlobal("requestAnimationFrame",(callback:FrameRequestCallback)=>window.setTimeout(callback,0));vi.stubGlobal("cancelAnimationFrame",window.clearTimeout);
+  const viewport=new EventTarget();vi.stubGlobal("visualViewport",viewport);
+  function Header(){return <output data-testid="progress">{useScrollHeader()}</output>;}
+  render(<Header/>);
+  const scroll=(y:number)=>act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
+  scroll(200);expect(screen.getByTestId("progress").textContent).toBe("1");
+  act(()=>{if(event==="keyboard resize")viewport.dispatchEvent(new Event("resize"));else window.dispatchEvent(new Event(event));});
+  expect(screen.getByTestId("progress").textContent).toBe("0");
+  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  Object.defineProperty(window,"scrollY",{configurable:true,value:0});
+});
+it("releases stale search focus when the phone keyboard closes",()=>{
+  const viewport=Object.assign(new EventTarget(),{height:400});vi.stubGlobal("visualViewport",viewport);
+  function Header(){return <header className="gallery-header"><input aria-label="Search"/><output>{useScrollHeader()}</output></header>;}
+  render(<Header/>);const input=screen.getByRole("textbox");input.focus();expect(document.activeElement).toBe(input);
+  act(()=>{viewport.height=720;viewport.dispatchEvent(new Event("resize"));});
+  expect(document.activeElement).not.toBe(input);
 });

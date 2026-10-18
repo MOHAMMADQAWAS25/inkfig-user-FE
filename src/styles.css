@@ -1543,11 +1543,12 @@ img { max-width: 100%; image-rendering: auto; }
   .gallery-filters button { min-height: 36px; padding: 6px 11px; font-size: .78rem; }
 
   .artwork-pin-media .artwork-card-type-tag, .artwork-pin-media .artwork-artist-link,
-  .artwork-pin-media .artwork-pin-like, .artwork-pin-media .artwork-pin-save,
+  .artwork-pin-media .artwork-pin-like, .artwork-pin-media .artwork-pin-save { display: none; pointer-events: none; }
   .profile-page .artwork-owner-menu { display: block; }
   .profile-page .artwork-card-manageable { padding-bottom: 0; }
   .artwork-pin-media::after { display: none; }
   .artwork-virtual-feed .artwork-pin-media:hover .feed-image { transform: none; }
+  .artwork-pin-media .artwork-image-button:hover .artwork-image, .artwork-pin-media .artwork-image-button:focus-visible .artwork-image { transform: none; }
 
   .app-sidebar, [dir="rtl"] .app-sidebar { display: grid; width: auto; grid-template-columns: repeat(7,minmax(0,1fr)); align-items: center; gap: 0; direction: ltr; background: #faf5e5; }
   :root[data-theme="dark"] .app-sidebar { background: #10140c; }
@@ -1687,7 +1688,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
   .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; transform: translateY(calc(-110% * var(--mobile-header-progress, 0))); opacity: calc(1 - var(--mobile-header-progress, 0)); transition: transform 320ms ease-out, opacity 320ms ease-out; }
   .gallery-header.mobile-header-hidden { pointer-events: none; }
   .gallery-header:has([aria-controls="notifications-panel"][aria-expanded="true"]) { z-index: 54; transform: none; opacity: 1; pointer-events: auto; }
-  .gallery-header.mobile-header-hidden:focus-within { transform: none; opacity: 1; pointer-events: auto; }
+  .gallery-header:has(.gallery-search input:focus) { transform: none; opacity: 1; pointer-events: auto; }
   .gallery-header .gallery-header-actions { display: none; }
   .mobile-header-menu, .mobile-header-notifications { display: grid; grid-row: 1; place-items: center; }
   .mobile-header-menu { grid-column: 1; }
@@ -1709,10 +1710,14 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
   .mobile-drawer { position: absolute; top: max(12px, env(safe-area-inset-top)); left: 12px; bottom: calc(88px + env(safe-area-inset-bottom)); width: min(280px, calc(100vw - 24px)); overflow-y: auto; padding: 14px; border: 1px solid rgba(255,255,255,.7); border-radius: 25px; background: rgba(250,245,225,.9); color: #39431c; box-shadow: 0 12px 50px rgba(16,20,12,.18); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); animation: mobile-drawer-arrive 240ms cubic-bezier(.2,.7,.2,1) both; }
   .mobile-drawer button { display: grid; place-items: center; width: 52px; height: 52px; border: 0; border-radius: 16px; padding: 0; background: transparent; color: inherit; cursor: pointer; }
   .mobile-drawer button:hover { background: rgba(97,125,43,.12); }
-  .mobile-drawer-close { margin-bottom: 22px; }
+  .mobile-drawer-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  .mobile-drawer-header img { width: 96px; height: 62px; object-fit: contain; }
+  .mobile-drawer-close { margin: 0; flex-shrink: 0; }
   .mobile-drawer-grid { display: flex; flex-direction: column; }
   .mobile-drawer .mobile-drawer-grid button { display: flex; justify-content: flex-start; align-items: center; gap: 14px; width: 100%; min-height: 56px; height: auto; padding: 14px 10px; border-bottom: 1px solid rgba(97,125,43,.16); border-radius: 0; text-align: start; font: inherit; font-size: .9rem; }
   .mobile-drawer .mobile-drawer-grid button:last-child { border-bottom: 0; }
+  .mobile-drawer-preferences { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 26px; }
+  .mobile-drawer .mobile-drawer-preferences button { width: 44px; height: 44px; border: 0; border-radius: 14px; background: transparent; }
   .mobile-find-users-icon { display: inline-block; flex: 0 0 24px; width: 24px; height: 24px; background: currentColor; -webkit-mask: url("./assets/user-avatar.png") center/contain no-repeat; mask: url("./assets/user-avatar.png") center/contain no-repeat; }
   .mobile-drawer { overscroll-behavior: contain; touch-action: pan-y; }
   .mobile-drawer-layer.is-closing .mobile-drawer { animation: mobile-drawer-leave 240ms ease both; pointer-events: none; }
@@ -1721,7 +1726,15 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
   [data-theme="dark"] .mobile-drawer { background: rgba(23,29,17,.9); color: #eee7bd; border-color: rgba(169,182,95,.24); box-shadow: 0 10px 35px rgba(0,0,0,.3); }
   [data-theme="dark"] .mobile-drawer .mobile-drawer-grid button { border-bottom-color: rgba(238,231,189,.14); }
   [data-theme="dark"] .mobile-bottom-nav a.active, [data-theme="dark"] .mobile-drawer button:hover { background: rgba(169,182,95,.16); }
-  .profile-swipe-area { touch-action: pan-y; min-height: 220px; }
+  .profile-swipe-area { touch-action: pan-y; min-height: 220px; overflow: hidden; overflow: clip; }
+  .profile-swipe-track { position: relative; width: 100%; transform: translate3d(calc(-100% * var(--profile-index, 0) + var(--profile-drag, 0px)),0,0); transition: transform 320ms cubic-bezier(.22,.75,.25,1); }
+  .profile-swipe-area[data-dragging] .profile-swipe-track { transition: none; }
+  .profile-swipe-slide { position: absolute; top: 0; width: 100%; min-width: 0; }
+  .profile-swipe-slide[data-active="true"] { position: relative; }
+  .profile-swipe-track .profile-sections { animation: none; }
+  .gallery-header .gallery-search { min-width: 0; max-width: 100%; }
+  .gallery-header .gallery-search input { font-size: 16px; min-width: 0; }
+  .gallery-header .search-user-badge { max-width: min(110px,35%); }
   [dir="rtl"] .profile-intro { direction: rtl; }
   [dir="rtl"] .profile-intro .profile-logout { grid-column: 3; }
   [dir="rtl"] .profile-avatar-camera > div { left: auto; right: 0; }
@@ -1733,6 +1746,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 @keyframes mobile-drawer-leave { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-105%); } }
 @media (prefers-reduced-motion: reduce) {
   .gallery-header, .mobile-bottom-nav a { transition: none !important; }
+  .profile-swipe-track { transition: none !important; }
   .mobile-drawer, .mobile-drawer-backdrop, .profile-swipe-area .profile-sections { animation: none !important; }
 }
 @keyframes control-arrive { from { opacity: 0; } to { opacity: 1; } }
