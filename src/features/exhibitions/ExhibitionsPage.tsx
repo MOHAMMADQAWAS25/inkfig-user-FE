@@ -320,7 +320,7 @@ export function ExhibitionsPage() {
             <Trophy aria-hidden="true" />
             <h1>{selected?.name ?? t("exhibitions.title")}</h1>
           </div>
-          {manage && !selected && (
+          {manage && (
             <button className="primary-button" disabled={busy} onClick={edit}>
               <Plus size={18} />
               {t(selected ? "exhibitions.edit" : "exhibitions.create")}
@@ -441,10 +441,8 @@ export function ExhibitionsPage() {
                     <dd>{date(selected.participation_closes_at)}</dd>
                   </div>
                 </dl>
-                {manage && <button className="primary-button" disabled={busy} onClick={edit}>
-                  <Plus size={18} aria-hidden="true" />{t("exhibitions.edit")}
-                </button>}
               </section>
+              </ExhibitionCard>
               {session ? (
                 <section className="exhibition-participation">
                   <h2>{t("exhibitions.participate")}</h2>
@@ -511,7 +509,6 @@ export function ExhibitionsPage() {
               ) : (
                 <Link to={`/${language}/login`}>{t("exhibitions.login")}</Link>
               )}
-              </ExhibitionCard>
               <nav
                 className="exhibition-tabs"
                 aria-label={t("exhibitions.works")}

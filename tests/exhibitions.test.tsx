@@ -164,7 +164,7 @@ it("submits an owned selected work and shows pending confirmation", async () => 
   );
   expect(await screen.findByRole("status")).toBeTruthy();
 });
-it("places all exhibition details and participation in the shared card without a view action", async () => {
+it("keeps exhibition details in the shared card and participation below it without a view action", async () => {
   vi.mocked(api.getExhibition).mockResolvedValue({ ...exhibition, banner_url: "/banner.jpg" });
   const { container } = view();
   await screen.findByText("My painting");
@@ -175,15 +175,19 @@ it("places all exhibition details and participation in the shared card without a
   expect(within(content).getByText("Spring collection")).toBeTruthy();
   expect(within(content).getByRole("timer")).toBeTruthy();
   expect(content.querySelectorAll("dl dt")).toHaveLength(3);
-  expect(within(content).getByRole("button", { name: "Submit for approval" })).toBeTruthy();
+  expect(within(content).queryByRole("button", { name: "Submit for approval" })).toBeNull();
+  const submit = screen.getByRole("button", { name: "Submit for approval" });
+  expect(submit.closest(".exhibition-detail-card")).toBeNull();
+  expect(card.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(card.querySelector(".exhibition-card-link")).toBeNull();
   expect(container.querySelector(".exhibition-hero-banner")).toBeNull();
 });
-it("keeps the manager edit action in the card information column", async () => {
+it("keeps the manager edit action in the original page header", async () => {
   state.role = "supervisor";
   const { container } = view();
   const edit = await screen.findByRole("button", { name: "Edit exhibition" });
-  expect(edit.closest(".exhibition-card-content")).toBeTruthy();
+  expect(edit.closest(".exhibition-card-content")).toBeNull();
+  expect(edit.closest(".exhibitions-heading")).toBeTruthy();
   expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
 });
 it("gives supervisors controls for an exhibition created by someone else", async () => {
