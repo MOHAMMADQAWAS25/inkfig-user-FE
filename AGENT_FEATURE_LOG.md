@@ -8168,3 +8168,87 @@ Frontend only through the existing Cloudflare main workflow; no backend deployme
 ### Git
 
 Branch: fix/mobile-drawer-glass-behavior. Commit hash and push outcome reported in handoff. Fetch/rebase before feature-branch push, then authorized fast-forward main merge/push. Prior log entries preserved; conflicts and merge/deployment status reported in handoff.
+
+## 2026-10-18 - Exhibition discovery, participation and management
+
+### Request
+
+Enable exhibitions created/edited by supervisors, admins and system administrators, with banners, participation dates, owned-work submissions, approval/rejection reasons and participant blocking. User confirmed all supervisors manage all exhibitions.
+
+### Changes
+
+- Replaced the Exhibition placeholder with a public paginated exhibition list and details pages.
+- Added management forms for required name, description, event date, participation opening/closing dates and optional banner upload.
+- Added approved works, my submissions and management review sections.
+- Added required-reason rejection/blocking dialogs, blocked-participant list and unblock controls.
+- Added existing-work selection with continuation loading and an upload-new-work route that publishes once then submits for review.
+- Retains the newly uploaded work identifier when submission fails, so retry does not publish a duplicate work.
+- Added bilingual, responsive theme-aware cards, natural image proportions, status chips, loading/error/empty feedback and safe scroll locking for decision dialogs.
+- Existing artwork publication and profile visibility remain unchanged; approval gates exhibition membership.
+
+### Repositories
+
+- `inkfig-user-FE`: exhibition pages, API client, routes, localized labels and upload integration.
+- `inkfig-main-system`: protected exhibition workflow, schema, image storage and validation.
+- `inkfig-user-system`: no code change; new permissions are assigned in the shared database by the main migration.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionsPage.tsx`: public discovery/detail and management/participation experience.
+- `src/features/exhibitions/exhibitionApi.ts`: existing request-helper integration and signed banner uploads.
+- `src/app/AppRouter.tsx`: exhibition list/detail routes.
+- `src/features/works/UploadWorkPage.tsx`: upload-and-submit flow with retained publication ID for retry.
+- `src/features/works/worksApi.ts`: returns the published work ID to the exhibition submission flow.
+- `src/i18n/resources.ts`: English/Arabic exhibition labels.
+- `src/styles.css`: responsive themed exhibition layouts and controls.
+- `tests/exhibitions.test.tsx`: student submission, supervisor-wide management, hidden student manager controls, closed windows and rejection reason flow.
+
+### API
+
+- Consumes main-backend `/api/v1/exhibitions` list/create/details/edit, submission list/create/review, banner signing/completion, blocked lists and block/unblock endpoints.
+- Uses public, mine and manage visibility scopes; follows bounded continuation cursors for every collection.
+- Reuses existing authenticated upload/publish and own-works endpoints.
+
+### Database
+
+- Migration: `20261018_013_create_exhibitions.sql` in main backend, applied successfully before release.
+- New exhibition tables, role permissions and banner bucket; no frontend-owned schema.
+
+### Permissions and scope
+
+- Supervisor, admin and system-administrator roles see management UI for all exhibitions.
+- Students submit their own published works; guests can discover exhibitions and approved works.
+- Pending/rejected entries appear only for their owner and managers.
+- Backend independently checks current database permissions, active verified account state, ownership, dates and exhibition blocks on every protected operation.
+
+### Frontend
+
+- Routes: `/:language/exhibition`, `/:language/exhibition/:exhibitionId` and `/:language/upload?exhibition={id}`.
+- Reuses existing desktop/mobile navigation and authentication helpers.
+- Forms use local datetime inputs converted to UTC; all dates must satisfy open < close <= event.
+- English/Arabic, RTL/LTR, light/dark, responsive grids, paginated works and blocked lists, pending/rejected states and failure feedback are supported.
+
+### Verification
+
+- `[passed] npm.cmd test` — 69 foundation/layout and 99 component tests before the final added rejection test.
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` — all 5 exhibition workflow tests after the final addition.
+- `[passed] npm.cmd run build` — strict TypeScript and production build.
+- `[passed] git diff --check`
+- `[passed] companion backend tests, typing and rolled-back real Supabase lifecycle verification`
+- `[not run] physical-device/browser visual inspection — verified via component workflows and responsive CSS checks only`
+
+### Deployment
+
+- Apply the main-backend migration, deploy main backend, then deploy frontend through existing main workflows.
+- Main API public exhibition listing verified live before frontend release.
+- No new environment variables, secrets, dependencies or IAM privileges.
+
+### Git
+
+- Branch: `main`
+- Commit: `37e8979`
+- Push: final synchronization and workflow deployment verified in handoff.
+
+### Notes
+
+Newly uploaded works are ordinary public profile works; pending approval controls their exhibition membership only. A rejected entry is retained and can be reconsidered by managers. Blocking is exhibition-specific and hides approved membership until unblocked. Existing non-blocking Vite 500kB chunk warning remains. Exhibition WebSocket updates are not included in this release.
