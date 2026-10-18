@@ -8574,3 +8574,62 @@ No migration required.
 ### Notes
 
 Existing non-blocking Vite large-chunk warning remains. The blur is decorative only and never modifies the uploaded image.
+
+## 2026-10-18 - Smoother exhibition-card hover animation
+
+### Request
+
+Make the exhibition card animate smoothly on hover.
+
+### Changes
+
+- Extended coordinated transitions to 420ms with eased lift and arrow movement.
+- Increased lift to 6px and softened the expanded shadow for clearer hover feedback.
+- Preserved uncropped banners, layout, keyboard focus and reduced-motion support.
+
+### Repositories
+
+- `inkfig-user-FE`: hover styling only.
+
+### Files
+
+- `src/styles.css`: refined transition duration, easing, lift and shadow.
+- `AGENT_FEATURE_LOG.md`: appended ticket record.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions or visibility changes. Backend authorization remains unchanged.
+
+### Frontend
+
+- Exhibition overview cards animate smoothly both entering and leaving hover or keyboard focus.
+- Existing responsive layout, localization, forms, pagination and states remain unchanged.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 9 tests.
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+- `[not run] manual browser inspection - no browser session used`
+
+### Deployment
+
+- Frontend deployment via existing Cloudflare workflow. No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `2ad747a`
+- Push: pending synchronization; actual outcome reported in handoff.
+
+### Notes
+
+Existing non-blocking Vite large-chunk warning remains.
