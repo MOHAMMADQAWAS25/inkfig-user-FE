@@ -8633,3 +8633,70 @@ No migration required.
 ### Notes
 
 Existing non-blocking Vite large-chunk warning remains.
+## 2026-10-18 - Consistent 500ms live-search debounce
+
+### Request
+
+Wait until the user stops editing for 500ms before processing character-driven searches.
+
+### Changes
+
+- Standardized account mention suggestions and sidebar account-search requests to a shared 500ms delay.
+- Added the same debounce to the administrator's local name/email filter; typing remains immediate.
+- Clears obsolete account suggestions/cursors when input changes, cancels scheduled requests on cleanup and ignores superseded responses.
+- Protected sidebar pagination against responses from a previous query.
+- Explicit artwork submissions, history selection, pagination clicks and backend endpoints remain unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: live-search timing and response protection.
+
+### Files
+
+- `src/lib/useDebouncedSearch.ts`: shared delay and debounced local search hook.
+- `src/features/home/HomePage.tsx`: 500ms account suggestions.
+- `src/features/navigation/AppSidebar.tsx`: 500ms discovery requests and stale-pagination guard.
+- `src/features/admin/AdminUsersPage.tsx`: debounced local directory filtering.
+- `tests/gallery-interactions.test.tsx`: fake-clock tests for delay, timer reset, clearing and unmount cancellation.
+- `AGENT_FEATURE_LOG.md`: appended ticket entry.
+
+### API
+
+No API changes. Existing account search endpoints receive fewer requests while typing.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Existing roles, profile visibility and administrator directory permissions unchanged.
+- Backend authorization remains authoritative and unchanged; debounce is not a security rate limiter.
+
+### Frontend
+
+- Home account mentions, desktop/mobile account discovery and administrator directory use 500ms quiet-time processing.
+- Existing localized loading, empty/error feedback, keyboard selection and pagination retained.
+- Enter/search-button artwork searches remain explicit immediate actions, not character-driven requests.
+
+### Verification
+
+- `[passed] npm.cmd test` - 69 source/layout checks and 106 component tests before final pagination guard.
+- `[passed] npm.cmd run test:feed -- tests/gallery-interactions.test.tsx` - 43 tests after final guard.
+- `[passed] npm.cmd run build` - TypeScript and Vite build after final guard.
+- `[passed] git diff --check`
+- `[not run] manual browser verification - component tests used`
+
+### Deployment
+
+- Frontend-only deployment through existing Cloudflare workflow. No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `ff454a7`
+- Push: pending final synchronization; outcome reported in handoff.
+
+### Notes
+
+Already-dispatched requests may complete on the server, but obsolete results are ignored. Existing non-blocking Vite chunk-size warning remains.
