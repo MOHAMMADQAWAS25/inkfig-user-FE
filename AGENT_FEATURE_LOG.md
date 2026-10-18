@@ -8912,3 +8912,64 @@ Remove the edit plus and detail-card hover movement; add profile-based work assi
 ### Notes
 
 Active quota is ten pending plus approved works per user per exhibition; rejections free capacity. Profile publication remains public independent of exhibition review. If membership fails after publication, retry submits the same profile work rather than uploading another. Available exhibitions have an open participation window and future start; no event-end field exists. Existing non-blocking Vite large-chunk warning remains.
+## 2026-10-18 - Sticky exhibition action navbar
+
+### Request
+
+Keep the exhibition page navbar visible while scrolling.
+
+### Changes
+
+- Made the exhibition toolbar sticky with a 12px top gap plus device safe-area inset.
+- Added stacking above exhibition cards while preserving blurred surfaces, wrapping and existing controls.
+- Shared toolbar styling also keeps personal-submissions back navigation sticky.
+- All workflows and unrelated navigation intentionally unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: exhibition toolbar positioning.
+
+### Files
+
+- `src/styles.css`: sticky positioning, safe-area offset and stacking.
+- `tests/exhibition-layout.test.mjs`: regression coverage for sticky/blur/wrapping rules.
+- `AGENT_FEATURE_LOG.md`: appended ticket entry.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- No permissions or visibility changes; backend authorization remains unchanged.
+
+### Frontend
+
+- Exhibition detail and personal-submissions toolbars remain visible as their pages scroll.
+- Mobile/desktop, RTL/LTR, themes and existing action states preserved.
+
+### Verification
+
+- `[passed] node --test tests/exhibition-layout.test.mjs` - 1 test.
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 15 tests.
+- `[passed] npm.cmd run build`
+- `[passed] git diff --check`
+- `[not run] real browser scroll inspection - CSS and component tests used`
+
+### Deployment
+
+- Frontend deployment via existing Cloudflare workflow. No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `cb64f12`
+- Push: pending synchronization; outcome reported in handoff.
+
+### Notes
+
+Existing non-blocking Vite chunk-size warning remains.
