@@ -8448,3 +8448,65 @@ No migration required.
 ### Notes
 
 Countdown targets event start, while participation eligibility uses the separate opening/closing dates and is enforced server-side.
+
+## 2026-10-18 - Horizontal two-column exhibition cards
+
+### Request
+
+Apply the approved horizontal exhibition-card preview with banner beside details and countdown.
+
+### Changes
+
+- Desktop overview cards use 45% banner / 55% details and one card per row.
+- Moved participation/past badge into the information column, refined typography and added an olive View exhibition action.
+- Mobile stacks banner above details; card height remains bounded by the visible viewport.
+- Preserved uncropped banners, countdowns, date sorting, independent pagination and exhibition workflows.
+
+### Repositories
+
+- `inkfig-user-FE`: horizontal overview-card layout.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionCard.tsx`: badge placement beside banner.
+- `src/styles.css`: responsive two-column cards, spacing, typography and action styling.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Public exhibition cards remain visible to all visitors.
+- Existing permissions and backend authorization remain unchanged.
+
+### Frontend
+
+- Exhibition overview uses horizontal cards on desktop and stacked cards at the existing 720px mobile breakpoint.
+- English/Arabic layout mirrors naturally through direction-aware CSS.
+- Light/dark, keyboard focus and reduced-motion behavior retained.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` — 7 tests.
+- `[passed] npm.cmd run build` — TypeScript and production build.
+- `[passed] git diff --check`
+
+### Deployment
+
+- Frontend-only deployment through existing Cloudflare workflow.
+- No configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `65f8247`
+- Push: final synchronization and push reported in handoff.
+
+### Notes
+
+Matches the approved layout concept using existing website typography and controls. Very short screens retain internal content scrolling so cards stay within viewport height.
