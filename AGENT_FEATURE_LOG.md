@@ -9154,3 +9154,71 @@ Frontend-only existing Cloudflare main workflow; no backend deployment or migrat
 ### Git
 
 Branch: fix/mobile-swipe-card-header. Exact commit/push/deployment results reported in handoff. Fetch/rebase before feature-branch push, then authorized fast-forward main merge/push. Earlier log entries and other agents' exhibition work preserved; conflicts reported in handoff.
+## 2026-10-18 - Read-only manager exhibition artwork popup and synchronization
+
+### Request
+
+Finish the exhibition workflow and ensure manager record clicks open the artwork on the same page without likes count, save or other interactive options.
+
+### Changes
+
+- Added an opt-in read-only artwork modal mode for exhibition review only.
+- Manager previews retain full artwork details, status, rejection/deletion context and close control; remove social/moderation/owner controls, profile navigation and external-link actions.
+- External work URLs remain visible as plain text; video controls are suppressed in read-only mode.
+- Home/profile/personal artwork previews retain their existing behavior by default.
+- Merged incoming mobile fixes from origin/main, preserving all source changes and both appended feature-log entries. Only the append location in the log conflicted; resolved by retaining both entries.
+
+### Repositories
+
+- `inkfig-user-FE`: read-only manager preview and integration verification.
+- `inkfig-main-system`: previously completed withdrawal release verified deployed; no additional backend edits in this follow-up.
+
+### Files
+
+- `src/features/home/ArtworkDetailModal.tsx`: opt-in read-only content/actions behavior.
+- `src/features/exhibitions/MyExhibitionSubmissionsPage.tsx`: manager preview selects read-only mode.
+- `src/styles.css`: readable wrapped noninteractive work URLs.
+- `tests/exhibitions.test.tsx`: ensures review preview stays in the record page with one close button and no navigation/action links.
+- `AGENT_FEATURE_LOG.md`: retains both concurrent entries and appends this follow-up.
+
+### API
+
+No API changes in this follow-up. The companion withdrawal POST/PATCH routes are confirmed present in production OpenAPI.
+
+### Database
+
+No migration required for the read-only popup. Companion migration `20261018_015_exhibition_withdrawal_requests.sql` was applied and tested earlier in this release.
+
+### Permissions and scope
+
+- Read-only mode is used in the supervisor/admin/system-administrator review route, not ordinary home/profile browsing.
+- Backend management/ownership/withdrawal authorization remains authoritative and unchanged.
+
+### Frontend
+
+- Review record clicks fetch and display the standard artwork card inline as a modal on the same route.
+- No likes count, save, profile/external navigation, edit/delete/report/moderation controls appear inside that preview; management remains on the underlying records.
+- Close/Escape/backdrop behavior, rejection reasons, natural image proportions, localization and mobile fixes remain intact.
+
+### Verification
+
+- `[passed] npm.cmd test` - 71 source/layout checks and 133 component tests after integrating remote mobile changes.
+- `[passed] npm.cmd run build` - TypeScript and Vite build.
+- `[passed] git diff --check`
+- `[passed] main-backend GitHub deployment` - successful, health200 and withdrawal routes present in production schema.
+- `[not run] physical browser visual inspection - component behavior and geometry regression checks used`
+
+### Deployment
+
+- Main backend already deployed successfully. Publish combined frontend through existing Cloudflare workflow.
+- No additional configuration, secrets or migrations.
+
+### Git
+
+- Branch: `main`
+- Commit: `a5f4dcb`; integration merge: `1942d30`.
+- Push: pending final synchronization; outcome reported in handoff.
+
+### Notes
+
+Preserved incoming commit `2c02204` mobile improvements and all prior exhibition work. Existing non-blocking Vite chunk warning and jsdom scrollTo notices remain.
