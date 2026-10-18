@@ -1814,7 +1814,7 @@ html:has(.auth-signin)::-webkit-scrollbar { display: none; width: 0; height: 0; 
 }
 /* Center originals in the full media column; show the image-derived blur only in spare space. */
 .artwork-modal { align-items: stretch; }
-.artwork-modal-media { position: relative; align-self: stretch; place-items: center; min-width: 0; min-inline-size: min(38vw,420px); max-width: min(62vw,720px); padding: clamp(20px,2.5vw,36px); isolation: isolate; background: var(--surface); }
+.artwork-modal-media { position: relative; align-self: stretch; place-items: center; min-width: 0; min-inline-size: 0; max-width: min(62vw,720px); padding: 0; isolation: isolate; background: var(--surface); }
 .artwork-modal-media .artwork-media-backdrop { position: absolute; z-index: -1; inset: -8%; display: block; width: 116%; height: 116%; max-width: none; max-height: none; object-fit: cover; object-position: center; filter: blur(24px) saturate(1.15) brightness(.85); opacity: .7; pointer-events: none; user-select: none; }
 .artwork-modal-media .artwork-media-original { position: relative; max-width: 100%; object-fit: contain; object-position: center; background: var(--surface); }
 .artwork-media-unavailable { display: grid; place-items: center; min-height: 220px; padding: 24px; color: var(--muted); }

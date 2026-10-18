@@ -9298,3 +9298,27 @@ Matching feature/gallery-creator-rows branches in main-system and user-FE. Deplo
 ### Git
 
 Branch: feature/gallery-creator-rows. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit hashes and push results reported in handoff; previous entries preserved.
+
+## 2026-10-18 - Apply artwork blur only when the layout has unused space
+
+### Request and changes
+
+Opened images now receive the existing richer decorative blur only when their unframed rendered size leaves more than two pixels of horizontal or vertical unused space. Removed unconditional media padding/minimum width. Fitting images retain their natural contain size with no blur or extra framing. Images with gaps keep centered four-sided breathing room through a visual-only scale; measuring untransformed dimensions prevents framing from manufacturing its own permanent gap. Rechecks on image load, container/image resize and viewport resize, with observer/listener cleanup and fresh image elements when switching URLs. Videos, failed-image feedback and read-only previews retain existing behavior. No uploaded files or actual image pixels are changed.
+
+### Repositories and files
+
+All three repositories checked clean and pulled main; incoming creator-row work preserved. Only inkfig-user-FE changed: ArtworkMedia.tsx, styles.css, auth/media component and layout tests, and this log. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, database, storage, embeddings, authentication/authorization, dependencies, configuration or backend/SnapStart changes. Applies to shared opened artwork previews on desktop and mobile, with existing themes/localization unchanged.
+
+### Verification
+
+219 tests passed (74 source/layout and 145 component/feed). Checks cover fitting images, subpixel tolerance, vertical and horizontal gaps, resize removal/reapplication without a feedback loop, work switching, image failure and single-player/read-only video behavior. Initial new regression exposed retained mocked image dimensions across URL changes; keying the image by URL fixed fresh-element behavior and the full rerun passed. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking bundle-size warning and jsdom scrollTo notices remain.
+
+Headless Edge checked the actual component with production CSS: a 400x650 image in a 400x650 column had no backdrop/framing, while a 225x225 image in a 225x650 column had conditional framing and blur. Physical devices/live authenticated artwork were not exercised. Temporary fixture files removed and no-hot-refresh preview stopped; no generated output committed.
+
+### Deployment and Git
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: fix/conditional-artwork-blur. Fetch/rebase before branch push, followed by authorized fast-forward main merge/push. Exact commit, push, conflicts and deployment results reported in handoff; all previous feature-log entries preserved.

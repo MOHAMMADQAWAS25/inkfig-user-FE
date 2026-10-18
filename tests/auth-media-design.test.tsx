@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 import { I18nProvider } from "../src/i18n/I18nProvider";
@@ -11,7 +11,17 @@ import { VerifyEmailPage } from "../src/features/auth/VerifyEmailPage";
 import { ArtworkMedia } from "../src/features/home/ArtworkMedia";
 
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:null,setSession:vi.fn()})}));
-afterEach(()=>{cleanup();localStorage.clear();document.documentElement.removeAttribute("data-theme");});
+afterEach(()=>{cleanup();vi.unstubAllGlobals();localStorage.clear();document.documentElement.removeAttribute("data-theme");});
+
+function sizeImage(container: HTMLElement, image: HTMLElement, width: number, height: number, mediaWidth: number, mediaHeight: number) {
+  Object.defineProperties(image, {
+    offsetWidth: { configurable: true, value: width }, offsetHeight: { configurable: true, value: height },
+    complete: { configurable: true, value: true }, naturalWidth: { configurable: true, value: width },
+  });
+  Object.defineProperties(container.querySelector(".artwork-modal-media"), {
+    clientWidth: { configurable: true, value: mediaWidth }, clientHeight: { configurable: true, value: mediaHeight },
+  });
+}
 
 it.each(["en","ar"])("shares the watercolor glass layout and top-right controls across all %s auth pages",language=>{
   for(const Page of [LoginPage,SignupPage,PasswordResetPage,VerifyEmailPage]){
@@ -38,9 +48,45 @@ it("keeps exactly one accessible sharp image with a decorative copy for the spar
   const {container}=render(<ArtworkMedia url="/portrait.png" title="Portrait" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);
   const original=screen.getByRole("img",{name:"Portrait"});
   expect(original.className).toBe("artwork-media-original");
+  expect(container.querySelector(".artwork-media-backdrop")).toBeNull();
+  sizeImage(container, original, 225, 225, 225, 650);
+  fireEvent.load(original);
   const blur=container.querySelector(".artwork-media-backdrop")!;
   expect(blur.getAttribute("src")).toBe(original.getAttribute("src"));
   expect(blur.getAttribute("aria-hidden")).toBe("true");expect(blur.getAttribute("alt")).toBe("");
+  expect(original.style.transform).toMatch(/^scale\(0\./);
+});
+it.each([[400,700,400,700],[400,700,401,701]])("leaves naturally fitting images without blur or artificial framing (%s x %s)",(width,height,mediaWidth,mediaHeight)=>{
+  const {container}=render(<ArtworkMedia url="/fit.png" title="Fit" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);
+  const original=screen.getByRole("img",{name:"Fit"});
+  sizeImage(container,original,width,height,mediaWidth,mediaHeight);
+  fireEvent.load(original);
+  expect(container.querySelector(".artwork-media-backdrop")).toBeNull();
+  expect(original.style.transform).toBe("");
+});
+it("rechecks horizontal mobile gaps and removes framing after resize without measuring its own transform",()=>{
+  let resize=()=>{};
+  const disconnect=vi.fn();
+  vi.stubGlobal("ResizeObserver",class { constructor(callback:()=>void){resize=callback;} observe(){} disconnect=disconnect; });
+  const view=render(<ArtworkMedia url="/square.png" title="Square" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);
+  const original=screen.getByRole("img",{name:"Square"});
+  sizeImage(view.container,original,225,225,366,225);
+  fireEvent.load(original);
+  expect(view.container.querySelector(".artwork-media-backdrop")).toBeTruthy();
+  const scale=original.style.transform;
+  act(()=>resize());
+  expect(original.style.transform).toBe(scale);
+  sizeImage(view.container,original,225,225,225,225);
+  act(()=>resize());
+  expect(view.container.querySelector(".artwork-media-backdrop")).toBeNull();
+  expect(original.style.transform).toBe("");
+  sizeImage(view.container,original,225,225,225,650);
+  fireEvent(window,new Event("resize"));
+  expect(view.container.querySelector(".artwork-media-backdrop")).toBeTruthy();
+  view.rerender(<ArtworkMedia url="/next.png" title="Next" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);
+  expect(view.container.querySelector(".artwork-media-backdrop")).toBeNull();
+  view.unmount();
+  expect(disconnect).toHaveBeenCalled();
 });
 it("handles failed images without showing a broken blurred duplicate and recovers for another work",()=>{
   const view=render(<ArtworkMedia url="/broken.png" title="Broken" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);

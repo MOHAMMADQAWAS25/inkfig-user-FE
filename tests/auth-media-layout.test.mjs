@@ -15,7 +15,7 @@ test("original artwork stays centered with bounded contain sizing and decorative
   assert.match(design,/\.artwork-modal \{ align-items: stretch/);
   assert.match(design,/\.artwork-modal-media \{[^}]*align-self: stretch; place-items: center/);
   assert.match(design,/\.artwork-media-backdrop \{[^}]*object-fit: cover;[^}]*filter: blur\(24px\) saturate\(1\.15\) brightness\(\.85\); opacity: \.7; pointer-events: none/);
-  assert.match(design,/\.artwork-modal-media \{[^}]*min-inline-size: min\(38vw,420px\)[^}]*padding: clamp\(20px,2\.5vw,36px\)/);
+  assert.match(design,/\.artwork-modal-media \{[^}]*min-inline-size: 0[^}]*padding: 0/);
   assert.match(design,/\.artwork-media-original \{[^}]*object-fit: contain; object-position: center/);
   assert.match(design,/\.artwork-media-original \{[^}]*max-width: 100%/);
   assert.match(design,/@media \(max-width:780px\) \{ \.artwork-modal-media \{ max-width: 100%/);
