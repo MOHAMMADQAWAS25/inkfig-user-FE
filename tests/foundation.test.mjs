@@ -716,7 +716,7 @@ test("offers an optional backend-uploaded avatar during signup", () => {
 
 test("lets owners edit post metadata and permanently delete their posts", () => {
   assert.match(profilePage, /className="artwork-owner-menu"/);
-  assert.match(profilePage, /canManage=\{ownProfile&&section==="posts"/);
+  assert.match(profilePage, /canManage=\{ownProfile&&page==="posts"/);
   assert.match(profilePage, /updateWork\(editing\.work_id/);
   assert.match(profilePage, /deleteWork\(work\.work_id\)/);
   assert.match(profilePage, /works\.imageCannotChange/);

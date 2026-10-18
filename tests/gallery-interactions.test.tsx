@@ -41,6 +41,25 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it.each(["Escape","submit"])("releases mobile search focus after %s so header scrolling can resume",async action=>{
+    vi.stubGlobal("matchMedia",(query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+    vi.mocked(requestJson).mockResolvedValue({data:[],status:200});
+    render(<MemoryRouter initialEntries={["/en"]}><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox") as HTMLInputElement;
+    act(()=>input.focus());expect(document.activeElement).toBe(input);
+    if(action==="Escape")fireEvent.keyDown(input,{key:"Escape"});else fireEvent.submit(screen.getByRole("search"));
+    expect(document.activeElement).not.toBe(input);
+  });
+  it("opens a mobile card on one tap and does not open it when the finger scrolls over it",()=>{
+    vi.stubGlobal("matchMedia",(query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+    const work={work_id:"work",title:"Art",artist_name:"Artist",owner_user_id:"artist",type_name_en:"Digital art",type_name_ar:"Art",mime_type:"image/png",image_url:"/art.png",like_count:0,liked_by_me:false,saved_by_me:false} as FeedWork;
+    const onOpen=vi.fn();const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={onOpen} onLike={vi.fn()} onSave={vi.fn()}/></MemoryRouter>);
+    const button=container.querySelector<HTMLButtonElement>(".artwork-image-button")!;
+    fireEvent.touchStart(button,{touches:[{clientX:100,clientY:100}]});fireEvent.touchMove(button,{touches:[{clientX:102,clientY:210}]});
+    fireEvent.touchEnd(button,{touches:[],changedTouches:[{clientX:102,clientY:210}]});fireEvent.click(button);expect(onOpen).not.toHaveBeenCalled();
+    fireEvent.touchStart(button,{touches:[{clientX:100,clientY:100}]});fireEvent.touchEnd(button,{touches:[],changedTouches:[{clientX:100,clientY:100}]});fireEvent.click(button);
+    expect(onOpen).toHaveBeenCalledOnce();
+  });
   it("waits 500ms after the last edit before requesting mention suggestions",async()=>{
     vi.useFakeTimers();
     try {

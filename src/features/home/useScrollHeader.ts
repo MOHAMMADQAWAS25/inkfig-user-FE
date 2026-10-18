@@ -24,8 +24,23 @@ export function useScrollHeader() {
       setProgress(offset);
     };
     const scroll = () => { if (!frame) frame = window.requestAnimationFrame(update); };
+    const rebase = () => {
+      window.cancelAnimationFrame(frame); frame = 0;
+      previous = Math.max(0, window.scrollY); offset = 0; setProgress(0);
+    };
+    const viewport = window.visualViewport;
+    let viewportHeight = viewport?.height ?? window.innerHeight;
+    const keyboardResize = () => {
+      const height = viewport?.height ?? window.innerHeight;
+      if (height - viewportHeight > 100 && document.activeElement instanceof HTMLInputElement && document.activeElement.closest(".gallery-header")) document.activeElement.blur();
+      viewportHeight = height;
+      rebase();
+    };
     window.addEventListener("scroll", scroll, { passive: true });
-    return () => { window.removeEventListener("scroll", scroll); window.cancelAnimationFrame(frame); };
+    window.addEventListener("resize", rebase);
+    window.addEventListener("pageshow", rebase);
+    viewport?.addEventListener("resize", keyboardResize);
+    return () => { window.removeEventListener("scroll", scroll); window.removeEventListener("resize", rebase); window.removeEventListener("pageshow", rebase); viewport?.removeEventListener("resize", keyboardResize); window.cancelAnimationFrame(frame); };
   }, [mobile]);
   return progress;
 }

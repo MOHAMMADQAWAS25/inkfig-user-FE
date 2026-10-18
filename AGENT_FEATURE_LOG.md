@@ -9124,3 +9124,33 @@ Fix the action navbar, move review into it, hide content below the banner before
 ### Notes
 
 Deletion removes only exhibition membership. Approved entries stay visible after launch while deletion awaits review; rejected deletion requests leave membership approved. Pending approved-deletion requests are included with approved records and visibly badged. Existing non-blocking Vite chunk warning and no exhibition realtime updates remain.
+
+## 2026-10-18 - Mobile profile pager, clean artwork taps and header recovery
+
+### Request and changes
+
+- Mobile own-profile Posts/Saved/Likes now use a finger-following three-panel pager with eased settling and edge resistance. Horizontal intent is distinguished from vertical scrolling; short/cancelled gestures settle back, multi-touch is ignored, swipe-generated clicks are suppressed and a new deliberate tap remains usable. Inactive panels are inert/aria-hidden; contents are memoized during dragging. Desktop and public-profile grids retain single-section rendering. Existing pagination, ownership controls and exhibition assignment remain intact.
+- Corrected a shared mobile CSS selector whose display:block rule for owner menus also exposed card metadata. Metadata/reaction controls are hidden and noninteractive on unopened phone cards; profile owner menus remain available. Touch movement/cancellation suppresses incidental clicks without intercepting vertical scrolling, while a stationary tap opens the card once. Removed mobile artwork hover zoom.
+- Drawer header now places the InkFig logo at physical top-left and close control at physical top-right. Theme/language are icon-only, side-by-side below Logout, aligned right with a gap and no divider. Deferred language switching, labeled navigation rows, logout order, permissions, focus containment and background scroll locking are preserved.
+- Mobile search uses a 16px input and bounded widths to prevent input-triggered zoom/overflow; profile tracks are clipped rather than creating horizontal page scroll. Search submission/recent execution and Escape release mobile input focus, and leaving the mobile search form dismisses account suggestions. Browser pinch zoom/accessibility remains enabled; browser zoom is not forcibly changed.
+- Audited header behavior after search dismissal/submission, retained header-button focus, notifications, Find users, drawer/artwork body locking/restoration, keyboard/viewport resizing and page restoration. Replaced broad focus-within pinning with actual search-input focus, and rebase tracking on window/visual-viewport resize and pageshow. Existing scroll-lock restoration handling and gradual motion remain.
+
+### Repositories and files
+
+All three repositories checked clean, switched to main and pulled before changes. New exhibition commits in frontend/main backend were retained. Frontend-only changes: CardMedia, HomePage/scroll hook, MobileNavigation, ProfilePage/swipe hook/new ProfilePager, mobile CSS, associated tests and this log. Both backends unchanged by this ticket.
+
+### API, database, permissions and scope
+
+No API, migration, database, storage, authorization, dependency or backend/SnapStart changes. Existing owner/edit/delete/exhibition-assignment permissions preserved. Runtime and visual changes are scoped to the existing 720px phone breakpoint; desktop hover, keyboard behavior and layouts remain unchanged. No generated assets, secrets or unrelated changes committed.
+
+### Verification
+
+197 tests passed (71 foundation/layout and 126 component/feed), including exhibition workflows. New checks cover finger-following/settling/inactive pager content, next-tap availability after scrolling, one-tap mobile card opening versus drag rejection, search focus release (including native keyboard dismissal), drawer logo/close/preferences layout, zoom-safe input sizing, clipped horizontal tracks, and header recovery after panels, restored button focus, keyboard resize, viewport resize and pageshow. Strict TypeScript/Vite production build and git diff --check passed. Updated source assertions for per-page ownership and separated metadata/owner-menu selectors. Existing non-blocking Vite bundle-size warning and jsdom unimplemented scrollTo notices remain; no checks bypassed. Live browser/physical-phone visual verification not performed.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: fix/mobile-swipe-card-header. Exact commit/push/deployment results reported in handoff. Fetch/rebase before feature-branch push, then authorized fast-forward main merge/push. Earlier log entries and other agents' exhibition work preserved; conflicts reported in handoff.

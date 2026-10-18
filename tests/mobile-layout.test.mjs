@@ -7,9 +7,18 @@ const mobile = css.split("/* Mobile-only gallery, navigation and profile refinem
 test("new gallery and profile styling stays inside the phone breakpoint",()=>{
   assert.match(mobile, /@media \(max-width: 720px\)/);
   assert.match(mobile, /\.artwork-pin-media \.artwork-card-type-tag/);
-  assert.match(mobile, /\.artwork-pin-media \.artwork-pin-save,[\s\S]*?display: none/);
+  assert.match(mobile, /\.artwork-pin-media \.artwork-pin-save \{ display: none; pointer-events: none/);
+  assert.match(mobile, /\.profile-page \.artwork-owner-menu \{ display: block/);
   assert.match(mobile, /\.gallery-filters button \{[^}]*font-size: \.78rem/);
   assert.match(mobile, /\.artwork-modal-save span[^}]*max-width: none; opacity: 1/);
+});
+test("mobile search avoids input zoom and profile tracks cannot create horizontal page overflow",()=>{
+  assert.match(mobile, /\.gallery-header \.gallery-search input \{ font-size: 16px; min-width: 0/);
+  assert.match(mobile, /\.profile-swipe-area \{[^}]*overflow: hidden; overflow: clip/);
+  assert.match(mobile, /\.profile-swipe-track \{[^}]*translate3d/);
+  assert.match(mobile, /\.profile-swipe-area\[data-dragging\] \.profile-swipe-track \{ transition: none/);
+  assert.doesNotMatch(mobile, /gallery-header\.mobile-header-hidden:focus-within/);
+  assert.match(mobile, /\.mobile-drawer-preferences \{[^}]*justify-content: flex-end[^}]*margin-top: 26px/);
 });
 test("phone has three mirrored navigation slots and a header notification slot",()=>{
   assert.match(mobile, /\.mobile-bottom-nav \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
