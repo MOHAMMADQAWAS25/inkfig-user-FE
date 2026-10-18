@@ -8767,3 +8767,65 @@ No migration required.
 ### Notes
 
 Long descriptions and controls scroll inside the bounded second column rather than increasing card height. Existing non-blocking Vite chunk-size warning remains.
+
+## 2026-10-18 - Restore controls outside exhibition details card
+
+### Request
+
+Keep only exhibition information in the two-column card; restore Edit exhibition and everything below it to original positions.
+
+### Changes
+
+- Returned manager editing to the page header and participation/upload/login controls below the card.
+- Retained banner, blur, name, full description, countdown, status and dates inside the card.
+- Removed unused in-card participation styling; listing cards, submission tabs and moderation workflows unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: exhibition layout correction.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionsPage.tsx`: restored control locations.
+- `src/styles.css`: removed obsolete nested participation rules.
+- `tests/exhibitions.test.tsx`: asserts participation follows card and edit stays in header.
+- `AGENT_FEATURE_LOG.md`: appended this ticket.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Existing public visibility and management/participation permissions unchanged.
+- Backend authorization remains authoritative and unchanged.
+
+### Frontend
+
+- Exhibition detail card contains information only, without a View exhibition action.
+- Original participation section and manager header action restored; mobile stacking, themes and localization retained.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 11 tests.
+- `[passed] npm.cmd run build` - TypeScript and Vite build before unused-CSS cleanup.
+- `[passed] git diff --check`
+- `[not run] browser visual inspection - component tests used`
+
+### Deployment
+
+- Frontend-only deployment via existing Cloudflare workflow. No special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `643541b`
+- Push: pending synchronization; outcome reported in handoff.
+
+### Notes
+
+Existing non-blocking Vite chunk-size warning remains.
