@@ -25,6 +25,8 @@ export function ExhibitionCard({
             <Trophy size={44} aria-hidden="true" />
           </div>
         )}
+      </div>
+      <div className="exhibition-card-content">
         <span
           className={`exhibition-status ${!past && exhibition.participation_open ? "open" : ""}`}
         >
@@ -36,8 +38,6 @@ export function ExhibitionCard({
                 : "exhibitions.closed",
           )}
         </span>
-      </div>
-      <div className="exhibition-card-content">
         <h3>{exhibition.name}</h3>
         <p className="exhibition-card-description">{exhibition.description}</p>
         <small className="exhibition-card-date">
