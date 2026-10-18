@@ -9364,3 +9364,55 @@ Applied gallery Save-only hover presentation to profile artwork grids, including
 ### Git
 
 Branch: fix/profile-save-only-hover. Fetch/rebase before push and authorized fast-forward main merge/push. Commit and push results reported in handoff; prior entries preserved.
+
+## 2026-10-18 - Stationary sign-in, formal registration and rotating search hints
+
+### Request
+
+Keep sign-in from moving vertically, substantially enlarge and reorganize signup without profile-picture upload, and alternate two relevant search placeholders smoothly following the supplied recording.
+
+### Changes
+
+- Scoped sign-in to the dynamic viewport with root/body scrolling disabled only on that route. Compact short-screen typography/logo/spacing fits ordinary phones. The stationary card retains internal overflow only when its content cannot fit (landscape, keyboard or enlarged content), keeping all controls reachable.
+- Expanded desktop signup from 820px to a bounded 1120px form, with a logo/title header, semantic personal-details and account-security fieldsets, aligned fields, restrained dividers and one centered submission action. Stacks sections/fields for narrow screens and follows RTL layout. Existing cream/deep-green watercolor glass themes remain intact.
+- Removed signup's avatar picker, file validation/upload and avatar request/navigation metadata. Existing required fields, university-email/phone/password checks, backend registration, verification and resend-limit state remain. Existing profile avatar changes/default initials and optional backend contract were not removed.
+- Added decorative, localized search hints: Search art and Search @artist's work. Eight-second two-hint cycle gently slides/fades, pauses/hides on focus or typed content, and becomes a static artwork hint after selecting an artist. Stable accessible search label/native fallback, selected-user chips, actual search/filtering, history, suggestions, keyboard behavior and mobile focus/dismissal stay unchanged. Overlay cannot intercept taps; reduced-motion users get a static hint.
+
+### Repositories
+
+All three repositories checked clean and main pulled before edits. Only inkfig-user-FE changed. Incoming creator-hover and save-only card styling retained; both backends unchanged.
+
+### Files
+
+SignupPage.tsx, HomePage.tsx, new SearchHints.tsx, resources.ts, styles.css, auth/media design and layout tests, foundation tests, gallery interaction tests, and this log.
+
+### API
+
+No endpoint/contract changes. Signup submits existing required registration data without optional avatar fields; no upload preparation/storage request is made by this form.
+
+### Database
+
+No migration, database, storage, embedding or backend/SnapStart changes.
+
+### Permissions and scope
+
+No authentication/authorization, roles or access-scope changes. Backend validation remains authoritative. No credentials, dependencies, configuration, generated build output or supplied recording committed.
+
+### Frontend
+
+English/Arabic, light/dark, desktop/tablet/phone supported. Recovery/verification behavior, profile picture management and gallery/detail functionality unchanged.
+
+### Verification
+
+- Passed 228 tests (76 source/layout, 152 component/feed), including required signup payload without avatar, verification navigation, email/phone/password failures before requests, named sections, localized hints, search hit area/value behavior, all existing search/history/mobile and artwork regressions.
+- Strict TypeScript and Vite production build and git diff --check passed. Existing non-blocking chunk-size warning and jsdom scrollTo notices remain. Initial source assertion prohibited old signup helper text; updated to require the new accessible email/phone descriptions, then full verification passed.
+- Reviewed recording frames at multiple timestamps in an isolated headless browser. Headless Edge checked actual built routes: desktop signup 1118px inner width; 390x667 sign-in had identical card position before/after attempted page scroll and no horizontal overflow; 844x390 sign-in stayed stationary with a bounded internally scrollable card; 390px Arabic/dark signup stacked without horizontal overflow. Checked mobile home hint phases at 0/4000ms: exactly one visible hint each, no width shift. Local gallery API unavailable in preview, so authenticated/live search results and physical device keyboards were not tested.
+- Temporary reference copy/review pages excluded and removed through the final build; preview servers stopped. Original user recording untouched.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment, migration or configuration needed. Deployment outcome reported in handoff.
+
+### Git
+
+Branch: feature/auth-layout-search-hints. Fetch/rebase before branch push, followed by the authorized fast-forward main merge/push. Commit hash, push/merge status, conflicts and deployment outcome reported in handoff. All previous feature-log entries preserved.

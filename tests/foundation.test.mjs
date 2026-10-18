@@ -418,7 +418,8 @@ test("provides polished authentication controls and reset-page motion", () => {
   assert.match(passwordField, /auth\.showPassword/);
   assert.match(dateOfBirthField, /CalendarDays/);
   assert.match(signup, /placeholder="05xxxxxxxx"/);
-  assert.doesNotMatch(signup, /auth\.emailHint|auth\.phoneHint/);
+  assert.match(signup, /aria-describedby="signup-email-hint"/);
+  assert.match(signup, /aria-describedby="signup-phone-hint"/);
   assert.match(passwordResetPage, /auth-photo-background/);
   assert.match(passwordResetPage, /auth-enter-from-end/);
   assert.doesNotMatch(signup, /placeholder="[^"]*@(?:students\.)?hebron\.edu/);
@@ -699,11 +700,8 @@ test("crops profile pictures with drag and zoom before uploading", () => {
   }
 });
 
-test("offers an optional backend-uploaded avatar during signup", () => {
-  assert.match(signup, /auth\.profilePictureOptional/);
-  assert.match(signup, /accept=\{PROFILE_AVATAR_ACCEPT\}/);
-  assert.match(signup, /response\.avatar_upload/);
-  assert.match(signup, /putAvatarFile/);
+test("keeps signup avatar-free while preserving existing profile avatar support", () => {
+  assert.doesNotMatch(signup, /avatarFile|PROFILE_AVATAR_ACCEPT|putAvatarFile|type="file"/);
   assert.match(verifyEmailPage, /state\?\.avatarObjectPath/);
   assert.match(registrationApi, /avatar_object_path:avatarObjectPath/);
   assert.match(profilePage, /profile\.avatar_url/);

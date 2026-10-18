@@ -1,6 +1,6 @@
 import React from "react";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 import { I18nProvider } from "../src/i18n/I18nProvider";
 import { ThemeProvider } from "../src/theme/ThemeProvider";
@@ -9,8 +9,11 @@ import { SignupPage } from "../src/features/auth/SignupPage";
 import { PasswordResetPage } from "../src/features/auth/PasswordResetPage";
 import { VerifyEmailPage } from "../src/features/auth/VerifyEmailPage";
 import { ArtworkMedia } from "../src/features/home/ArtworkMedia";
+import { registerUser } from "../src/features/auth/registrationApi";
+import { SearchHints } from "../src/features/home/SearchHints";
 
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:null,setSession:vi.fn()})}));
+vi.mock("../src/features/auth/registrationApi",()=>({registerUser:vi.fn(),verifyEmail:vi.fn(),resendVerification:vi.fn()}));
 afterEach(()=>{cleanup();vi.unstubAllGlobals();localStorage.clear();document.documentElement.removeAttribute("data-theme");});
 
 function sizeImage(container: HTMLElement, image: HTMLElement, width: number, height: number, mediaWidth: number, mediaHeight: number) {
@@ -42,7 +45,43 @@ it("retains sign-in field semantics and required registration fields",()=>{
   view.unmount();
   const signup=render(<MemoryRouter><I18nProvider><ThemeProvider><SignupPage/></ThemeProvider></I18nProvider></MemoryRouter>);
   expect(signup.container.querySelectorAll("input[required]").length).toBeGreaterThanOrEqual(5);
-  expect(signup.container.querySelector('input[type="file"]')?.hasAttribute("required")).toBe(false);
+  expect(signup.container.querySelector('input[type="file"]')).toBeNull();
+  expect(screen.getAllByRole("group")).toHaveLength(2);
+});
+function SignupRouteProbe(){const location=useLocation();return <output data-testid="signup-route">{location.pathname}|{JSON.stringify(location.state)}</output>;}
+it("submits the existing required registration data without preparing or uploading an avatar",async()=>{
+  vi.mocked(registerUser).mockResolvedValue({email:"12345678@students.hebron.edu",verification_required:true,expires_in_seconds:600,resend_after_seconds:60,hourly_limit_reached:false,avatar_upload:null});
+  const {container}=render(<MemoryRouter initialEntries={["/en/signup"]}><I18nProvider><ThemeProvider><SignupPage/><SignupRouteProbe/></ThemeProvider></I18nProvider></MemoryRouter>);
+  for(const [name,value] of Object.entries({full_name:"Student Artist",phone_number:"0591234567",date_of_birth:"2000-01-01",email:"12345678@students.hebron.edu",password:"SecurePass123",password_confirmation:"SecurePass123"})){
+    fireEvent.change(container.querySelector(`[name="${name}"]`)!,{target:{value}});
+  }
+  fireEvent.submit(container.querySelector("form")!);
+  await waitFor(()=>expect(registerUser).toHaveBeenCalledWith({full_name:"Student Artist",phone_number:"0591234567",gender:"female",date_of_birth:"2000-01-01",email:"12345678@students.hebron.edu",password:"SecurePass123",password_confirmation:"SecurePass123"}));
+  await waitFor(()=>expect(screen.getByTestId("signup-route").textContent).toContain("/en/verify-email"));
+  expect(screen.getByTestId("signup-route").textContent).not.toContain("avatarObjectPath");
+});
+it.each([
+  { email:"artist@example.com",phone:"0591234567",confirmation:"SecurePass123",error:"Enter a valid Hebron University email address." },
+  { email:"12345678@students.hebron.edu",phone:"123",confirmation:"SecurePass123",error:"Phone number must contain exactly 10 digits." },
+  { email:"12345678@students.hebron.edu",phone:"0591234567",confirmation:"DifferentPass123",error:"The passwords do not match." },
+])("preserves signup validation before sending a request: $error",({email,phone,confirmation,error})=>{
+  vi.mocked(registerUser).mockClear();
+  const {container}=render(<MemoryRouter initialEntries={["/en/signup"]}><I18nProvider><ThemeProvider><SignupPage/></ThemeProvider></I18nProvider></MemoryRouter>);
+  for(const [name,value] of Object.entries({email,phone_number:phone,password:"SecurePass123",password_confirmation:confirmation}))fireEvent.change(container.querySelector(`[name="${name}"]`)!,{target:{value}});
+  fireEvent.submit(container.querySelector("form")!);
+  expect(screen.getByRole("alert").textContent).toBe(error);
+  expect(registerUser).not.toHaveBeenCalled();
+});
+it.each(["en","ar"])("renders localized decorative search hints without changing input semantics (%s)",language=>{
+  const view=render(<MemoryRouter initialEntries={[`/${language}`]}><I18nProvider><SearchHints visible artistSelected={false}/></I18nProvider></MemoryRouter>);
+  const hints=view.container.querySelector(".search-hints")!;
+  expect(hints.getAttribute("aria-hidden")).toBe("true");
+  expect(hints.children).toHaveLength(2);
+  expect(hints.textContent).toContain(language==="en"?"Search art":"ابحث عن عمل فني");
+  expect(hints.textContent).toContain("@");
+  view.rerender(<MemoryRouter initialEntries={[`/${language}`]}><I18nProvider><SearchHints visible={false} artistSelected/></I18nProvider></MemoryRouter>);
+  expect(hints.getAttribute("data-visible")).toBe("false");
+  expect(hints.children).toHaveLength(1);
 });
 it("keeps exactly one accessible sharp image with a decorative copy for the spare space",()=>{
   const {container}=render(<ArtworkMedia url="/portrait.png" title="Portrait" mimeType="image/png" readOnly={false} failureLabel="Unable to load"/>);

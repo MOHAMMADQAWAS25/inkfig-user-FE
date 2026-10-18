@@ -20,11 +20,26 @@ test("original artwork stays centered with bounded contain sizing and decorative
   assert.match(design,/\.artwork-media-original \{[^}]*max-width: 100%/);
   assert.match(design,/@media \(max-width:780px\) \{ \.artwork-modal-media \{ max-width: 100%/);
 });
-test("sign-in hides only its scrollbar and neutralizes blue autofill without blocking short-screen scrolling",()=>{
-  assert.match(design,/html:has\(\.auth-signin\) \{ overflow-y: auto; scrollbar-gutter: auto; scrollbar-width: none/);
+test("sign-in stays within the viewport with accessible short-screen card overflow and neutral autofill",()=>{
+  assert.match(design,/html:has\(\.auth-signin\) \{ overflow-y: hidden; scrollbar-gutter: auto; scrollbar-width: none/);
+  assert.match(design,/\.auth-photo-background\.auth-signin \{[^}]*height: 100dvh; min-height: 0/);
+  assert.match(design,/\.auth-signin \.login-card \{ max-height: 100%; overflow-y: auto/);
   assert.match(design,/html:has\(\.auth-signin\)::-webkit-scrollbar \{ display: none/);
   assert.match(design,/\.auth-signin \.form-stack input[^}]*background: transparent/);
   assert.match(design,/\.auth-signin \.password-input-shell[^}]*background: transparent/);
   assert.match(design,/input:is\(:autofill,:-webkit-autofill\)[^}]*1000px var\(--signin-autofill\) inset/);
   assert.match(design,/:root\[data-theme="dark"\] \.auth-signin \{ --signin-autofill:#1c2314/);
+});
+test("formal registration grows on desktop and stacks named sections on smaller screens",()=>{
+  assert.match(design,/\.signup-form-column \{ width: min\(1120px,100%\)/);
+  assert.match(design,/\.signup-security-section \{[^}]*border-inline-start: 1px solid var\(--border\)/);
+  assert.match(design,/@media \(max-width:760px\) \{\s*\.signup-card \.signup-form-grid \{ grid-template-columns: minmax\(0,1fr\)/);
+});
+test("search hints slide and fade without intercepting input, with a reduced-motion fallback",()=>{
+  assert.match(design,/\.gallery-search-field \{[^}]*flex: 1 1 0; min-width: 0; align-self: stretch/);
+  assert.match(design,/\.search-hints \{[^}]*pointer-events: none/);
+  assert.match(design,/@keyframes search-hint-first/);
+  assert.match(design,/@keyframes search-hint-second/);
+  assert.match(design,/focus-within \.search-hints > span \{ animation-play-state: paused/);
+  assert.match(design,/@media \(prefers-reduced-motion:reduce\) \{[^}]*\}[^}]*animation: none/);
 });

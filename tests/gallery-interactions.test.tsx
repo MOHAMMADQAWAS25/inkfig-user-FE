@@ -41,6 +41,20 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("keeps the animated search area clickable and hides decorative hints when typing",()=>{
+    const {container}=render(<MemoryRouter initialEntries={["/en"]}><HomePage/></MemoryRouter>);
+    const input=screen.getByRole("combobox") as HTMLInputElement;
+    expect(input.getAttribute("aria-autocomplete")).toBe("list");
+    expect(input.getAttribute("placeholder")).toBe("Search");
+    expect(container.querySelector(".search-hints")?.getAttribute("data-visible")).toBe("true");
+    fireEvent.click(container.querySelector(".gallery-search-field")!);
+    expect(document.activeElement).toBe(input);
+    fireEvent.change(input,{target:{value:"landscape"}});
+    expect(container.querySelector(".search-hints")?.getAttribute("data-visible")).toBe("false");
+    expect(input.value).toBe("landscape");
+    fireEvent.change(input,{target:{value:""}});
+    expect(container.querySelector(".search-hints")?.getAttribute("data-visible")).toBe("true");
+  });
   it("shows the creator below the artwork and falls back only when the avatar fails",()=>{
     const work={work_id:"work",title:"Art",artist_name:"Ahmad",artist_avatar_url:"/ahmad.png",owner_user_id:"ahmad",type_name_en:"Digital art",mime_type:"image/png",image_url:"/art.png",like_count:0} as FeedWork;
     const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={vi.fn()} onLike={vi.fn()} onSave={vi.fn()}/></MemoryRouter>);
