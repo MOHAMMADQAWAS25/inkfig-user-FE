@@ -9336,3 +9336,17 @@ Creator identity rows below gallery cards show only the circular avatar at rest.
 ### Git
 
 Branch: fix/creator-avatar-hover-name. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit/push outcomes reported in handoff; prior entries preserved.
+
+## 2026-10-18 - Save-only gallery hover overlay
+
+### Request and changes
+
+Gallery card hover now exposes only the existing Save icon at the physical top-right in both reading directions. Scoped CSS hides the card's like control, category tag and duplicate creator overlay. Creator avatar/name reveal below each card and detail-view interactions remain unchanged. Existing Save authorization, hover/keyboard interaction and mobile presentation retained. Masonry sizing and appending are untouched.
+
+### Verification and deployment
+
+219 existing tests and TypeScript/Vite production build passed, with the existing bundle-size warning; git diff --check passed. Frontend-only CSS deployment, no database, API, permission, backend or SnapStart changes. Live visual verification not performed.
+
+### Git
+
+Branch: fix/card-save-only-hover. Fetch/rebase before push and authorized fast-forward main merge/push. Commit/push results reported in handoff; earlier entries preserved.
