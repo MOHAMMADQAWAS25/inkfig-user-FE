@@ -61,7 +61,7 @@ export async function getUserWorks(userId:string,cursor?:string): Promise<WorkPa
 export async function getLikedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/likes${cursorSuffix(cursor)}`)).data; }
 export async function getSavedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/saves${cursorSuffix(cursor)}`)).data; }
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
-export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<void> {
+export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<string> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
   const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label.trim()||null}));
   if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
@@ -72,6 +72,7 @@ export async function uploadWork(input: {typeId:string; title:string; descriptio
   const uploaded = await fetch(prepared.upload_url, {method:"PUT", headers:{"x-upsert":"false"}, body});
   if (!uploaded.ok) throw new Error("Upload failed");
   await requestJson<null>(mainApiBaseUrl, "POST", `/works/${prepared.work_id}/publish`);
+  return prepared.work_id;
 }
 export async function setWorkLike(id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`); }
 export async function setWorkSave(id:string, saved:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, saved ? "PUT" : "DELETE", `/works/${id}/save`); }
