@@ -16,6 +16,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ExhibitionCard } from "./ExhibitionCard";
+import { ExhibitionCountdown } from "./ExhibitionCountdown";
 import { getMyWorks } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import {
@@ -433,6 +434,7 @@ export function ExhibitionsPage() {
                 />
               )}
               <section className="exhibition-summary">
+                <ExhibitionCountdown eventAt={selected.event_at} />
                 <p>{selected.description}</p>
                 <dl>
                   <div>

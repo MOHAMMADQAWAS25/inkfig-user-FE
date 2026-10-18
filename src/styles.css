@@ -1774,6 +1774,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-hero-banner { display:block; width:100%; max-height:460px; object-fit:contain; margin:20px 0; border-radius:18px; }
 .exhibition-summary,.exhibition-participation,.exhibition-editor,.exhibition-blocks { padding:24px; margin:24px 0; }
 .exhibition-summary>p { white-space:pre-wrap; }
+.exhibition-summary>.exhibition-countdown { max-inline-size:440px; margin-block:0 24px; padding:18px; }
 .exhibition-summary dl { display:flex; gap:24px; flex-wrap:wrap; }
 .exhibition-summary dd { margin:8px 0; }
 .exhibition-status { display:inline-block; padding:6px 12px; border-radius:30px; background:#eee9d6; color:#635a36; font-size:.85rem; }
