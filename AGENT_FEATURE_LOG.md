@@ -9253,3 +9253,30 @@ Frontend-only existing Cloudflare main workflow; no backend deployment or migrat
 ### Git
 
 Branch: feature/auth-watercolor-artwork-framing. Commit/push/deployment outcomes reported in handoff. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Earlier log entries and concurrent exhibition work preserved; conflicts reported in handoff.
+
+## 2026-10-18 - Sign-in surface corrections and four-sided artwork framing
+
+### Request and changes
+
+- Added a sign-in-only class and root scrollbar override: no forced/reserved scrollbar track on sign-in, while short-screen content remains vertically scrollable. Other routes retain their existing scrollbar behavior.
+- Restored the original cream pen nib in light authentication styling, matching dark mode; retained deep-olive nib details and canonical logo geometry. Updated the design note accordingly.
+- Sign-in email/password inputs and password wrapper now use transparent backgrounds matching the glass form in normal/hover/focus states. Scoped light/dark autofill inset surfaces and text colors cover browser blue autofill coloring, including the focused password-input specificity case. Existing validation, password visibility and authentication behavior unchanged.
+- Increased artwork backdrop opacity to .7 with restrained saturation (1.15) and brightness (.85), retaining the soft 24px blur and sharp unchanged original. Added 20–36px padding on every edge and a bounded desktop minimum media width so small square images have visible left/right breathing room as well as centered top/bottom space. Mobile removes the minimum-width constraint; contain bounds, read-only previews and video behavior preserved.
+
+### Repositories and files
+
+All three repositories checked clean and pulled main before edits. Frontend only: LoginPage, styles, design notes, related layout/branding tests and this log. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, database, storage, embedding, authentication/authorization, dependency or backend/SnapStart changes. No original images modified, no secrets/configuration/build output committed.
+
+### Verification
+
+214 tests passed (74 foundation/layout and 140 component/feed). Added scoped sign-in scroll/autofill/password-wrapper assertions and updated cream-nib/richer-blur/four-sided-spacing checks. Strict TypeScript/Vite production build and git diff --check passed. Existing non-blocking Vite bundle warning and jsdom scrollTo notices remain; no failed checks bypassed.
+
+Headless Edge sign-in render reviewed without hiding browser scrollbars; confirmed no visible sign-in track and cream nib. A 225px square-artwork fixture confirmed sharp original centered with visible space on all four sides and stronger image-derived color. Physical devices, live saved-credential autofill and the user's actual uploaded artwork were not exercised. Temporary fixtures and preview server removed/stopped before handoff.
+
+### Deployment and Git
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: fix/signin-fields-artwork-spacing. Fetch/rebase before branch push, followed by authorized fast-forward main merge/push. Exact commit, conflicts, push and deployment outcomes reported in handoff. Previous feature-log entries preserved.

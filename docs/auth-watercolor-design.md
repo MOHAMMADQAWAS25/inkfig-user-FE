@@ -1,6 +1,6 @@
 # Authentication watercolor assets
 
-The user-provided light/dark mockups guided the background composition and glass forms. The production forms and logo are real HTML/SVG, never baked into the artwork. The canonical logo geometry and fig are preserved; auth-only CSS gives the pen nib a deep-olive fill on cream and a cream fill on deep green. Dark leaf fills use the established light-olive brand tint for contrast.
+The user-provided light/dark mockups guided the background composition and glass forms. The production forms and logo are real HTML/SVG, never baked into the artwork. The canonical logo geometry and fig are preserved; the pen nib keeps its original creamy fill in both themes. Dark leaf fills use the established light-olive brand tint for contrast.
 
 ## Saved assets
 

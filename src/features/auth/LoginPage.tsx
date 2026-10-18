@@ -46,7 +46,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="auth-layout auth-photo-background">
+    <main className="auth-layout auth-photo-background auth-signin">
       <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <div className="auth-form-column login-form-column auth-enter-from-start">
         <section className="auth-card login-card" aria-labelledby="login-title">

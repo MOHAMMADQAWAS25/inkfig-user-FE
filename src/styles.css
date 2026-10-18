@@ -1770,6 +1770,15 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .auth-photo-background .login-form-column { width: min(620px,100%); }
 .auth-photo-background .auth-card { width: min(620px,100%); max-height: none; overflow: visible; padding: clamp(28px,3vw,40px); border: 1px solid rgb(97 125 43 / .65); border-radius: 12px; background: rgb(255 253 235 / .55); color: #283014; box-shadow: 0 18px 60px rgb(57 67 28 / .09),inset 0 1px 0 rgb(255 255 255 / .6); backdrop-filter: blur(18px) saturate(115%); -webkit-backdrop-filter: blur(18px) saturate(115%); scrollbar-gutter: auto; --text:#283014; --muted:#53603c; --primary:#617d2b; --primary-hover:#4c6422; --primary-ink:#fffdf0; --border:rgb(97 125 43 / .5); --border-strong:#617d2b; --input-background:rgb(255 253 240 / .46); --surface:rgb(255 253 240 / .85); --surface-raised:#eee7bd; --error-background:rgb(152 40 36 / .08); --auth-logo-nib:#39431c; --auth-logo-detail:#eee7bd; --auth-logo-leaf:#617d2b; }
 .auth-photo-background .auth-card::before { content: none; }
+/* Keep sign-in scrollable on short screens without the gallery's permanent scroll track. */
+html:has(.auth-signin) { overflow-y: auto; scrollbar-gutter: auto; scrollbar-width: none; }
+html:has(.auth-signin)::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.auth-photo-background .auth-card { --auth-logo-nib:#eee7bd; --auth-logo-detail:#39431c; }
+.auth-signin .form-stack input, .auth-signin .form-stack input:hover, .auth-signin .form-stack input:focus { background: transparent; color: var(--text); }
+.auth-signin .password-input-shell, .auth-signin .password-input-shell:hover, .auth-signin .password-input-shell:focus-within { background: transparent; }
+.auth-signin { --signin-autofill:#f5f1d9; }
+:root[data-theme="dark"] .auth-signin { --signin-autofill:#1c2314; }
+.auth-signin .form-stack input:is(:autofill,:-webkit-autofill) { -webkit-box-shadow: 0 0 0 1000px var(--signin-autofill) inset; box-shadow: 0 0 0 1000px var(--signin-autofill) inset; -webkit-text-fill-color: var(--text); caret-color: var(--text); }
 .auth-photo-background .signup-card { width: 100%; }
 .auth-photo-background .auth-logo { width: min(200px,54%); margin: 0 auto 18px; }
 .auth-logo svg { display: block; width: 100%; height: auto; }
@@ -1797,11 +1806,11 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 }
 /* Center originals in the full media column; show the image-derived blur only in spare space. */
 .artwork-modal { align-items: stretch; }
-.artwork-modal-media { position: relative; align-self: stretch; place-items: center; min-width: 0; max-width: min(62vw,720px); isolation: isolate; background: var(--surface); }
-.artwork-modal-media .artwork-media-backdrop { position: absolute; z-index: -1; inset: -8%; display: block; width: 116%; height: 116%; max-width: none; max-height: none; object-fit: cover; object-position: center; filter: blur(24px); opacity: .38; pointer-events: none; user-select: none; }
+.artwork-modal-media { position: relative; align-self: stretch; place-items: center; min-width: 0; min-inline-size: min(38vw,420px); max-width: min(62vw,720px); padding: clamp(20px,2.5vw,36px); isolation: isolate; background: var(--surface); }
+.artwork-modal-media .artwork-media-backdrop { position: absolute; z-index: -1; inset: -8%; display: block; width: 116%; height: 116%; max-width: none; max-height: none; object-fit: cover; object-position: center; filter: blur(24px) saturate(1.15) brightness(.85); opacity: .7; pointer-events: none; user-select: none; }
 .artwork-modal-media .artwork-media-original { position: relative; max-width: 100%; object-fit: contain; object-position: center; background: var(--surface); }
 .artwork-media-unavailable { display: grid; place-items: center; min-height: 220px; padding: 24px; color: var(--muted); }
-@media (max-width:780px) { .artwork-modal-media { max-width: 100%; } }
+@media (max-width:780px) { .artwork-modal-media { max-width: 100%; min-inline-size: 0; } }
 /* Exhibitions: natural artwork proportions and responsive operational controls. */
 .exhibitions-page { min-height:100vh; padding:32px 28px 100px; color:var(--text); }
 .exhibitions-shell { max-width:1280px; margin-inline:auto; }

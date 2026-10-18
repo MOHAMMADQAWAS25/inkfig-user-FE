@@ -247,7 +247,7 @@ test("centers the logo inside both forms and themes their scrollbars", () => {
 });
 
 test("uses the supplied responsive background on login and signup", () => {
-  assert.ok(loginPage.includes('className="auth-layout auth-photo-background"'));
+  assert.ok(loginPage.includes('className="auth-layout auth-photo-background auth-signin"'));
   assert.ok(signup.includes('className="auth-layout auth-layout-scroll auth-photo-background"'));
   assert.ok(loginPage.includes("auth-enter-from-start"));
   assert.ok(signup.includes("auth-enter-from-end"));
