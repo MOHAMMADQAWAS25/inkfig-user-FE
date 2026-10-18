@@ -1826,7 +1826,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-upload-link { display:inline-flex; gap:8px; align-items:center; margin-top:20px; }
 .exhibition-detail-card { margin-block:20px 28px; }
 .exhibition-detail-card:hover,.exhibition-detail-card:focus-visible { transform:none; }
-.exhibition-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px; margin-block:16px 24px; border:1px solid rgb(97 125 43 / .25); border-radius:18px; background:rgb(255 253 242 / .78); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+.exhibition-toolbar { position:sticky; top:calc(12px + env(safe-area-inset-top,0px)); z-index:20; display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px; margin-block:16px 24px; border:1px solid rgb(97 125 43 / .25); border-radius:18px; background:rgb(255 253 242 / .78); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
 .exhibition-toolbar>a,.exhibition-toolbar>button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:42px; padding:10px 16px; border-radius:12px; text-decoration:none; color:inherit; }
 .exhibition-toolbar>.primary-button { background:var(--primary); color:var(--primary-contrast,#fff); }
 .exhibition-toolbar>button:disabled { opacity:.5; cursor:not-allowed; }
