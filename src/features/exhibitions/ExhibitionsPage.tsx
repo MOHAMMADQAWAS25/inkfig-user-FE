@@ -15,6 +15,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
+import { ExhibitionCountdown } from "./ExhibitionCountdown";
 import { getMyWorks } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import {
@@ -334,6 +335,7 @@ export function ExhibitionsPage() {
                       <CalendarDays size={16} />
                       {date(item.event_at)}
                     </small>
+                    <ExhibitionCountdown eventAt={item.event_at} />
                   </div>
                 </Link>
               ))}

@@ -1764,6 +1764,13 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 .exhibition-card p { white-space:pre-wrap; overflow-wrap:anywhere; }
 .exhibition-card small { display:flex; align-items:center; gap:8px; }
 .exhibition-banner-fallback { min-height:160px; display:grid; place-items:center; background:linear-gradient(135deg,#39431c,#8b9b4d); color:#fff8dc; }
+.exhibition-countdown { margin-top:18px; padding:14px; border-radius:14px; background:rgb(97 125 43 / .10); }
+.exhibition-countdown-label { display:flex; align-items:center; gap:7px; font-size:.82rem; font-weight:650; }
+.exhibition-countdown-units { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:12px; }
+.exhibition-countdown-units>span { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.exhibition-countdown-units strong { font-size:1.35rem; font-variant-numeric:tabular-nums; }
+.exhibition-countdown-units small { font-size:.7rem; opacity:.8; }
+:root[data-theme=dark] .exhibition-countdown { background:rgb(169 182 95 / .12); }
 .exhibition-hero-banner { display:block; width:100%; max-height:460px; object-fit:contain; margin:20px 0; border-radius:18px; }
 .exhibition-summary,.exhibition-participation,.exhibition-editor,.exhibition-blocks { padding:24px; margin:24px 0; }
 .exhibition-summary>p { white-space:pre-wrap; }
