@@ -1,3 +1,4 @@
+import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export function ArtworkMedia({ url, title, mimeType, readOnly, failureLabel }: { url: string; title: string; mimeType: string; readOnly: boolean; failureLabel: string }) {
@@ -36,9 +37,9 @@ export function ArtworkMedia({ url, title, mimeType, readOnly, failureLabel }: {
   }, [url, video, failed]);
   const scale = !failed && !video && frame?.url === url ? frame.scale : 1;
   return <div ref={mediaRef} className="artwork-modal-media" data-framed={scale < 1}>
-    {scale < 1 && <img className="artwork-media-backdrop" src={url} alt="" aria-hidden="true" draggable={false} decoding="async" />}
+    {scale < 1 && <img {...artworkImageProtection} className="artwork-media-backdrop" src={url} alt="" aria-hidden="true" draggable={false} decoding="async" />}
     {failed ? <p className="artwork-media-unavailable" role="status">{failureLabel}</p> : video
       ? <video className="artwork-media-original" src={url} controls={!readOnly} playsInline preload="metadata" onError={() => setFailed(true)}/>
-      : <img key={url} ref={imageRef} className="artwork-media-original" style={scale < 1 ? { transform: `scale(${scale})` } : undefined} src={url} alt={title} draggable={false} decoding="async" onError={() => setFailed(true)}/>}
+      : <img {...artworkImageProtection} key={url} ref={imageRef} className="artwork-media-original" style={scale < 1 ? { transform: `scale(${scale})` } : undefined} src={url} alt={title} draggable={false} decoding="async" onError={() => setFailed(true)}/>}
   </div>;
 }

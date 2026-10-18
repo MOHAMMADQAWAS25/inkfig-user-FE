@@ -9588,3 +9588,25 @@ Branch: feature/layout-review-refinements in both affected repositories. Fetch/r
 ### Post-synchronization verification
 
 Rebased over 5e50a6d first-login reminder. Resolved only the adjacent HomePage imports and log append-point conflicts by retaining both imports/features and both complete log entries. Scoped incoming native-dialog styles preserved. Slider focus/Tab/Escape/outside-dismiss now yield to an open native dialog above them, with a regression ensuring the first-login popup cannot lose focus to a lower slider. Final combined checks: 263 tests passed (79 source/layout, 184 component), TypeScript/Vite build and git diff --check passed. Backend deployment remains successful; no prior feature-log text rewritten.
+
+## 2026-10-18 - Lightweight artwork image interaction protection
+
+### Request and changes
+
+Disable default context menus and image dragging on published artwork images. Added shared stable artworkImageProtection props with draggable=false, onContextMenu.preventDefault and onDragStart.preventDefault. Applied to homepage feed images, profile posts/likes/saved cards and existing-post edit previews, shared full-size artwork media including exhibition/review detail previews, exhibition public artwork/submission thumbnails and moderation artwork thumbnails/previews. Decorative copies derived from artwork receive the same handlers. Reported-user avatars remain unmodified through conditional thumbnail props. No document-wide listeners, overlays, new rendering wrappers or CSS changes.
+
+### Repositories and files
+
+Frontend only: shared works/artworkImageProtection.ts, feed/LazyImage, home/ArtworkMedia, profile/ProfilePage, exhibitions/ExhibitionsPage and SubmissionIdentity, admin/AdminReportsPage, interaction regression tests and this log. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, authorization, permissions, storage, dependencies, configuration, credentials or SnapStart changes. Avatars, logos, exhibition banners/backgrounds and local upload/crop previews excluded. Normal clicks, previews, controls, touch scrolling, lazy/responsive images, videos and masonry preserved. This is a lightweight browser-interaction deterrent, not protection against screenshots, developer tools or direct downloads.
+
+### Verification
+
+267 tests passed (79 source/layout, 188 component); strict TypeScript/Vite production build and git diff --check passed. New tests verify canceled contextmenu/dragstart events, draggable=false, preserved card clicks, unchanged avatars/video controls, thumbnail blur-layer protection and coverage/exclusions across profile/exhibition/moderation/upload paths. Initial source-coverage test path resolution failed; corrected to the project-relative source path and full suite rerun successfully. Existing non-blocking bundle warning and jsdom scrollTo notices remain. No live browser verification or production content mutation performed.
+
+### Deployment and Git
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: feature/artwork-image-protection. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit, conflicts and deployment outcomes reported in handoff. Earlier entries and concurrent layout/review changes preserved.

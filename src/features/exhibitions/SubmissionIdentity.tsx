@@ -1,3 +1,4 @@
+import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useState } from "react";
 import { ImageOff } from "lucide-react";
 
@@ -5,8 +6,8 @@ export function SubmissionThumbnail({ url }: { url: string }) {
   const [loaded, setLoaded] = useState<{ url: string; gaps: boolean } | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   return <span className="exhibition-record-thumbnail" aria-hidden="true">
-    {failed !== url && loaded?.url === url && loaded.gaps && <img className="record-thumbnail-blur" src={url} alt="" draggable={false}/>}
-    {failed === url ? <ImageOff size={24}/> : <img className="record-thumbnail-original" src={url} alt="" loading="lazy" decoding="async" onLoad={event => {
+    {failed !== url && loaded?.url === url && loaded.gaps && <img {...artworkImageProtection} className="record-thumbnail-blur" src={url} alt="" draggable={false}/>}
+    {failed === url ? <ImageOff size={24}/> : <img {...artworkImageProtection} className="record-thumbnail-original" src={url} alt="" loading="lazy" decoding="async" onLoad={event => {
       const image = event.currentTarget;
       setLoaded({ url, gaps: image.naturalWidth > 0 && image.naturalHeight > 0 && Math.abs(image.naturalWidth - image.naturalHeight) > 1 });
     }} onError={() => setFailed(url)}/>}

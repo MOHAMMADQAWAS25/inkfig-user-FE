@@ -1,3 +1,4 @@
+import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -376,7 +377,7 @@ export function ExhibitionsPage() {
                 {submissions.map((item) => (
                   <article className="exhibition-card" key={item.submission_id}>
                     <Link to={`/${language}?work=${item.work_id}`}>
-                      <img
+                      <img {...artworkImageProtection}
                         src={item.image_url}
                         alt={item.title}
                         loading="lazy"
