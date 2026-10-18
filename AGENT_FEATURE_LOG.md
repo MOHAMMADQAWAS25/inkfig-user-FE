@@ -8829,3 +8829,86 @@ No migration required.
 ### Notes
 
 Existing non-blocking Vite chunk-size warning remains.
+## 2026-10-18 - Profile exhibition assignment and personal submissions
+
+### Request
+
+Remove the edit plus and detail-card hover movement; add profile-based work assignment, exhibition upload participation, ten-work limit and blurred action navbar with a My submissions page.
+
+### Changes
+
+- Exhibition details now have a responsive blurred toolbar with icon/text Edit exhibition, eligible Participate upload link and My submissions navigation.
+- Removed the old existing-work selector from exhibition details. Profile own-post three-dot menus now offer Assign to an exhibition, including mobile menus.
+- Added a paginated accessible dialog showing only backend-eligible exhibitions, one selection, loading/empty/error/success states, Escape/backdrop close, keyboard focus containment and scroll lock.
+- Exhibition uploads accept one file, show exhibition context, check eligibility before upload and reuse the published work ID if membership submission needs retry.
+- Personal page separates approved and pending works with independent server-filtered cursors; collapsed rejection history retains reasons.
+- Detail card no longer translates on hover. Listing-card motion, uncropped banners, blur, details, countdown, public approved gallery and management review workflow unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: toolbar, assignment/upload workflow and personal status page.
+- `inkfig-main-system`: eligible listing, server-authoritative active quota and status filtering.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionToolbar.tsx`: blurred action navbar.
+- `src/features/exhibitions/AssignExhibitionDialog.tsx`: paginated selection and single-work assignment.
+- `src/features/exhibitions/MyExhibitionSubmissionsPage.tsx`: independent approved/pending pages and rejected history.
+- `src/features/exhibitions/ExhibitionsPage.tsx`: new toolbar and removal of obsolete participation selector.
+- `src/features/exhibitions/exhibitionApi.ts`: eligible lookup and status query client helpers.
+- `src/features/profile/ProfilePage.tsx`: owner-menu assignment dialog entry.
+- `src/features/works/UploadWorkPage.tsx`: contextual single-work upload and preflight/retry behavior.
+- `src/app/AppRouter.tsx`: personal submissions route.
+- `src/i18n/resources.ts`: English/Arabic labels, quota and eligibility explanations.
+- `src/styles.css`: glass toolbar, stationary detail card, responsive dialog/status grids and mobile owner menu.
+- `tests/exhibitions.test.tsx`, `tests/gallery-interactions.test.tsx`, `tests/mobile-profile.test.tsx`: updated workflow, eligibility, paging, owner-menu and upload-retry coverage.
+
+### API
+
+- Consumes `GET /api/v1/exhibitions/eligible` with optional owned work_id/exhibition_id and bounded cursors.
+- Consumes `GET /api/v1/exhibitions/{id}/submissions?scope=mine&status=approved|pending|rejected` using separate cursors.
+- Reuses single-work `POST /api/v1/exhibitions/{id}/submissions`, upload/publish and existing management APIs.
+- Handles backend permission, block, closed-window, duplicate and quota failures without bypassing review.
+
+### Database
+
+- Migration: `20261018_014_index_active_exhibition_submissions.sql` in main backend, applied successfully to Supabase.
+- No frontend-owned schema. Partial index supports backend quota/eligibility; no data removed or rewritten.
+
+### Permissions and scope
+
+- Profile assignment only appears for own posts with exhibitions.participate, inside existing owner controls.
+- Edit/review UI remains supervisor/admin/system-administrator scoped across exhibitions.
+- Eligible participation requires current backend permission, verified active account, owned published work, open window, no block and fewer than ten pending/approved memberships.
+- Backend validates permissions/scope, limits and moderation; frontend eligibility is only a UX aid.
+
+### Frontend
+
+- Route `/:language/exhibition/:exhibitionId/submissions` requires sign-in and shows private status sections with independent loading/errors/empty states/load-more.
+- Route `/:language/upload?exhibition={id}` shows exhibition context, one-file input and Submit for approval action.
+- Profile three-dot menu opens selection dialog; invalid/full/blocked/closed/already-assigned exhibitions are absent.
+- Existing Arabic/English, RTL/LTR, light/dark, reduced motion and responsive gallery navigation preserved.
+
+### Verification
+
+- `[passed] npm.cmd test` - 69 source/layout checks and 114 component tests.
+- `[passed] npm.cmd run build` - strict TypeScript and Vite build.
+- `[passed] companion backend tests, mypy and rolled-back real Supabase quota/eligibility verification`
+- `[passed] git diff --check`
+- `[failed] initial updated workflow test - obsolete selector expectation; corrected to toolbar participation action.
+- `[failed] first upload-retry regression - unstable dependency could reset retained publication; changed to stable actor/language dependencies and final full rerun passed.
+- `[not run] real browser visual inspection - component workflows and responsive CSS verified`
+
+### Deployment
+
+- Main backend/migration first, then frontend via existing Cloudflare workflow. No configuration or secret changes.
+
+### Git
+
+- Branch: `main`
+- Commit: `651188a`
+- Push: pending final synchronization; verified outcome reported in handoff.
+
+### Notes
+
+Active quota is ten pending plus approved works per user per exhibition; rejections free capacity. Profile publication remains public independent of exhibition review. If membership fails after publication, retry submits the same profile work rather than uploading another. Available exhibitions have an open participation window and future start; no event-end field exists. Existing non-blocking Vite large-chunk warning remains.
