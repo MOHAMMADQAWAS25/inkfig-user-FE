@@ -2117,6 +2117,14 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibition-detail-card .exhibition-summary dt { font-size:.78rem; opacity:.75; }
 .exhibition-detail-card .exhibition-summary dd { font-size:.88rem; margin-block:6px 0; overflow-wrap:anywhere; }
 @media(max-width:720px) { .exhibition-detail-card .exhibition-summary dl { grid-template-columns:minmax(0,1fr); } }
+.first-login-backup-dialog { width:min(440px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); margin:auto; padding:0; overflow:auto; border:1px solid var(--border); border-radius:18px; background:var(--surface); color:var(--text); }
+.first-login-backup-dialog::backdrop { background:rgb(12 15 8 / .65); }
+.first-login-backup-content { padding:28px; }
+.first-login-backup-content>svg { color:var(--primary); }
+.first-login-backup-content h2 { margin:16px 0 12px; font-size:1.35rem; }
+.first-login-backup-content p { margin:0 0 24px; line-height:1.6; color:var(--muted); }
+.first-login-backup-actions { display:flex; flex-wrap:wrap; gap:12px; }
+.first-login-backup-actions button { flex:1 1 130px; }
 .backup-warning { display:flex; align-items:flex-start; gap:8px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--text); }
 .backup-warning svg, .backup-warning-icon { flex-shrink:0; color:var(--primary); }
 .reset-destinations { display:grid; gap:12px; min-width:0; margin:0; padding:16px; border:1px solid var(--border); border-radius:10px; }

@@ -6,6 +6,7 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 
 import { useScrollHeader } from "./useScrollHeader";
 import { SearchHints } from "./SearchHints";
+import { FirstLoginBackupPrompt } from "./FirstLoginBackupPrompt";
 import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -202,6 +203,7 @@ export function HomePage() {
 
   return (
     <main className="gallery-home">
+      <FirstLoginBackupPrompt ready={!feed.loading} />
       <AppSidebar />
       <header className={`gallery-header${headerProgress >= 1 ? " mobile-header-hidden" : ""}`} style={{ "--mobile-header-progress": headerProgress } as CSSProperties}>
         <span className="mobile-header-menu" id="mobile-menu-slot" />

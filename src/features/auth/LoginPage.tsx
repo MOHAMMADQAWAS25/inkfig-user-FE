@@ -18,9 +18,10 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBackupPrompt, setShowBackupPrompt] = useState(false);
 
   if (session !== null) {
-    return <Navigate replace to={`/${language}`} />;
+    return <Navigate replace to={`/${language}`} state={showBackupPrompt ? { firstLoginBackupPrompt: true } : null} />;
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -29,6 +30,7 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       const response = await loginUser(email.trim().toLowerCase(), password);
+      setShowBackupPrompt(response.show_backup_email_prompt === true);
       setSession({
         email: response.email,
         fullName: response.full_name,

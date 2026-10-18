@@ -109,3 +109,10 @@ it("localizes the optional security section in Arabic", () => {
   wrap(<BackupEmailSettings profile={profile} onSaved={vi.fn()} />, "ar");
   expect(screen.getByRole("heading", { name: "البريد الإلكتروني الاحتياطي" })).toBeTruthy();
 });
+
+it("opens Security directly through the first-login reminder deep link", async () => {
+  auth.session = { email: profile.email };
+  vi.mocked(loadProfileSettings).mockResolvedValue(profile);
+  render(<MemoryRouter initialEntries={["/en/settings?section=security"]}><I18nProvider><ThemeProvider><SettingsPage /></ThemeProvider></I18nProvider></MemoryRouter>);
+  expect(await screen.findByRole("heading", { name: "Backup email" })).toBeTruthy();
+});

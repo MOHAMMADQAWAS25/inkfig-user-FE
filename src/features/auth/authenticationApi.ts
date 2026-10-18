@@ -1,6 +1,7 @@
 import { requestJson, userApiBaseUrl } from "../../api/httpClient";
 
 export interface AuthenticationResponse {
+  show_backup_email_prompt?: boolean;
   expires_in: number;
   user_id: string;
   email: string;

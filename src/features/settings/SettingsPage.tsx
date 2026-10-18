@@ -1,6 +1,6 @@
 import { KeyRound, MailCheck, Shield, UserRoundPen, X, TriangleAlert, Mail } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 
 import { ApiError } from "../../api/httpClient";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -22,9 +22,10 @@ type Section = "profile" | "password" | "account" | "security";
 const blankProfile: ProfileSettings = { email: "", full_name: "", phone_number: "", gender: "female", date_of_birth: "", is_active: true };
 
 export function SettingsPage() {
+  const [searchParams] = useSearchParams();
   const { language, t } = useI18n();
   const { session, setSession, signOut } = useAuth();
-  const [section, setSection] = useState<Section>("profile");
+  const [section, setSection] = useState<Section>(() => searchParams.get("section") === "security" ? "security" : "profile");
   const [profile, setProfile] = useState(blankProfile);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [resetDestination, setResetDestination] = useState<ResetDestination>();

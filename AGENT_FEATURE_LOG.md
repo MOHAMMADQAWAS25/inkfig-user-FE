@@ -9522,3 +9522,25 @@ Branch: feature/backup-email in both repositories. Focused commits, fetch/rebase
 ### Post-synchronization verification
 
 Rebased over concurrent upload-form polish e53aa4f. Only the append-only feature log conflicted; preserved the complete incoming entry followed by this ticket, without dropping either agent's work. Resources and scoped styles merged automatically. Full combined verification passed: 242 tests (78 source/layout, 164 component) and strict TypeScript/Vite build. Backend remains 109 passing tests with clean mypy. Branch/main push results reported in handoff.
+
+## 2026-10-18 - First-login backup email popup
+
+### Request and changes
+
+Added a small centered native modal after the first successful sign-in and homepage initial feed load. Title: Keep access after graduation; body reuses Add a backup email to help keep access after graduation. Add backup email closes and navigates directly to /settings?section=security; Later, Escape and backdrop click dismiss permanently for that login. Native modal provides focus containment and inert background, with initial Later focus and focus restoration. No new animation; shared theme colors, responsive width, English/Arabic supported. Existing Security warning unchanged.
+
+### Repositories and files
+
+inkfig-user-FE: LoginPage/authenticationApi, new FirstLoginBackupPrompt, HomePage, SettingsPage query-selected section, localized strings, scoped dialog styles, popup/deep-link tests and this log. Matching user-system branch provides persistent first-login eligibility; main-system unchanged.
+
+### API, state and scope
+
+Consumes optional show_backup_email_prompt from successful login only. Transports it through replace-navigation state, immediately removes that state on home mount, and never adds it to persisted AuthSession. Refresh/ordinary navigation/returning sign-ins therefore do not replay it. Rechecks owner settings before showing, suppressing users who already saved a backup; errors fail closed without blocking browsing. No account/permission changes, new dependencies, secrets or SnapStart effects. A user who leaves before seeing the first-login prompt does not receive a later-login reminder, as requested.
+
+### Verification
+
+252 tests passed (78 source/layout and 174 component); strict TypeScript/Vite build and git diff --check passed. New tests cover login-to-home flag delivery without session persistence, homepage readiness, state consumption, Add destination and actual Security deep link, Later/Escape/outside dismissal, guest/restored-session suppression, saved-backup suppression and Arabic content. Initial jsdom tests required explicit native-dialog method shims; corrected and complete suite passed. Backend 115 tests and mypy on 121 files passed. Existing non-blocking Vite chunk warning/jsdom notices remain. Native-browser visual/real-user testing not performed.
+
+### Deployment and Git
+
+Apply user-system migration 20261018_022_track_first_login.sql and deploy backend first, then existing Cloudflare frontend workflow. Matching branch: feature/first-login-backup-reminder. Fetch/rebase before branch push and authorized fast-forward main merge/push; exact hashes, conflict and deployment outcomes reported in handoff. All previous entries preserved.
