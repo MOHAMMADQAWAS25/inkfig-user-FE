@@ -8700,3 +8700,70 @@ No migration required.
 ### Notes
 
 Already-dispatched requests may complete on the server, but obsolete results are ignored. Existing non-blocking Vite chunk-size warning remains.
+
+## 2026-10-18 - Shared two-column exhibition details card
+
+### Request
+
+Show the overview-style card at the top of exhibition details, with additional details in its second column and no View exhibition action.
+
+### Changes
+
+- Added a non-linked detail variant to the existing exhibition card, preserving its banner, blur, countdown and responsive layout.
+- Placed the complete description, event/participation dates, manager edit action and existing participation controls in the information column.
+- Removed the separate hero banner/summary presentation and the detail variant's View exhibition action; listing cards retain that action.
+- Preserved viewport bounds through internal information-column scrolling, with untruncated full descriptions.
+- Submission/review tabs, approved works, blocking controls and all backend rules remain unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: shared detail presentation only.
+
+### Files
+
+- `src/features/exhibitions/ExhibitionCard.tsx`: non-linked detail mode with additional information content.
+- `src/features/exhibitions/ExhibitionsPage.tsx`: dates, editing and participation inside shared card.
+- `src/styles.css`: full-description and grouped date/control styling.
+- `tests/exhibitions.test.tsx`: information-column and manager edit-placement checks.
+- `AGENT_FEATURE_LOG.md`: appended this entry.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+- Public exhibition details remain visible to visitors; participation and management retain existing role visibility.
+- Backend continues validating current permissions, ownership, participation dates and blocks; authorization unchanged.
+
+### Frontend
+
+- Exhibition details use banner/information columns on desktop and stacked layout on mobile.
+- Full description and all dates appear alongside countdown, status and existing available controls.
+- Detail wrapper is a section, not a link, avoiding nested interactive links/buttons.
+- Existing localization, themes, hover/reduced-motion styles, forms and loading/error states remain.
+
+### Verification
+
+- `[passed] npm.cmd run test:feed -- tests/exhibitions.test.tsx` - 11 tests.
+- `[passed] npm.cmd run build` - TypeScript and Vite production build.
+- `[passed] git diff --check`
+- `[not run] browser visual inspection - component workflows and CSS verification used`
+
+### Deployment
+
+- Frontend-only deployment through existing Cloudflare workflow; no special deployment steps.
+
+### Git
+
+- Branch: `main`
+- Commit: `62e7e79`
+- Push: pending synchronization; outcome reported in handoff.
+
+### Notes
+
+Long descriptions and controls scroll inside the bounded second column rather than increasing card height. Existing non-blocking Vite chunk-size warning remains.
