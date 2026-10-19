@@ -12,13 +12,14 @@ import { AdminReportsPage } from "../features/admin/AdminReportsPage";
 import { FeaturePlaceholderPage } from "../features/navigation/FeaturePlaceholderPage";
 import { SettingsPage } from "../features/settings/SettingsPage";
 import { SiteFooter } from "../features/layout/SiteFooter";
+import { PageMetadata } from "../seo/PageMetadata";
 import { ExhibitionsPage } from "../features/exhibitions/ExhibitionsPage";
 import { MyExhibitionSubmissionsPage, ReviewExhibitionSubmissionsPage } from "../features/exhibitions/MyExhibitionSubmissionsPage";
 
 export function AppRouter() {
   const location = useLocation();
   return (
-    <><div key={location.pathname} className="site-content"><Routes>
+    <><PageMetadata /><div key={location.pathname} className="site-content"><Routes>
       <Route path="/:language" element={<HomePage />} />
       <Route path="/:language/login" element={<LoginPage />} />
       <Route path="/:language/signup" element={<SignupPage />} />

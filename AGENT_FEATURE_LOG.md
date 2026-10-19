@@ -9700,3 +9700,27 @@ Consumes new /notifications/unread-count and /exhibitions/pending-counts plus ad
 ### Deployment and limitations
 
 Deploy user-system migration/API, main-system, then frontend via main workflows. Badge counts represent pending submissions plus pending withdrawals and clear through decisions, not merely viewing. Bell count represents unread saved student decisions and existing social notifications. WebSocket receipt triggers lightweight summaries on other pages but full list reloads only while the corresponding view is open. No periodic list polling. Transport remains best effort with reconnect/open recovery; closed tabs do not get a new permanent browser notification. No personal-browser or real two-account production decision exercise was performed.
+
+## 2026-10-19 - Google Search discovery foundation
+
+### Request and repository scope
+
+Prepare InkFig to appear in Google searches for its name, including the website-side setup. All three clean main repositories pulled/rebased successfully before changes; both backends unchanged. Search Console ownership requires the owner's Google session and verification record; neither ownership nor indexing is claimed.
+
+### Changes and files
+
+- scripts/build-seo.mjs and src/seo/pages.json generate localized initial HTML heads for the English/Arabic homepage and exhibition listing, real robots.txt and a four-URL multilingual sitemap.xml. Adds descriptive brand titles/descriptions, reciprocal hreflang/self-canonical links, social metadata and WebSite structured data on homepages/root, without new dependencies.
+- src/seo/PageMetadata.tsx and AppRouter update metadata during client navigation, discard stale alternatives/schema on account routes, and exclude query/filter, account, moderation and individual-record URLs from indexing for this initial discovery rollout. Generated Cloudflare _headers additionally mark account/admin/submission entry requests noindex before JavaScript. Crawler access remains allowed so noindex is readable; no authorization relies on robots rules.
+- index.html/package.json integrate head generation into the existing build/deployment. README.md and docs/search-indexing.md document ownership TXT verification, sitemap submission, request indexing, limitations and safe owner handoff. tests/seo-build.test.mjs and tests/seo.test.tsx cover generated artifacts and SPA metadata transitions.
+
+### API, database, permissions and frontend
+
+No API changes. No migration required. No backend, authentication, permissions, secrets, environment-file or SnapStart runtime changes. No visual/feed behavior changes or new analytics/cookies. Existing public content is not duplicated into build-time database exports. Only four public discovery pages are included initially, not every artwork/profile/exhibition record.
+
+### Verification
+
+307 tests passed (83 Node/source checks, 224 Vitest checks); strict TypeScript and Vite production build passed. Inspected generated localized HTML, canonical/hreflang/schema, robots.txt, sitemap and private-route headers. git diff --check passed. Existing non-blocking Vite large-bundle warning and jsdom scrollTo notices remain. Before changes, live robots.txt and sitemap.xml incorrectly returned SPA HTML. Browser/live post-deployment outcomes reported in handoff.
+
+### Deployment and limitations
+
+Frontend-only deployment through existing Cloudflare main workflow; no backend push/deployment or migration required. Pull/rebase again immediately before pushing. Google Search Console still requires owner sign-in and its exact verification value; no DNS records, Google account settings or indexing requests fabricated. Google controls crawl timing, indexing and rank. Gallery content still uses JavaScript (not full SSR); individual-record metadata, missing-record HTTP handling and dynamic artwork sitemap remain follow-up work. Earlier feature-log entries preserved.

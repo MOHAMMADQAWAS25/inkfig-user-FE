@@ -7,6 +7,9 @@ This repository contains the web frontend through which students, teachers, and 
 See [the infinite image feed guide](docs/infinite-feed.md) for masonry/list layout,
 lazy images, virtualization, tuning, and verification commands.
 
+See [Google Search setup](docs/search-indexing.md) for generated search metadata,
+sitemap, crawler rules, and the owner-only Search Console verification steps.
+
 ## Product vision
 
 InkFig is an art-focused community platform with some similarities to Pinterest, while remaining tailored to the university context. Each student has an account and a personal body of work. Students can upload and display different kinds of art, including digital artwork made with tools such as Photoshop, hand-created artwork, and other art forms.

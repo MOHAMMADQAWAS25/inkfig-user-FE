@@ -1,0 +1,25 @@
+{
+  "origin": "https://inkfig-hu.com",
+  "en": {
+    "home": {
+      "title": "InkFig | Hebron University Art Community",
+      "description": "Discover original artwork, student portfolios and creative exhibitions on InkFig, the Hebron University art community."
+    },
+    "exhibition": {
+      "title": "Art Exhibitions | InkFig — Hebron University",
+      "description": "Explore student art exhibitions and discover creative work from the Hebron University community on InkFig."
+    },
+    "private": { "title": "Your account | InkFig", "description": "Manage your InkFig account and community activities." }
+  },
+  "ar": {
+    "home": {
+      "title": "InkFig | مجتمع الفن والإبداع في جامعة الخليل",
+      "description": "اكتشف الأعمال الفنية الأصلية وإبداعات الطلبة والمعارض الفنية على InkFig، مجتمع الفن والإبداع في جامعة الخليل."
+    },
+    "exhibition": {
+      "title": "المعارض الفنية | InkFig — جامعة الخليل",
+      "description": "استكشف المعارض الفنية وأعمال طلبة جامعة الخليل وإبداعاتهم على منصة InkFig."
+    },
+    "private": { "title": "حسابك | InkFig", "description": "إدارة حسابك وأنشطتك في مجتمع InkFig." }
+  }
+}
