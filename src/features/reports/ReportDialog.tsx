@@ -1,16 +1,20 @@
 import { Flag, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { TranslationKey } from "../../i18n/resources";
-import { createReport, type ReportReason } from "./reportsApi";
+import { createReport, getReportingEligibility, type ReportReason } from "./reportsApi";
 
 const userReasons:ReportReason[]=["impersonation","harassment","spam","hate_speech","other"];
 const workReasons:ReportReason[]=["harassment","hate_speech","violence","spam","copyright","impersonation","other"];
 export function ReportDialog({targetType,targetUserId,targetWorkId,onClose,t}:{targetType:"work"|"user";targetUserId:string;targetWorkId?:string;onClose:()=>void;t:(key:TranslationKey)=>string}){
  const [reason,setReason]=useState<ReportReason>(targetType==="user"?"impersonation":"harassment");const [details,setDetails]=useState("");const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [sent,setSent]=useState(false);
+ const [eligibility,setEligibility]=useState<"loading"|"allowed"|"blocked"|"error">("loading");
+ const [attempt,setAttempt]=useState(0);
+ useEffect(()=>{const controller=new AbortController();setEligibility("loading");getReportingEligibility(controller.signal).then(value=>{if(!controller.signal.aborted)setEligibility(value.allowed?"allowed":"blocked");}).catch(()=>{if(!controller.signal.aborted)setEligibility("error");});return()=>controller.abort();},[attempt]);
  const reasons=targetType==="user"?userReasons:workReasons;
  const detailsRequired=reason==="other";
  function reasonLabel(item:ReportReason){if(targetType==="user"&&item==="impersonation")return t("reports.userReason.impersonation");if(targetType==="user"&&item==="spam")return t("reports.userReason.spam");return t(`reports.reason.${item}` as TranslationKey);}
- async function submit(event:React.FormEvent){event.preventDefault();if(busy)return;const normalizedDetails=details.trim().replace(/\s+/gu," ");if((detailsRequired&&!normalizedDetails)||(normalizedDetails&&Array.from(normalizedDetails).length<10)){setError(t("reports.detailsInvalid"));return;}setBusy(true);setError("");try{await createReport({targetType,targetUserId,targetWorkId,reasonCode:reason,details:normalizedDetails});setSent(true);}catch(error){setError(error instanceof Error&&error.message.includes("already")?t("reports.duplicate"):t("reports.failed"));}finally{setBusy(false)}}
+ async function submit(event:React.FormEvent){event.preventDefault();if(busy||eligibility!=="allowed")return;const normalizedDetails=details.trim().replace(/\s+/gu," ");if((detailsRequired&&!normalizedDetails)||(normalizedDetails&&Array.from(normalizedDetails).length<10)){setError(t("reports.detailsInvalid"));return;}setBusy(true);setError("");try{await createReport({targetType,targetUserId,targetWorkId,reasonCode:reason,details:normalizedDetails});setSent(true);}catch(error){if(error instanceof Error&&error.message.includes("reporting privileges")){setEligibility("blocked");}else{setError(error instanceof Error&&error.message.includes("already")?t("reports.duplicate"):t("reports.failed"));}}finally{setBusy(false)}}
+ if(eligibility!=="allowed")return <div className="report-dialog-backdrop"><section className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-access-title"><h2 id="report-access-title">{t(eligibility==="blocked"?"reports.reportingBlocked":eligibility==="error"?"reports.failed":"reports.checkingAccess")}</h2>{eligibility==="error"&&<button type="button" onClick={()=>setAttempt(value=>value+1)}>{t("admin.refresh")}</button>}<button type="button" onClick={onClose}>{t("reports.cancel")}</button></section></div>;
  return <div className="report-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!busy&&onClose()}>
   <form className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" onSubmit={submit}>
    <button className="report-dialog-close" type="button" aria-label={t("reports.cancel")} disabled={busy} onClick={onClose}><X size={19}/></button>

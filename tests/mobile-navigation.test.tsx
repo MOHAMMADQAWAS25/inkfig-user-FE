@@ -27,6 +27,11 @@ it("shows the exhibition request counter on its mobile drawer icon",()=>{
 });
 function Probe() { return <output>{useLocation().pathname}</output>; }
 const notifications = vi.fn(), accounts = vi.fn();
+it("shows pending reports on the mobile Reports entry, capped at 99+",()=>{
+  render(<MemoryRouter initialEntries={["/en"]}><MobileNavigation unreadCount={0} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports reportCount={120}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button",{name:"Menu"}));
+  expect(screen.getByRole("button",{name:translations.en["nav.reports"]}).querySelector(".exhibition-count")?.textContent).toBe("99+");
+});
 function navigation() {
   return render(<MemoryRouter initialEntries={[`/${state.language}`]}><MobileNavigation unreadCount={2} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header><Probe/></MemoryRouter>);
 }

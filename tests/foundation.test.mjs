@@ -585,7 +585,8 @@ test("receives live notification invalidations over an authenticated websocket",
   assert.match(appSidebar, /new WebSocket/);
   assert.match(appSidebar, /reports\.changed/);
   assert.match(appSidebar, /inkfig:reports-changed/);
-  assert.match(adminReportsPage, /addEventListener\("inkfig:reports-changed"/);
+  assert.match(adminReportsPage, /useReportsLive/);
+  assert.match(readFileSync(new URL("../src/features/reports/useReportsLive.ts", import.meta.url), "utf8"), /addEventListener\("inkfig:reports-changed"/);
   assert.match(appSidebar, /notifications\.changed/);
   assert.match(appSidebar, /encodeURIComponent\(access\.ticket\)/);
   assert.match(appSidebar, /Math\.min\(30000/);

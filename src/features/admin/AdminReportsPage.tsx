@@ -1,6 +1,6 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { CheckCircle2, Flag, RefreshCw, ShieldBan, Trash2, UserRound, FileImage, ExternalLink, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 
 import { useI18n } from "../../i18n/I18nProvider";
@@ -8,7 +8,8 @@ import type { TranslationKey } from "../../i18n/resources";
 import { hasPermission } from "../../lib/permissions";
 import { useAuth } from "../auth/AuthContext";
 import { AppSidebar } from "../navigation/AppSidebar";
-import { getReports, reviewReport, type ReportItem, type ReportStatus } from "../reports/reportsApi";
+import { useReportsLive } from "../reports/useReportsLive";
+import { getReports, reviewReport, setReporterRestriction, type ReportItem, type ReportStatus } from "../reports/reportsApi";
 import { deleteWorkAsModerator, getWork, type Work } from "../works/worksApi";
 import { getPublicProfile, type PublicProfile } from "../profile/profileApi";
 import { setManagedUserStatus } from "./administrationApi";
@@ -28,13 +29,37 @@ export function AdminReportsPage(){
  const visible=items.filter(item=>(type==="all"||item.target_type===type)&&(reason==="all"||item.reason_code===reason)&&(filter==="all"||item.status===filter)).sort((a,b)=>oldest?a.created_at.localeCompare(b.created_at):b.created_at.localeCompare(a.created_at));
  const selected=visible.find(item=>item.report_id===selectedId)??null;
  useEffect(()=>{setPreview(null);if(!selected){setPreviewLoading(false);return;}let active=true;setPreviewLoading(true);const request=selected.target_work_id?getWork(selected.target_work_id):getPublicProfile(selected.target_user_id);request.then(value=>{if(active)setPreview(value);}).catch(()=>undefined).finally(()=>{if(active)setPreviewLoading(false);});return()=>{active=false;};},[selected?.report_id]);
- async function load(append=false){const next=append?cursor:undefined;if(append&&next===null)return;append?setLoadingMore(true):setLoading(true);setError("");try{const page=await getReports(filter==="all"?undefined:filter,next??undefined);setItems(current=>append?[...current,...page.items.filter(item=>!current.some(old=>old.report_id===item.report_id))]:page.items);setCursor(page.next_cursor);}catch{setError(t("reports.loadFailed"));}finally{setLoading(false);setLoadingMore(false)}}
- useEffect(()=>{if(canManage)void load();},[canManage,filter]);
- useEffect(()=>{if(!canManage)return;const refresh=()=>void load();window.addEventListener("inkfig:reports-changed",refresh);return()=>window.removeEventListener("inkfig:reports-changed",refresh);},[canManage,filter]);
+ const generation=useRef(0);
+ async function load(append=false,live=false){
+  const next=append?cursor:undefined;if(append&&next===null)return;
+  const request=++generation.current;
+  setLoadingMore(append);if(!live)setLoading(!append);setError("");
+  try{
+   const pages=live?Math.max(1,Math.ceil(items.length/25)):1;
+   const fetched:ReportItem[]=[];let offset=next??0;let nextCursor:number|null=null;
+   for(let index=0;index<pages;index++){
+    const page=await getReports(filter==="all"?undefined:filter,offset);
+    if(request!==generation.current)return;
+    fetched.push(...page.items);nextCursor=page.next_cursor;
+    if(nextCursor===null)break;offset=nextCursor;
+   }
+   setItems(current=>Array.from(new Map([...(append?current:[]),...fetched].map(item=>[item.report_id,item])).values()));setCursor(nextCursor);
+  }catch{if(request===generation.current)setError(t("reports.loadFailed"));}
+  finally{if(request===generation.current){setLoading(false);setLoadingMore(false);}}
+ }
+ useEffect(()=>{if(canManage)void load();return()=>{generation.current++;};},[canManage,filter,session?.userId]);
+ useReportsLive(()=>void load(false,true),canManage);
  if(!session)return <Navigate replace to={`/${language}/login`}/>;if(!canManage)return <Navigate replace to={`/${language}`}/>;
  async function update(item:ReportItem,status:Exclude<ReportStatus,"pending">){setBusy(item.report_id);setError("");setNotice("");try{await reviewReport(item.report_id,status);setItems(current=>current.map(entry=>entry.report_id===item.report_id?{...entry,status}:entry));setNotice(t("reports.updated"));}catch{setError(t("reports.actionFailed"));}finally{setBusy(null)}}
  async function removeWork(item:ReportItem){if(!item.target_work_id||!window.confirm(t("reports.confirmDeleteWork")))return;setBusy(item.report_id);setError("");try{await deleteWorkAsModerator(item.target_work_id,`${t(`reports.reason.${item.reason_code}` as TranslationKey)}${item.details?`: ${item.details}`:""}`);await reviewReport(item.report_id,"actioned");setItems(current=>current.map(entry=>entry.report_id===item.report_id?{...entry,status:"actioned"}:entry));setNotice(t("reports.workDeleted"));}catch{setError(t("reports.actionFailed"));}finally{setBusy(null)}}
  async function suspendUser(item:ReportItem){if(!window.confirm(t("reports.confirmSuspendUser").replace("{name}",item.target_user_name)))return;setBusy(item.report_id);setError("");try{await setManagedUserStatus(item.target_user_id,false);await reviewReport(item.report_id,"actioned");setItems(current=>current.map(entry=>entry.report_id===item.report_id?{...entry,status:"actioned"}:entry));setNotice(t("reports.userSuspended"));}catch{setError(t("reports.actionFailed"));}finally{setBusy(null)}}
+ async function restrictReporter(item:ReportItem){
+  const blocked=!item.reporter_reporting_blocked;
+  if(!window.confirm(t(blocked?"reports.confirmBlockReporter":"reports.confirmUnblockReporter").replace("{name}",item.reporter_name)))return;
+  setBusy(item.report_id);setError("");setNotice("");
+  try{await setReporterRestriction(item.reporter_user_id,blocked);setItems(current=>current.map(report=>report.reporter_user_id===item.reporter_user_id?{...report,reporter_reporting_blocked:blocked}:report));setNotice(t("reports.restrictionUpdated"));}
+  catch{setError(t("reports.actionFailed"));}finally{setBusy(null);}
+ }
  const date=(value:string)=>new Intl.DateTimeFormat(language,{dateStyle:"medium",timeStyle:"short"}).format(new Date(value));
  const workPreview=preview&&"work_id" in preview?preview:null;
  const profilePreview=preview&&"avatar_url" in preview?preview:null;
@@ -51,6 +76,7 @@ export function AdminReportsPage(){
  <h2>{selected.target_type==="work"?selected.target_work_title??t("reports.unavailable"):selected.target_user_name}</h2><Link className="moderation-owner" to={`/${language}/profile/${selected.target_user_id}`}>{selected.target_user_name}<ExternalLink size={14}/></Link>{workPreview&&<span className="moderation-category">{language==="ar"?workPreview.type_name_ar:workPreview.type_name_en}</span>}
  <section className="moderation-detail-box"><h3>{t("reports.detailsTitle")}</h3><dl><div><dt>{t("reports.reason")}</dt><dd><span className={`moderation-reason ${selected.reason_code}`}>{t(`reports.reason.${selected.reason_code}` as TranslationKey)}</span></dd></div><div><dt>{t("reports.reporter")}</dt><dd>{selected.reporter_name}</dd></div><div><dt>{t("reports.date")}</dt><dd>{date(selected.created_at)}</dd></div><div><dt>{t("reports.statusLabel")}</dt><dd><span className={`report-status ${selected.status}`}>{t(`reports.status.${selected.status}` as TranslationKey)}</span></dd></div></dl><h4>{t("reports.message")}</h4><p className="moderation-message">{selected.details??t("reports.noMessage")}</p>{selected.reviewer_notes&&<p>{selected.reviewer_notes}</p>}</section>
  <div className="moderation-view-links">{selected.target_work_id&&<Link to={`/${language}?work=${selected.target_work_id}`}><ExternalLink size={15}/>{t("reports.viewPost")}</Link>}<Link to={`/${language}/profile/${selected.target_user_id}`}><UserRound size={15}/>{t("reports.viewProfile")}</Link></div>
+ {selected.reporter_can_be_restricted&&selected.reporter_user_id!==session.userId&&<section className="moderation-detail-box"><h3>{t("reports.reporter")}: {selected.reporter_name}</h3><div className="moderation-actions"><button type="button" className={selected.reporter_reporting_blocked?undefined:"danger"} disabled={!!busy} onClick={()=>void restrictReporter(selected)}><ShieldBan size={16}/>{t(selected.reporter_reporting_blocked?"reports.unblockReporter":"reports.blockReporter")}</button></div></section>}
  <section className="moderation-detail-box"><h3>{t("reports.actions")}</h3><div className="moderation-actions"><button type="button" disabled={!!busy} onClick={()=>void update(selected,"reviewed")}><CheckCircle2 size={16}/>{t("reports.markReviewed")}</button><button type="button" disabled={!!busy} onClick={()=>void update(selected,"dismissed")}><X size={16}/>{t("reports.dismiss")}</button>{selected.target_work_id&&hasPermission(session.permissions,"works.delete_any")&&<button type="button" className="danger" disabled={!!busy} onClick={()=>void removeWork(selected)}><Trash2 size={16}/>{t("reports.deleteWork")}</button>}{hasPermission(session.permissions,"users.status.manage")&&<button type="button" className="danger" disabled={!!busy} onClick={()=>void suspendUser(selected)}><ShieldBan size={16}/>{t("reports.suspendUser")}</button>}</div></section>
  </aside>}</div><p className="moderation-scope-note">{t("reports.loadedScope")}</p></section></section></main>;
 }

@@ -10,6 +10,7 @@ import { useAuth } from "../auth/AuthContext";
 import { getWebSocketTicket, notificationTarget } from "../notifications/notificationApi";
 import { useNotificationInbox } from "../notifications/useNotificationInbox";
 import { useExhibitionCounts } from "../exhibitions/useExhibitionCounts";
+import { useReportCount } from "../reports/useReportCount";
 import { searchProfilesPage } from "../profile/profileApi";
 import type { ProfileSearchResult } from "../profile/profileApi";
 import { useMobileViewport } from "../../lib/useMobileViewport";
@@ -57,6 +58,7 @@ export function AppSidebar() {
   const inbox=useNotificationInbox(session?.userId,notificationsOpen&&!closingPanels.notifications);
   const {items:notifications,unread:unreadCount,loading:notificationsLoading,cursor:notificationsCursor,loadingMore:notificationsLoadingMore}=inbox;
   const exhibitionCounts=useExhibitionCounts();
+  const reportCount=useReportCount();
   const activePanel = accountsOpen ? "account-discovery-panel" : notificationsOpen ? "notifications-panel" : null;
   usePageScrollLock(activePanel !== null);
   useLayoutEffect(() => {
@@ -150,13 +152,13 @@ export function AppSidebar() {
   async function loadMoreAccounts(){if(nextCursor===null||loading||loadingMore)return;const generation=accountSearchGeneration.current;setLoadingMore(true);setSearchFailed(false);try{const page=await searchProfilesPage(normalizedQuery,nextCursor);if(generation!==accountSearchGeneration.current)return;setAccounts(current=>{const known=new Set(current.map(account=>account.user_id));return [...current,...page.items.filter(account=>!known.has(account.user_id))];});setNextCursor(page.next_cursor);}catch{if(generation===accountSearchGeneration.current)setSearchFailed(true);}finally{if(generation===accountSearchGeneration.current)setLoadingMore(false)}}
 
 
-  return <>{mobile ? <MobileNavigation unreadCount={unreadCount} notificationsOpen={notificationsOpen} onNotifications={()=>{setAccountsOpen(false);setNotificationsOpen(open=>!open);}} onAccounts={()=>{setNotificationsOpen(false);setAccountsOpen(true);}} administration={Boolean(showSystemAdministration)} reports={showReportAdministration} exhibitionCount={exhibitionCounts?.total??0} onNavigateCapture={navigateAfterClosing}/> : <aside className="app-sidebar" onClickCapture={navigateAfterClosing} aria-label={t("nav.primary")}>
+  return <>{mobile ? <MobileNavigation unreadCount={unreadCount} notificationsOpen={notificationsOpen} onNotifications={()=>{setAccountsOpen(false);setNotificationsOpen(open=>!open);}} onAccounts={()=>{setNotificationsOpen(false);setAccountsOpen(true);}} administration={Boolean(showSystemAdministration)} reports={showReportAdministration} exhibitionCount={exhibitionCounts?.total??0} reportCount={reportCount??0} onNavigateCapture={navigateAfterClosing}/> : <aside className="app-sidebar" onClickCapture={navigateAfterClosing} aria-label={t("nav.primary")}>
     <Link className="app-sidebar-logo" to={`/${language}`} state={{resetHome:true}} aria-label={t("app.name")}><img src={inkfigLogo} alt="" /></Link>
     <nav className="app-sidebar-nav">
       {items.map(({to,label,icon:Icon,className,end})=><NavLink className={className} key={to} to={to} state={end?{resetHome:true}:undefined} end={end} aria-label={label} data-tooltip={label}><Icon aria-hidden="true" size={24}/>{className==="mobile-nav-exhibition"&&(exhibitionCounts?.total??0)>0&&<span className="notification-badge">{exhibitionCounts!.total>99?"99+":exhibitionCounts!.total}</span>}</NavLink>)}
       <button className={`app-sidebar-panel-button${notificationsOpen?" active":""}`} type="button" aria-label={t("nav.notifications")} data-tooltip={t("nav.notifications")} aria-expanded={notificationsOpen} aria-controls="notifications-panel" onClick={()=>{setAccountsOpen(false);setNotificationsOpen(open=>!open);}}><Bell aria-hidden="true" size={24}/>{unreadCount>0&&<span className="notification-badge">{unreadCount>99?"99+":unreadCount}</span>}</button>
       {showSystemAdministration&&<NavLink className="mobile-nav-admin" to={`/${language}/admin/users`} aria-label={t("nav.administration")} data-tooltip={t("nav.administration")}><ShieldCheck aria-hidden="true" size={24}/></NavLink>}
-      {showReportAdministration&&<NavLink className="mobile-nav-reports" to={`/${language}/admin/reports`} aria-label={t("nav.reports")} data-tooltip={t("nav.reports")}><Flag aria-hidden="true" size={24}/></NavLink>}
+      {showReportAdministration&&<NavLink className="mobile-nav-reports" to={`/${language}/admin/reports`} aria-label={t("nav.reports")} data-tooltip={t("nav.reports")}><Flag aria-hidden="true" size={24}/>{(reportCount??0)>0&&<span className="notification-badge">{reportCount!>99?"99+":reportCount}</span>}</NavLink>}
       <button className={`app-sidebar-people-search${accountsOpen?" active":""}`} type="button" aria-label={t("accounts.findUsers")} data-tooltip={t("accounts.findUsers")} aria-expanded={accountsOpen} aria-controls="account-discovery-panel" onClick={()=>{setNotificationsOpen(false);setAccountsOpen(open=>!open);}}><span aria-hidden="true"/></button>
       <Link className={`mobile-nav-saved${savedActive?" active":""}`} to={`/${language}/profile?section=saved`} aria-label={t("nav.saved")} data-tooltip={t("nav.saved")}><Bookmark aria-hidden="true" size={24}/></Link>
     </nav>

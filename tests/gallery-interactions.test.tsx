@@ -20,6 +20,7 @@ vi.mock("../src/api/httpClient",()=>({userApiBaseUrl:"api",requestJson:vi.fn()})
 vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:"en",t:(key:keyof typeof translations.en)=>translations.en[key]})}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"viewer",role:"student",permissions:["works.upload","works.like","works.save"],fullName:"Viewer",email:"viewer@example.com"},signOut:vi.fn()})}));
 vi.mock("../src/features/exhibitions/useExhibitionCounts",()=>({useExhibitionCounts:()=>undefined}));
+vi.mock("../src/features/reports/useReportCount",()=>({useReportCount:()=>undefined}));
 vi.mock("../src/features/notifications/notificationApi",()=>({getNotifications:vi.fn().mockResolvedValue({items:[],unread_count:0,next_cursor:null}),getUnreadNotificationCount:vi.fn().mockResolvedValue({unread_count:0}),notificationTarget:()=>"/en/exhibition",getWebSocketTicket:vi.fn().mockRejectedValue(new Error("offline")),markNotificationsRead:vi.fn()}));
 vi.mock("../src/features/profile/profileApi",()=>({getPublicProfile:vi.fn().mockResolvedValue({avatar_url:null}),searchProfiles:vi.fn().mockResolvedValue([]),searchProfilesPage:vi.fn().mockResolvedValue({items:[],next_cursor:null})}));
 vi.mock("../src/features/works/worksApi",()=>({getWorkTypes:vi.fn(),getWork:vi.fn(),uploadWork:vi.fn(),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWorkAsModerator:vi.fn(),isValidWorkUrl:()=>true,validateWorkFile:(file:File)=>file.type.startsWith("image/")?null:"unsupported"}));

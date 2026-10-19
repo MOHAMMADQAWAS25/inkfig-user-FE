@@ -9724,3 +9724,29 @@ No API changes. No migration required. No backend, authentication, permissions, 
 ### Deployment and limitations
 
 Frontend-only deployment through existing Cloudflare main workflow; no backend push/deployment or migration required. Pull/rebase again immediately before pushing. Google Search Console still requires owner sign-in and its exact verification value; no DNS records, Google account settings or indexing requests fabricated. Google controls crawl timing, indexing and rank. Gallery content still uses JavaScript (not full SSR); individual-record metadata, missing-record HTTP handling and dynamic artwork sitemap remain follow-up work. Earlier feature-log entries preserved.
+
+## 2026-10-19 - Pending-report badges, open-only updates and reporter blocking
+
+### Request and repository scope
+
+Add a pending-report counter to the Reports icon and update it via WebSocket. User clarified reporting remains enabled, duplicate reports are prevented and administrators can restrict an individual reporter. All three clean main repositories pulled/rebased first. Frontend and user-system affected; main-system unchanged.
+
+### Changes and files
+
+- reports/useReportCount.ts fetches only a protected pending summary off the reports page, keyed by account, cancels stale in-flight counts and refreshes on existing reports.changed/reconnect signals. Coalesces bursts, defers hidden-tab updates, cleans subscriptions and excludes students/non-managers.
+- navigation/AppSidebar.tsx and MobileNavigation.tsx show the pending user/post total on the desktop flag and mobile Reports menu entry. Zero hides the badge, counts above 99 show 99+. Viewing does not resolve reports.
+- reports/useReportsLive.ts and admin/AdminReportsPage.tsx refresh full lists only while mounted, preserve loaded pages/filters on live updates and guard stale responses. Reporter controls confirm block/restore of reporting access, update all loaded reports by that reporter and leave account suspension/target-user actions separate.
+- reports/reportsApi.ts adds summary/eligibility/restriction contracts and dispatches local invalidations after successful admin actions. ReportDialog checks eligibility on open with abort/retry states, blocks form access when restricted and handles a server-side block after opening. Existing reasons, required Other details and duplicate messaging remain. i18n/resources.ts adds English/Arabic copy.
+- Tests cover manager-only summary requests, signals/reconnect/racing first fetch, hidden/unmounted listeners, desktop/mobile badges, correct reporter versus target restriction, blocked/failed/retried eligibility, late restriction and duplicate errors. docs/report-moderation.md documents APIs/behavior/deployment.
+
+### API, database and scope
+
+Consumes new user-system /reports/pending-count, /reports/eligibility and /reports/reporters/{id}/restriction and additive moderation list fields. No frontend migration; requires user-system migration 20261019_024_reporter_restrictions.sql/backend first. No new permissions, dependencies, environment variables, credentials or analytics. Backend enforces restrictions and unique-index duplicate protection, including older clients. No SnapStart effects from browser-only code. No global reporting pause remains.
+
+### Verification
+
+319 frontend tests passed (83 source/Node checks plus 236 Vitest tests); strict TypeScript/Vite production build and git diff --check passed. Updated old source-level listener expectation to the new open-only hook; no failed checks bypassed. Existing bundle-size/jsdom scrollTo warnings remain; one Vitest worker emitted a termination timeout after all test files passed and process returned success. Companion backend: 140 tests, mypy on 123 files and targeted Ruff passed; additive migration/actual count-list SQL verified in a rolled-back DB transaction. No real user was blocked or real report created for verification. No physical-device or real two-admin production interaction was exercised.
+
+### Deployment and limitations
+
+User-system migration/API first, frontend second via existing main workflows. Main-system unchanged/no deployment. Pull/rebase again immediately before push and verify workflows. WebSocket is an invalidation, not a notification-table write or arithmetic counter increment: protected REST provides authoritative counts; lists load only while open. Transport is best effort with reconnect/open recovery; report pagination remains offset-based. Exact commits/deployment results reported in handoff. Previous feature-log entries preserved.

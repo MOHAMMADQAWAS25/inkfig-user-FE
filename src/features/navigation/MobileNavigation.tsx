@@ -19,10 +19,11 @@ interface Props {
   administration: boolean;
   reports: boolean;
   exhibitionCount?: number;
+  reportCount?: number;
   onNavigateCapture?: (event: MouseEvent<HTMLElement>) => void;
 }
 
-export function MobileNavigation({ unreadCount, notificationsOpen, onNotifications, onAccounts, administration, reports, exhibitionCount = 0, onNavigateCapture }: Props) {
+export function MobileNavigation({ unreadCount, notificationsOpen, onNotifications, onAccounts, administration, reports, exhibitionCount = 0, reportCount = 0, onNavigateCapture }: Props) {
   const { language, t, setLanguage } = useI18n();
   const { session, signOut } = useAuth();
   const location = useLocation();
@@ -106,7 +107,7 @@ export function MobileNavigation({ unreadCount, notificationsOpen, onNotificatio
           <button type="button" aria-label={t("accounts.findUsers")} onClick={() => close(onAccounts)}><span className="mobile-find-users-icon" aria-hidden="true"/><span>{t("accounts.findUsers")}</span></button>
           <button type="button" aria-label={t("nav.saved")} onClick={() => go("profile?section=saved")}><Bookmark aria-hidden="true" /><span>{t("nav.saved")}</span></button>
           {administration && <button type="button" aria-label={t("nav.administration")} onClick={() => go("admin/users")}><ShieldCheck aria-hidden="true" /><span>{t("nav.administration")}</span></button>}
-          {reports && <button type="button" aria-label={t("nav.reports")} onClick={() => go("admin/reports")}><Flag aria-hidden="true" /><span>{t("nav.reports")}</span></button>}
+          {reports && <button type="button" aria-label={t("nav.reports")} onClick={() => go("admin/reports")}><Flag aria-hidden="true" /><span>{t("nav.reports")}</span>{reportCount>0&&<span className="exhibition-count">{reportCount>99?"99+":reportCount}</span>}</button>}
           <button type="button" aria-label={t("nav.settings")} onClick={() => go("settings")}><Settings aria-hidden="true" /><span>{t("nav.settings")}</span></button>
           {session && <button type="button" aria-label={t("nav.logout")} onClick={() => close(signOut)}><LogOut aria-hidden="true" /><span>{t("nav.logout")}</span></button>}
         </div>
