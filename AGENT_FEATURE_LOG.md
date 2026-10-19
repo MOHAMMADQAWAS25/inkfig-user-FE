@@ -9802,3 +9802,29 @@ Computer-use skill attempted a local fixture preview; browser URL could not be v
 ### Git and deployment
 
 Matching feature/artwork-detail-page branches in frontend and main-system. Frontend subject: Add routed artwork details and related masonry feed. Backend subject: Add stored-vector related artwork feed. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Deploy backend first, frontend second using existing workflows; no migration/user-system deployment. Exact hashes, push/conflict/merge and workflow outcomes reported in final handoff. Previous log entries preserved.
+
+## 2026-10-20 - Opened artwork like and save icon colors
+
+### Request and changes
+
+Give the opened-post heart a red like color and bookmark a yellow save color. Added three icon-only selectors scoped to artwork-page-actions: heart uses the existing theme-aware red --danger token; bookmark uses existing gold #a98100 in light and yellow #f4c430 in dark. Colors apply before and after selection; existing outline versus currentColor fill continues to communicate selected state. Labels, counts, layout, interaction handlers, permissions, related/home/profile cards and other icons are unchanged.
+
+### Repositories and files
+
+Only inkfig-user-FE changed: src/features/works/artworkPage.css, tests/artwork-action-colors.test.mjs and this log. Main pulled from clean worktree and complete feature log read before editing. Both backends unchanged.
+
+### API, database, permissions and SnapStart
+
+No API, database migration, data, authorization, dependency, configuration, environment, credential or backend SnapStart changes. CSS-only runtime adjustment preserves English/Arabic and responsive geometry.
+
+### Verification
+
+331 frontend tests passed (86 Node/source and 245 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. Added scoped light/dark icon color regression. Existing non-blocking bundle-size warning and jsdom scrollTo notices remain. No interactive visual review claimed and no production like/save requests used for testing.
+
+### Deployment and rollback
+
+Frontend-only existing main workflow; no backend deployment or migration. To undo this ticket only, revert the commit titled Fix opened artwork like and save icon colors and redeploy frontend. Pre-change baseline c92f533f70909aa136ccfa26c9a8c68a82029e8f is a reference, not a reset target; retain unrelated later changes and historical log entries.
+
+### Git
+
+Branch: fix/artwork-action-colors. Commit subject: Fix opened artwork like and save icon colors. Fetch/rebase before branch push and previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment results reported in final handoff.

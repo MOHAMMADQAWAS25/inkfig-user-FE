@@ -24,6 +24,9 @@
 .artwork-page-actions { border-top:1px solid var(--border); padding-block:18px; }
 .artwork-page-actions button,.artwork-page-manage button,.artwork-page-manage a { display:inline-flex; align-items:center; gap:8px; padding:8px 0; border:0; background:none; color:var(--text); cursor:pointer; text-decoration:none; }
 .artwork-page-actions button[aria-pressed=true] { color:var(--primary); }
+.artwork-page-actions .lucide-heart { color:var(--danger); }
+.artwork-page-actions .lucide-bookmark { color:#a98100; }
+:root[data-theme="dark"] .artwork-page-actions .lucide-bookmark { color:#f4c430; }
 .artwork-page-share button { display:inline-flex; justify-content:center; align-items:center; gap:10px; flex:1 1 130px; min-height:48px; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
 .artwork-page-manage { margin-top:16px; font-size:.85rem; }
 .artwork-page-related { margin-top:36px; }
