@@ -10,10 +10,11 @@ type FeedProps = {
   loading: boolean; loadingMore: boolean; error: unknown; hasNextPage: boolean;
   loadMore: () => void; retry: () => void; emptyMessage: string;
   renderItem: (work: FeedWork, width: number, priority: boolean) => ReactNode;
+  restoreScroll?: boolean;
 };
 
 /** Window-scroll virtualization without scroll event listeners or per-card observers. */
-export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem }: FeedProps) {
+export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem, restoreScroll = true }: FeedProps) {
   const { language, t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const calculator = useRef(new FeedLayout());
@@ -60,17 +61,17 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
     if (!width || loading || restored.current) return;
     restored.current = true;
     lastScroll.current = scrollMemory.get(cacheKey) ?? 0;
-    window.scrollTo({ top: lastScroll.current, behavior: "instant" });
-  }, [cacheKey, width, loading]);
+    if (restoreScroll) window.scrollTo({ top: lastScroll.current, behavior: "instant" });
+  }, [cacheKey, width, loading, restoreScroll]);
 
   useLayoutEffect(() => {
     return () => {
-      if (!restored.current) return;
+      if (!restored.current || !restoreScroll) return;
       scrollMemory.delete(cacheKey);
       scrollMemory.set(cacheKey, lastScroll.current);
       while (scrollMemory.size > 8) scrollMemory.delete(scrollMemory.keys().next().value!);
     };
-  }, [cacheKey]);
+  }, [cacheKey, restoreScroll]);
 
   useLayoutEffect(() => {
     let frame = 0, measuredBucket = NaN, lastHeight = 0;

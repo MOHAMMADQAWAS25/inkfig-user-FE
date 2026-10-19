@@ -1,5 +1,5 @@
 import { LogOut, Search, UserRound, X } from "lucide-react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
@@ -11,13 +11,13 @@ import { workCategories } from "../works/workCategories";
 import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
-import { deleteWorkAsModerator, getWork, setWorkLike, setWorkSave } from "../works/worksApi";
+import { setWorkLike, setWorkSave } from "../works/worksApi";
 import type { Work } from "../works/worksApi";
 import { useInfiniteFeed } from "../feed/useInfiniteFeed";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
 import type { FeedWork } from "../works/worksApi";
-import { ArtworkDetailModal } from "./ArtworkDetailModal";
+import { artworkPath } from "../works/artworkNavigation";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
@@ -36,6 +36,7 @@ export function HomePage() {
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [searchParams,setSearchParams]=useSearchParams();
   const [activeCategory, setActiveCategory] = useState(searchParams.get("category") ?? "all");
@@ -48,11 +49,6 @@ export function HomePage() {
   const [accountSearchLoading,setAccountSearchLoading]=useState(false);
   const [activeSuggestion,setActiveSuggestion]=useState(0);
   const [mentionQuery,setMentionQuery]=useState<string|null>(null);
-  const [detailError,setDetailError]=useState(false);
-  const [detailLoading,setDetailLoading]=useState(false);
-  const [detailAttempt,setDetailAttempt]=useState(0);
-  const [selectedWorkId,setSelectedWorkId]=useState<string|null>(null);
-  const [deepLinkedWork,setDeepLinkedWork]=useState<Work|null>(null);
   const profileMenuRef=useRef<HTMLDetailsElement>(null);
   const searchRef=useRef<HTMLFormElement>(null);
   const history=useSearchHistory(session?.userId);
@@ -85,11 +81,6 @@ export function HomePage() {
     viewer: session ? `${session.userId}:${session.role}:${session.permissions.join(",")}` : "guest",
   });
   const { items: works, setItems: setWorks } = feed;
-  const loadedWork = works.find(work => work.work_id === selectedWorkId);
-  const selectedWork = deepLinkedWork?.work_id === selectedWorkId ? {
-    ...deepLinkedWork,
-    ...(loadedWork ? { like_count: loadedWork.like_count, liked_by_me: loadedWork.liked_by_me, saved_by_me: loadedWork.saved_by_me } : {}),
-  } : null;
   useEffect(() => {
     const query=searchParams.get("q")??"";
     const account=searchParams.get("artist")?{user_id:searchParams.get("artist")!,full_name:searchParams.get("artistName")??"",avatar_url:null}:null;
@@ -109,30 +100,15 @@ export function HomePage() {
   useDismissOnly(historyOpen || mentionQuery !== null, target => Boolean(searchRef.current?.contains(target)), () => { setMentionQuery(null); setHistoryOpen(false); searchRef.current?.querySelector<HTMLInputElement>("input")?.blur(); });
   useEffect(()=>{function closeProfileMenu(event:PointerEvent){const menu=profileMenuRef.current;if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.removeAttribute("open");}document.addEventListener("pointerdown",closeProfileMenu);return()=>document.removeEventListener("pointerdown",closeProfileMenu);},[]);
   useEffect(()=>{let active=true;if(!session){setProfileAvatar(null);return;}getPublicProfile(session.userId).then(profile=>{if(active)setProfileAvatar(profile.avatar_url)}).catch(()=>{if(active)setProfileAvatar(null)});return()=>{active=false};},[session]);
-  const detailWorkId = searchParams.get("work");
   useEffect(() => {
-    setSelectedWorkId(detailWorkId);
-    setDeepLinkedWork(null); setDetailError(false);
-    if (!detailWorkId) { setDetailLoading(false); return; }
-    const controller = new AbortController();
-    setDetailLoading(true);
-    getWork(detailWorkId, controller.signal).then(work => { if (!controller.signal.aborted) setDeepLinkedWork(work); })
-      .catch(() => { if (!controller.signal.aborted) setDetailError(true); })
-      .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
-    return () => controller.abort();
-  }, [detailWorkId, detailAttempt, session?.userId]);
+    const legacy = searchParams.get("work");
+    if (!legacy) return;
+    const previous = new URLSearchParams(searchParams); previous.delete("work");
+    navigate(artworkPath(language, legacy), { replace: true, state: { returnTo: `/${language}${previous.size ? `?${previous}` : ""}` } });
+  }, [searchParams, navigate, language]);
   const openWork = useCallback((work: Work) => {
-    const next = new URLSearchParams(searchParams); next.set("work", work.work_id);
-    setSearchParams(next);
-  }, [searchParams, setSearchParams]);
-  function closeWork() {
-    const id = selectedWorkId;
-    setSelectedWorkId(null); setDeepLinkedWork(null);
-    const next = new URLSearchParams(searchParams); next.delete("work"); setSearchParams(next, {replace:true});
-    requestAnimationFrame(() => {
-      document.querySelector<HTMLButtonElement>(`button[data-work-id="${CSS.escape(id ?? "")}"]`)?.focus({preventScroll:true});
-    });
-  }
+    navigate(artworkPath(language, work.work_id), { state: { returnTo: location.pathname + location.search } });
+  }, [language, navigate, location.pathname, location.search]);
   function submitSearch(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
     if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}
@@ -170,11 +146,9 @@ export function HomePage() {
     const next=!work.liked_by_me;
     const patch={liked_by_me:next,like_count:work.like_count+(next?1:-1)};
     setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,...patch}:item));
-    setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,...patch}:current);
     try{await setWorkLike(work.work_id,next);}catch{
       const previous={liked_by_me:work.liked_by_me,like_count:work.like_count};
       setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,...previous}:item));
-      setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,...previous}:current);
     }finally{interactionRequests.current.delete(key);}
   }, [session, setWorks]);
   const toggleSave = useCallback(async (work:Work)=>{
@@ -183,14 +157,11 @@ export function HomePage() {
     interactionRequests.current.add(key);
     const next=!work.saved_by_me;
     setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:next}:item));
-    setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,saved_by_me:next}:current);
     try{await setWorkSave(work.work_id,next);}catch{
       setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:work.saved_by_me}:item));
-      setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,saved_by_me:work.saved_by_me}:current);
     }finally{interactionRequests.current.delete(key);}
   }, [session, setWorks]);
   const renderCard = useCallback((work:FeedWork,width:number,priority:boolean)=><PostCard work={work} width={width} priority={priority} onOpen={openWork} onLike={toggleLike} onSave={toggleSave}/>, [openWork, toggleLike, toggleSave]);
-  async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));closeWork();}
 
   return (
     <main className="gallery-home">
@@ -228,8 +199,6 @@ export function HomePage() {
 
       </section>
 
-      {detailWorkId&&!selectedWork&&<div className="artwork-modal-backdrop"><section className="moderation-dialog" role="dialog" aria-modal="true" aria-label={t("works.viewDetails")}><p role="status">{t(detailLoading?"works.loading":"works.loadFailed")}</p>{detailError&&<button type="button" onClick={()=>setDetailAttempt(current=>current+1)}>{t("feed.retry")}</button>}<button type="button" onClick={closeWork}>{t("works.closeDetails")}</button></section></div>}
-      {selectedWork&&<ArtworkDetailModal language={language} work={selectedWork} canLike={Boolean(session&&hasPermission(session.permissions,"works.like"))} canSave={Boolean(session&&hasPermission(session.permissions,"works.save"))} canReport={Boolean(session&&session.userId!==selectedWork.owner_user_id&&hasPermission(session.permissions,"reports.create"))} canModerateDelete={Boolean(session&&hasPermission(session.permissions,"works.delete_any"))} onClose={closeWork} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} t={t}/>}
 
 
     </main>

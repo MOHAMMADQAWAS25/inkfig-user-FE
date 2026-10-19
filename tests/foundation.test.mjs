@@ -30,6 +30,7 @@ const feedQuery = readFileSync(new URL("../src/features/feed/useInfiniteFeed.ts"
 const feedSentinel = readFileSync(new URL("../src/features/feed/useFeedSentinel.ts", import.meta.url), "utf8");
 const feedLayout = readFileSync(new URL("../src/features/feed/feedLayout.ts", import.meta.url), "utf8");
 const artworkDetailModal = readFileSync(new URL("../src/features/home/ArtworkDetailModal.tsx", import.meta.url), "utf8");
+const artworkPage = readFileSync(new URL("../src/features/works/ArtworkPage.tsx", import.meta.url), "utf8");
 const worksApi = readFileSync(new URL("../src/features/works/worksApi.ts", import.meta.url), "utf8");
 const uploadWorkPage = readFileSync(new URL("../src/features/works/UploadWorkPage.tsx", import.meta.url), "utf8");
 const profilePage = readFileSync(new URL("../src/features/profile/ProfilePage.tsx", import.meta.url), "utf8");
@@ -60,7 +61,7 @@ test("reports posts and users with localized reasons and duplicate protection", 
   assert.match(reportDialog, /harassment.*hate_speech.*violence.*spam.*copyright.*impersonation.*other/);
   assert.doesNotMatch(reportDialog, /sexual_content/);
   assert.match(reportsApi, /POST","\/reports"/);
-  assert.match(homePage, /reports\.create/);
+  assert.match(artworkPage, /reports\.create/);
   assert.match(profilePage, /targetType="user"/);
   assert.match(resources, /"reports\.reportWork"/);
   assert.match(resources, /"reports\.duplicate"/);
@@ -100,8 +101,8 @@ test("provides a permission-driven system administrator workspace", () => {
 });
 
 test("lets authorized administrators delete artwork with a required audited reason", () => {
-  assert.match(homePage, /works\.delete_any/);
-  assert.match(profilePage, /works\.delete_any/);
+  assert.match(artworkPage, /works\.delete_any/);
+  assert.match(artworkPage, /deleteWorkAsModerator/);
   assert.match(artworkDetailModal, /canModerateDelete/);
   assert.match(artworkDetailModal, /minLength=\{10\}/);
   assert.match(artworkDetailModal, /maxLength=\{1000\}/);
@@ -317,8 +318,8 @@ test("loads public works and provides authenticated direct image uploads", () =>
   assert.match(artworkDetailModal, /noopener noreferrer/);
   assert.match(feedQuery, /getFeed/);
   assert.match(homePage, /setWorkLike/);
-  assert.match(homePage, /ArtworkDetailModal/);
-  assert.match(homePage, /setSelectedWorkId/);
+  assert.match(homePage, /artworkPath/);
+  assert.match(router, /\/:language\/artwork\/:workId/);
   assert.match(postCard, /artwork-image-button/);
 });
 
@@ -366,7 +367,7 @@ test("provides an authenticated profile with posts and likes collections", () =>
   assert.match(profilePage, /role="tab"/);
   assert.match(profilePage, /aria-selected/);
   assert.match(profilePage, /const \[section,setSection\]/);
-  assert.match(profilePage, /ArtworkDetailModal/);
+  assert.match(profilePage, /artworkPath/);
   assert.match(worksApi, /`\/works\/me\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(worksApi, /`\/works\/likes\$\{cursorSuffix\(cursor\)\}`/);
   assert.match(styles, /\.profile-artwork-grid/);
@@ -602,7 +603,7 @@ test("refreshes notification counters without fetching a closed list", () => {
 test("links like notifications to the exact work and keeps actor avatars linked to profiles", () => {
   assert.match(notificationApi, /work_title:string\|null/);
   assert.match(appSidebar, /className="notification-avatar" to=\{`\/\$\{language\}\/profile\/\$\{item\.actor_user_id\}`\}/);
-  assert.match(notificationApi, /`\/\$\{language\}\?work=\$\{item\.work_id\}`/);
+  assert.match(notificationApi, /`\/\$\{language\}\/artwork\/\$\{item\.work_id\}`/);
   assert.match(appSidebar, /notification-work-title/);
   assert.match(homePage, /searchParams\.get\("work"\)/);
   assert.match(worksApi, /GET",`\/works\/\$\{id\}`/);
@@ -763,7 +764,7 @@ test("keeps gallery cards minimal until hover and opens full details", () => {
   assert.match(styles, /\.artwork-pin-like \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-save\.saved \{ opacity: 0/);
   assert.match(styles, /\.artwork-pin-media, \.artwork-image-button \{ cursor: pointer/);
-  assert.match(homePage, /next.set\("work", work.work_id\)/);
+  assert.match(homePage, /navigate\(artworkPath\(language, work.work_id\)/);
   assert.match(styles, /html \{ scroll-behavior: smooth/);
   assert.match(resources, /"home\.searchPlaceholder": "Search"/);
 });

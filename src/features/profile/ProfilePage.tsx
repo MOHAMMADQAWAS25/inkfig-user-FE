@@ -1,8 +1,8 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trophy, Trash2, UserRound, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ProfilePager } from "./ProfilePager";
-import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useI18n } from "../../i18n/I18nProvider";
 import type { TranslationKey } from "../../i18n/resources";
@@ -11,11 +11,12 @@ import { useAuth } from "../auth/AuthContext";
 import { SmoothDetails } from "../layout/SmoothDetails";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { CardMedia } from "../feed/CardMedia";
-import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
+import { useQueryClient } from "@tanstack/react-query";
+import { artworkPath } from "../works/artworkNavigation";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { ReportDialog } from "../reports/ReportDialog";
 import {
-  deleteWork, deleteWorkAsModerator, getLikedWorks, getSavedWorks, getUserWorks, getWorkTypes, setWorkLike,
+  deleteWork, getWork, getLikedWorks, getSavedWorks, getUserWorks, getWorkTypes, setWorkLike,
   setWorkSave, updateWork, type Work, type WorkLink, type WorkPage, type WorkType,
 } from "../works/worksApi";
 import { workTypeTone } from "../works/workTypePresentation";
@@ -39,7 +40,7 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
   if (!works.length) return <div className="profile-empty"><Image size={30}/><p>{empty}</p></div>;
   return <div className="profile-artwork-grid">{works.map(work=>
     <article className={`artwork-card ${canManage?"artwork-card-manageable":""}`} key={work.work_id}><CardMedia>
-      <button className="artwork-image-button" type="button" aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={()=>onSelect(work)}><img {...artworkImageProtection} className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></button>
+      <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event=>{if(event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();onSelect(work);}}}><img {...artworkImageProtection} className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></Link>
       <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>
       <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
@@ -47,7 +48,10 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
     </CardMedia>{canManage&&<SmoothDetails className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div>{onAssign&&<button type="button" onClick={()=>onAssign(work)}><Trophy size={16}/>{t("exhibitions.assign")}</button>}<button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></SmoothDetails>}</article>)}</div>;
 }
 
+type ProfileSnapshot = { profile: PublicProfile; posts: Work[]; likes: Work[]; saved: Work[]; cursors: PageCursors; y: number; section: Section };
 export function ProfilePage() {
+  const client = useQueryClient(); const navigate = useNavigate(); const location = useLocation();
+  const restoreY = useRef<number | null>(null);
   const {session,signOut}=useAuth();
   const {language,t}=useI18n();
   const {userId}=useParams();
@@ -60,7 +64,6 @@ export function ProfilePage() {
   const [saved,setSaved]=useState<Work[]>([]);
   const requested=searchParams.get("section");
   const [section,setSection]=useState<Section>(requested==="likes"||requested==="saved"?requested:"posts");
-  const [selectedId,setSelectedId]=useState<string|null>(null);
   const [connectionKind,setConnectionKind]=useState<"followers"|"following"|null>(null);
   const [accounts,setAccounts]=useState<ProfileAccount[]>([]);
   const [connectionsLoading,setConnectionsLoading]=useState(false);
@@ -88,10 +91,16 @@ export function ProfilePage() {
   const [mutationError,setMutationError]=useState(false);
   const [reportingUser,setReportingUser]=useState(false);
   const avatarInputRef=useRef<HTMLInputElement>(null);
-  const selected=[...posts,...likes,...saved].find(work=>work.work_id===selectedId)??null;
 
   useEffect(()=>{
     if(!session||!profileUserId)return;
+    const cached = client.getQueryData<ProfileSnapshot>(["profile-gallery", session.userId, profileUserId]);
+    if (cached) {
+      setProfile(cached.profile); setPosts(cached.posts); setLikes(cached.likes); setSaved(cached.saved);
+      setCursors(cached.cursors); setSection(cached.section); restoreY.current = cached.y; setLoading(false);
+      void getPublicProfile(profileUserId).then(setProfile).catch(()=>undefined);
+      return;
+    }
     setLoading(true);setFailed(false);
     const requests:Promise<unknown>[]=[getPublicProfile(profileUserId),getUserWorks(profileUserId)];
     if(ownProfile)requests.push(getLikedWorks(),getSavedWorks());
@@ -115,9 +124,29 @@ export function ProfilePage() {
     document.addEventListener("pointerdown",dismissMenus,true);
     return()=>document.removeEventListener("pointerdown",dismissMenus,true);
   },[]);
+  useLayoutEffect(() => {
+    if (!loading && restoreY.current !== null) { window.scrollTo({ top: restoreY.current, behavior: "instant" }); restoreY.current = null; }
+  }, [loading]);
+  useEffect(() => {
+    const id = searchParams.get("edit");
+    if (!id || !ownProfile || !session || !hasPermission(session.permissions,"works.upload")) return;
+    let cancelled = false;
+    getWork(id).then(work => {
+      if (!cancelled && work.owner_user_id === session.userId) {
+        setEditing(work); setEditTitle(work.title); setEditDescription(work.description); setEditTypeId(work.type_id);
+        setEditLinks(work.links.length ? work.links : [{url:"",label:null}]);
+        const next = new URLSearchParams(searchParams); next.delete("edit"); setSearchParams(next,{replace:true});
+      }
+    }).catch(()=>{ if(!cancelled)setMutationError(true); });
+    return () => { cancelled = true; };
+  }, [searchParams, ownProfile, session?.userId]);
   if(!session)return <Navigate replace to={`/${language}/login`}/>;
   if(!hasPermission(session.permissions,"profile.read_own"))return <Navigate replace to={`/${language}`}/>;
 
+  function openArtwork(work: Work) {
+    if (profile) client.setQueryData(["profile-gallery", session!.userId, profileUserId], { profile, posts, likes, saved, cursors, y: window.scrollY, section } satisfies ProfileSnapshot);
+    navigate(artworkPath(language, work.work_id), { state: { returnTo: location.pathname + location.search } });
+  }
   async function toggleProfileFollow(){
     if(!profile||profile.is_self||followBusy)return;
     const previous=profile;const next=!profile.is_following;setFollowBusy(profile.user_id);
@@ -152,8 +181,7 @@ export function ProfilePage() {
   async function removeAvatar(){if(!profile?.avatar_url||avatarBusy||!window.confirm(t("profile.removePictureConfirm")))return;setAvatarBusy(true);setAvatarError(false);setAvatarUploadError(false);setAvatarRemoveError(false);try{await removeProfileAvatar();setProfile(current=>current?{...current,avatar_url:null}:current);}catch{setAvatarRemoveError(true);}finally{setAvatarBusy(false);}}
   function beginEdit(work:Work){setEditing(work);setEditTitle(work.title);setEditDescription(work.description);setEditTypeId(work.type_id);setEditLinks(work.links.length?work.links:[{url:"",label:null}]);setMutationError(false);}
   async function saveEdit(event:React.FormEvent){event.preventDefault();if(!editing||mutationBusy)return;setMutationBusy(true);setMutationError(false);try{await updateWork(editing.work_id,{typeId:editTypeId,title:editTitle,description:editDescription,links:editLinks});const type=workTypes.find(item=>item.type_id===editTypeId);const update=(work:Work):Work=>work.work_id===editing.work_id?{...work,title:editTitle.trim(),description:editDescription.trim(),type_id:editTypeId,type_name_en:type?.name_en??work.type_name_en,type_name_ar:type?.name_ar??work.type_name_ar,links:editLinks.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label?.trim()||null}))}:work;setPosts(current=>current.map(update));setLikes(current=>current.map(update));setSaved(current=>current.map(update));setEditing(null);}catch{setMutationError(true);}finally{setMutationBusy(false);}}
-  async function removeWork(work:Work){if(mutationBusy||!window.confirm(t("works.deleteConfirm")))return;setMutationBusy(true);setMutationError(false);try{await deleteWork(work.work_id);const remove=(items:Work[])=>items.filter(item=>item.work_id!==work.work_id);setPosts(remove);setLikes(remove);setSaved(remove);if(selectedId===work.work_id)setSelectedId(null);}catch{setMutationError(true);}finally{setMutationBusy(false);}}
-  async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);const remove=(items:Work[])=>items.filter(item=>item.work_id!==work.work_id);setPosts(remove);setLikes(remove);setSaved(remove);setSelectedId(null);}
+  async function removeWork(work:Work){if(mutationBusy||!window.confirm(t("works.deleteConfirm")))return;setMutationBusy(true);setMutationError(false);try{await deleteWork(work.work_id);const remove=(items:Work[])=>items.filter(item=>item.work_id!==work.work_id);setPosts(remove);setLikes(remove);setSaved(remove);}catch{setMutationError(true);}finally{setMutationBusy(false);}}
 
   return <main className="profile-page app-page-with-sidebar"><AppSidebar/>
     {loading?<p className="profile-state">{t("profile.loading")}</p>:failed||!profile?<p className="profile-state error-message">{t("profile.loadFailed")}</p>:<>
@@ -167,13 +195,12 @@ export function ProfilePage() {
         <button role="tab" type="button" aria-selected={section==="saved"} className={section==="saved"?"active":""} aria-label={t("profile.saved")} title={t("profile.saved")} onClick={()=>selectSection("saved")}><Bookmark aria-hidden="true" size={28}/><span>{saved.length}</span></button>
         <button role="tab" type="button" aria-selected={section==="likes"} className={section==="likes"?"active":""} aria-label={t("profile.likes")} title={t("profile.likes")} onClick={()=>selectSection("likes")}><Heart aria-hidden="true" size={28}/><span>{likes.length}</span></button>
       </nav>}
-      <ProfilePager section={section} select={selectSection} enabled={ownProfile}>{page=><><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canManage={ownProfile&&page==="posts"&&hasPermission(session.permissions,"works.upload")} canSave={hasPermission(session.permissions,"works.save")} empty={t(page==="posts"?"profile.noPosts":page==="likes"?"profile.noLikes":"profile.noSaved")} language={language} works={page==="posts"?posts:page==="likes"?likes:saved} onSelect={work=>setSelectedId(work.work_id)} onEdit={beginEdit} onAssign={ownProfile&&page==="posts"&&hasPermission(session.permissions,"exhibitions.participate")?setAssigning:undefined} onDelete={work=>void removeWork(work)} onLike={toggleLike} onSave={toggleSave} t={t}/>{mutationError&&<p className="pagination-error" role="alert">{t("works.changeFailed")}</p>}{cursors[page]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</>}</ProfilePager>
+      <ProfilePager section={section} select={selectSection} enabled={ownProfile}>{page=><><ArtworkGrid canLike={hasPermission(session.permissions,"works.like")} canManage={ownProfile&&page==="posts"&&hasPermission(session.permissions,"works.upload")} canSave={hasPermission(session.permissions,"works.save")} empty={t(page==="posts"?"profile.noPosts":page==="likes"?"profile.noLikes":"profile.noSaved")} language={language} works={page==="posts"?posts:page==="likes"?likes:saved} onSelect={openArtwork} onEdit={beginEdit} onAssign={ownProfile&&page==="posts"&&hasPermission(session.permissions,"exhibitions.participate")?setAssigning:undefined} onDelete={work=>void removeWork(work)} onLike={toggleLike} onSave={toggleSave} t={t}/>{mutationError&&<p className="pagination-error" role="alert">{t("works.changeFailed")}</p>}{cursors[page]&&<button className="pagination-load-more" type="button" disabled={loadingMore} onClick={loadMore}>{t(loadingMore?"works.loadingMore":"works.loadMore")}</button>}{paginationFailed&&<p className="pagination-error" role="alert">{t("works.loadFailed")}</p>}</>}</ProfilePager>
     </>}
     <AnimatedPresence open={Boolean(connectionKind)}>{connectionKind&&<div className="profile-connections-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&setConnectionKind(null)}><section className="profile-connections-dialog" role="dialog" aria-modal="true" aria-labelledby="connections-title"><header><h2 id="connections-title">{t(connectionKind==="followers"?"profile.followers":"profile.following")}</h2><button type="button" aria-label={t("profile.closeConnections")} onClick={()=>setConnectionKind(null)}><X size={20}/></button></header>{connectionsLoading?<p>{t("profile.loadingConnections")}</p>:!accounts.length?<p>{t("profile.noConnections")}</p>:<div className="profile-account-list">{accounts.map(account=><div className="profile-account-row" key={account.user_id}><Link to={`/${language}/profile/${account.user_id}`} onClick={()=>setConnectionKind(null)}><span>{account.full_name.charAt(0).toUpperCase()}</span><strong>{account.full_name}</strong></Link>{account.user_id!==session.userId&&<button type="button" disabled={followBusy===account.user_id} className={account.is_following?"following":""} onClick={()=>toggleAccountFollow(account)}>{t(account.is_following?"profile.unfollow":"profile.follow")}</button>}</div>)}{connectionsCursor!==null&&<button className="pagination-load-more" type="button" disabled={connectionsLoadingMore} onClick={()=>void loadMoreConnections()}>{t(connectionsLoadingMore?"works.loadingMore":"works.loadMore")}</button>}</div>}</section></div>}</AnimatedPresence>
     {assigning&&<AssignExhibitionDialog workId={assigning.work_id} onClose={()=>setAssigning(null)}/>}
     <AnimatedPresence open={Boolean(avatarCropFile)}>{avatarCropFile&&<ProfileAvatarCropDialog busy={avatarBusy} file={avatarCropFile} onCancel={closeAvatarCrop} onSave={saveCroppedAvatar} t={t}/>}</AnimatedPresence>
     <AnimatedPresence open={Boolean(reportingUser&&profile)}>{reportingUser&&profile&&<ReportDialog targetType="user" targetUserId={profile.user_id} onClose={()=>setReportingUser(false)} t={t}/>}</AnimatedPresence>
-    {selected&&<ArtworkDetailModal language={language} work={selected} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} canReport={session.userId!==selected.owner_user_id&&hasPermission(session.permissions,"reports.create")} canModerateDelete={hasPermission(session.permissions,"works.delete_any")} onClose={()=>setSelectedId(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} onModerateDelete={moderateDelete} onEditOwnWork={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")?beginEdit:undefined} onDeleteOwnWork={ownProfile&&section==="posts"&&hasPermission(session.permissions,"works.upload")?work=>void removeWork(work):undefined} t={t}/>}
     <AnimatedPresence open={Boolean(editing)}>{editing&&<div className="work-edit-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!mutationBusy&&setEditing(null)}><form className="work-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="work-edit-title" onSubmit={saveEdit}><header><h2 id="work-edit-title">{t("works.editPost")}</h2><button type="button" aria-label={t("works.closeEdit")} disabled={mutationBusy} onClick={()=>setEditing(null)}><X size={20}/></button></header><img {...artworkImageProtection} src={editing.image_url} alt={editing.title}/><p className="work-edit-image-note">{t("works.imageCannotChange")}</p><label>{t("works.title")}<input required maxLength={160} value={editTitle} onChange={event=>setEditTitle(event.target.value)}/></label><label>{t("works.type")}<select required value={editTypeId} onChange={event=>setEditTypeId(event.target.value)}>{workTypes.map(type=><option key={type.type_id} value={type.type_id}>{language==="ar"?type.name_ar:type.name_en}</option>)}</select></label><label>{t("works.description")}<textarea maxLength={2000} value={editDescription} onChange={event=>setEditDescription(event.target.value)}/></label><fieldset><legend>{t("works.links")}</legend>{editLinks.map((link,index)=><div className="work-edit-link" key={index}><input type="text" maxLength={120} placeholder={t("works.linkLabel")} value={link.label??""} onChange={event=>setEditLinks(items=>items.map((item,itemIndex)=>itemIndex===index?{...item,label:event.target.value}:item))}/><input type="url" placeholder={t("works.linkUrl")} value={link.url} onChange={event=>setEditLinks(items=>items.map((item,itemIndex)=>itemIndex===index?{...item,url:event.target.value}:item))}/><button type="button" aria-label={t("works.removeLink")} onClick={()=>setEditLinks(items=>items.filter((_,itemIndex)=>itemIndex!==index))}><X size={17}/></button></div>)}{editLinks.length<10&&<button className="work-edit-add-link" type="button" onClick={()=>setEditLinks(items=>[...items,{url:"",label:null}])}>{t("works.addLink")}</button>}</fieldset>{mutationError&&<p className="error-message" role="alert">{t("works.changeFailed")}</p>}<button className="work-edit-save" type="submit" disabled={mutationBusy||!editTitle.trim()}>{t(mutationBusy?"works.savingChanges":"works.saveChanges")}</button></form></div>}</AnimatedPresence>
   </main>;
 }

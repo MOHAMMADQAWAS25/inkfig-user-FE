@@ -1,6 +1,7 @@
 import React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProfilePage } from "../src/features/profile/ProfilePage";
 import { translations } from "../src/i18n/resources";
@@ -19,14 +20,18 @@ vi.mock("../src/features/profile/profileApi",()=>({getPublicProfile:vi.fn().mock
 vi.mock("../src/features/profile/profileAvatarUpload",()=>({PROFILE_AVATAR_ACCEPT:"image/*",isValidProfileAvatarSource:()=>true,removeProfileAvatar:vi.fn().mockResolvedValue(undefined),uploadProfileAvatar:vi.fn()}));
 vi.mock("../src/features/profile/ProfileAvatarCropDialog",()=>({ProfileAvatarCropDialog:()=>null}));
 vi.mock("../src/features/exhibitions/exhibitionApi",()=>({getEligibleExhibitions:vi.fn().mockResolvedValue({items:[],next_cursor:null}),submitWork:vi.fn()}));
-vi.mock("../src/features/works/worksApi",()=>({getUserWorks:vi.fn().mockResolvedValue({items:[artwork],next_cursor:null}),getLikedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getSavedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getWorkTypes:vi.fn().mockResolvedValue([]),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWork:vi.fn(),deleteWorkAsModerator:vi.fn(),updateWork:vi.fn()}));
+vi.mock("../src/features/works/worksApi",()=>({getWork:vi.fn().mockResolvedValue(artwork),getUserWorks:vi.fn().mockResolvedValue({items:[artwork],next_cursor:null}),getLikedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getSavedWorks:vi.fn().mockResolvedValue({items:[],next_cursor:null}),getWorkTypes:vi.fn().mockResolvedValue([]),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWork:vi.fn(),deleteWorkAsModerator:vi.fn(),updateWork:vi.fn()}));
 beforeEach(()=>{vi.clearAllMocks();vi.spyOn(window,"confirm").mockReturnValue(true);});
 afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
+
+function renderProfile(path = "/en/profile") {
+  return render(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={[path]}><ProfilePage /></MemoryRouter></QueryClientProvider>);
+}
 
 describe("mobile profile controls",()=>{
   it("opens exhibition assignment from the owner's three-dot menu",async()=>{
     vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
-    const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
+    const {container}=renderProfile();
     await screen.findByRole("heading",{name:"Viewer"});
     const menu=container.querySelector<HTMLDetailsElement>(".artwork-owner-menu")!;
     fireEvent.click(menu.querySelector("summary")!);
@@ -35,7 +40,7 @@ describe("mobile profile controls",()=>{
     await waitFor(()=>expect(getEligibleExhibitions).toHaveBeenCalledWith(0,"work"));
   });
   it("keeps avatar upload and removal accessible through the camera menu",async()=>{
-    const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
+    const {container}=renderProfile();
     await screen.findByRole("heading",{name:"Viewer"});
     for(const [key,count] of [["profile.posts","1"],["profile.saved","0"],["profile.likes","0"]] as const){
       const tab=screen.getByRole("tab",{name:translations.en[key]});
@@ -53,15 +58,10 @@ describe("mobile profile controls",()=>{
     await waitFor(()=>expect(container.querySelector(".profile-avatar > img")).toBeNull());
     fireEvent.click(screen.getByRole("button",{name:translations.en["nav.logout"]}));expect(signOut).toHaveBeenCalledTimes(1);
   });
-  it("preserves owner editing inside opened artwork when mobile card menus are hidden",async()=>{
-    const {container}=render(<MemoryRouter><ProfilePage/></MemoryRouter>);
-    fireEvent.click(await screen.findByRole("button",{name:`${translations.en["works.viewDetails"]}: My artwork`}));
-    expect(screen.getByRole("dialog")).toBeTruthy();
-    const actions=container.querySelector(".artwork-modal-owner-actions")!;
-    expect(actions.querySelectorAll("button")).toHaveLength(2);
-    vi.useFakeTimers();
-    fireEvent.click(actions.querySelector("button")!);
-    await act(async()=>{await vi.advanceTimersByTimeAsync(240);});
-    expect(container.querySelector(".work-edit-dialog")).toBeTruthy();
+  it("preserves owner editing through the artwork page's edit deep link",async()=>{
+    const {container}=renderProfile("/en/profile?edit=work");
+    await waitFor(()=>expect(container.querySelector(".work-edit-dialog")).toBeTruthy());
+    expect((container.querySelector('.work-edit-dialog input[maxlength="160"]') as HTMLInputElement).value).toBe("My artwork");
+    expect((await screen.findByRole("link",{name:`${translations.en["works.viewDetails"]}: My artwork`})).getAttribute("href")).toBe("/en/artwork/work");
   });
 });

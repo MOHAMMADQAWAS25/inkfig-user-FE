@@ -11,5 +11,5 @@ export async function getUnreadNotificationCount(){return (await requestJson<{un
 
 export function notificationTarget(item:NotificationItem,language:string){
   if(item.event_type.startsWith("submission_")||item.event_type.startsWith("withdrawal_"))return item.exhibition_id?`/${language}/exhibition/${item.exhibition_id}/submissions`:`/${language}/exhibition`;
-  return item.event_type==="like"&&item.work_id?`/${language}?work=${item.work_id}`:`/${language}/profile/${item.actor_user_id}`;
+  return item.event_type==="like"&&item.work_id?`/${language}/artwork/${item.work_id}`:`/${language}/profile/${item.actor_user_id}`;
 }

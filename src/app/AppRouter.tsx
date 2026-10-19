@@ -5,6 +5,7 @@ import { SignupPage } from "../features/auth/SignupPage";
 import { VerifyEmailPage } from "../features/auth/VerifyEmailPage";
 import { PasswordResetPage } from "../features/auth/PasswordResetPage";
 import { HomePage } from "../features/home/HomePage";
+import { ArtworkPage } from "../features/works/ArtworkPage";
 import { ProfilePage } from "../features/profile/ProfilePage";
 import { UploadWorkPage } from "../features/works/UploadWorkPage";
 import { AdminUsersPage } from "../features/admin/AdminUsersPage";
@@ -21,6 +22,7 @@ export function AppRouter() {
   return (
     <><PageMetadata /><div key={location.pathname} className="site-content"><Routes>
       <Route path="/:language" element={<HomePage />} />
+      <Route path="/:language/artwork/:workId" element={<ArtworkPage />} />
       <Route path="/:language/login" element={<LoginPage />} />
       <Route path="/:language/signup" element={<SignupPage />} />
       <Route path="/:language/verify-email" element={<VerifyEmailPage />} />

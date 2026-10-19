@@ -1,0 +1,35 @@
+.artwork-page { min-height:100svh; padding-block:24px 60px; color:var(--text); background:var(--bg); }
+.artwork-page-shell { width:100%; max-width:1800px; margin-inline:auto; padding-inline:clamp(16px,2.5vw,44px); box-sizing:border-box; }
+.artwork-page-back { display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; padding:8px 0; border:0; background:none; color:var(--muted); cursor:pointer; }
+[dir=rtl] .artwork-page-back svg { transform:rotate(180deg); }
+.artwork-page-hero { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr); align-items:start; gap:clamp(24px,3vw,50px); }
+.artwork-page-hero>.artwork-modal-media { width:100%; max-width:none; min-width:0; min-height:320px; height: min(76svh,900px); overflow:hidden; border:1px solid var(--border); border-radius:18px; align-self:start; }
+.artwork-page .artwork-modal-media .artwork-media-original { width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; }
+.artwork-page .artwork-modal-media video.artwork-media-original { width:100%; }
+.artwork-page-info { min-width:0; padding-block:12px; }
+.artwork-page-creator { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:30px; }
+.artwork-page-creator>a { display:flex; align-items:center; gap:12px; min-width:0; color:var(--text); text-decoration:none; }
+.artwork-page-creator strong { overflow-wrap:anywhere; }
+.artwork-page-creator img,.artwork-creator-initial { width:56px; height:56px; flex:0 0 56px; border-radius:50%; object-fit:cover; }
+.artwork-creator-initial { display:grid; place-items:center; background:var(--surface); color:var(--primary); }
+.artwork-page-creator>button { padding:10px 20px; border:1px solid var(--primary); border-radius:999px; background:transparent; color:var(--primary); cursor:pointer; }
+.artwork-page h1 { margin:0 0 18px; font-size:clamp(1.8rem,3vw,3rem); line-height:1.15; overflow-wrap:anywhere; }
+.artwork-page-category { display:inline-block; padding:7px 12px; border:1px solid var(--border); border-radius:999px; color:var(--primary); background:var(--surface); }
+.artwork-page-description { margin:22px 0; color:var(--muted); line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
+.artwork-page-date { display:flex; align-items:center; gap:12px; margin:24px 0; }
+.artwork-page-date time { display:block; margin-top:5px; }
+.artwork-page-links { display:grid; gap:10px; margin-block:20px; overflow-wrap:anywhere; }
+.artwork-page-links a { color:var(--primary); }
+.artwork-page-actions,.artwork-page-share,.artwork-page-manage { display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
+.artwork-page-actions { border-top:1px solid var(--border); padding-block:18px; }
+.artwork-page-actions button,.artwork-page-manage button,.artwork-page-manage a { display:inline-flex; align-items:center; gap:8px; padding:8px 0; border:0; background:none; color:var(--text); cursor:pointer; text-decoration:none; }
+.artwork-page-actions button[aria-pressed=true] { color:var(--primary); }
+.artwork-page-share button { display:inline-flex; justify-content:center; align-items:center; gap:10px; flex:1 1 130px; min-height:48px; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
+.artwork-page-manage { margin-top:16px; font-size:.85rem; }
+.artwork-page-related { margin-top:36px; }
+.artwork-page-related h2 { margin:0 0 22px; font-size:1.6rem; }
+.artwork-page-skeleton { min-height:65svh; display:grid; place-items:center; border-radius:18px; background:var(--surface); }
+.artwork-page-unavailable { padding:50px 20px; text-align:center; }
+.artwork-page-unavailable a,.artwork-page-unavailable button { margin:12px; color:var(--primary); }
+.artwork-page button:disabled { opacity:.5; cursor:default; }
+@media(max-width:900px) { .artwork-page-hero { grid-template-columns:minmax(0,1fr); gap:20px; }.artwork-page-hero>.artwork-modal-media { height:auto; min-height:240px; max-height:75svh; }.artwork-page .artwork-modal-media .artwork-media-original { max-height:75svh; width:100%; height:auto; }.artwork-page-creator { margin-bottom:24px; }.artwork-page-info { display:contents; }.artwork-page-creator { grid-row:1; }.artwork-page-info>* { min-width:0; }.artwork-page-description,.artwork-page-date { margin-block:4px 12px; }.artwork-page h1 { margin-bottom:0; }.artwork-page-category { justify-self:start; }.artwork-page-actions { width:100%; box-sizing:border-box; }.artwork-page { padding-bottom:100px; } }

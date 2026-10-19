@@ -9776,3 +9776,29 @@ Windows Computer Use initialization could not start because of helper_sandbox_lo
 ### Deployment and Git
 
 Frontend-only existing main deployment workflow; no backend deployment/migration. Branch: fix/exhibition-scroll-and-hover. Commit message: Fix exhibition scroll chaining and refine home hover. Fetch/rebase before branch push, then explicitly authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment outcomes reported in final handoff. Prior feature-log entries preserved.
+
+## 2026-10-19 - Routed artwork details and related masonry
+
+### Request, baseline and rollback record
+
+Replace public artwork popups with a reference-inspired dedicated page and homepage-format related artwork, with a complete reversible record. Clean main was pulled before editing. Frontend baseline c925263f8ec2bdc74a911c52bff1e9dc62c22c08; main backend baseline b11e077f0e60abb25a6a044ce5f63df3de1fb58c. Added docs/artwork-detail-page-rollback.md in both repositories with scope, commit subjects, deployment/reversal order and safe revert-only instructions. Do not reset to these baselines or discard later work.
+
+### Changes and files
+
+New ArtworkPage.tsx/artworkPage.css implement localized /:language/artwork/:workId, responsive contain media, creator/follow, actual creation date, category/description/links, existing authorized like/save/report/edit/delete/moderation, copy/share and loading/unavailable states. ArtworkMedia retains right-click/drag protection. Added relatedArtworksApi/useRelatedArtworks, artworkNavigation and updateArtworkCache. Related cards reuse Feed/PostCard and masonry, infinite pagination and cache; no related-feed mount scroll reset. Cache updates synchronize interactions/deletions and own liked/saved snapshots. Moderation dialog supports focus containment, Escape/backdrop dismissal and shared scroll locking.
+
+AppRouter, HomePage, ProfilePage, PostCard, ExhibitionsPage and notificationApi route public card opens to the standalone page, including legacy ?work= links. Native links retain modified-click/new-tab behavior. Home query/cache restoration retained; profile snapshots retain loaded pages/cursors/tab/scroll and existing edit form supports an owned-work deep link. Administrative/review previews remain modals. Feed adds optional restoreScroll=false without changing its default or layout algorithm. Added English/Arabic strings. Updated foundation/feed-card-performance/mobile-profile tests and added artwork-page.test.tsx; rollback document and this log complete the inventory.
+
+### API, data, permissions and compatibility
+
+Requires companion main-system GET /works/{id}/related. Stored compatible vectors rank visual matches first, with same-category fallback; excludes current/unpublished/inactive-owner works. No user-system changes, migration, credentials, dependencies or configuration changes. Existing backend remains authoritative for actions and ownership. No fabricated handles/checkmarks or artwork data. Browser-only state adds no backend SnapStart initialization.
+
+### Verification and limitations
+
+330 frontend checks passed (85 Node/source and 245 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Backend companion: 118 passed, two opt-in DB checks skipped, mypy 77 files passed. Added coverage for full-page metadata, related pagination/navigation, like/save rollback, follow/copy, unavailable source, Arabic/owner editing, own collection cache updates and moderator Escape. Corrected test label assumptions and reran all checks. Existing large-chunk and jsdom scrollTo warnings remain.
+
+Computer-use skill attempted a local fixture preview; browser URL could not be verified safely, so Computer Use stopped and no further UI actions were issued. Temporary preview files/server removed before the clean production build. No successful interactive visual/physical-device review is claimed. Live SQL verification unavailable because DATABASE_URL is not configured; no real artwork/user/storage writes made during tests.
+
+### Git and deployment
+
+Matching feature/artwork-detail-page branches in frontend and main-system. Frontend subject: Add routed artwork details and related masonry feed. Backend subject: Add stored-vector related artwork feed. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Deploy backend first, frontend second using existing workflows; no migration/user-system deployment. Exact hashes, push/conflict/merge and workflow outcomes reported in final handoff. Previous log entries preserved.

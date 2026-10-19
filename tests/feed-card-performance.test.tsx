@@ -27,7 +27,7 @@ it("skips unchanged cards but updates artwork, priority and action callbacks",()
   expect(LazyImage).toHaveBeenCalledTimes(3);
   const onOpen=vi.fn();
   view.rerender(<PostCard {...props} work={updated} priority onOpen={onOpen}/>);
-  fireEvent.click(view.getByRole("button",{name:"works.viewDetails: Updated"}));
+  fireEvent.click(view.getByRole("link",{name:"works.viewDetails: Updated"}));
   expect(onOpen).toHaveBeenCalledWith(updated);
   expect(props.onOpen).not.toHaveBeenCalled();
 });

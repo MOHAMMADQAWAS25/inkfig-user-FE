@@ -8,6 +8,7 @@ import { hasPermission } from "../../lib/permissions";
 import { LazyImage } from "./LazyImage";
 import { CardMedia } from "./CardMedia";
 import { memo, useState } from "react";
+import { artworkPath } from "../works/artworkNavigation";
 
 export const PostCard = memo(function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
   work: FeedWork; width: number; priority: boolean;
@@ -18,10 +19,10 @@ export const PostCard = memo(function PostCard({ work, width, priority, onOpen, 
   const [failedAvatar,setFailedAvatar]=useState<string|null>(null);
   const profileHref=session ? `/${language}/profile/${work.owner_user_id}` : `/${language}/login`;
   return <div className="feed-post-card"><CardMedia>
-    <button className="artwork-image-button" type="button" data-work-id={work.work_id}
-      aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={() => onOpen(work)}>
+    <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} data-work-id={work.work_id}
+      aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onOpen(work); } }}>
       <LazyImage work={work} width={width} priority={priority} failureLabel={t("feed.imageFailed")} />
-    </button>
+    </Link>
     <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
     <Link className="artwork-artist-link" to={session ? `/${language}/profile/${work.owner_user_id}` : `/${language}/login`}><UserRound size={15} />{work.artist_name}</Link>
     <button className={`artwork-pin-like ${work.liked_by_me ? "liked" : ""}`} disabled={!session || !hasPermission(session.permissions, "works.like")}

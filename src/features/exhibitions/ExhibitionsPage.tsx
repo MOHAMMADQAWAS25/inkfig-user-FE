@@ -384,7 +384,7 @@ export function ExhibitionsPage() {
               <div className="exhibitions-grid">
                 {submissions.map((item) => (
                   <article className="exhibition-card" key={item.submission_id}>
-                    <Link to={`/${language}?work=${item.work_id}`}>
+                    <Link to={`/${language}/artwork/${item.work_id}`} state={{ returnTo: `/${language}/exhibition/${selected.exhibition_id}` }}>
                       <img {...artworkImageProtection}
                         src={item.image_url}
                         alt={item.title}
