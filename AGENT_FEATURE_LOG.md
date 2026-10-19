@@ -9643,3 +9643,33 @@ Deploy companion main-system first, then existing Cloudflare main workflow. No m
 ### Git
 
 Branch: feature/exhibition-interaction-polish. Commit message: Polish exhibition interactions and account form controls. Fetch/rebase before branch push and explicitly authorized fast-forward main merge/push. Exact hashes, push/merge/conflict and deployment outcomes reported in final handoff. Prior feature-log entries preserved.
+
+## 2026-10-19 - Reduce homepage scroll rendering work
+
+### Request and repository scope
+
+Fix homepage lag diagnosed during scrolling. Frontend owns the fix; main-system and user-system were pulled from main, clean and unchanged. Preserve current gallery, mobile header, interactions and natural artwork proportions.
+
+### Changes and files
+
+- `src/features/feed/Feed.tsx`: memoize the feed and refresh the virtual window in half-screen buckets (minimum 128px), rounding the rendered bounds outward. Keep the two-screen overscan, exact scroll-memory sampling, focused-card retention, hidden-tab pause and resize handling. Recompute the window after layout/data changes; avoid per-pixel rectangle reads and state updates.
+- `src/features/feed/PostCard.tsx`: memoize unchanged cards using normal shallow comparison; changed work, dimensions, priority, callbacks, auth and localization still update.
+- `src/features/home/HomePage.tsx`: stabilize detail/like/save handlers with explicit dependencies and the card renderer, so header/search state does not invalidate otherwise unchanged feed props. No ignored callback comparisons or stale-handler escape hatches.
+- `tests/feed.test.tsx`, `tests/feed-card-performance.test.tsx`: sub-window scroll suppression, large jumps, focused-card retention, frame cleanup, unrelated parent renders, changed artwork/priority/callback behavior.
+- `AGENT_FEATURE_LOG.md`: append implementation record.
+
+### API, database, permissions and SnapStart
+
+No API changes. No migration required. No backend, permissions, data-scope, dependencies, secrets or environment-file changes; browser-only changes have no Lambda SnapStart impact. Pagination remains IntersectionObserver-driven.
+
+### Verification
+
+- 283 frontend tests passed (82 source/layout and 201 component/feed), strict TypeScript checks and Vite production builds passed. Existing non-blocking bundle-size warning and jsdom scrollTo notices remain.
+- Playwright isolated Chromium profile, same four-second mobile-width scroll with 4x CPU slowdown: instrumented feed render observations fell from 236 to 13; combined card observations from 7059 to 166. These are synthetic measurements, not a physical-phone FPS certification.
+- Read-only production API checks with the optimized local production bundle: English desktop 1440px and Arabic mobile 390px, top/middle/large-jump/back scrolling, no card overlap/horizontal overflow/blank viewport, working detail and history navigation, no page errors.
+- Initial comparison used localhost API build defaults and could not load the feed; rebuilt with production API URLs supplied only to the build process. No .env was edited. Temporary browser-only asset interception did not change deployment or backend data.
+- git diff --check passed; no real user likes/saves/reports/uploads/deletions were submitted. Automated interaction tests cover those behaviors.
+
+### Deployment and limitations
+
+Frontend-only deployment through the existing main workflow. Commit focused files, pull/rebase main immediately before pushing, verify deployment. Both backends require no push/tests/deployment. User's personal Chrome could not be attached because its Playwright extension is absent; measurements use an isolated browser, and device/extension-specific lag may still need a follow-up. Diagnostic scripts stay ignored under output/playwright.

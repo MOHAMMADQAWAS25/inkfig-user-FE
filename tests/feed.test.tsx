@@ -157,6 +157,48 @@ describe("infinite feed query", () => {
 });
 
 describe("sentinel and media", () => {
+  it("skips sub-window scroll renders, updates on large jumps and retains focused cards", () => {
+    const frames = new Map<number, FrameRequestCallback>(); let nextFrame = 0;
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => { frames.set(++nextFrame, callback); return nextFrame; });
+    vi.stubGlobal("cancelAnimationFrame", (id: number) => frames.delete(id));
+    Object.defineProperty(window, "scrollY", { configurable:true, value:0 });
+    vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockImplementation(() => ({width:1000,top:-window.scrollY,height:500}) as DOMRect);
+    const renderItem = vi.fn((item: FeedWork) => <button>{item.title}</button>);
+    const props = {items:Array.from({length:1000},(_,i)=>work(i)),cacheKey:"scroll-performance",loading:false,loadingMore:false,error:null,
+      hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem};
+    const Wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter initialEntries={["/en"]}><I18nProvider>{children}</I18nProvider></MemoryRouter>;
+    const view = render(<Feed {...props}/>, {wrapper:Wrapper});
+    function scroll(top:number) {
+      Object.defineProperty(window,"scrollY",{configurable:true,value:top});
+      act(()=>{const callbacks=[...frames.values()];frames.clear();callbacks.forEach(callback=>callback(0));});
+    }
+    renderItem.mockClear();
+    for (let y=1;y<=100;y++) scroll(y);
+    expect(renderItem).not.toHaveBeenCalled();
+    scroll(800); expect(renderItem).toHaveBeenCalled();
+    const focused = view.container.querySelector<HTMLButtonElement>("button")!;
+    act(()=>focused.focus());
+    scroll(20_000);
+    expect(focused.isConnected).toBe(true);
+    expect(view.container.querySelectorAll("article").length).toBeLessThan(80);
+    act(()=>focused.blur());
+    expect(focused.isConnected).toBe(false);
+    expect(view.container.textContent).toContain("Art 1");
+    view.unmount(); expect(frames.size).toBe(0);
+    Object.defineProperty(window,"scrollY",{configurable:true,value:0});
+  });
+  it("does not rerender the feed for unrelated parent updates but accepts new work data", () => {
+    const renderItem = vi.fn((item: FeedWork) => <button>{item.title}</button>);
+    const props={items:[work(1)],cacheKey:"memo-performance",loading:false,loadingMore:false,error:null,
+      hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem};
+    const Wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter initialEntries={["/en"]}><I18nProvider>{children}</I18nProvider></MemoryRouter>;
+    const view=render(<div data-progress={0}><Feed {...props}/></div>,{wrapper:Wrapper});
+    renderItem.mockClear();
+    view.rerender(<div data-progress={.5}><Feed {...props}/></div>);
+    expect(renderItem).not.toHaveBeenCalled();
+    view.rerender(<div><Feed {...props} items={[{...props.items[0],title:"Changed artwork"}]}/></div>);
+    expect(screen.getByText("Changed artwork")).toBeTruthy();
+  });
   it("restores scroll after width measurement in Strict Mode", async () => {
     const props = { items: [work(1)], cacheKey: "strict-restore-test", loading: false, loadingMore: false, error: null,
       hasNextPage: false, loadMore: vi.fn(), retry: vi.fn(), emptyMessage: "Empty", renderItem: (item: FeedWork) => <button>{item.title}</button> };

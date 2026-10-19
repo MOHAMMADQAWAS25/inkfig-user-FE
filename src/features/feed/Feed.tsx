@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { memo, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { FeedWork } from "../works/worksApi";
 import { useI18n } from "../../i18n/I18nProvider";
 import { CREATOR_ROW_HEIGHT, FeedLayout, visiblePositions, type LayoutResult, type Position } from "./feedLayout";
@@ -13,7 +13,7 @@ type FeedProps = {
 };
 
 /** Window-scroll virtualization without scroll event listeners or per-card observers. */
-export function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem }: FeedProps) {
+export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem }: FeedProps) {
   const { language, t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const calculator = useRef(new FeedLayout());
@@ -73,23 +73,29 @@ export function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, 
   }, [cacheKey]);
 
   useLayoutEffect(() => {
-    let frame = 0, measuredScroll = NaN, lastHeight = 0;
+    let frame = 0, measuredBucket = NaN, lastHeight = 0;
     const measure = () => {
-      if (window.scrollY !== measuredScroll || window.innerHeight !== lastHeight) {
-        measuredScroll = window.scrollY; lastHeight = window.innerHeight;
-        if (restored.current) lastScroll.current = measuredScroll;
+      const scroll = window.scrollY;
+      if (restored.current) lastScroll.current = scroll;
+      const step = Math.max(128, Math.floor(window.innerHeight / 2));
+      const bucket = Math.floor(scroll / step);
+      if (bucket !== measuredBucket || window.innerHeight !== lastHeight) {
+        measuredBucket = bucket; lastHeight = window.innerHeight;
         const top = -(containerRef.current?.getBoundingClientRect().top ?? 0);
         // Two screens in each direction, with a practical minimum for small windows.
+        // Round outwards so a half-screen scroll never outruns the rendered buffer.
         const buffer = Math.max(800, lastHeight * 2);
-        setRange({ top: top - buffer, bottom: top + lastHeight + buffer });
+        const start = Math.floor(top / step) * step;
+        setRange(current => current.top === start - buffer && current.bottom === start + step + lastHeight + buffer
+          ? current : { top: start - buffer, bottom: start + step + lastHeight + buffer });
       }
       if (!document.hidden) frame = requestAnimationFrame(measure);
     };
-    const resume = () => { cancelAnimationFrame(frame); measuredScroll = NaN; measure(); };
+    const resume = () => { cancelAnimationFrame(frame); measuredBucket = NaN; measure(); };
     measure();
     document.addEventListener("visibilitychange", resume);
     return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", resume); };
-  }, [width, cacheKey]);
+  }, [width, cacheKey, positions]);
 
   const visible = visiblePositions(positions, range.top, range.bottom);
   if (focusedId && !visible.some(position => position.id === focusedId)) {
@@ -121,4 +127,4 @@ export function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, 
       <button className="pagination-load-more" type="button" disabled={loadingMore} onClick={retry}>{t("feed.retry")}</button></div> : null}
     {!error && !loading && hasNextPage && typeof IntersectionObserver === "undefined" && <button className="pagination-load-more" onClick={loadMore}>{t("works.loadMore")}</button>}
   </>;
-}
+});

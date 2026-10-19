@@ -1,6 +1,6 @@
 import { LogOut, Search, UserRound, X } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
@@ -16,6 +16,7 @@ import type { Work } from "../works/worksApi";
 import { useInfiniteFeed } from "../feed/useInfiniteFeed";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
+import type { FeedWork } from "../works/worksApi";
 import { ArtworkDetailModal } from "./ArtworkDetailModal";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -120,10 +121,10 @@ export function HomePage() {
       .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
     return () => controller.abort();
   }, [detailWorkId, detailAttempt, session?.userId]);
-  function openWork(work: Work) {
+  const openWork = useCallback((work: Work) => {
     const next = new URLSearchParams(searchParams); next.set("work", work.work_id);
     setSearchParams(next);
-  }
+  }, [searchParams, setSearchParams]);
   function closeWork() {
     const id = selectedWorkId;
     setSelectedWorkId(null); setDeepLinkedWork(null);
@@ -162,7 +163,7 @@ export function HomePage() {
   function updateSearch(event:ChangeEvent<HTMLInputElement>){const typed=event.target.value;if(selectedAccount){setSearchQuery(`@${selectedAccount.full_name}${typed?` ${typed}`:""}`);setMentionQuery(null);setAccountSuggestions([]);return;}setSearchQuery(typed);const at=typed.lastIndexOf("@");if(at<0){setMentionQuery(null);setAccountSuggestions([]);return;}setMentionQuery(typed.slice(at+1).trimStart());}
   function selectAccount(account:ProfileSearchResult){const at=searchQuery.lastIndexOf("@");const next=at>=0?`${searchQuery.slice(0,at)}@${account.full_name}`:`${searchQuery} @${account.full_name}`;setSearchQuery(next);setSelectedAccount(account);setMentionQuery(null);setAccountSuggestions([]);}
   function handleSearchKeyDown(event:KeyboardEvent<HTMLInputElement>){if(event.key==="Escape"){event.preventDefault();setHistoryOpen(false);setMentionQuery(null);blurMobileSearch();return;}if(showHistory&&historyItems.length){if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();setHistoryIndex(index=>index<0?(event.key==="ArrowDown"?0:historyItems.length-1):(index+(event.key==="ArrowDown"?1:-1)+historyItems.length)%historyItems.length);return;}if(event.key==="Enter"&&historyIndex>=0){event.preventDefault();selectRecent(historyItems[historyIndex]);return;}}if(mentionQuery===null||accountSuggestions.length===0)return;if(event.key==="ArrowDown"){event.preventDefault();setActiveSuggestion(index=>(index+1)%accountSuggestions.length);}else if(event.key==="ArrowUp"){event.preventDefault();setActiveSuggestion(index=>(index-1+accountSuggestions.length)%accountSuggestions.length);}else if(event.key==="Escape"){event.preventDefault();setMentionQuery(null);}else if(event.key==="Enter"){event.preventDefault();selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);}}
-  async function toggleLike(work:Work){
+  const toggleLike = useCallback(async (work:Work)=>{
     const key=`like:${work.work_id}`;
     if(!session || !hasPermission(session.permissions,"works.like") || interactionRequests.current.has(key))return;
     interactionRequests.current.add(key);
@@ -175,8 +176,8 @@ export function HomePage() {
       setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,...previous}:item));
       setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,...previous}:current);
     }finally{interactionRequests.current.delete(key);}
-  }
-  async function toggleSave(work:Work){
+  }, [session, setWorks]);
+  const toggleSave = useCallback(async (work:Work)=>{
     const key=`save:${work.work_id}`;
     if(!session || !hasPermission(session.permissions,"works.save") || interactionRequests.current.has(key))return;
     interactionRequests.current.add(key);
@@ -187,7 +188,8 @@ export function HomePage() {
       setWorks(current=>current.map(item=>item.work_id===work.work_id?{...item,saved_by_me:work.saved_by_me}:item));
       setDeepLinkedWork(current=>current?.work_id===work.work_id?{...current,saved_by_me:work.saved_by_me}:current);
     }finally{interactionRequests.current.delete(key);}
-  }
+  }, [session, setWorks]);
+  const renderCard = useCallback((work:FeedWork,width:number,priority:boolean)=><PostCard work={work} width={width} priority={priority} onOpen={openWork} onLike={toggleLike} onSave={toggleSave}/>, [openWork, toggleLike, toggleSave]);
   async function moderateDelete(work:Work,reason:string){await deleteWorkAsModerator(work.work_id,reason);setWorks(current=>current.filter(item=>item.work_id!==work.work_id));closeWork();}
 
   return (
@@ -222,7 +224,7 @@ export function HomePage() {
         <Feed key={feed.cacheKey} cacheKey={feed.cacheKey} items={works} loading={feed.loading} loadingMore={feed.loadingMore}
           error={feed.error} hasNextPage={feed.hasNextPage} loadMore={feed.loadMore} retry={feed.retry}
           emptyMessage={normalizedArtworkSearch.length>=2||submittedAccount?t("home.noSearchResults"):t("works.empty")}
-          renderItem={(work,width,priority)=><PostCard work={work} width={width} priority={priority} onOpen={openWork} onLike={toggleLike} onSave={toggleSave}/>} />
+          renderItem={renderCard} />
 
       </section>
 

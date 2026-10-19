@@ -7,9 +7,9 @@ import { useAuth } from "../auth/AuthContext";
 import { hasPermission } from "../../lib/permissions";
 import { LazyImage } from "./LazyImage";
 import { CardMedia } from "./CardMedia";
-import { useState } from "react";
+import { memo, useState } from "react";
 
-export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
+export const PostCard = memo(function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
   work: FeedWork; width: number; priority: boolean;
   onOpen: (work: FeedWork) => void; onLike: (work: FeedWork) => void; onSave: (work: FeedWork) => void;
 }) {
@@ -36,4 +36,4 @@ export function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
     {work.artist_avatar_url&&failedAvatar!==work.artist_avatar_url?<img src={work.artist_avatar_url} alt="" width={28} height={28} loading="lazy" decoding="async" onError={()=>setFailedAvatar(work.artist_avatar_url??null)}/>:<span className="feed-creator-initial" aria-hidden="true">{work.artist_name.trim().charAt(0).toLocaleUpperCase(language)||"I"}</span>}
     <span className="feed-creator-name">{work.artist_name}</span>
   </Link></div>;
-}
+});
