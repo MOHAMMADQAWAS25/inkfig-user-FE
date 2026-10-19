@@ -9610,3 +9610,36 @@ No API, migration, authorization, permissions, storage, dependencies, configurat
 ### Deployment and Git
 
 Frontend-only existing Cloudflare main workflow; no backend deployment or migration. Branch: feature/artwork-image-protection. Fetch/rebase before branch push and authorized fast-forward main merge/push. Commit, conflicts and deployment outcomes reported in handoff. Earlier entries and concurrent layout/review changes preserved.
+
+## 2026-10-19 - Exhibition interactions, focused sliders and stationary signup
+
+### Request and changes
+
+- Shared administrator/owner submission rows now have restrained desktop card elevation, thumbnail zoom/tint, colored action-button hover/focus states, and consistent artist/title/status presentation. Only the thumbnail opens artwork details; artist avatar/name are separate profile links with an avatar/name preview on hover or keyboard focus. Touch devices avoid sticky card hover. Existing image context-menu/drag protection, contain-only margin blur, manager read-only preview, owner withdrawals, filtering and pagination preserved.
+- Added reusable ThemedSelect for submission status and signup gender. Themed/RTL listbox has quick fade/slide opening and closing, selection indicator, keyboard arrows/Home/End/Enter/Escape/Tab/type-ahead, outside dismissal, disabled states and retained native required form values. Menu opens upward when space below is constrained and respects the signup card's clipping bounds. Reduced-motion supported.
+- Signup page uses a stationary dynamic viewport; compact desktop spacing fits all required fields/actions without page scrolling. Internal form overflow remains only as a small-screen/keyboard/enlarged-content accessibility fallback; no required fields are hidden or removed. Existing authentication/validation, cream logo nib and watercolor glass themes preserved.
+- Moved exhibition participation information to its own full-width themed box immediately beneath the Share your work details box, outside the file/links panel. Existing eligibility, previews and upload/submission retry behavior retained. Home creator names gain a subtle hover highlight/underline without changing masonry row geometry or visibility.
+- Slider backdrop now covers the navigation rail, header and mobile bottom bar through closing. Background pointer hovering/clicks are blocked, with existing blur, first-gesture dismissal, focus trap, page scroll lock and native-dialog precedence preserved. Mobile notification header is kept below the modal backdrop.
+- Administrator/system-administrator exhibition toolbar includes Delete exhibition with a native modal confirmation, initial Cancel focus, explicit irreversible/kept-original-post warning, busy/error/retry states and return to exhibition listing after success. Supervisors/ordinary users receive no delete option; companion backend enforces authorization independently.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled. Matching feature/exhibition-interaction-polish branches in user-FE and main-system; user-system unchanged. New components/ThemedSelect and exhibitions/DeleteExhibitionDialog; signup, submission records/identity, exhibition toolbar/page/API, upload page, localized resources, scoped styles, interaction/layout tests and this log. Incoming artwork-image protection retained.
+
+### API, database, permissions and scope
+
+Consumes companion main-system DELETE /exhibitions/{id}. Existing submission avatar metadata reused without per-card profile requests. No frontend migration, dependencies, secrets or configuration changes. No authorization solely entrusted to the frontend. Exhibition deletion preserves original posts; backend handles exhibition-owned cascades/banner cleanup. No backend/SnapStart effects from visual changes.
+
+### Verification
+
+280 tests passed (82 source/layout and 198 component/feed); strict TypeScript/Vite production build and git diff --check passed. Added dropdown semantics/form values/keyboard/dismissal/disabled tests, both owner/manager image-only detail and separate profile-link tests, administrator visibility/confirmation and failure/cancel tests, independent upload context placement and modal/sign-up/reduced-motion layout regressions. Updated exact old class/native-select assumptions after the intended structure change; initial failures corrected and complete checks rerun. Existing non-blocking Vite chunk warning and jsdom scrollTo notices remain.
+
+Headless Edge read-only fixtures of actual components/current CSS checked cream signup, dark review dropdown/actions, dark exhibition upload, 390px Arabic owner records and modal slider. Desktop signup had pageHeight equal viewport height and cardScroll equal cardHeight; upload context below details, mobile records within width. Slider hit-test on rail returned backdrop with z-index52 and rail pointer-events none, with page scroll locked. Fixed preview-discovered context-box width. Fixture APIs blocked writes; no real reviews/uploads/deletions performed. Physical devices not exercised. Temporary preview source removed, production build cleared generated fixtures and no-refresh preview stopped.
+
+### Deployment
+
+Deploy companion main-system first, then existing Cloudflare main workflow. No migration, new environment variables or user-system deployment. Exact production workflow outcomes reported in final handoff.
+
+### Git
+
+Branch: feature/exhibition-interaction-polish. Commit message: Polish exhibition interactions and account form controls. Fetch/rebase before branch push and explicitly authorized fast-forward main merge/push. Exact hashes, push/merge/conflict and deployment outcomes reported in final handoff. Prior feature-log entries preserved.

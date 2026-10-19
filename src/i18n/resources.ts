@@ -1,6 +1,9 @@
 export type Language = "ar" | "en";
 
 const en = {
+  "exhibitions.delete": "Delete exhibition",
+  "exhibitions.deleting": "Deleting…",
+  "exhibitions.deleteWarning": "This permanently deletes the exhibition, its submissions and participation blocks, and its banner. Artists’ original posts are kept. This cannot be undone.",
   "reports.filterType": "Report type",
   "reports.type.all": "All Reports",
   "reports.type.work": "Post Reports",
@@ -527,6 +530,9 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
+  "exhibitions.delete": "حذف المعرض",
+  "exhibitions.deleting": "جارٍ الحذف…",
+  "exhibitions.deleteWarning": "سيُحذف المعرض ومشاركاته وقيود المشاركة وصورة الغلاف نهائيًا. ستبقى منشورات الفنانين الأصلية محفوظة. لا يمكن التراجع عن هذا الإجراء.",
   "reports.filterType": "نوع البلاغ",
   "reports.type.all": "جميع البلاغات",
   "reports.type.work": "بلاغات المنشورات",

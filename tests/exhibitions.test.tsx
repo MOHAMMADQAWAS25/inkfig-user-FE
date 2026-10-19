@@ -45,6 +45,7 @@ vi.mock("../src/features/exhibitions/exhibitionApi", () => ({
   getEligibleExhibitions: vi.fn(),
   getExhibition: vi.fn(),
   saveExhibition: vi.fn(),
+  deleteExhibition: vi.fn(),
   getSubmissions: vi.fn(),
   submitWork: vi.fn(),
   reviewSubmission: vi.fn(),
@@ -82,6 +83,8 @@ function view(path = "/en/exhibition/event") {
 beforeEach(() => {
   vi.clearAllMocks();
   state.role = "user";
+  Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value: function (this: HTMLDialogElement) { this.setAttribute("open", ""); } });
+  Object.defineProperty(HTMLDialogElement.prototype, "close", { configurable: true, value: function (this: HTMLDialogElement) { this.removeAttribute("open"); } });
   vi.mocked(getWork).mockResolvedValue({ work_id: "work", title: "Painting", owner_user_id: "me", artist_name: "Me", description: "Artwork detail", image_url: "/art.jpg", mime_type: "image/jpeg", links: [], created_at: "2026-10-18T12:00:00Z", like_count: 0, liked_by_me: false, saved_by_me: false, type_id: "art", type_name_en: "Art", type_name_ar: "Art" });
   vi.mocked(api.withdrawSubmission).mockResolvedValue(undefined);
   vi.mocked(api.reviewWithdrawal).mockResolvedValue(undefined);
@@ -181,7 +184,7 @@ it("renders a horizontal review identity with avatar and distinct action color h
   expect(screen.getByRole("button",{name:"Approve"}).className).toBe("review-approve");
   expect(screen.getByRole("button",{name:"Reject"}).className).toBe("review-reject");
   expect(screen.getByRole("button",{name:"Block participant"}).className).toBe("review-block");
-  expect(container.querySelector(".exhibition-record-info")?.getAttribute("data-review")).toBe("true");
+  expect(container.querySelector(".exhibition-submission-record")?.getAttribute("data-review")).toBe("true");
   expect(container.querySelector(".exhibition-record-artist img")?.getAttribute("src")).toBe("/artist.png");
   expect(container.querySelector(".exhibition-record-thumbnail")).toBeTruthy();
 });
@@ -224,7 +227,8 @@ it("filters one personal record list with server-side status pagination", async 
   }));
   render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
   await screen.findByRole("combobox", { name: "Status" });
-  fireEvent.change(screen.getByRole("combobox", { name: "Status" }), { target: { value: "pending" } });
+  fireEvent.click(screen.getByRole("combobox", { name: "Status" }));
+  fireEvent.click(screen.getByRole("option", { name: "Pending" }));
   const pending = await screen.findByRole("region", { name: "My submissions" });
   const back = screen.getByRole("link", { name: "Back to exhibition" });
   expect(back.getAttribute("href")).toBe("/en/exhibition/event");
@@ -334,6 +338,55 @@ it("keeps the manager edit action without a plus in the blurred toolbar", async 
   expect(edit.closest(".exhibition-toolbar")).toBeTruthy();
   expect(edit.querySelector(".lucide-plus")).toBeNull();
   expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
+});
+it.each(["user", "supervisor"])("does not offer exhibition deletion to %s", async role => {
+  state.role = role;
+  view();
+  await screen.findByText("Spring collection");
+  expect(screen.queryByRole("button", { name: "Delete exhibition" })).toBeNull();
+});
+it.each(["admin", "system_administrator"])("requires %s confirmation before deleting an exhibition", async role => {
+  state.role = role;
+  vi.mocked(api.deleteExhibition).mockResolvedValue(undefined);
+  view();
+  fireEvent.click(await screen.findByRole("button", { name: "Delete exhibition" }));
+  const dialog = screen.getByRole("dialog", { name: "Delete exhibition" });
+  expect(api.deleteExhibition).not.toHaveBeenCalled();
+  expect(within(dialog).getByText(/Artists’ original posts are kept/)).toBeTruthy();
+  expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Cancel" }));
+  fireEvent.click(within(dialog).getByRole("button", { name: "Delete exhibition" }));
+  await waitFor(() => expect(api.deleteExhibition).toHaveBeenCalledWith("event"));
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+});
+it("keeps a failed exhibition deletion open with retry and cancel", async () => {
+  state.role = "admin";
+  vi.mocked(api.deleteExhibition).mockRejectedValue(new Error("Banner cleanup failed"));
+  view();
+  const trigger = await screen.findByRole("button", { name: "Delete exhibition" });
+  trigger.focus();
+  fireEvent.click(trigger);
+  const dialog = screen.getByRole("dialog");
+  fireEvent.click(within(dialog).getByRole("button", { name: "Delete exhibition" }));
+  expect((await within(dialog).findByRole("alert")).textContent).toBe("Banner cleanup failed");
+  expect((within(dialog).getByRole("button", { name: "Delete exhibition" }) as HTMLButtonElement).disabled).toBe(false);
+  fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(trigger);
+});
+it.each([false, true])("opens submissions only from thumbnails and links artists separately (manage=%s)", async manage => {
+  state.role = manage ? "admin" : "user";
+  vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ submission_id: "submission", work_id: "work", user_id: "student", artist_name: "Student", artist_avatar_url: "/avatar.png", title: "Painting", image_url: "/art.jpg", status: "pending", rejection_reason: null, created_at: "2026-10-18T12:00:00Z" }], next_cursor: null });
+  const { container } = render(<MemoryRouter initialEntries={[`/en/exhibition/event/${manage ? "review" : "submissions"}`]}><Routes><Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
+  const artwork = await screen.findByRole("button", { name: `${translations.en["works.viewDetails"]}: Painting` });
+  const row = container.querySelector(".exhibition-submission-record")!;
+  fireEvent.click(row.querySelector(".exhibition-record-info > strong")!);
+  expect(getWork).not.toHaveBeenCalled();
+  const artist = within(row as HTMLElement).getByRole("link", {name:"Student"});
+  expect(artist.getAttribute("href")).toBe("/en/profile/student");
+  expect(artwork.contains(artist)).toBe(false);
+  expect(container.querySelector(".submission-profile-preview img")?.getAttribute("src")).toBe("/avatar.png");
+  fireEvent.click(artwork);
+  await waitFor(() => expect(getWork).toHaveBeenCalledWith("work"));
 });
 it("gives supervisors controls for an exhibition created by someone else", async () => {
   state.role = "supervisor";

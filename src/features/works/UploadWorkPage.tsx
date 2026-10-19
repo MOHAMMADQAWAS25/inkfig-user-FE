@@ -41,7 +41,7 @@ export function UploadWorkPage() {
  async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(`/${language}`);}catch(cause){setError(cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
  return <main className="upload-page app-page-with-sidebar"><AppSidebar/>
    <form className="upload-workspace form-stack" onSubmit={submit} aria-labelledby="upload-title">
-     <section className="upload-card upload-details">
+     <div className="upload-details-column"><section className="upload-card upload-details">
        <header className="upload-heading"><span className="upload-heading-icon"><ImagePlus size={34} aria-hidden="true"/></span><div><h1 id="upload-title">{t("works.uploadTitle")}</h1><p>{t("works.uploadDescription")}</p></div></header>
        <label className="upload-field"><span><Type size={18} aria-hidden="true"/>{t("works.title")} <span aria-hidden="true">*</span></span><input required maxLength={160} value={title} disabled={busy} onChange={event=>setTitle(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{title.length}/160</small></label>
        {types.length ? <WorkTypePicker types={types} value={typeId} onChange={setTypeId} disabled={busy}/> : <p className="form-message error-message" role="status">{t("works.noTypes")}</p>}
@@ -49,6 +49,8 @@ export function UploadWorkPage() {
        {error&&<p className="form-message error-message" role="alert">{error}</p>}
        <footer className="upload-actions"><button className="upload-cancel" type="button" disabled={busy} onClick={()=>navigate(exhibitionId?`/${language}/exhibition/${exhibitionId}`:`/${language}`)}><X size={17} aria-hidden="true"/>{t("works.cancelUpload")}</button><button className="primary-button" disabled={busy||!file||!typeId||Boolean(exhibitionId&&!exhibitionReady)} type="submit"><CloudUpload size={18} aria-hidden="true"/>{busy?t("works.uploading"):t(exhibitionId?"exhibitions.submit":"works.publish")}</button></footer>
      </section>
+       {exhibitionId&&<section className="upload-card exhibition-upload-context"><strong>{exhibitionName||t("exhibitions.loading")}</strong><p>{t("exhibitions.limitHint")}</p><p>{t("exhibitions.pendingHint")}</p></section>}
+     </div>
      <aside className="upload-media-panel">
        <div className="work-file-field" data-dragging={dragging} onDragOver={event=>{event.preventDefault();if(!busy)setDragging(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDragging(false);}} onDrop={event=>{event.preventDefault();setDragging(false);const selected=event.dataTransfer.files[0];if(selected)selectFile(selected);}}>
          <label htmlFor="artwork-file"><ImagePlus size={18} aria-hidden="true"/>{t("works.image")}</label>
@@ -64,7 +66,6 @@ export function UploadWorkPage() {
          {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
          {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
        </fieldset>
-       {exhibitionId&&<div className="exhibition-upload-context"><strong>{exhibitionName||t("exhibitions.loading")}</strong><p>{t("exhibitions.limitHint")}</p><p>{t("exhibitions.pendingHint")}</p></div>}
      </aside>
    </form>
  </main>;

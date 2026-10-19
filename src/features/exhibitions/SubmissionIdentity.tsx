@@ -1,6 +1,7 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useState } from "react";
 import { ImageOff } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function SubmissionThumbnail({ url }: { url: string }) {
   const [loaded, setLoaded] = useState<{ url: string; gaps: boolean } | null>(null);
@@ -14,10 +15,18 @@ export function SubmissionThumbnail({ url }: { url: string }) {
   </span>;
 }
 
-export function SubmissionArtist({ name, avatar, language }: { name: string; avatar?: string | null; language: string }) {
+export function SubmissionArtist({ name, avatar, language, userId }: { name: string; avatar?: string | null; language: string; userId?: string }) {
   const [failed, setFailed] = useState<string | null>(null);
-  return <span className="exhibition-record-artist">
+  const identity = <>
     {avatar && failed !== avatar ? <img src={avatar} alt="" loading="lazy" onError={() => setFailed(avatar)}/> : <span className="submission-artist-initial" aria-hidden="true">{name.trim().charAt(0).toLocaleUpperCase(language) || "I"}</span>}
-    <span>{name}</span>
+    <span className="submission-artist-name">{name}</span>
+  </>;
+  if (!userId) return <span className="exhibition-record-artist">{identity}</span>;
+  return <span className="submission-artist-profile">
+    <Link className="exhibition-record-artist" to={`/${language}/profile/${userId}`}>{identity}</Link>
+    <span className="submission-profile-preview" aria-hidden="true">
+      {avatar && failed !== avatar ? <img src={avatar} alt="" loading="lazy" onError={() => setFailed(avatar)}/> : <span className="submission-artist-initial">{name.trim().charAt(0).toLocaleUpperCase(language) || "I"}</span>}
+      <strong>{name}</strong>
+    </span>
   </span>;
 }

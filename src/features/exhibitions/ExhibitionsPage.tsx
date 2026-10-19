@@ -1,7 +1,7 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   CalendarDays,
   Plus,
@@ -13,6 +13,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { ExhibitionCard } from "./ExhibitionCard";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
+import { DeleteExhibitionDialog } from "./DeleteExhibitionDialog";
 import {
   listExhibitions,
   getExhibition,
@@ -38,6 +39,9 @@ export function ExhibitionsPage() {
   const { session } = useAuth();
   const { language, t } = useI18n();
   const { exhibitionId } = useParams();
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const canDelete = Boolean(session && ["admin", "system_administrator"].includes(session.role));
   const manage = Boolean(
     session &&
     ["supervisor", "admin", "system_administrator"].includes(session.role),
@@ -258,7 +262,8 @@ export function ExhibitionsPage() {
             </button>
           )}
         </header>}
-        {selected && <ExhibitionToolbar id={selected.exhibition_id} manage={manage} signedIn={Boolean(session)} available={available && selected.participation_open} busy={busy} onEdit={edit}/>}
+        {selected && <ExhibitionToolbar id={selected.exhibition_id} manage={manage} signedIn={Boolean(session)} available={available && selected.participation_open} busy={busy} onEdit={edit} onDelete={canDelete ? () => setDeleting(true) : undefined}/>}
+        {deleting && selected && canDelete && <DeleteExhibitionDialog id={selected.exhibition_id} name={selected.name} onClose={() => setDeleting(false)} onDeleted={() => { setDeleting(false); navigate(`/${language}/exhibition`, { replace: true }); }}/>}
         {error && (
           <p className="form-message error-message" role="alert">
             {error}

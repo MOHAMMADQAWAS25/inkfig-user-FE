@@ -48,6 +48,9 @@ export async function getExhibition(id: string) {
     await requestJson<Exhibition>(mainApiBaseUrl, "GET", `/exhibitions/${id}`)
   ).data;
 }
+export async function deleteExhibition(id: string) {
+  await requestJson(mainApiBaseUrl, "DELETE", `/exhibitions/${id}`);
+}
 export async function saveExhibition(data: ExhibitionInput, id?: string) {
   return (
     await requestJson<Exhibition>(

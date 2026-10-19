@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { Check, X, Trash2, Ban, Clock3, ChevronRight } from "lucide-react";
+import { Check, X, Trash2, Ban, Clock3 } from "lucide-react";
+import { ThemedSelect } from "../../components/ThemedSelect";
 import { useAuth } from "../auth/AuthContext";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -129,14 +130,15 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   if (!authorized) return <Navigate replace to={`/${language}/exhibition/${exhibitionId}`}/>;
   return <main className="exhibitions-page app-page-with-sidebar exhibition-records-page"><AppSidebar/><div className="exhibitions-shell">
     <ExhibitionNavbar label={t("exhibitions.actions")}><ExhibitionBackButton to={`/${language}/exhibition/${exhibitionId}`} label={t("exhibitions.backToExhibition")}/><strong>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</strong></ExhibitionNavbar>
-    <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><label>{t("exhibitions.filterStatus")}<select value={filter} disabled={busy} onChange={event => { setFilter(event.target.value as Status); setSelected(null); }}>{(["all","approved","rejected","pending"] as const).map(status => <option key={status} value={status}>{status === "all" ? t("exhibitions.allStatuses") : label(status)}</option>)}</select></label></header>
+    <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><ThemedSelect label={t("exhibitions.filterStatus")} value={filter} disabled={busy} onChange={value => { setFilter(value as Status); setSelected(null); }} options={(["all","approved","rejected","pending"] as const).map(status => ({ value: status, label: status === "all" ? t("exhibitions.allStatuses") : label(status) }))}/></header>
     {error && <p className="error-message" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     {loading ? <p role="status">{t("exhibitions.loading")}</p> : <section className="exhibition-record-list" aria-label={t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}>
       {!items.length && <p className="exhibition-section-empty">{t("exhibitions.noSubmissions")}</p>}
       {items.map(item => <article className="exhibition-submission-record" data-review={manage} key={item.submission_id}>
-        <button className="exhibition-record-open" onClick={() => { setSelected(item); setError(""); }} aria-label={`${t("works.viewDetails")}: ${item.title}`}>
-          <SubmissionThumbnail url={item.image_url}/><span className="exhibition-record-info" data-review={manage}><strong>{item.title}</strong>{manage && <SubmissionArtist name={item.artist_name} avatar={item.artist_avatar_url} language={language}/>}<span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>{item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}</span><ChevronRight className="exhibition-record-chevron" size={18} aria-hidden="true"/>
-        </button>
+        <div className="exhibition-record-summary">
+          <button className="exhibition-record-open" onClick={() => { setSelected(item); setError(""); }} aria-label={`${t("works.viewDetails")}: ${item.title}`}><SubmissionThumbnail url={item.image_url}/></button>
+          <div className="exhibition-record-info"><strong>{item.title}</strong><SubmissionArtist name={item.artist_name} avatar={item.artist_avatar_url} language={language} userId={item.user_id}/><span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>{item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}</div>
+        </div>
         <div className="exhibition-record-actions">
           {manage ? <>
             {item.status !== "approved" && <button className="review-approve" disabled={busy} onClick={() => void run(() => reviewSubmission(exhibitionId,item.submission_id,"approved"))}><Check size={16}/>{t("exhibitions.approve")}</button>}

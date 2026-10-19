@@ -376,6 +376,10 @@ describe("upload preview and card reset",()=>{
     vi.mocked(submitWork).mockRejectedValueOnce(new Error("Try membership again")).mockResolvedValueOnce(undefined);
     const {container}=render(<MemoryRouter initialEntries={["/en/upload?exhibition=event"]}><UploadWorkPage/></MemoryRouter>);
     await screen.findByText("Spring exhibition");
+    const context = container.querySelector(".exhibition-upload-context")!;
+    expect(context.parentElement?.classList.contains("upload-details-column")).toBe(true);
+    expect(context.previousElementSibling?.classList.contains("upload-details")).toBe(true);
+    expect(container.querySelector(".upload-media-panel")?.contains(context)).toBe(false);
     fireEvent.change(await screen.findByLabelText("Artwork image"),{target:{files:[new File(["image"],"art.png",{type:"image/png"})]}});
     fireEvent.change(screen.getByRole("textbox",{name:translations.en["works.title"]}),{target:{value:"My painting"}});
     fireEvent.click(screen.getByRole("radio",{name:"Digital art"}));

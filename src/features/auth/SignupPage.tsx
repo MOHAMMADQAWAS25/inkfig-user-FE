@@ -12,6 +12,7 @@ import { DateOfBirthField } from "./DateOfBirthField";
 import { PasswordField } from "./PasswordField";
 import { registerUser } from "./registrationApi";
 import type { Gender, RegistrationRequest } from "./registrationApi";
+import { ThemedSelect } from "../../components/ThemedSelect";
 
 const STUDENT_EMAIL = /^\d{8}@students\.hebron\.edu$/i;
 const STAFF_EMAIL = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@hebron\.edu$/i;
@@ -84,7 +85,7 @@ export function SignupPage() {
   }
 
   return (
-    <main className="auth-layout auth-layout-scroll auth-photo-background">
+    <main className="auth-layout auth-layout-scroll auth-photo-background auth-signup">
       <div className="auth-theme-control auth-page-controls"><ThemeToggle /><LanguageToggle /></div>
       <div className="auth-form-column signup-form-column auth-enter-from-end">
         <section className="auth-card signup-card" aria-labelledby="signup-title">
@@ -121,13 +122,9 @@ export function SignupPage() {
                   <input required autoComplete="tel" aria-describedby="signup-phone-hint" dir="ltr" inputMode="numeric" maxLength={10} minLength={10} name="phone_number" pattern="[0-9]{10}" placeholder="05xxxxxxxx" type="tel" value={form.phone_number} onChange={(event) => updateField("phone_number", event.target.value)} />
                   <small id="signup-phone-hint">{t("auth.phoneHint")}</small>
                 </label>
-                <label>
-                  <span>{t("auth.gender")}</span>
-                  <select required name="gender" value={form.gender} onChange={(event) => updateField("gender", event.target.value as Gender)}>
-                    <option value="female">{t("auth.genderFemale")}</option>
-                    <option value="male">{t("auth.genderMale")}</option>
-                  </select>
-                </label>
+                <ThemedSelect label={t("auth.gender")} required name="gender" value={form.gender} disabled={isSubmitting}
+                  options={[{ value: "female", label: t("auth.genderFemale") }, { value: "male", label: t("auth.genderMale") }]}
+                  onChange={value => updateField("gender", value as Gender)}/>
                 <DateOfBirthField label={t("auth.dateOfBirth")} value={form.date_of_birth} onChange={(value) => updateField("date_of_birth", value)} />
               </div>
             </fieldset>
