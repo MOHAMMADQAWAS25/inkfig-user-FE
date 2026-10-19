@@ -9750,3 +9750,29 @@ Consumes new user-system /reports/pending-count, /reports/eligibility and /repor
 ### Deployment and limitations
 
 User-system migration/API first, frontend second via existing main workflows. Main-system unchanged/no deployment. Pull/rebase again immediately before push and verify workflows. WebSocket is an invalidation, not a notification-table write or arithmetic counter increment: protected REST provides authoritative counts; lists load only while open. Transport is best effort with reconnect/open recovery; report pagination remains offset-based. Exact commits/deployment results reported in handoff. Previous feature-log entries preserved.
+
+## 2026-10-19 - Exhibition scroll chaining and home hover timing
+
+### Request and changes
+
+- Fixed scrolling over exhibition cards: the shared overview/detail content panel used overscroll-behavior:contain, trapping wheel/touch scroll at its boundaries. Changed it to auto so scrolling continues to the page for upcoming, current and past exhibitions. Kept overflow:auto so genuinely long content remains accessible; modal slider scroll locks are unchanged.
+- Search placeholders now use a six-second two-hint cycle (approximately three seconds each), retaining opacity fades, focus/typing pause, stable accessible labels and reduced-motion fallback.
+- Home creator avatar/name link now gently scales together on desktop hover and keyboard focus instead of underlining/highlighting the name. Logical reading-edge origin supports English/Arabic, transform-only sizing preserves feed geometry/memoization, touch-only devices do not acquire hover zoom and reduced-motion disables scaling/transitions.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled first, retaining incoming live-notification/report, SEO and feed-performance changes. Only inkfig-user-FE changed: src/styles.css, tests/auth-media-layout.test.mjs, tests/exhibition-layout.test.mjs and this log. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, authorization, data/storage, dependencies, environment, credential or SnapStart changes. Existing exhibition routes, artwork actions, profile navigation and sidebar modal behavior remain intact.
+
+### Verification
+
+321 tests passed (85 Node/source checks and 236 Vitest tests), strict TypeScript/Vite/SEO production build and git diff --check passed. Added regressions for shared exhibition scroll chaining, preserved inner overflow, creator no-underline/zoom/RTL/reduced-motion, and updated hint-cycle expectation. Initial unconstrained test run encountered worker startup timeouts; full npm test -- --maxWorkers=2 rerun passed, without skipping checks or changing test configuration. Existing bundle-size warning and jsdom scrollTo notices remain.
+
+Windows Computer Use initialization could not start because of helper_sandbox_lock_failed / SetNamedSecurityInfoW error 5; no interactive-browser/physical-device scroll verification is claimed. No user data or app settings changed while attempting browser checks; no refresh server or temporary browser fixtures started for this ticket.
+
+### Deployment and Git
+
+Frontend-only existing main deployment workflow; no backend deployment/migration. Branch: fix/exhibition-scroll-and-hover. Commit message: Fix exhibition scroll chaining and refine home hover. Fetch/rebase before branch push, then explicitly authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment outcomes reported in final handoff. Prior feature-log entries preserved.

@@ -1876,7 +1876,7 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .gallery-search-field input { align-self: stretch; }
 .gallery-search-field input::placeholder { color: transparent; }
 .search-hints { position: absolute; inset: 0; display: grid; align-items: center; overflow: hidden; color: #626b48; pointer-events: none; user-select: none; transition: opacity 160ms ease; }
-.search-hints > span { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: search-hint-first 10s ease-in-out infinite; }
+.search-hints > span { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: search-hint-first 6s ease-in-out infinite; }
 .search-hints > span + span { animation-name: search-hint-second; }
 .search-hints[data-visible="false"], .gallery-search-field:focus-within .search-hints { opacity: 0; }
 .search-hints[data-visible="false"] > span, .gallery-search-field:focus-within .search-hints > span { animation-play-state: paused; }
@@ -2036,7 +2036,7 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibition-overview-card:dir(rtl):is(:hover,:focus-visible) .exhibition-card-link svg { translate:-2px -2px; }
 .exhibition-card-media>.exhibition-banner-fallback { block-size:100%; min-block-size:0; }
 .exhibition-card-media>.exhibition-status { position:absolute; inset-block-start:12px; inset-inline-start:12px; max-inline-size:calc(100% - 24px); box-shadow:0 2px 8px rgb(0 0 0 / .12); }
-.exhibition-overview-card>.exhibition-card-content { min-block-size:0; min-inline-size:0; overflow:auto; overscroll-behavior:contain; padding:clamp(20px,3vw,40px); }
+.exhibition-overview-card>.exhibition-card-content { min-block-size:0; min-inline-size:0; overflow:auto; overscroll-behavior:auto; padding:clamp(20px,3vw,40px); }
 .exhibition-card-content>.exhibition-status { margin-bottom:16px; }
 .exhibition-card-content h3 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; font-size:clamp(1.35rem,2.3vw,2rem); margin:0 0 12px; }
 .exhibition-card-content>.exhibition-card-description { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; margin:0 0 18px; opacity:.8; line-height:1.6; }
@@ -2155,6 +2155,9 @@ body:has(#account-discovery-panel, #notifications-panel) .gallery-header { z-ind
 .submission-profile-preview strong { min-width: 0; overflow-wrap: anywhere; }
 .submission-artist-profile:focus-within .submission-profile-preview { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
 .feed-creator-name { border-radius: 5px; transition: color 160ms ease, background 160ms ease; }
+.feed-creator { transform-origin: left center; transition: transform 180ms ease; }
+[dir="rtl"] .feed-creator { transform-origin: right center; }
+.feed-creator:focus-visible { transform: scale(1.035); }
 .feed-creator:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 8px; }
 @media (hover: hover) and (pointer: fine) {
   .exhibition-submission-record:hover { position: relative; z-index: 1; transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 8px 24px rgb(25 36 12 / .12); }
@@ -2163,7 +2166,7 @@ body:has(#account-discovery-panel, #notifications-panel) .gallery-header { z-ind
   .exhibition-record-actions > button:hover:not(:disabled) { filter: brightness(.93) saturate(1.1); transform: translateY(-2px); box-shadow: 0 4px 10px rgb(15 25 10 / .14); }
   .exhibition-record-artist:hover { background: color-mix(in srgb,var(--primary) 12%,transparent); }
   .submission-artist-profile:hover .submission-profile-preview { opacity: 1; visibility: visible; transform: none; transition-delay: 100ms; }
-  .feed-creator:hover .feed-creator-name { background: color-mix(in srgb,var(--primary) 10%,transparent); text-decoration: underline; text-underline-offset: 3px; }
+  .feed-creator:hover { transform: scale(1.035); text-decoration: none; }
 }
 .upload-details-column { display: grid; align-content: start; min-width: 0; gap: 16px; }
 .upload-details-column .exhibition-upload-context { width: 100%; margin: 0; background: var(--surface); border-color: var(--border); box-shadow: none; }
@@ -2186,7 +2189,8 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 }
 @media (max-width: 720px) { .exhibition-record-summary { gap: 12px; } }
 @media (prefers-reduced-motion: reduce) {
-  .themed-select *, .exhibition-submission-record, .exhibition-record-open *, .exhibition-record-actions > button, .exhibition-record-artist, .submission-profile-preview { transition: none; }
+  .themed-select *, .exhibition-submission-record, .exhibition-record-open *, .exhibition-record-actions > button, .exhibition-record-artist, .submission-profile-preview, .feed-creator { transition: none; }
+  .feed-creator:is(:hover,:focus-visible) { transform: none; }
 }
 .exhibition-toolbar>a,.exhibition-toolbar>button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:42px; padding:10px 16px; border-radius:12px; text-decoration:none; color:inherit; }
 .exhibition-toolbar>.primary-button { background:var(--primary); color:var(--primary-contrast,#fff); }
