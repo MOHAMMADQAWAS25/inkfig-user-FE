@@ -45,7 +45,8 @@ it("renders a full page, real metadata and existing homepage cards below", async
   expect(screen.getByText("Created")).toBeTruthy();
   expect(await screen.findByRole("link", { name: "View artwork details: Second artwork" })).toHaveProperty("href", expect.stringContaining("/en/artwork/two"));
   expect(screen.getByTestId("related-feed").dataset.restore).toBe("false");
-  expect(document.querySelector('.artwork-media-original')?.getAttribute("draggable")).toBe("false");
+  expect(document.querySelector('.artwork-page-media-original')?.getAttribute("draggable")).toBe("false");
+  expect(document.querySelector('.artwork-modal-media')).toBeNull();
 });
 
 it("paginates related artwork and navigates to another standalone page", async () => {
@@ -60,9 +61,10 @@ it("paginates related artwork and navigates to another standalone page", async (
 
 it("preserves like/save actions and rolls back a failed mutation", async () => {
   mount(); await screen.findByRole("heading", { name: sample.title });
-  fireEvent.click(screen.getByRole("button", { name: "12 likes" }));
+  const actions = within(document.querySelector(".artwork-page-actions") as HTMLElement);
+  fireEvent.click(actions.getByRole("button", { name: "12 likes" }));
   await waitFor(() => expect(setWorkLike).toHaveBeenCalledWith("one", true));
-  expect(screen.getByRole("button", { name: "13 likes" }).getAttribute("aria-pressed")).toBe("true");
+  expect(actions.getByRole("button", { name: "13 likes" }).getAttribute("aria-pressed")).toBe("true");
   vi.mocked(setWorkSave).mockRejectedValueOnce(new Error("Offline"));
   fireEvent.click(within(document.querySelector(".artwork-page-actions") as HTMLElement).getByRole("button", { name: "Save", exact: true }));
   await screen.findByRole("alert");

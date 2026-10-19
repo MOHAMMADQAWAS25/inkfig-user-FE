@@ -9828,3 +9828,29 @@ Frontend-only existing main workflow; no backend deployment or migration. To und
 ### Git
 
 Branch: fix/artwork-action-colors. Commit subject: Fix opened artwork like and save icon colors. Fetch/rebase before branch push and previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment results reported in final handoff.
+
+## 2026-10-20 - Isolated full-image viewer on artwork pages
+
+### Request and rollback baseline
+
+Fix clipped/oversized portrait artwork and excessive artificial landscape framing, while preserving unrelated UI and a safe route back to the current state. Clean main pulled first; baseline 43d1a8886aa528327cd9bb41d987b2a83db97f61. Complete root feature log read. Dedicated fix/artwork-page-image-fit branch and single focused commit; docs/artwork-detail-page-rollback.md records inventory, baseline and revert-only instructions. No reset/force push or historical-log deletion.
+
+### Changes, repositories and files
+
+Frontend only. New src/features/works/ArtworkPageMedia.tsx replaces shared popup media usage only in ArtworkPage.tsx. Distinct page-only classes avoid inherited artwork-modal CSS and popup framing logic. artworkPage.css gives the viewer definite responsive bounds, border-box sizing and no forced minimum height; absolutely positioned width/height 100% image/video uses object-fit:contain and centered positioning. This prevents intrinsic media/grid minimum sizes escaping the frame, preserves proportions and uses the theme surface for unavoidable letterboxing. Removes blur-copy/extra transform shrinking on this page without editing ArtworkMedia.tsx or global popup CSS. Video controls/preload and localized failures retained; source-keyed remount clears failures when navigating. Original artwork right-click/drag deterrents remain.
+
+Updated tests/artwork-page.test.tsx for dedicated class and unambiguous main-action selectors; added artwork-page-media.test.tsx and artwork-page-media-layout.test.mjs. This log and rollback document complete the changed-file inventory. Cards, masonry, related-artwork API/rules, sidebar, metadata, icon colors, editing/moderation and shared popup behavior unchanged. Both backends untouched.
+
+### API, database, permissions and compatibility
+
+No API, migration, data/storage mutation, permission, dependency, configuration, credential or backend SnapStart changes. Viewer uses the existing original media URL; no image processing or resizing of stored files. Existing English/Arabic and light/dark tokens retained. Remaining spare space for differing aspect ratios is intentional to avoid cropping/stretching.
+
+### Verification and limitations
+
+339 frontend tests passed (87 Node/source, 252 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. New component checks cover portrait/landscape/square/panoramic/tall natural dimensions without transform/backdrop, one accessible original, drag/context-menu protection, failed-source recovery and video controls/error handling. Source/CSS regressions verify definite mobile/desktop bounds, contain/centering and no popup selectors/scaling. Existing shared popup framing, feed/masonry and page interaction suites passed. Initial full suite found an ambiguous 12 likes test selector shared by main/related cards; scoped it to main actions and reran all checks, without changing runtime actions. Existing Vite large-chunk and jsdom scrollTo warnings remain.
+
+Computer-use skill/browser inventory returned no apps or browsers, so interactive visual verification was unavailable; no screenshot/physical-device layout certification claimed. DOM/source tests do not perform real browser pixel-layout measurement. No production likes/saves/uploads or artwork mutations used for tests.
+
+### Deployment, Git and reversal
+
+Frontend-only existing main deployment workflow; no backend deployment/migration. Subject: Fix artwork page image fitting with isolated viewer. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment result reported in final handoff. Revert only this ticket commit and redeploy to restore prior viewer behavior, keeping earlier red/yellow icons, related logic and unrelated work. Historical entries preserved.

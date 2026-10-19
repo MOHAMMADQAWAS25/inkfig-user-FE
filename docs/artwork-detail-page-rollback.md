@@ -24,3 +24,13 @@ Ticket branch: `feature/artwork-detail-page` (frontend and main backend).
 Use new revert commits, not reset/force-push. Identify this ticket's commits by branch and commit subject (`Add routed artwork details and related masonry feed`); exact hashes are reported in the final handoff. Revert only those commits, preserving later unrelated changes. If conflicts occur, inspect them rather than choosing a whole side. Revert/redeploy frontend first to restore prior popup/card behavior; then revert/redeploy the main-backend endpoint. No database rollback or content deletion is needed. Rerun relevant tests/builds and follow the repository's pull/log/synchronize/push workflow. Append a rollback entry to the feature log; do not remove historical entries.
 
 The baseline hashes are reference points, not instructions to discard newer work.
+
+## 2026-10-20 - Isolated contain-fit artwork-page viewer
+
+Branch: `fix/artwork-page-image-fit`. Pre-change frontend baseline: `43d1a8886aa528327cd9bb41d987b2a83db97f61`.
+
+Replaces only the artwork page's shared popup media usage with `ArtworkPageMedia.tsx`. Dedicated class names prevent popup CSS inheritance. A definite responsive viewport contains a full-width/full-height, absolutely positioned image/video with `object-fit: contain` and centered positioning. Natural media dimensions cannot grow grid tracks beyond the viewer. No decorative blur copy, transform/shrinking calculation, measurement observers or forced minimum viewer height. Neutral theme surface fills unavoidable letterboxing; portrait, square and panoramic artwork retain their proportions. Existing popup media component and global popup styles remain untouched. Image right-click/drag deterrents, localized errors, video controls, post actions, theme colors, metadata, masonry and related rules are retained.
+
+Changed files: ArtworkPage.tsx, new ArtworkPageMedia.tsx, artworkPage.css, artwork-page.test.tsx, new artwork-page-media.test.tsx and artwork-page-media-layout.test.mjs, this document and AGENT_FEATURE_LOG.md. No backend, migration, storage or artwork-data changes.
+
+To return exactly to this ticket's starting viewer behavior, revert the commit titled `Fix artwork page image fitting with isolated viewer`, then rebuild/redeploy frontend. Revert only this follow-up: do not revert the earlier icon colors or related-artwork/backend work, reset main, force-push, or remove historical feature-log entries. Exact commit hash and verification/deployment results are provided in the handoff. If future edits overlap, inspect conflicts and preserve unrelated changes.

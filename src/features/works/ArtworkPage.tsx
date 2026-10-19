@@ -8,7 +8,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
-import { ArtworkMedia } from "../home/ArtworkMedia";
+import { ArtworkPageMedia } from "./ArtworkPageMedia";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
 import { ReportDialog } from "../reports/ReportDialog";
@@ -102,7 +102,7 @@ export function ArtworkPage() {
     <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>
     {query.isPending ? <div className="artwork-page-skeleton" role="status">{t("works.loading")}</div> : !work || query.error ? <section className="artwork-page-unavailable" role="status"><h1>{t(query.error instanceof ApiError && query.error.status === 404 ? "artwork.unavailable" : "works.loadFailed")}</h1><button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button><Link to={`/${language}`}>{t("artwork.home")}</Link></section> : <>
       <article className="artwork-page-hero">
-        <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={false} failureLabel={t("feed.imageFailed")} />
+        <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} />
         <section className="artwork-page-info" aria-labelledby="artwork-title">
           <div className="artwork-page-creator"><Link to={`/${language}/profile/${work.owner_user_id}`}>
             {work.artist_avatar_url && !avatarFailed ? <img src={work.artist_avatar_url} alt="" onError={() => setAvatarFailed(true)} /> : <span className="artwork-creator-initial"><UserRound size={26} /></span>}<strong>{work.artist_name}</strong></Link>
