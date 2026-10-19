@@ -9673,3 +9673,30 @@ No API changes. No migration required. No backend, permissions, data-scope, depe
 ### Deployment and limitations
 
 Frontend-only deployment through the existing main workflow. Commit focused files, pull/rebase main immediately before pushing, verify deployment. Both backends require no push/tests/deployment. User's personal Chrome could not be attached because its Playwright extension is absent; measurements use an isolated browser, and device/extension-specific lag may still need a follow-up. Diagnostic scripts stay ignored under output/playwright.
+
+## 2026-10-19 - Open-only live lists, student notifications and exhibition badges
+
+### Request and scope
+
+Implement exhibition WebSocket updates with saved student decisions, no saved admin request notifications, and manager pending counters. Full list requests must not run while the associated page/panel is closed. All three repositories synchronized before work; frontend owns UI/event subscriptions only.
+
+### Changes and files
+
+- src/features/notifications/useNotificationInbox.ts fetches unread counts with the panel closed and list pages only when open. Adds event burst coalescing, account/panel response guards, stale-pagination protection, preserved loaded pages, hidden-tab deferral and read marking.
+- notificationApi.ts adds unread summary and decision metadata/links; AppSidebar.tsx dispatches exhibition/notification/report invalidations and resyncs on reconnect. Removes background list fetches/toasts that required closed-list data.
+- src/features/exhibitions/useExhibitionLive.ts refreshes only matching mounted lists and defers hidden-tab refreshes. MyExhibitionSubmissionsPage.tsx silently updates already-loaded pages and selected status/reasons while preserving filters; public exhibition work lists refresh when open.
+- useExhibitionCounts.ts shares summary cache and one debounced live subscription per query client/account; no manager counter requests for students. AppSidebar/MobileNavigation show the aggregate badge on the trophy/exhibition entry; ExhibitionToolbar shows the selected exhibition's Review submissions count. Student My submissions has no misleading pending-action badge.
+- exhibitionApi.ts, resources.ts and styles.css add contracts, English/Arabic decision messages and count styling.
+- Tests cover closed/open request behavior, account changes, matching and hidden lists, shared counters, student exclusion, navigation links, review/mobile badges and live student status/unmount cleanup.
+
+### API, database and permissions
+
+Consumes new /notifications/unread-count and /exhibitions/pending-counts plus additive notification metadata and exhibitions.changed signals. No frontend migration. Requires user-system 20261019_023_exhibition_notifications.sql and both backend deployments first. Backend permissions remain authoritative; no new credentials, dependencies or environment-file changes. Browser-only changes have no SnapStart impact.
+
+### Verification
+
+294 tests passed (82 source/layout and 212 component/feed); strict TypeScript checks and Vite production build passed. Existing non-blocking bundle-size warning/jsdom scrollTo notices remain. Updated tests that intentionally expected old background list/toast behavior; corrected new test setup/selector assumptions and reran. Backend SQL/atomicity/notification dedupe verified separately in rolled-back transactions, with no real user decisions sent. git diff --check passed.
+
+### Deployment and limitations
+
+Deploy user-system migration/API, main-system, then frontend via main workflows. Badge counts represent pending submissions plus pending withdrawals and clear through decisions, not merely viewing. Bell count represents unread saved student decisions and existing social notifications. WebSocket receipt triggers lightweight summaries on other pages but full list reloads only while the corresponding view is open. No periodic list polling. Transport remains best effort with reconnect/open recovery; closed tabs do not get a new permanent browser notification. No personal-browser or real two-account production decision exercise was performed.

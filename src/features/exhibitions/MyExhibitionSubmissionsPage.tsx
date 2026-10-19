@@ -11,6 +11,7 @@ import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi";
 import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { ExhibitionNavbar } from "./ExhibitionNavbar";
+import { useExhibitionLive } from "./useExhibitionLive";
 import { SubmissionArtist, SubmissionThumbnail } from "./SubmissionIdentity";
 import { getExhibition, getSubmissions, reviewSubmission, withdrawSubmission, reviewWithdrawal, blockParticipant, getBlocks, unblockParticipant, type Block, type Exhibition, type Submission } from "./exhibitionApi";
 
@@ -43,6 +44,8 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   const authorized = Boolean(session && (!manage || canManage));
   const scope = manage ? "manage" : "mine";
   const requiredReason = action && ["withdraw", "reject", "block", "rejectWithdrawal"].includes(action.kind);
+  const [liveRevision,setLiveRevision]=useState(0);
+  useExhibitionLive(exhibitionId,()=>setLiveRevision(value=>value+1),authorized);
   const label = (status: string) => t(status === "approved" ? "exhibitions.status.approved" : status === "rejected" ? "exhibitions.status.rejected" : "exhibitions.status.pending");
   const message = (cause: unknown) => cause instanceof Error ? cause.message : t("exhibitions.failed");
   usePageScrollLock(action !== null);
@@ -56,12 +59,24 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
     if (!authorized) return;
     let active = true;
     generation.current += 1;
-    setLoading(true); setItems([]); setCursor(null); setError("");
-    getSubmissions(exhibitionId, scope, 0, filter === "all" ? undefined : filter).then(page => {
+    if(liveRevision===0){setLoading(true);setItems([]);setCursor(null);} setError("");
+    const pages=liveRevision?Math.max(1,Math.ceil(items.length/20)):1;
+    const load=async()=>{
+      let next:number|null=0;const loaded:Submission[]=[];
+      for(let index=0;index<pages&&next!==null;index++){
+        const page=await getSubmissions(exhibitionId,scope,next,filter==="all"?undefined:filter);
+        if(!active)return null;
+        loaded.push(...page.items);next=page.next_cursor;
+      }
+      return {items:[...new Map(loaded.map(item=>[item.submission_id,item])).values()],next_cursor:next};
+    };
+    load().then(page => {
+      if(!page)return;
       if (active) { setItems(page.items); setCursor(page.next_cursor); }
     }).catch(cause => { if (active) setError(message(cause)); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; generation.current += 1; };
-  }, [exhibitionId, scope, filter, revision, authorized, language]);
+  }, [exhibitionId, scope, filter, revision, authorized, language, liveRevision]);
+  useEffect(()=>{setSelected(current=>current?items.find(item=>item.submission_id===current.submission_id)??null:null);},[items]);
   useEffect(() => {
     if (!manage || !authorized) return;
     let active = true;

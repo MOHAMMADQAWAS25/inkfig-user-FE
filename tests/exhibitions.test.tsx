@@ -18,7 +18,8 @@ import { getWork } from "../src/features/works/worksApi";
 import * as api from "../src/features/exhibitions/exhibitionApi";
 import { translations, type TranslationKey } from "../src/i18n/resources";
 
-const state = vi.hoisted(() => ({ role: "user" as string }));
+const state = vi.hoisted(() => ({ role: "user" as string, pending:0 }));
+vi.mock("../src/features/exhibitions/useExhibitionCounts",()=>({useExhibitionCounts:()=>state.pending?{total:state.pending,items:[{exhibition_id:"event",submissions:state.pending,withdrawals:0}]}:undefined}));
 vi.mock("../src/features/auth/AuthContext", () => ({
   useAuth: () => ({
     session: { userId: "me", role: state.role, permissions: [] },
@@ -83,6 +84,7 @@ function view(path = "/en/exhibition/event") {
 beforeEach(() => {
   vi.clearAllMocks();
   state.role = "user";
+  state.pending = 0;
   Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value: function (this: HTMLDialogElement) { this.setAttribute("open", ""); } });
   Object.defineProperty(HTMLDialogElement.prototype, "close", { configurable: true, value: function (this: HTMLDialogElement) { this.removeAttribute("open"); } });
   vi.mocked(getWork).mockResolvedValue({ work_id: "work", title: "Painting", owner_user_id: "me", artist_name: "Me", description: "Artwork detail", image_url: "/art.jpg", mime_type: "image/jpeg", links: [], created_at: "2026-10-18T12:00:00Z", like_count: 0, liked_by_me: false, saved_by_me: false, type_id: "art", type_name_en: "Art", type_name_ar: "Art" });
@@ -104,6 +106,23 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 afterEach(() => vi.restoreAllMocks());
+it("shows pending requests only on the manager review control, not My submissions",async()=>{
+  state.role="admin";state.pending=5;
+  const rendered=view();
+  const review=await screen.findByRole("link",{name:"Review submissions5"});
+  expect(review.querySelector(".exhibition-count")?.textContent).toBe("5");
+  expect(rendered.container.querySelector('a[href="/en/exhibition/event/submissions"] .exhibition-count')).toBeNull();
+});
+it("updates the mounted student list live and stops fetching after unmount",async()=>{
+  vi.mocked(api.getSubmissions).mockResolvedValue({items:[record],next_cursor:null});
+  const rendered=render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);await screen.findByText("Painting");
+  vi.mocked(api.getSubmissions).mockResolvedValue({items:[{...record,status:"approved"}],next_cursor:null});
+  window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}}));
+  await waitFor(()=>expect(rendered.container.querySelector(".exhibition-submission-record .exhibition-status.approved")).toBeTruthy());
+  rendered.unmount();vi.mocked(api.getSubmissions).mockClear();
+  window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}}));
+  await new Promise(resolve=>setTimeout(resolve,250));expect(api.getSubmissions).not.toHaveBeenCalled();
+});
 it("keeps the fixed navbar aligned with its container and reserves wrapped height on resize", () => {
   let width = 1000, height = 68;
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function(this: HTMLElement) {

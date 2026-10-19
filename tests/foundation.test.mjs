@@ -572,7 +572,7 @@ test("provides persistent responsive social notifications and refined hover feed
 test("paginates notifications, profile connections, and administration results", () => {
   assert.match(notificationApi, /next_cursor:number\|null/);
   assert.match(appSidebar, /notificationsCursor/);
-  assert.match(appSidebar, /loadMoreNotifications/);
+  assert.match(appSidebar, /inbox\.more/);
   assert.match(profileApi, /ProfileAccountPage/);
   assert.match(profileApi, /\/\$\{kind\}\?\$\{query\.toString\(\)\}/);
   assert.match(profilePage, /connectionsCursor/);
@@ -591,23 +591,17 @@ test("receives live notification invalidations over an authenticated websocket",
   assert.match(appSidebar, /Math\.min\(30000/);
 });
 
-test("shows up to five unread live websocket notifications for one minute", () => {
-  assert.match(appSidebar, /refreshNotifications\(true\)/);
-  assert.match(appSidebar, /setLiveNotifications\(current=>\[\.\.\.current\.filter/);
-  assert.match(appSidebar, /\.slice\(-5\)/);
-  assert.match(appSidebar, /knownNotificationIdsRef/);
-  assert.match(appSidebar, /className="live-notification-stack"/);
-  assert.match(appSidebar, /window\.setTimeout\([^]*60000/);
-  assert.match(appSidebar, /className="live-notification-toast"/);
-  assert.match(appSidebar, /aria-live="polite"/);
-  assert.match(styles, /\.live-notification-stack[^}]*position: fixed[^}]*bottom: 24px[^}]*left: 24px/);
-  assert.match(styles, /@keyframes live-notification-in/);
+test("refreshes notification counters without fetching a closed list", () => {
+  assert.match(appSidebar, /useNotificationInbox/);
+  assert.match(notificationApi, /\/notifications\/unread-count/);
+  assert.match(appSidebar, /inkfig:notifications-changed/);
+  assert.doesNotMatch(appSidebar, /refreshNotifications\(true\)|live-notification-toast/);
 });
 
 test("links like notifications to the exact work and keeps actor avatars linked to profiles", () => {
   assert.match(notificationApi, /work_title:string\|null/);
   assert.match(appSidebar, /className="notification-avatar" to=\{`\/\$\{language\}\/profile\/\$\{item\.actor_user_id\}`\}/);
-  assert.match(appSidebar, /`\/\$\{language\}\?work=\$\{item\.work_id\}`/);
+  assert.match(notificationApi, /`\/\$\{language\}\?work=\$\{item\.work_id\}`/);
   assert.match(appSidebar, /notification-work-title/);
   assert.match(homePage, /searchParams\.get\("work"\)/);
   assert.match(worksApi, /GET",`\/works\/\$\{id\}`/);

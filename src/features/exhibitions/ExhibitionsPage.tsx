@@ -14,6 +14,7 @@ import { AppSidebar } from "../navigation/AppSidebar";
 import { ExhibitionCard } from "./ExhibitionCard";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import { DeleteExhibitionDialog } from "./DeleteExhibitionDialog";
+import { useExhibitionLive } from "./useExhibitionLive";
 import {
   listExhibitions,
   getExhibition,
@@ -70,6 +71,8 @@ export function ExhibitionsPage() {
   const [banner, setBanner] = useState<File | null>(null);
   const [createdId, setCreatedId] = useState<string | undefined>();
   const started = Boolean(selected && Date.parse(selected.event_at) <= now);
+  const [liveRevision,setLiveRevision]=useState(0);
+  useExhibitionLive(exhibitionId,()=>setLiveRevision(value=>value+1),started);
   useEffect(() => {
     if (editing)
       document
@@ -153,7 +156,7 @@ export function ExhibitionsPage() {
     return () => {
       active = false;
     };
-  }, [exhibitionId, scope, started]);
+  }, [exhibitionId, scope, started, liveRevision]);
   useEffect(() => {
     setAvailable(false);
     if (!session || !exhibitionId) return;

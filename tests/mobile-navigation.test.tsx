@@ -20,6 +20,11 @@ beforeEach(() => {
   vi.stubGlobal("matchMedia", vi.fn((query: string) => ({ matches: query.includes("max-width"), addEventListener: vi.fn(), removeEventListener: vi.fn() })));
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+it("shows the exhibition request counter on its mobile drawer icon",()=>{
+  render(<MemoryRouter initialEntries={["/en"]}><MobileNavigation unreadCount={0} notificationsOpen={false} onNotifications={vi.fn()} onAccounts={vi.fn()} administration reports exhibitionCount={105}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button",{name:"Menu"}));
+  expect(screen.getByRole("button",{name:translations.en["nav.exhibition"]}).querySelector(".exhibition-count")?.textContent).toBe("99+");
+});
 function Probe() { return <output>{useLocation().pathname}</output>; }
 const notifications = vi.fn(), accounts = vi.fn();
 function navigation() {

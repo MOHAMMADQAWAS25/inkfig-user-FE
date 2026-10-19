@@ -31,6 +31,8 @@ export type Submission = {
 };
 export type Block = { user_id: string; full_name: string; reason: string };
 export type Page<T> = { items: T[]; next_cursor: number | null };
+export type ExhibitionCounts={total:number;items:{exhibition_id:string;submissions:number;withdrawals:number}[]};
+export async function getExhibitionCounts(){return (await requestJson<ExhibitionCounts>(mainApiBaseUrl,"GET","/exhibitions/pending-counts")).data;}
 export async function listExhibitions(
   cursor = 0,
   period: "all" | "upcoming" | "past" = "all",

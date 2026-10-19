@@ -18,10 +18,11 @@ interface Props {
   onAccounts: () => void;
   administration: boolean;
   reports: boolean;
+  exhibitionCount?: number;
   onNavigateCapture?: (event: MouseEvent<HTMLElement>) => void;
 }
 
-export function MobileNavigation({ unreadCount, notificationsOpen, onNotifications, onAccounts, administration, reports, onNavigateCapture }: Props) {
+export function MobileNavigation({ unreadCount, notificationsOpen, onNotifications, onAccounts, administration, reports, exhibitionCount = 0, onNavigateCapture }: Props) {
   const { language, t, setLanguage } = useI18n();
   const { session, signOut } = useAuth();
   const location = useLocation();
@@ -101,7 +102,7 @@ export function MobileNavigation({ unreadCount, notificationsOpen, onNotificatio
       <section ref={dialog} className="mobile-drawer" id="mobile-menu" role="dialog" aria-modal="true" aria-label={menuLabel} dir={language === "ar" ? "rtl" : "ltr"}>
         <header className="mobile-drawer-header" dir="ltr"><img src={inkfigLogo} alt={t("app.name")}/><button className="mobile-drawer-close" type="button" aria-label={closeLabel} onClick={() => close()}><X aria-hidden="true" /></button></header>
         <div className="mobile-drawer-grid">
-          <button type="button" aria-label={t("nav.exhibition")} onClick={() => go("exhibition")}><Trophy aria-hidden="true" /><span>{t("nav.exhibition")}</span></button>
+          <button type="button" aria-label={t("nav.exhibition")} onClick={() => go("exhibition")}><Trophy aria-hidden="true" /><span>{t("nav.exhibition")}</span>{exhibitionCount>0&&<span className="exhibition-count">{exhibitionCount>99?"99+":exhibitionCount}</span>}</button>
           <button type="button" aria-label={t("accounts.findUsers")} onClick={() => close(onAccounts)}><span className="mobile-find-users-icon" aria-hidden="true"/><span>{t("accounts.findUsers")}</span></button>
           <button type="button" aria-label={t("nav.saved")} onClick={() => go("profile?section=saved")}><Bookmark aria-hidden="true" /><span>{t("nav.saved")}</span></button>
           {administration && <button type="button" aria-label={t("nav.administration")} onClick={() => go("admin/users")}><ShieldCheck aria-hidden="true" /><span>{t("nav.administration")}</span></button>}
