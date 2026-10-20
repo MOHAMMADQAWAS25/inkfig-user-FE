@@ -39,7 +39,8 @@
 .artwork-page-creator .profile-avatar-initial { background: var(--primary); color: var(--primary-ink); font-size: 1.4rem; font-weight: 750; }
 @media (hover:hover) and (pointer:fine) {
   .artwork-page button:hover:not(:disabled), .artwork-page-manage a:hover { transform: translateY(-2px); background: color-mix(in srgb,var(--primary) 10%,transparent); border-radius: 8px; }
-  .artwork-page-share button:hover:not(:disabled), .artwork-page-creator > button:hover:not(:disabled) { box-shadow: 0 5px 15px rgb(25 36 12 / .12); }
+  .artwork-page-share button:hover:not(:disabled) { box-shadow: 0 5px 15px rgb(25 36 12 / .12); }
+  .artwork-page-creator > button:hover:not(:disabled) { background: var(--primary); color: var(--primary-ink); border-radius: 999px; transform: none; box-shadow: none; }
   .artwork-page-creator > a:hover { transform: translateY(-1px); }
 }
 @media (prefers-reduced-motion:reduce) { .artwork-page :is(button,a) { transition: none; }.artwork-page button:hover:not(:disabled), .artwork-page-manage a:hover, .artwork-page-creator > a:hover { transform: none; } }

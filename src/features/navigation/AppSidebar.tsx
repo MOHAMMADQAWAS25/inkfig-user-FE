@@ -23,7 +23,7 @@ export function AppSidebar() {
   const { language, t } = useI18n();
   const { session } = useAuth();
   const location = useLocation();
-  const labeledRail = location.pathname === `/${language}` || location.pathname === `/${language}/`;
+  const labeledRail = true;
   const navigate = useNavigate();
   const navigationTimerRef=useRef<number|undefined>(undefined);
   const [accountsOpen,setAccountsOpenRaw]=useState(false);

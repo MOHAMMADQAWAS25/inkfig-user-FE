@@ -2242,6 +2242,7 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 /* An exhibition's public wall uses editorial split cards, not feed masonry. */
 .exhibitions-page.app-page-with-sidebar { padding-inline-start: calc(var(--app-rail-size) + 24px); padding-inline-end: 24px; }
 .exhibition-gallery-heading { margin-block: 24px 30px; }
+.exhibition-overview-card:not(.exhibition-detail-card), .exhibition-artwork-card { box-shadow: 0 6px 28px color-mix(in srgb,var(--primary) 16%,transparent), 0 0 18px color-mix(in srgb,var(--primary) 10%,transparent); }
 .exhibition-gallery-heading h1 { margin: 14px 0 0; font-size: clamp(2rem,4vw,3.5rem); line-height: 1.15; overflow-wrap: anywhere; }
 .exhibition-artwork-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
 .exhibition-artwork-card { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); min-width: 0; min-height: 330px; overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--text); text-decoration: none; transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease; }
@@ -2267,7 +2268,7 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 @media (max-width:480px) { .exhibition-artwork-card { grid-template-columns: minmax(0,1fr); }.exhibition-artwork-media { min-height: 220px; height: 260px; }.exhibition-artwork-details { border-inline-start: 0; border-top: 1px solid var(--border); } }
 @media (max-width:720px) { .exhibitions-page.app-page-with-sidebar { padding-inline: 12px; } }
 @media (prefers-reduced-motion:reduce) { .exhibition-artwork-card, .exhibition-artwork-media img { transition: none; }.exhibition-artwork-card:hover, .exhibition-artwork-card:hover img { transform: none; } }
-/* Labels replace hover tooltips on the desktop home rail. */
+/* Persistent labels replace hover tooltips on every desktop rail. */
 @media (min-width:721px) {
   .app-sidebar-labeled { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
   .app-sidebar-labeled .app-sidebar-nav { width: 100%; gap: 10px; margin-top: 12px; }

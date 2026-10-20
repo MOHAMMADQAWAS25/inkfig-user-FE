@@ -10192,3 +10192,25 @@ No API, migration, permission, dependency, credential, environment or SnapStart 
 ### Deployment, rollback and Git
 
 Frontend main workflow only. Branch fix/report-preview-center; subject Center the report popup preview column. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore top alignment, preserving prior scrolling/filter changes. Historical entries untouched.
+
+## 2026-10-20 - Exterior exhibition glow and persistent rail labels
+
+### Request and changes
+
+Added a soft theme-relative blurred outer box shadow to unopened exhibition overview and artwork cards, excluding opened detail cards. Sharp artwork/text and existing interactions preserved; no image filters or backdrop layers added. Desktop navigation now retains labels on every route and omits hover tooltips, preserving mobile navigation, rail width, badges, localization and short-screen rail reachability. Artwork Follow/Unfollow hover swaps outline colors to the primary fill/ink palette while keeping the existing pill radius, with no hover lift, shape change or added shadow. Other action-button styles unchanged.
+
+### Repositories, files and scope
+
+All three repositories checked clean and main pulled. Only inkfig-user-FE changed: AppSidebar.tsx, artworkPage.css, styles.css, gallery interaction tests, new exhibition-glow-follow.test.mjs and this log. Both backends unchanged. No API, migration, permissions, data/storage, dependency, environment, credentials or SnapStart effects. Incoming report-popup refinements preserved.
+
+### Verification
+
+383 tests passed (94 Node/source and 289 component), strict TypeScript/Vite/SEO build and git diff --check passed before final synchronization. Coverage includes persistent labels/no tooltips on home/exhibition/artwork/settings, external-only shadow and stable pill/color swap. Existing non-blocking bundle-size/jsdom scrollTo notices remain. No interactive browser review or production mutations performed. Final combined checks after any rebase reported in handoff.
+
+### Deployment and Git
+
+Frontend-only existing main workflow. Branch fix/exhibition-glow-and-sidebar-labels; commit subject Add exhibition glow and persistent navigation labels. Fetch/rebase before branch push, preserve concurrent work/log entries, then previously authorized fast-forward main merge/push. Exact hash, tests, conflicts and deployment outcome in final handoff. Historical entries preserved.
+
+### Post-synchronization verification
+
+Rebased over a82be90 report reason filtering. Only the feature-log append point conflicted; preserved both complete entries without altering previous history. Combined verification: 385 tests (94 Node/source, 291 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. No application conflict or unrelated change.
