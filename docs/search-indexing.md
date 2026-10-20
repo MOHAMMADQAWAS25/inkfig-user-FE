@@ -14,12 +14,10 @@ full server rendering or an artwork-level sitemap.
 WebSite markup use the same names and stable website ID, including the domain
 root. These alternatives describe one website, not separate domains.
 
-The homepage includes a compact, expandable About InkFig introduction in English
-and Arabic, also present in initial HTML without JavaScript. It describes the
-university graduation project and links to the public gallery and exhibitions.
-React renders the same content for visitors; no crawler-only text, invented
-university endorsement, social profiles, or keyword stuffing is added. Artwork
-feeds still require JavaScript; this is not full-page SSR.
+The About InkFig homepage disclosure and its initial-HTML content were removed
+at the owner's request. Brand metadata, titles, descriptions, canonicals,
+hreflang, robots rules and the sitemap remain. No hidden replacement text is
+injected. Artwork feeds still require JavaScript; this is not full-page SSR.
 
 After deployment, inspect the root and localized homepages in Search Console
 and request recrawling. In Performance, compare exact queries `inkfig` and

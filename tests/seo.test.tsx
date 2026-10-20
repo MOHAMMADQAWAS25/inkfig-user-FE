@@ -4,8 +4,6 @@ import { Link, MemoryRouter } from "react-router-dom";
 import { afterEach, expect, it } from "vitest";
 import { PageMetadata } from "../src/seo/PageMetadata";
 import brand from "../src/seo/brand.json";
-import { BrandIntroduction } from "../src/seo/BrandIntroduction";
-import { I18nProvider } from "../src/i18n/I18nProvider";
 
 afterEach(() => {
   cleanup();
@@ -39,17 +37,6 @@ it("updates locale, canonicals, alternatives and schema without duplicates on na
   expect(canonical()).toBe("https://inkfig-hu.com/en/exhibition/");
   expect(document.title).toContain("Art Exhibitions");
   expect(document.head.querySelector('script[type="application/ld+json"]')).toBeNull();
-});
-
-it.each(["en", "ar"] as const)("offers the same honest, expandable brand introduction in %s", language => {
-  const { container } = render(<MemoryRouter initialEntries={[`/${language}/`]}><I18nProvider><BrandIntroduction /></I18nProvider></MemoryRouter>);
-  const details = container.querySelector("details")!;
-  expect(details.open).toBe(false);
-  expect(details.querySelector("h1")?.textContent).toBe("InkFig");
-  expect(details.querySelector("p")?.textContent).toBe(brand[language].description);
-  fireEvent.click(container.querySelector("summary")!);
-  expect(details.open).toBe(true);
-  expect(screen.getByRole("link", { name: brand[language].exhibitions }).getAttribute("href")).toBe(`/${language}/exhibition/`);
 });
 
 it.each(["/en/settings", "/ar/admin/users", "/en/login", "/ar/exhibition/id/review", "/en/exhibition/id/submissions", "/en/profile/user", "/unknown", "/fr", "/en/?q=portrait", "/en/?work=123"])("excludes non-discovery and query URLs: %s", path => {

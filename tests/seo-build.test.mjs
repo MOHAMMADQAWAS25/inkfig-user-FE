@@ -7,6 +7,13 @@ import test from "node:test";
 import { buildSeo } from "../scripts/build-seo.mjs";
 const brand = JSON.parse(await readFile(new URL("../src/seo/brand.json", import.meta.url), "utf8"));
 
+test("homepage does not mount or style the removed About disclosure", async () => {
+  const home = await readFile(new URL("../src/features/home/HomePage.tsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.doesNotMatch(home, /BrandIntroduction|brand-introduction/);
+  assert.doesNotMatch(styles, /\.brand-introduction/);
+});
+
 test("generates localized initial HTML, real crawl assets and private-route headers", async () => {
   const directory = await mkdtemp(join(tmpdir(), "inkfig-seo-"));
   const output = pathToFileURL(directory + "/");
@@ -27,17 +34,13 @@ test("generates localized initial HTML, real crawl assets and private-route head
         assert.equal(schema.name, "InkFig");
         assert.deepEqual(schema.alternateName, brand.alternateName);
         assert.equal(schema["@id"], "https://inkfig-hu.com/#website");
-        assert.ok(html.includes("<h1>InkFig</h1>"));
-        assert.ok(html.includes(brand[language].description));
-        assert.ok(html.includes(`href="/${language}/exhibition/"`));
-        assert.equal((html.match(/class="brand-introduction"/g) || []).length, 1);
-      } else {
-        assert.ok(!html.includes('class="brand-introduction"'));
       }
+      assert.ok(!html.includes('class="brand-introduction"'));
+      assert.ok(html.includes('<div id="root"></div>'));
     }
     const root = await readFile(new URL("index.html", output), "utf8");
     assert.ok(root.includes('"url":"https://inkfig-hu.com/"'));
-    assert.ok(root.includes(brand.en.description));
+    assert.ok(!root.includes('class="brand-introduction"'));
     const sitemap = await readFile(new URL("sitemap.xml", output), "utf8");
     assert.equal((sitemap.match(/<loc>/g) || []).length, 4);
     assert.equal((sitemap.match(/<xhtml:link/g) || []).length, 12);

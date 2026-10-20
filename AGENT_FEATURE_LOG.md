@@ -9927,3 +9927,68 @@ No migration required. No database, storage, data or vector changes.
 ### Notes
 
 Google controls indexing, site-name selection and ranking. No guarantee of appearing equally high for inkfig and inkfig-hu. No Search Console settings, DNS, analytics, social profiles or external endorsements changed. Existing non-blocking Vite bundle warning and jsdom scrollTo notices remain. No backend/SnapStart changes.
+
+## 2026-10-20 - Remove homepage About InkFig disclosure
+
+### Request
+
+Remove the About InkFig control from the homepage while retaining the brand SEO metadata.
+
+### Changes
+
+- Removed the React disclosure, build-time initial HTML introduction, unused localized introduction copy and scoped styling. No hidden replacement content.
+- Retained InkFig names, alternate names, stable WebSite ID, titles, descriptions, canonical/hreflang, robots rules and sitemap.
+- Gallery behavior, search, account routes and both backends intentionally unchanged.
+
+### Repositories
+
+- `inkfig-user-FE`: homepage disclosure removal, regressions and documentation.
+
+### Files
+
+- `src/features/home/HomePage.tsx`: removed component import and mount.
+- `src/seo/BrandIntroduction.tsx`: deleted unused component (recoverable in Git).
+- `src/seo/brand.json`: retained brand identity; removed unused introduction copy.
+- `scripts/build-seo.mjs`: removed initial-body introduction generation.
+- `src/styles.css`: removed disclosure-only rules.
+- `tests/seo-build.test.mjs`, `tests/seo.test.tsx`: removal checks and retained metadata coverage.
+- `docs/search-indexing.md`: reflects removal, no SSR claim.
+- `AGENT_FEATURE_LOG.md`: appended this record without deleting prior entries.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required. No database/storage/data changes.
+
+### Permissions and scope
+
+No permissions or roles changed. Backend authorization remains unchanged and authoritative.
+
+### Frontend
+
+No About InkFig disclosure on English/Arabic homepages, including pre-JavaScript HTML. Existing themes, responsive gallery, navigation, forms, loading and error states unchanged.
+
+### Verification
+
+- `[passed] node --test tests/seo-build.test.mjs` - two tests including absence of component/style/build markup and preservation of metadata.
+- `[passed] npm.cmd test -- --pool=threads --maxWorkers=2` - 87 Node/source checks and 252 component tests; additional removal regression added afterward and both SEO build tests rerun successfully.
+- `[passed] npm.cmd run build` - strict TypeScript, Vite and SEO generation. Existing non-blocking bundle-size warning and jsdom scrollTo notices remain.
+- `[passed] git diff --check`
+- `[not run] interactive browser review` - browser controls unavailable; source and generated-artifact regressions used.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow. No backend deployment, migration or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: identified by subject `Remove homepage About InkFig disclosure`; exact hash in final handoff.
+- Push: pending final synchronization at entry creation; final result reported in handoff.
+
+### Notes
+
+No guarantee or claim of a ranking change. Historical implementation record preserved. Deleted component remains recoverable from Git; no user content deleted. No backend/SnapStart changes.

@@ -27,18 +27,12 @@ export function seoHead(language, kind) {
   ].join("\n    ");
 }
 
-export function brandIntroduction(language) {
-  const copy = brand[language];
-  return `<details class="brand-introduction"><summary>${escape(copy.summary)}</summary><div><h1>${escape(brand.name)}</h1><p>${escape(copy.description)}</p><nav aria-label="${escape(copy.summary)}"><a href="/${language}/">${escape(copy.gallery)}</a><a href="/${language}/exhibition/">${escape(copy.exhibitions)}</a></nav></div></details>`;
-}
-
 export async function buildSeo(output = new URL("dist/", root)) {
   const shell = await readFile(new URL("index.html", output), "utf8");
   if (!shell.includes("<!-- seo:start -->") || !shell.includes("<!-- seo:end -->")) throw new Error("SEO head markers missing");
   const html = (language, kind) => shell
     .replace(/<html[^>]*>/, `<html lang="${language}" dir="${language === "ar" ? "rtl" : "ltr"}">`)
-    .replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, `<!-- seo:start -->\n    ${seoHead(language, kind)}\n    <!-- seo:end -->`)
-    .replace('<div id="root"></div>', `<div id="root">${kind === "home" ? brandIntroduction(language) : ""}</div>`);
+    .replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, `<!-- seo:start -->\n    ${seoHead(language, kind)}\n    <!-- seo:end -->`);
   // Keep the root usable, and serve localized metadata before JavaScript runs.
   await writeFile(new URL("index.html", output), html("en", "home"));
   const urls = [];
