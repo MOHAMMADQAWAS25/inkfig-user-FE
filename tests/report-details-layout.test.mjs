@@ -16,3 +16,13 @@ test("report details use a bounded theme-aware native popup rather than a second
   assert.match(css, /\.moderation-detail-media > \.moderation-preview \{[^}]*height:100%[^}]*object-fit:contain/);
   assert.match(css, /\.moderation-detail-dialog::backdrop/);
 });
+
+test("desktop report preview stays fixed while only the details column scrolls", () => {
+  const css = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
+  const desktop = css.split("@media(min-width:761px){")[1]?.split("@media(max-width:760px)")[0];
+  assert.ok(desktop);
+  assert.match(desktop, /\.moderation-detail-dialog \{ overflow-y:hidden/);
+  assert.match(desktop, /\.moderation-detail-columns \{ min-height:0; max-height:calc\(100svh - 132px\)/);
+  assert.match(desktop, /\.moderation-detail-media \{ position:relative; height:min\(65svh,620px,calc\(100svh - 132px\)\)/);
+  assert.match(desktop, /\.moderation-detail-content \{[^}]*min-height:0[^}]*max-height:calc\(100svh - 132px\)[^}]*overflow-y:auto[^}]*scrollbar-gutter:stable/);
+});

@@ -64,3 +64,11 @@ Frontend-only branch `fix/report-popup-columns`, baseline
 `Arrange report popup preview and details in two columns` and redeploy frontend to
 restore the single-column popup, preserving the popup itself and unrelated work.
 No migration or backend deployment required.
+
+### Fixed desktop preview (2026-10-20)
+
+On desktop, only the right details column scrolls; the left preview and close
+button remain stationary. Both columns are bounded to the viewport, including
+short windows. Mobile retains the existing stacked, internally scrolling popup.
+Frontend-only branch `fix/report-fixed-preview`, baseline `e8fe34d`.
+Revert only `Keep report preview fixed while details scroll` to undo this change.

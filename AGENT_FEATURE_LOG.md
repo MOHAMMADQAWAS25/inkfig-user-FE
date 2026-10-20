@@ -10126,3 +10126,25 @@ No API, migration, storage/data mutation, role/permission, dependency, environme
 ### Deployment, rollback and Git
 
 Frontend-only existing main deployment workflow; no backend deployment/migration. Branch fix/report-popup-columns; subject Arrange report popup preview and details in two columns. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment results reported in handoff. Revert only this ticket commit and redeploy frontend to restore the single-column popup, preserving current exhibition changes, server filtering and other work. Baseline/reversal scope in docs/report-moderation.md; no reset/force push or historical log removal.
+
+## 2026-10-20 - Fixed report preview while details scroll
+
+### Request and changes
+
+Keep the left report image fixed. Desktop popup now keeps its close button and left preview stationary while only the bounded right details column scrolls. Viewport limits include short windows; stable scrollbar gutter avoids width movement. Existing mobile stacked popup scrolling, contain-fit images, themes, Arabic direction, handlers and moderation behavior unchanged.
+
+### Repositories and files
+
+Frontend only: src/styles.css, tests/report-details-layout.test.mjs, docs/report-moderation.md and this log. Clean main pulled and complete log read before changes; baseline e8fe34d7c94a6af2f6f027e39f86d64a840f580d. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, permissions, dependency, credential, environment or SnapStart changes. No production data mutations. Prior log entries preserved.
+
+### Verification
+
+378 checks passed (92 Node/source and 286 Vitest). Strict TypeScript/Vite/SEO build and git diff --check passed. Added scoped desktop overflow/viewport regression assertions; existing mobile and popup interaction coverage retained. No real-browser visual certification; existing non-blocking bundle-size/jsdom warnings remain.
+
+### Deployment, rollback and Git
+
+Frontend main workflow only. Branch fix/report-fixed-preview; commit subject Keep report preview fixed while details scroll. Fetch/rebase before branch push and previously authorized fast-forward merge/push to main; exact commit and outcome in handoff. Revert only this ticket commit and redeploy to restore previous popup scrolling without undoing the two-column layout or unrelated work. No reset, force push or historical log removal.

@@ -1537,6 +1537,12 @@ img { max-width: 100%; image-rendering: auto; }
 .moderation-detail-media > .moderation-profile-preview { width:min(70%,260px); height:auto; aspect-ratio:1; object-fit:cover; }
 .moderation-detail-media > .moderation-preview-placeholder { width:100%; height:100%; }
 .moderation-detail-content { display:grid; align-content:start; gap:16px; min-width:0; }
+@media(min-width:761px){
+  .reports-admin-page .moderation-detail-dialog { overflow-y:hidden; }
+  .moderation-detail-columns { min-height:0; max-height:calc(100svh - 132px); }
+  .moderation-detail-media { position:relative; height:min(65svh,620px,calc(100svh - 132px)); }
+  .moderation-detail-content { min-height:0; max-height:calc(100svh - 132px); overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+}
 @media(max-width:760px){.moderation-detail-columns { grid-template-columns:minmax(0,1fr); gap:16px; }.moderation-detail-media { position:relative; height:min(42svh,360px); }}
 .reports-admin-page .moderation-detail-dialog:not([open]) { display:none; }
 .moderation-detail-dialog::backdrop { background:rgb(10 12 7 / .65); backdrop-filter:blur(5px); }
