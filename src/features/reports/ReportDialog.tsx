@@ -5,8 +5,7 @@ import { usePageScrollLock } from "../layout/usePageScrollLock";
 import type { TranslationKey } from "../../i18n/resources";
 import { createReport, getReportingEligibility, type ReportReason } from "./reportsApi";
 
-const userReasons:ReportReason[]=["impersonation","harassment","spam","hate_speech","other"];
-const workReasons:ReportReason[]=["harassment","hate_speech","violence","spam","copyright","impersonation","other"];
+import { userReportReasons as userReasons, workReportReasons as workReasons } from "./reportReasons";
 function ReportModal({ children, titleId, busy, onClose }: { children: ReactNode; titleId: string; busy: boolean; onClose: () => void }) {
  const dialog = useRef<HTMLDialogElement>(null);
  usePageScrollLock(true);

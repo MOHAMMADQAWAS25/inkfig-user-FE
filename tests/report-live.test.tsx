@@ -50,6 +50,30 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();for(const client of clients)client.clear();clients.length=0;vi.restoreAllMocks();vi.unstubAllGlobals();});
 const signal=()=>window.dispatchEvent(new Event("inkfig:reports-changed"));
 
+it.each(["en","ar"] as const)("shows unique type-scoped reasons and clears only incompatible selections in %s",async(language)=>{
+  state.language=language;
+  render(<AdminReportsPage/>,{wrapper});
+  await waitFor(()=>expect(getReports).toHaveBeenCalled());
+  const select=screen.getByRole<HTMLSelectElement>("combobox",{name:translations[language]["reports.reason"]});
+  const values=()=>Array.from(select.options,option=>option.value);
+  const all=values();
+  expect(new Set(all).size).toBe(all.length);
+  expect(all).toEqual(expect.arrayContaining(["copyright","violence","sexual_content","impersonation","spam"]));
+  fireEvent.change(select,{target:{value:"copyright"}});
+  fireEvent.click(screen.getByRole("button",{name:new RegExp(translations[language]["reports.type.user"])}));
+  expect(values()).toEqual(["all","impersonation","harassment","spam","hate_speech","other"]);
+  expect(select.value).toBe("all");
+  await waitFor(()=>expect(getReports).toHaveBeenLastCalledWith("pending",0,{targetType:"user",reasonCode:undefined,sort:"newest"}));
+  fireEvent.change(select,{target:{value:"spam"}});
+  fireEvent.click(screen.getByRole("button",{name:new RegExp(translations[language]["reports.type.work"])}));
+  expect(select.value).toBe("spam");
+  await waitFor(()=>expect(getReports).toHaveBeenLastCalledWith("pending",0,{targetType:"work",reasonCode:"spam",sort:"newest"}));
+  const work=values();
+  fireEvent.click(screen.getByRole("button",{name:new RegExp(translations[language]["reports.type.all"])}));
+  expect(values()).toEqual(all);
+  expect(new Set([...work,"impersonation","harassment","spam","hate_speech","other"])).toEqual(new Set(all));
+});
+
 it("loads only a summary with the reports page closed and coalesces signals",async()=>{
   const view=renderHook(()=>useReportCount(),{wrapper});
   await waitFor(()=>expect(view.result.current).toBe(4));

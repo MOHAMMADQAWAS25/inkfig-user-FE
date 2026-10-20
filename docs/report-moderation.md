@@ -72,3 +72,16 @@ button remain stationary. Both columns are bounded to the viewport, including
 short windows. Mobile retains the existing stacked, internally scrolling popup.
 Frontend-only branch `fix/report-fixed-preview`, baseline `e8fe34d`.
 Revert only `Keep report preview fixed while details scroll` to undo this change.
+
+### Type-scoped reason filters (2026-10-20)
+
+All Reports offers the unique union of post and account reason codes. User Reports
+offers only impersonation, harassment, spam, hate speech and Other, matching backend
+submission validation. Post Reports retains work reasons, including historical
+sexual-content reports for moderation only. Options describe supported reasons,
+not merely those present in the currently loaded batch. New-report forms share the
+same current reason definitions; historical reasons are not offered for submission.
+Changing type preserves a compatible reason, otherwise resets to All Reasons in the
+same interaction. Existing server-side status/type/reason/order filtering precedes
+pagination; scope changes restart at the first batch and reject stale responses.
+Frontend-only `fix/report-reason-filters`; revert this ticket's commit to undo.

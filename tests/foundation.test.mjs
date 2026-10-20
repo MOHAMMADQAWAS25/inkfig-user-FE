@@ -58,7 +58,9 @@ test("uses the approved frontend dependencies", () => {
 });
 
 test("reports posts and users with localized reasons and duplicate protection", () => {
-  assert.match(reportDialog, /harassment.*hate_speech.*violence.*spam.*copyright.*impersonation.*other/);
+  const reasons = readFileSync(new URL("../src/features/reports/reportReasons.ts", import.meta.url), "utf8");
+  assert.match(reasons, /workReportReasons[^\n]*harassment.*hate_speech.*violence.*spam.*copyright.*impersonation.*other/);
+  assert.match(reportDialog, /workReportReasons as workReasons/);
   assert.doesNotMatch(reportDialog, /sexual_content/);
   assert.match(reportsApi, /POST","\/reports"/);
   assert.match(artworkPage, /reports\.create/);

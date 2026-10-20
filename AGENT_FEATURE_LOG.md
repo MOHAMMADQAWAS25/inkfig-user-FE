@@ -10148,3 +10148,25 @@ No API, migration, permissions, dependency, credential, environment or SnapStart
 ### Deployment, rollback and Git
 
 Frontend main workflow only. Branch fix/report-fixed-preview; commit subject Keep report preview fixed while details scroll. Fetch/rebase before branch push and previously authorized fast-forward merge/push to main; exact commit and outcome in handoff. Revert only this ticket commit and redeploy to restore previous popup scrolling without undoing the two-column layout or unrelated work. No reset, force push or historical log removal.
+
+## 2026-10-20 - Consistent type-scoped report reason filters
+
+### Request and changes
+
+All Reports now offers the deduplicated union of post/account reason codes; User Reports only offers the five reasons accepted by backend profile-report validation. Post Reports includes historical sexual-content reasons for moderation without reintroducing them in new-report submission. Shared current reason definitions keep submission and moderation options aligned. Type changes preserve compatible reasons and atomically reset incompatible selections to All Reasons. Existing server filtering, pagination reset/generation guards, counts, sorting, status and popup behavior retained. Reason options represent supported classifications, not loaded-only records.
+
+### Repositories and files
+
+Frontend only: AdminReportsPage.tsx, ReportDialog.tsx, new reportReasons.ts, report-live and foundation tests, docs/report-moderation.md and this log. Clean main pulled and complete log read; baseline de2e217c5900a73f08cb1d4c7a8f31e69b2d2c8a. Backend reports.py inspected: type/reason/status predicates and ordering run before limit/offset and aggregate counts use full database scope. No backend changes needed; main-system unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, permission, dependency, secret, environment or SnapStart changes. Backend authorization remains authoritative. No production data mutations or visual redesign.
+
+### Verification
+
+380 checks passed (92 Node/source, 288 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Added English/Arabic interaction coverage for union uniqueness, exact profile options, incompatible-reason reset, compatible-reason preservation and first-page backend request scope. Existing continuation/status/sort/stale-response tests pass. Updated source assertion to inspect extracted reason definition rather than duplicated literals. No real-browser visual certification; existing non-blocking bundle-size/jsdom notices remain.
+
+### Deployment, rollback and Git
+
+Frontend existing main workflow only; no backend deployment/migration. Branch fix/report-reason-filters; subject Align report reason filters with selected report type. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and workflow outcomes in handoff. Revert only this ticket commit to undo, preserving fixed preview and unrelated work. Historical log entries unchanged.
