@@ -10104,3 +10104,25 @@ Backend migration/API first, frontend existing Cloudflare workflow next. Branch:
 ### Post-synchronization verification
 
 Rebased over 4840a3b server-filtered administration pagination. Resolved exhibition-page conflicts by extending the incoming separate server-owned groups/cursors with Current, retaining backend order and no browser-clock filtering. Preserved both entire feature-log entries in append order; resources/tests merged automatically. Complete combined verification passed: 375 tests (91 Node/source, 284 Vitest), strict TypeScript/Vite/SEO build and git diff --check. Companion backend migration/deployment run 39473166722 succeeded before frontend main publication. No failed checks bypassed; generated fixtures absent and preview stopped.
+
+## 2026-10-20 - Two-column report details popup
+
+### Request and changes
+
+Keep the report details popup and place the artwork/account image in the left column and report information/actions in the right. AdminReportsPage now groups existing preview content and existing details/actions into distinct columns. Popup width increased to a bounded1100px. Desktop media is bounded and sticky within the scrollable dialog; artwork uses contain-fit without cropping, avatars retain circular profile presentation and missing previews retain placeholders. At760px and below media stacks above details. Physical left/right positions retained in Arabic through LTR grid direction with localized RTL inner content. Existing popup close/focus/busy/scroll-lock behavior and all moderation handlers unchanged.
+
+### Repositories and files
+
+Frontend only: src/features/admin/AdminReportsPage.tsx, scoped report popup rules in src/styles.css, tests/report-details-layout.test.mjs, tests/report-live.test.tsx, docs/report-moderation.md and this log. Main pulled from clean worktree and complete feature log read before editing. Baseline afa1b7b8d39e02cb5c8a049e8b70b3c89e174e70 includes incoming Current exhibition/gallery/reporting refinements, all preserved. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, storage/data mutation, role/permission, dependency, environment, credential or backend SnapStart changes. Server-side report filters/pagination/counts, preview fetching, image right-click/drag protection and authorized moderation actions remain intact. No queue/sidebar/public artwork layout changes.
+
+### Verification
+
+377 frontend checks passed (91 Node/source, 286 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. New interaction cases verify artwork/avatar in the media column, report headings/actions only in content column, Arabic text direction, image interaction protection and dismissal. Updated layout regression verifies width, equal bounded columns, contain-fit and mobile stacking. Existing popup/filter/pagination/permission/action suites pass. Follow-up targeted report suite18 passed after resetting profile mock defaults for isolation. Native dialogs are mocked in jsdom; no real-browser pixel-layout/focus or physical-device review claimed. No production moderation/upload/user mutations performed. Existing non-blocking Vite bundle-size and jsdom scrollTo warnings remain.
+
+### Deployment, rollback and Git
+
+Frontend-only existing main deployment workflow; no backend deployment/migration. Branch fix/report-popup-columns; subject Arrange report popup preview and details in two columns. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment results reported in handoff. Revert only this ticket commit and redeploy frontend to restore the single-column popup, preserving current exhibition changes, server filtering and other work. Baseline/reversal scope in docs/report-moderation.md; no reset/force push or historical log removal.

@@ -10,6 +10,9 @@ test("report details use a bounded theme-aware native popup rather than a second
   assert.match(page, /<ReportDetailsDialog /);
   assert.match(dialog, /showModal\(\)/);
   assert.match(dialog, /usePageScrollLock\(true\)/);
-  assert.match(css, /\.reports-admin-page \.moderation-detail-dialog \{[^}]*width:min\(700px,calc\(100% - 32px\)\)[^}]*max-height:calc\(100svh - 40px\)[^}]*overflow-y:auto[^}]*background:var\(--surface\)/);
+  assert.match(css, /\.reports-admin-page \.moderation-detail-dialog \{[^}]*width:min\(1100px,calc\(100% - 32px\)\)[^}]*max-height:calc\(100svh - 40px\)[^}]*overflow-y:auto[^}]*background:var\(--surface\)/);
+  assert.match(css, /\.moderation-detail-columns \{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\)[^}]*direction:ltr/);
+  assert.match(css, /@media\(max-width:760px\)\{\.moderation-detail-columns \{ grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(css, /\.moderation-detail-media > \.moderation-preview \{[^}]*height:100%[^}]*object-fit:contain/);
   assert.match(css, /\.moderation-detail-dialog::backdrop/);
 });

@@ -48,3 +48,19 @@ Frontend-only change on `fix/report-details-popup`, baseline
 the commit titled `Open report details in a modal popup` and redeploy frontend;
 preserve other changes and append a rollback log. No database migration or backend
 deployment is needed.
+
+### Two-column report details (2026-10-20)
+
+The popup uses a wider responsive two-column layout: reported artwork or account
+avatar on the physical left, report metadata/messages/links/actions on the right.
+Artwork is contained without cropping in a bounded preview; missing previews keep
+their existing placeholder. Arabic text is RTL inside the content column without
+swapping the image/detail positions. At 760px and below, image stacks above details.
+The native popup dismissal, focus/scroll restoration, busy guards, filtering,
+pagination and backend-authorized actions are unchanged.
+
+Frontend-only branch `fix/report-popup-columns`, baseline
+`afa1b7b8d39e02cb5c8a049e8b70b3c89e174e70`. Revert the commit titled
+`Arrange report popup preview and details in two columns` and redeploy frontend to
+restore the single-column popup, preserving the popup itself and unrelated work.
+No migration or backend deployment required.

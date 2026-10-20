@@ -10,10 +10,11 @@ import { AdminReportsPage } from "../src/features/admin/AdminReportsPage";
 import { getPendingReportCount, getReports, reviewReport, setReporterRestriction, type ReportItem } from "../src/features/reports/reportsApi";
 import { translations } from "../src/i18n/resources";
 import { getWork } from "../src/features/works/worksApi";
+import { getPublicProfile } from "../src/features/profile/profileApi";
 
-const state=vi.hoisted(()=>({permissions:["reports.manage"] as string[]}));
+const state=vi.hoisted(()=>({permissions:["reports.manage"] as string[],language:"en" as "en"|"ar"}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"manager",role:"admin",permissions:state.permissions},signOut:vi.fn()})}));
-vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:"en",t:(key:keyof typeof translations.en)=>translations.en[key]})}));
+vi.mock("../src/i18n/I18nProvider",()=>({useI18n:()=>({language:state.language,t:(key:keyof typeof translations.en)=>translations[state.language][key]})}));
 vi.mock("../src/features/exhibitions/useExhibitionCounts",()=>({useExhibitionCounts:()=>undefined}));
 vi.mock("../src/features/notifications/useNotificationInbox",()=>({useNotificationInbox:()=>({items:[],unread:0,loading:false,cursor:null,loadingMore:false})}));
 vi.mock("../src/features/notifications/notificationApi",()=>({getWebSocketTicket:vi.fn().mockResolvedValue({websocket_url:"wss://example.test",ticket:"ticket"}),notificationTarget:()=>"/en"}));
@@ -33,7 +34,7 @@ function wrapper({children}:{children:React.ReactNode}){
   return <MemoryRouter><QueryClientProvider client={clients[clients.length-1]}>{children}</QueryClientProvider></MemoryRouter>;
 }
 beforeEach(()=>{
-  vi.clearAllMocks();state.permissions=["reports.manage"];Socket.instances=[];
+  vi.clearAllMocks();state.permissions=["reports.manage"];state.language="en";Socket.instances=[];
   clients.push(new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}}));
   vi.stubGlobal("WebSocket",Socket);
   vi.stubGlobal("matchMedia",vi.fn(()=>({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()})));
@@ -41,6 +42,7 @@ beforeEach(()=>{
   vi.mocked(getPendingReportCount).mockResolvedValue({pending_count:4});
   vi.mocked(getReports).mockResolvedValue({items:[],next_cursor:null});
   vi.mocked(setReporterRestriction).mockResolvedValue(undefined);
+  vi.mocked(getPublicProfile).mockResolvedValue({avatar_url:null} as Awaited<ReturnType<typeof getPublicProfile>>);
   Object.defineProperty(HTMLDialogElement.prototype,"showModal",{configurable:true,value:vi.fn(function(this:HTMLDialogElement){this.setAttribute("open","");})});
   Object.defineProperty(HTMLDialogElement.prototype,"close",{configurable:true,value:vi.fn(function(this:HTMLDialogElement){this.removeAttribute("open");})});
   vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
@@ -120,7 +122,7 @@ async function openReport(item=report) {
   await waitFor(()=>expect(view.container.querySelector(".moderation-target")).not.toBeNull());
   const trigger=view.container.querySelector<HTMLButtonElement>(".moderation-target")!;
   fireEvent.click(trigger);
-  return {...view,trigger,dialog:screen.getByRole("dialog",{name:translations.en["reports.detailsTitle"]})};
+  return {...view,trigger,dialog:screen.getByRole("dialog",{name:translations[state.language]["reports.detailsTitle"]})};
 }
 
 it("opens report details in a native popup without shrinking/reloading the table and restores focus",async()=>{
@@ -233,4 +235,32 @@ it("ignores old report batches when the filter changes during a request",async()
   await act(async()=>finish({items:[{...report,target_user_name:"Stale report scope"}],next_cursor:null,total:900}));
   expect(screen.queryByText("Stale report scope")).toBeNull();
   expect(screen.getByText("Showing 1 of 1 matching reports")).toBeTruthy();
+});
+
+it("places the reported artwork in the media column and all details/actions in the other column",async()=>{
+  vi.mocked(getWork).mockResolvedValue({work_id:"work",image_url:"/reported-art.png",title:"Reported artwork",type_name_en:"Digital Art"} as Awaited<ReturnType<typeof getWork>>);
+  const {dialog}=await openReport({...report,target_type:"work",target_work_id:"work",target_work_title:"Reported artwork"});
+  const media=dialog.querySelector<HTMLElement>(".moderation-detail-media")!;
+  const content=dialog.querySelector<HTMLElement>(".moderation-detail-content")!;
+  const image=await within(media).findByRole("img",{name:"Reported artwork"});
+  expect(image.getAttribute("src")).toBe("/reported-art.png");
+  expect(image.getAttribute("draggable")).toBe("false");
+  expect(fireEvent.contextMenu(image)).toBe(false);
+  expect(within(content).getByRole("heading",{name:translations.en["reports.detailsTitle"]})).toBeTruthy();
+  expect(within(content).getByRole("button",{name:translations.en["reports.markReviewed"]})).toBeTruthy();
+  expect(within(media).queryByRole("button")).toBeNull();
+  expect(within(content).queryByRole("img")).toBeNull();
+});
+
+it("places an account avatar in the media column and preserves Arabic detail direction",async()=>{
+  state.language="ar";
+  vi.mocked(getPublicProfile).mockResolvedValue({avatar_url:"/reported-avatar.png"} as Awaited<ReturnType<typeof getPublicProfile>>);
+  const {dialog}=await openReport();
+  const media=dialog.querySelector<HTMLElement>(".moderation-detail-media")!;
+  const content=dialog.querySelector<HTMLElement>(".moderation-detail-content")!;
+  expect((await within(media).findByRole("img",{name:"Target"})).getAttribute("src")).toBe("/reported-avatar.png");
+  expect(content.dir).toBe("rtl");
+  expect(within(content).getByRole("heading",{name:translations.ar["reports.detailsTitle"]})).toBeTruthy();
+  fireEvent.click(within(dialog).getByRole("button",{name:translations.ar["reports.closeDetails"]}));
+  expect(screen.queryByRole("dialog")).toBeNull();
 });
