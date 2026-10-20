@@ -10327,3 +10327,65 @@ Focused hook/component checks passed (43 tests). Full suite passed: 405 checks (
 ### Deployment and Git
 
 Frontend existing main deployment workflow only. Branch: fix/exhibition-gallery-loading. Commit subject: Stabilize exhibition gallery loading and live refresh. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment results in handoff. No previous log entries modified. A full browser refresh still necessarily reloads the application and performs one initial data load; this removes avoidable staged loading and periodic gallery rerenders, not the browser refresh itself. Revert only this ticket commit to restore previous loading without undoing unrelated work.
+
+## 2026-10-20 - No-upscale opened artwork images
+
+### Request
+
+Try displaying opened artwork without automatically enlarging small original images, while shrinking larger images to fit and preserving proportions/centering.
+
+### Changes
+
+- Applied object-fit:scale-down only to image elements in the dedicated artwork-page viewer. The browser selects intrinsic CSS dimensions or a smaller contain-fit size; existing object-position:center retained.
+- Preserved bounded responsive viewer, original image URL/file, proportional sizing, image protection, errors, actions and all other layouts. No JavaScript measurement loop, observers, transforms or dependencies introduced.
+- Videos retain contain behavior; feed/profile/related cards and moderation/shared popup media intentionally unchanged. No zoom feature added in this focused trial.
+
+### Repositories
+
+- `inkfig-user-FE`: page-only image fit, tests and rollback documentation. Both backends unchanged.
+
+### Files
+
+- `src/features/works/artworkPage.css`: image-only scale-down rule.
+- `src/features/works/ArtworkPageMedia.tsx`: updated viewer documentation comment.
+- `tests/artwork-page-media-layout.test.mjs`: scoped no-upscale rule and unchanged video/base containment regression.
+- `tests/artwork-page-media.test.tsx`: added small portrait/landscape/square cases alongside existing aspect-ratio, interaction, error and video checks.
+- `docs/artwork-detail-page-rollback.md`: baseline, scope, limitations and revert-only instructions.
+- `AGENT_FEATURE_LOG.md`: appended this record, preserving history.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required. No schema, index, storage, image-processing or existing-data changes.
+
+### Permissions and scope
+
+No permissions, roles or account scopes changed. Backend authorization remains unchanged and authoritative. Only public opened artwork-page images receive the styling.
+
+### Frontend
+
+Desktop/mobile, English/Arabic and light/dark viewer bounds unchanged. Small images remain at intrinsic CSS size with centered surrounding surface space; large images shrink to available bounds. No cropping/stretching added. Existing loading, error, playback, feed and navigation behavior retained.
+
+### Verification
+
+- `[passed] npm.cmd test -- --pool=threads --maxWorkers=2` - 96 Node/source and 313 component tests (409 total).
+- `[passed] npm.cmd run build` - strict TypeScript, Vite and SEO generation. Existing non-blocking large-bundle warning and jsdom scrollTo notices remain.
+- `[passed] git diff --check`
+- `[not run] interactive browser/pixel-layout certification` - unavailable browser controls; DOM/source regressions do not certify actual device rendering. No production uploads or data mutations used for testing.
+
+### Deployment
+
+Frontend-only existing main Cloudflare deployment workflow. No backend deployment, migration or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: subject `Prevent upscaling small images on artwork pages`; hash reported in handoff.
+- Push: pending synchronization at entry creation; final result in handoff.
+
+### Notes
+
+Baseline 1265206 is a reference, not a reset target. Revert only this focused commit and redeploy to restore enlargement. Natural CSS size does not guarantee physical-pixel sharpness on high-density screens, improve a low-quality source or remove compression artifacts. No backend/SnapStart changes. Previous log entries preserved.

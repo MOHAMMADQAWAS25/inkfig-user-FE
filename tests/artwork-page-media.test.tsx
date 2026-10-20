@@ -8,6 +8,7 @@ afterEach(cleanup);
 it.each([
   ["portrait", 1200, 2400], ["landscape", 2400, 1200], ["square", 1200, 1200],
   ["panorama", 8000, 600], ["very-tall", 600, 8000],
+  ["small-portrait", 200, 300], ["small-landscape", 300, 200], ["small-square", 200, 200],
 ] as const)("renders one untransformed %s image without popup framing", (shape, width, height) => {
   const { container } = render(<ArtworkPageMedia url={`/${shape}.png`} title={shape} mimeType="image/png" failureLabel="Unavailable" />);
   const image = screen.getByRole("img", { name: shape });

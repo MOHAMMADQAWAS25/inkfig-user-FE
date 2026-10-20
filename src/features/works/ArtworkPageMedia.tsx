@@ -8,7 +8,7 @@ type ArtworkPageMediaProps = {
   failureLabel: string;
 };
 
-/** Page-only viewer: definite bounds and contain-fit, without popup framing. */
+/** Page-only viewer: bounded, centered images without upscaling or popup framing. */
 export function ArtworkPageMedia(props: ArtworkPageMediaProps) {
   // Remount on source changes so a failed image cannot hide the next artwork.
   return <ArtworkPageMediaSource key={props.url} {...props} />;

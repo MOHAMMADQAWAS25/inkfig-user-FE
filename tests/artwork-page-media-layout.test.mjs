@@ -13,3 +13,10 @@ test("page-only viewer has definite responsive bounds, no popup selectors or int
   assert.match(page, /<ArtworkPageMedia /);
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
 });
+
+test("opened artwork images shrink to fit without enlarging small originals; videos keep contain", () => {
+  assert.match(css, /\.artwork-page-media > img\.artwork-page-media-original \{ object-fit:scale-down; \}/);
+  assert.match(css, /\.artwork-page-media-original \{[^}]*width:100%; height:100%[^}]*object-fit:contain; object-position:center/);
+  assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
+  assert.equal((css.match(/object-fit:scale-down/g) || []).length, 1);
+});
