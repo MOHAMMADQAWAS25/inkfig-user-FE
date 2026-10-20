@@ -1,6 +1,7 @@
 import React from "react";
 import {
   cleanup,
+  act,
   fireEvent,
   render,
   screen,
@@ -9,6 +10,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
 import { AssignExhibitionDialog } from "../src/features/exhibitions/AssignExhibitionDialog";
 import { MyExhibitionSubmissionsPage, ReviewExhibitionSubmissionsPage } from "../src/features/exhibitions/MyExhibitionSubmissionsPage";
@@ -70,6 +72,7 @@ const exhibition = {
 };
 function view(path = "/en/exhibition/event") {
   return render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route
@@ -78,7 +81,7 @@ function view(path = "/en/exhibition/event") {
         />
         <Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/>
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter></QueryClientProvider>,
   );
 }
 beforeEach(() => {
@@ -351,6 +354,38 @@ it("opens a current exhibition as a titled split-card wall without its banner", 
   expect(container.querySelector('[src="/banner.jpg"]')).toBeNull();
 });
 
+it("keeps one loading screen until the initial exhibition wall is ready",async()=>{
+  vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:"2020-01-01T00:00:00Z"});
+  let resolve!:(page:api.Page<api.Submission>)=>void;
+  vi.mocked(api.getSubmissions).mockReturnValue(new Promise(done=>{resolve=done;}));
+  view();
+  await waitFor(()=>expect(api.getSubmissions).toHaveBeenCalledOnce());
+  expect(screen.queryByRole("heading",{name:exhibition.name})).toBeNull();
+  expect(screen.getByRole("status").textContent).toBe(translations.en["exhibitions.loading"]);
+  expect(screen.queryByText(translations.en["exhibitions.noSubmissions"])).toBeNull();
+  await act(async()=>resolve({items:[record],next_cursor:null}));
+  await screen.findByRole("link",{name:"View artwork details: Painting"});
+  expect(screen.queryByRole("status")).toBeNull();
+});
+
+it("does not unmount visible cards while a live background update is pending",async()=>{
+  vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:"2020-01-01T00:00:00Z"});
+  vi.mocked(api.getSubmissions).mockResolvedValue({items:[record],next_cursor:null});
+  view();
+  const card=await screen.findByRole("link",{name:"View artwork details: Painting"});
+  const image=card.querySelector("img");
+  let resolve!:(page:api.Page<api.Submission>)=>void;
+  vi.mocked(api.getSubmissions).mockImplementationOnce(()=>new Promise(done=>{resolve=done;}));
+  act(()=>window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}})));
+  await waitFor(()=>expect(api.getSubmissions).toHaveBeenCalledTimes(2));
+  expect(card.isConnected).toBe(true);
+  expect(screen.queryByRole("status")).toBeNull();
+  await act(async()=>resolve({items:[{...record,title:"Updated painting"}],next_cursor:null}));
+  const updated=await screen.findByRole("link",{name:"View artwork details: Updated painting"});
+  expect(updated).toBe(card);
+  expect(updated.querySelector("img")).toBe(image);
+});
+
 it("keeps the backend period and ordering even when the browser clock disagrees",async()=>{
   vi.spyOn(Date,"now").mockReturnValue(Date.parse("2035-01-01T00:00:00Z"));
   const nearer={...exhibition,exhibition_id:"near",name:"Backend first",event_at:"2026-11-01T00:00:00Z"};
@@ -365,7 +400,7 @@ it("opens a single-work exhibition upload and links to my submissions from the t
   view();
   const participate = await screen.findByRole("link", { name: "Participate" });
   expect(participate.getAttribute("href")).toBe("/en/upload?exhibition=event");
-  expect(participate.closest(".exhibition-toolbar")).toBeTruthy();
+  await waitFor(() => expect(screen.getByRole("link", { name: "Participate" }).closest(".exhibition-toolbar")).toBeTruthy());
   expect(screen.getByRole("link", { name: "My submissions" }).getAttribute("href")).toBe("/en/exhibition/event/submissions");
   expect(screen.queryByRole("combobox")).toBeNull();
 });

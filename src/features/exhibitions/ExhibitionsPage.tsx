@@ -13,21 +13,18 @@ import { AppSidebar } from "../navigation/AppSidebar";
 import { ExhibitionCard } from "./ExhibitionCard";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import { DeleteExhibitionDialog } from "./DeleteExhibitionDialog";
-import { useExhibitionLive } from "./useExhibitionLive";
+import { useExhibitionGallery } from "./useExhibitionGallery";
 import { exhibitionEnd, exhibitionPeriod, type ExhibitionPeriod } from "./exhibitionPeriod";
 import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
 import {
   listExhibitions,
-  getExhibition,
   saveExhibition,
-  getSubmissions,
   getEligibleExhibitions,
   uploadBanner,
 } from "./exhibitionApi";
 import type {
   Exhibition,
   ExhibitionInput,
-  Submission,
 } from "./exhibitionApi";
 
 function localDate(value: string) {
@@ -49,15 +46,11 @@ export function ExhibitionsPage() {
     ["supervisor", "admin", "system_administrator"].includes(session.role),
   );
   const [items, setItems] = useState<Record<ExhibitionPeriod,Exhibition[]>>({current:[],upcoming:[],past:[]});
-  const [selected, setSelected] = useState<Exhibition | null>(null);
+  const gallery = useExhibitionGallery(exhibitionId, session?.userId ?? "guest");
+  const { selected, now, started, submissions } = gallery;
   const [cursor, setCursor] = useState<number | null>(null);
   const [pastCursor, setPastCursor] = useState<number | null>(null);
   const [currentCursor, setCurrentCursor] = useState<number | null>(null);
-  const [now, setNow] = useState(() => Date.now());
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [subCursor, setSubCursor] = useState<number | null>(null);
-  const [submissionsLoading, setSubmissionsLoading] = useState(true);
-  const scope = "public";
   const [available, setAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -74,9 +67,6 @@ export function ExhibitionsPage() {
   });
   const [banner, setBanner] = useState<File | null>(null);
   const [createdId, setCreatedId] = useState<string | undefined>();
-  const started = Boolean(selected && Date.parse(selected.event_at) <= now);
-  const [liveRevision,setLiveRevision]=useState(0);
-  useExhibitionLive(exhibitionId,()=>setLiveRevision(value=>value+1),started);
   useEffect(() => {
     if (editing)
       document
@@ -100,26 +90,12 @@ export function ExhibitionsPage() {
     };
   }
   useEffect(() => {
-    const tick = () => setNow(Date.now());
-    tick();
-    const timer = window.setInterval(tick, 1000);
-    document.addEventListener("visibilitychange", tick);
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", tick);
-    };
-  }, [exhibitionId]);
-  useEffect(() => {
     let active = true;
-    setLoading(true);
+    setLoading(!exhibitionId);
     setError("");
-    setSelected(null);
     setEditing(false);
-    const request = exhibitionId
-      ? getExhibition(exhibitionId).then((value) => {
-          if (active) setSelected(value);
-        })
-      : loadSections().then((page) => {
+    if (exhibitionId) return;
+    const request = loadSections().then((page) => {
           if (active) {
             setItems(page.items);
             setCursor(page.upcomingCursor);
@@ -139,34 +115,14 @@ export function ExhibitionsPage() {
     };
   }, [exhibitionId]);
   useEffect(() => {
-    if (!exhibitionId || !started) return;
-    let active = true;
-    setSubmissions([]);
-    setSubCursor(null);
-    setSubmissionsLoading(true);
-    getSubmissions(exhibitionId, scope)
-      .then((page) => {
-        if (active) {
-          setSubmissions(page.items);
-          setSubCursor(page.next_cursor);
-        }
-      })
-      .catch((cause) => {
-        if (active) failure(cause);
-      }).finally(() => { if (active) setSubmissionsLoading(false); });
-    return () => {
-      active = false;
-    };
-  }, [exhibitionId, scope, started, liveRevision]);
-  useEffect(() => {
     setAvailable(false);
-    if (!session || !exhibitionId) return;
+    if (!session || !exhibitionId || !selected) return;
     let active = true;
     getEligibleExhibitions(0, undefined, exhibitionId).then(page => {
       if (active) setAvailable(page.items.length > 0);
     }).catch(cause => { if (active) failure(cause); });
     return () => { active = false; };
-  }, [session, exhibitionId, selected?.participation_open]);
+  }, [session?.userId, session?.role, exhibitionId, selected?.participation_open]);
   async function run(task: () => Promise<void>) {
     setBusy(true);
     setError("");
@@ -180,14 +136,7 @@ export function ExhibitionsPage() {
     }
   }
   async function refresh() {
-    if (!exhibitionId) return;
-    const [details, page] = await Promise.all([
-      getExhibition(exhibitionId),
-      getSubmissions(exhibitionId, scope),
-    ]);
-    setSelected(details);
-    setSubmissions(page.items);
-    setSubCursor(page.next_cursor);
+    await gallery.refresh();
   }
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -258,7 +207,7 @@ export function ExhibitionsPage() {
     <main className="exhibitions-page app-page-with-sidebar">
       <AppSidebar />
       <div className="exhibitions-shell">
-        {!selected && <header className="exhibitions-heading">
+        {!selected && !exhibitionId && <header className="exhibitions-heading">
           <div>
             <Trophy aria-hidden="true" />
             <h1>{t("exhibitions.title")}</h1>
@@ -272,13 +221,14 @@ export function ExhibitionsPage() {
         </header>}
         {selected && <ExhibitionToolbar id={selected.exhibition_id} manage={manage} signedIn={Boolean(session)} available={available && selected.participation_open} busy={busy} onEdit={edit} onDelete={canDelete ? () => setDeleting(true) : undefined}/>}
         {deleting && selected && canDelete && <DeleteExhibitionDialog id={selected.exhibition_id} name={selected.name} onClose={() => setDeleting(false)} onDeleted={() => { setDeleting(false); navigate(`/${language}/exhibition`, { replace: true }); }}/>}
-        {error && (
+        {(error || gallery.error) && (
           <p className="form-message error-message" role="alert">
-            {error}
+            {error || gallery.error?.message}
           </p>
         )}
         {notice && <p role="status">{notice}</p>}
-        {loading ? (
+        {gallery.error && !gallery.selected && <button className="pagination-load-more" disabled={gallery.loading} onClick={() => void run(gallery.refresh)}>{t("feed.retry")}</button>}
+        {(exhibitionId ? gallery.loading : loading) ? (
           <p role="status">{t("exhibitions.loading")}</p>
         ) : !selected && !exhibitionId ? (
           <>
@@ -384,24 +334,19 @@ export function ExhibitionsPage() {
               <div className="exhibition-artwork-grid">
                 {submissions.map(item => <ExhibitionArtworkCard key={item.submission_id} item={item} exhibitionId={selected.exhibition_id}/>)}
               </div>
-              {submissionsLoading ? <p role="status">{t("exhibitions.loading")}</p> : !submissions.length && <p>{t("exhibitions.noSubmissions")}</p>}
-              {subCursor !== null && (
+              {!submissions.length && !gallery.works.isError && <p>{t("exhibitions.noSubmissions")}</p>}
+              {(gallery.works.isError || gallery.works.hasNextPage) && (
                 <button
                   className="pagination-load-more"
-                  disabled={busy}
+                  disabled={busy || gallery.works.isFetching}
                   onClick={() =>
                     void run(async () => {
-                      const page = await getSubmissions(
-                        exhibitionId!,
-                        scope,
-                        subCursor,
-                      );
-                      setSubmissions((current) => [...current, ...page.items]);
-                      setSubCursor(page.next_cursor);
+                      if (gallery.works.isFetchNextPageError || !gallery.works.isError) await gallery.works.fetchNextPage({ throwOnError: true });
+                      else await gallery.works.refetch({ throwOnError: true });
                     })
                   }
                 >
-                  {t("exhibitions.more")}
+                  {t(gallery.works.isError ? "feed.retry" : "exhibitions.more")}
                 </button>
               )}
               </section>}

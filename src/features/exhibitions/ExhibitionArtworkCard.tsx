@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, CalendarDays } from "lucide-react";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -6,7 +7,7 @@ import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import type { Submission } from "./exhibitionApi";
 
-export function ExhibitionArtworkCard({ item, exhibitionId }: { item: Submission; exhibitionId: string }) {
+export const ExhibitionArtworkCard = memo(function ExhibitionArtworkCard({ item, exhibitionId }: { item: Submission; exhibitionId: string }) {
   const { language, t } = useI18n();
   return <Link className="exhibition-artwork-card" to={`/${language}/artwork/${item.work_id}`}
     state={{ returnTo: `/${language}/exhibition/${exhibitionId}` }} aria-label={`${t("works.viewDetails")}: ${item.title}`}>
@@ -20,4 +21,4 @@ export function ExhibitionArtworkCard({ item, exhibitionId }: { item: Submission
       <span className="exhibition-artwork-open">{t("works.viewDetails")}<ArrowUpRight size={18} aria-hidden="true"/></span>
     </div>
   </Link>;
-}
+});

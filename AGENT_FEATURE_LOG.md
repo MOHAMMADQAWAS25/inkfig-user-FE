@@ -10302,3 +10302,28 @@ Deploy companion main backend then frontend via existing main workflows. No migr
 ### Notes
 
 Followed backend architecture skill for companion changes; shared pure domain rule and existing HTTP/service/processor boundaries retained. No backend SnapStart effects from browser validation. Original uploaded files and prior feature-log history preserved.
+
+## 2026-10-20 - Stable exhibition gallery loading and background updates
+
+### Request
+
+Fix the repeated rendering/loading appearance when opening or refreshing an exhibition's public artwork wall.
+
+### Changes and files
+
+- Added useExhibitionGallery.ts using the existing TanStack Query provider: viewer/exhibition-scoped in-memory detail and public-page caches, 30-second freshness, shared in-flight requests, cached return navigation and background updates without clearing visible cards. Loaded pages refresh sequentially using current backend cursors, preserving pagination.
+- ExhibitionsPage.tsx now shows one initial loading stage, no temporary listing heading on detail routes, retained cards on refresh failures and localized retry controls. Participation eligibility waits for metadata and depends on stable account identity/role rather than object-reference changes.
+- Replaced the page-wide one-second interval with a cleaned-up start/end-boundary timer plus visible-tab resynchronization. Existing self-contained countdowns remain unchanged. Memoized ExhibitionArtworkCard skips unchanged props during background query transitions.
+- Added hook regressions and expanded exhibitions.test.tsx for Strict Mode request sharing, cached remount, loaded-page live refresh, failures, route/viewer isolation, delayed responses, upcoming guards, schedule boundaries, single initial loading and retained card/image DOM identity.
+
+### Repositories, API and database
+
+All three repositories checked clean, switched to main and pulled ff-only before implementation. Frontend only; both backends unchanged. Existing API contracts and server-owned visibility, moderation, participation and pagination preserved. No migration, dependencies, credentials, storage/data mutation, permissions, environment or backend/SnapStart changes. Cache is memory-only and cleared by existing authentication transitions; no private submission lists or browser-persisted artwork cache introduced.
+
+### Verification
+
+Focused hook/component checks passed (43 tests). Full suite passed: 405 checks (95 Node/source and 310 Vitest). Strict TypeScript/Vite/SEO production build and git diff --check passed. Initial new assertions needed asynchronous query-notification waits; a slow-loading test also exposed unstable eligibility-effect dependencies, corrected and rerun. No failed checks bypassed. No interactive browser/physical-device certification or production data mutations; existing non-blocking bundle-size/jsdom scrollTo notices remain.
+
+### Deployment and Git
+
+Frontend existing main deployment workflow only. Branch: fix/exhibition-gallery-loading. Commit subject: Stabilize exhibition gallery loading and live refresh. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment results in handoff. No previous log entries modified. A full browser refresh still necessarily reloads the application and performs one initial data load; this removes avoidable staged loading and periodic gallery rerenders, not the browser refresh itself. Revert only this ticket commit to restore previous loading without undoing unrelated work.
