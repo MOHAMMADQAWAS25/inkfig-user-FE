@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bookmark, CalendarDays, Copy, Flag, Heart, Pencil, Share2, Trash2, UserRound } from "lucide-react";
+import { ArrowLeft, Bookmark, CalendarDays, Copy, Flag, Heart, Pencil, Share2, Trash2 } from "lucide-react";
+import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { ApiError } from "../../api/httpClient";
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -32,7 +33,7 @@ export function ArtworkPage() {
   const [error, setError] = useState(""); const [notice, setNotice] = useState("");
   const [reporting, setReporting] = useState(false); const [moderating, setModerating] = useState(false);
   const [reason, setReason] = useState(""); const [deleting, setDeleting] = useState(false);
-  const [followBusy, setFollowBusy] = useState(false); const [avatarFailed, setAvatarFailed] = useState(false);
+  const [followBusy, setFollowBusy] = useState(false);
   const requests = useRef(new Set<string>());
   const moderationForm = useRef<HTMLFormElement>(null);
   usePageScrollLock(moderating);
@@ -51,7 +52,7 @@ export function ArtworkPage() {
     document.addEventListener("keydown", keyboard);
     return () => { document.removeEventListener("keydown", keyboard); previous?.focus(); };
   }, [moderating, deleting]);
-  useEffect(() => { setAvatarFailed(false); setNotice(""); setError(""); setModerating(false); setReporting(false); }, [workId]);
+  useEffect(() => { setNotice(""); setError(""); setModerating(false); setReporting(false); }, [workId]);
   const can = (permission: string) => Boolean(session && hasPermission(session.permissions, permission));
   const own = Boolean(work && session?.userId === work.owner_user_id);
   const returnTo = safeArtworkReturn(location.state?.returnTo, `/${language}`);
@@ -105,7 +106,7 @@ export function ArtworkPage() {
         <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} />
         <section className="artwork-page-info" aria-labelledby="artwork-title">
           <div className="artwork-page-creator"><Link to={`/${language}/profile/${work.owner_user_id}`}>
-            {work.artist_avatar_url && !avatarFailed ? <img src={work.artist_avatar_url} alt="" onError={() => setAvatarFailed(true)} /> : <span className="artwork-creator-initial"><UserRound size={26} /></span>}<strong>{work.artist_name}</strong></Link>
+            <ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-creator-initial"/><strong>{work.artist_name}</strong></Link>
             {!own && session && creator.data && <button disabled={followBusy} type="button" onClick={() => void follow()}>{t(creator.data.is_following ? "profile.unfollow" : "profile.follow")}</button>}
           </div>
           <h1 id="artwork-title">{work.title}</h1>

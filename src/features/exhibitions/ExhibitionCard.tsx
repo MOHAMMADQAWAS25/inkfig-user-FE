@@ -4,16 +4,19 @@ import { ArrowUpRight, CalendarDays, Trophy } from "lucide-react";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ExhibitionCountdown } from "./ExhibitionCountdown";
 import type { Exhibition } from "./exhibitionApi";
+import { exhibitionEnd } from "./exhibitionPeriod";
 
 export function ExhibitionCard({
   exhibition,
   past,
   detail = false,
+  current = false,
   children,
 }: {
   exhibition: Exhibition;
   past: boolean;
   detail?: boolean;
+  current?: boolean;
   children?: ReactNode;
 }) {
   const { language, t } = useI18n();
@@ -37,7 +40,7 @@ export function ExhibitionCard({
           className={`exhibition-status ${!past && exhibition.participation_open ? "open" : ""}`}
         >
           {t(
-            past
+            current ? "exhibitions.currentBadge" : past
               ? "exhibitions.pastBadge"
               : exhibition.participation_open
                 ? "exhibitions.open"
@@ -55,7 +58,8 @@ export function ExhibitionCard({
             }).format(new Date(exhibition.event_at))}
           </time>
         </small>}
-        {(!past || detail) && <ExhibitionCountdown eventAt={exhibition.event_at} />}
+        {current && <small className="exhibition-card-date"><CalendarDays size={16} aria-hidden="true"/><span>{t("exhibitions.ends")}: <time dateTime={exhibitionEnd(exhibition)}>{new Intl.DateTimeFormat(language,{dateStyle:"medium",timeStyle:"short"}).format(new Date(exhibitionEnd(exhibition)))}</time></span></small>}
+        {(!past || detail) && !current && <ExhibitionCountdown eventAt={exhibition.event_at} />}
         {children}
         {!detail && <span className="exhibition-card-link">
           {t("exhibitions.view")}

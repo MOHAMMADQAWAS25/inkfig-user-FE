@@ -323,6 +323,32 @@ it("shows both empty sections when no exhibitions are available", async () => {
   view("/en/exhibition");
   expect(await screen.findByText("No upcoming exhibitions yet.")).toBeTruthy();
   expect(screen.getByText("No past exhibitions yet.")).toBeTruthy();
+  expect(screen.getByText("No exhibitions are currently running.")).toBeTruthy();
+});
+it("lists current exhibitions with an independent server-side cursor", async () => {
+  vi.spyOn(Date,"now").mockReturnValue(Date.parse("2026-10-20T12:00:00Z"));
+  const current = {...exhibition,exhibition_id:"current",name:"Running exhibition",event_at:"2026-10-20T10:00:00Z",event_ends_at:"2026-10-21T20:00:00Z"};
+  vi.mocked(api.listExhibitions).mockImplementation(async (cursor=0,period="all")=>({items:period==="current"?[current]:[],next_cursor:period==="current"&&cursor===0?20:null}));
+  view("/en/exhibition");
+  const region=await screen.findByRole("region",{name:"Current Exhibitions"});
+  await within(region).findByRole("heading",{name:"Running exhibition"});
+  fireEvent.click(screen.getByRole("button",{name:"Load more current exhibitions"}));
+  await waitFor(()=>expect(api.listExhibitions).toHaveBeenCalledWith(20,"current"));
+  expect(screen.queryAllByRole("heading",{name:"Running exhibition"})).toHaveLength(1);
+});
+it("opens a current exhibition as a titled split-card wall without its banner", async () => {
+  const start=new Date(Date.now()-3600000).toISOString(),end=new Date(Date.now()+86400000).toISOString();
+  vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:start,event_ends_at:end,banner_url:"/banner.jpg"});
+  vi.mocked(api.getSubmissions).mockResolvedValue({items:[{submission_id:"entry",work_id:"work",user_id:"artist",artist_name:"Artist",title:"Autumn art",description:"A colorful autumn landscape",type_name_en:"Digital Art",image_url:"/art.jpg",status:"approved",rejection_reason:null,created_at:start}],next_cursor:null});
+  const {container}=view();
+  expect(await screen.findByRole("heading",{level:1,name:"Student exhibition"})).toBeTruthy();
+  expect(container.querySelector(".exhibition-detail-card")).toBeNull();
+  const link=await screen.findByRole("link",{name:"View artwork details: Autumn art"});
+  expect(link.getAttribute("href")).toBe("/en/artwork/work");
+  expect(link.querySelector(".exhibition-artwork-media img")?.getAttribute("src")).toBe("/art.jpg");
+  expect(link.querySelector(".exhibition-artwork-details")?.textContent).toContain("A colorful autumn landscape");
+  expect(link.querySelector(".profile-avatar-initial")?.textContent).toBe("A");
+  expect(container.querySelector('[src="/banner.jpg"]')).toBeNull();
 });
 
 it("keeps the backend period and ordering even when the browser clock disagrees",async()=>{
@@ -353,7 +379,7 @@ it("keeps exhibition details in the shared card and participation below it witho
   const content = card.querySelector(".exhibition-card-content") as HTMLElement;
   expect(within(content).getByText("Spring collection")).toBeTruthy();
   expect(within(content).getByRole("timer")).toBeTruthy();
-  expect(content.querySelectorAll("dl dt")).toHaveLength(3);
+  expect(content.querySelectorAll("dl dt")).toHaveLength(4);
   expect(within(content).queryByRole("button", { name: "Submit for approval" })).toBeNull();
   const participate = await screen.findByRole("link", { name: "Participate" });
   expect(participate.closest(".exhibition-detail-card")).toBeNull();

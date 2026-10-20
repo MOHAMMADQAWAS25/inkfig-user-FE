@@ -1,6 +1,12 @@
 export type Language = "ar" | "en";
 
 const en = {
+  "exhibitions.current": "Current Exhibitions",
+  "exhibitions.currentBadge": "Happening now",
+  "exhibitions.currentHint": "Explore the exhibitions happening now.",
+  "exhibitions.noCurrent": "No exhibitions are currently running.",
+  "exhibitions.moreCurrent": "Load more current exhibitions",
+  "exhibitions.ends": "Exhibition ends",
   "exhibitions.delete": "Delete exhibition",
   "exhibitions.deleting": "Deleting…",
   "exhibitions.deleteWarning": "This permanently deletes the exhibition, its submissions and participation blocks, and its banner. Artists’ original posts are kept. This cannot be undone.",
@@ -552,6 +558,12 @@ const en = {
 export type TranslationKey = keyof typeof en;
 
 const ar: Record<TranslationKey, string> = {
+  "exhibitions.current": "المعارض الحالية",
+  "exhibitions.currentBadge": "مقام الآن",
+  "exhibitions.currentHint": "استكشف المعارض المقامة الآن.",
+  "exhibitions.noCurrent": "لا توجد معارض مقامة حاليًا.",
+  "exhibitions.moreCurrent": "تحميل المزيد من المعارض الحالية",
+  "exhibitions.ends": "نهاية المعرض",
   "exhibitions.delete": "حذف المعرض",
   "exhibitions.deleting": "جارٍ الحذف…",
   "exhibitions.deleteWarning": "سيُحذف المعرض ومشاركاته وقيود المشاركة وصورة الغلاف نهائيًا. ستبقى منشورات الفنانين الأصلية محفوظة. لا يمكن التراجع عن هذا الإجراء.",

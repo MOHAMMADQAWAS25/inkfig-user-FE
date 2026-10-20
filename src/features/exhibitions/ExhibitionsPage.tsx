@@ -1,7 +1,6 @@
-import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   CalendarDays,
   Plus,
@@ -15,6 +14,8 @@ import { ExhibitionCard } from "./ExhibitionCard";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import { DeleteExhibitionDialog } from "./DeleteExhibitionDialog";
 import { useExhibitionLive } from "./useExhibitionLive";
+import { exhibitionEnd, exhibitionPeriod, type ExhibitionPeriod } from "./exhibitionPeriod";
+import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
 import {
   listExhibitions,
   getExhibition,
@@ -47,13 +48,15 @@ export function ExhibitionsPage() {
     session &&
     ["supervisor", "admin", "system_administrator"].includes(session.role),
   );
-  const [items, setItems] = useState<{upcoming:Exhibition[];past:Exhibition[]}>({upcoming:[],past:[]});
+  const [items, setItems] = useState<Record<ExhibitionPeriod,Exhibition[]>>({current:[],upcoming:[],past:[]});
   const [selected, setSelected] = useState<Exhibition | null>(null);
   const [cursor, setCursor] = useState<number | null>(null);
   const [pastCursor, setPastCursor] = useState<number | null>(null);
+  const [currentCursor, setCurrentCursor] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [subCursor, setSubCursor] = useState<number | null>(null);
+  const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const scope = "public";
   const [available, setAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -65,6 +68,7 @@ export function ExhibitionsPage() {
     name: "",
     description: "",
     event_at: "",
+    event_ends_at: "",
     participation_opens_at: "",
     participation_closes_at: "",
   });
@@ -83,14 +87,16 @@ export function ExhibitionsPage() {
     setError(cause instanceof Error ? cause.message : t("exhibitions.failed"));
   }
   async function loadSections() {
-    const [upcoming, past] = await Promise.all([
+    const [upcoming, past, current] = await Promise.all([
       listExhibitions(0, "upcoming"),
       listExhibitions(0, "past"),
+      listExhibitions(0, "current"),
     ]);
     return {
-      items: {upcoming:upcoming.items,past:past.items},
+      items: {upcoming:upcoming.items,past:past.items,current:current.items},
       upcomingCursor: upcoming.next_cursor,
       pastCursor: past.next_cursor,
+      currentCursor: current.next_cursor,
     };
   }
   useEffect(() => {
@@ -118,6 +124,7 @@ export function ExhibitionsPage() {
             setItems(page.items);
             setCursor(page.upcomingCursor);
             setPastCursor(page.pastCursor);
+            setCurrentCursor(page.currentCursor);
           }
         });
     request
@@ -136,6 +143,7 @@ export function ExhibitionsPage() {
     let active = true;
     setSubmissions([]);
     setSubCursor(null);
+    setSubmissionsLoading(true);
     getSubmissions(exhibitionId, scope)
       .then((page) => {
         if (active) {
@@ -145,7 +153,7 @@ export function ExhibitionsPage() {
       })
       .catch((cause) => {
         if (active) failure(cause);
-      });
+      }).finally(() => { if (active) setSubmissionsLoading(false); });
     return () => {
       active = false;
     };
@@ -187,6 +195,7 @@ export function ExhibitionsPage() {
       const data = {
         ...form,
         event_at: new Date(form.event_at).toISOString(),
+        event_ends_at: new Date(form.event_ends_at || "").toISOString(),
         participation_opens_at: new Date(
           form.participation_opens_at,
         ).toISOString(),
@@ -210,6 +219,7 @@ export function ExhibitionsPage() {
         setItems(page.items);
         setCursor(page.upcomingCursor);
         setPastCursor(page.pastCursor);
+        setCurrentCursor(page.currentCursor);
       }
     });
   }
@@ -222,6 +232,7 @@ export function ExhibitionsPage() {
             name: selected.name,
             description: selected.description,
             event_at: localDate(selected.event_at),
+            event_ends_at: localDate(exhibitionEnd(selected)),
             participation_opens_at: localDate(selected.participation_opens_at),
             participation_closes_at: localDate(
               selected.participation_closes_at,
@@ -231,6 +242,7 @@ export function ExhibitionsPage() {
             name: "",
             description: "",
             event_at: "",
+            event_ends_at: "",
             participation_opens_at: "",
             participation_closes_at: "",
           },
@@ -271,10 +283,10 @@ export function ExhibitionsPage() {
         ) : !selected && !exhibitionId ? (
           <>
             <p>{t("exhibitions.intro")}</p>
-            {(["upcoming", "past"] as const).map((period) => {
+            {(["current", "upcoming", "past"] as const).map((period: ExhibitionPeriod) => {
               const past = period === "past";
               const entries = items[period];
-              const next = past ? pastCursor : cursor;
+              const next = past ? pastCursor : period === "current" ? currentCursor : cursor;
               return (
                 <section
                   className="exhibition-period-section"
@@ -285,12 +297,12 @@ export function ExhibitionsPage() {
                     <span>
                       <CalendarDays size={20} aria-hidden="true" />
                       <h2 id={`exhibition-${period}-title`}>
-                        {t(past ? "exhibitions.past" : "exhibitions.upcoming")}
+                        {t(past ? "exhibitions.past" : period === "current" ? "exhibitions.current" : "exhibitions.upcoming")}
                       </h2>
                     </span>
                     <p>
                       {t(
-                        past
+                        period === "current" ? "exhibitions.currentHint" : past
                           ? "exhibitions.pastHint"
                           : "exhibitions.upcomingHint",
                       )}
@@ -302,13 +314,14 @@ export function ExhibitionsPage() {
                         key={item.exhibition_id}
                         exhibition={item}
                         past={past}
+                        current={period === "current"}
                       />
                     ))}
                   </div>
                   {!entries.length && (
                     <p className="exhibition-section-empty">
                       {t(
-                        past ? "exhibitions.noPast" : "exhibitions.noUpcoming",
+                        past ? "exhibitions.noPast" : period === "current" ? "exhibitions.noCurrent" : "exhibitions.noUpcoming",
                       )}
                     </p>
                   )}
@@ -317,7 +330,7 @@ export function ExhibitionsPage() {
                       disabled={busy}
                       className="pagination-load-more"
                       aria-label={t(
-                        past
+                        period === "current" ? "exhibitions.moreCurrent" : past
                           ? "exhibitions.morePast"
                           : "exhibitions.moreUpcoming",
                       )}
@@ -333,6 +346,7 @@ export function ExhibitionsPage() {
                             ).values(),
                           ]}));
                           if (past) setPastCursor(page.next_cursor);
+                          else if (period === "current") setCurrentCursor(page.next_cursor);
                           else setCursor(page.next_cursor);
                         })
                       }
@@ -347,13 +361,14 @@ export function ExhibitionsPage() {
         ) : (
           selected && (
             <>
-              <ExhibitionCard exhibition={selected} past={Date.parse(selected.event_at) <= Date.now()} detail>
+              {started ? <header className="exhibition-gallery-heading"><span className="exhibition-status">{t(exhibitionPeriod(selected, now) === "current" ? "exhibitions.currentBadge" : "exhibitions.past")}</span><h1>{selected.name}</h1></header> : <ExhibitionCard exhibition={selected} past={false} detail>
               <section className="exhibition-summary">
                 <dl>
                   <div>
                     <dt>{t("exhibitions.eventDate")}</dt>
                     <dd>{date(selected.event_at)}</dd>
                   </div>
+                  <div><dt>{t("exhibitions.ends")}</dt><dd>{date(exhibitionEnd(selected))}</dd></div>
                   <div>
                     <dt>{t("exhibitions.opens")}</dt>
                     <dd>{date(selected.participation_opens_at)}</dd>
@@ -364,38 +379,12 @@ export function ExhibitionsPage() {
                   </div>
                 </dl>
               </section>
-              </ExhibitionCard>
+              </ExhibitionCard>}
               {Date.parse(selected.event_at) <= now && <section className="exhibition-public-works" aria-label={t("exhibitions.works")}>
-              <div className="exhibitions-grid">
-                {submissions.map((item) => (
-                  <article className="exhibition-card" key={item.submission_id}>
-                    <Link to={`/${language}/artwork/${item.work_id}`} state={{ returnTo: `/${language}/exhibition/${selected.exhibition_id}` }}>
-                      <img {...artworkImageProtection}
-                        src={item.image_url}
-                        alt={item.title}
-                        loading="lazy"
-                      />
-                    </Link>
-                    <div>
-                      <h3>{item.title}</h3>
-                      <Link to={`/${language}/profile/${item.user_id}`}>
-                        {item.artist_name}
-                      </Link>
-                      <p className={`exhibition-status ${item.status}`}>
-                        {t(
-                          item.status === "approved"
-                            ? "exhibitions.approved"
-                            : item.status === "rejected"
-                              ? "exhibitions.rejected"
-                              : "exhibitions.pending",
-                        )}
-                      </p>
-                      {item.rejection_reason && <p>{item.rejection_reason}</p>}
-                    </div>
-                  </article>
-                ))}
+              <div className="exhibition-artwork-grid">
+                {submissions.map(item => <ExhibitionArtworkCard key={item.submission_id} item={item} exhibitionId={selected.exhibition_id}/>)}
               </div>
-              {!submissions.length && <p>{t("exhibitions.noSubmissions")}</p>}
+              {submissionsLoading ? <p role="status">{t("exhibitions.loading")}</p> : !submissions.length && <p>{t("exhibitions.noSubmissions")}</p>}
               {subCursor !== null && (
                 <button
                   className="pagination-load-more"
@@ -448,6 +437,7 @@ export function ExhibitionsPage() {
               {(
                 [
                   "event_at",
+                  "event_ends_at",
                   "participation_opens_at",
                   "participation_closes_at",
                 ] as const
@@ -456,14 +446,15 @@ export function ExhibitionsPage() {
                   {t(
                     index === 0
                       ? "exhibitions.eventDate"
-                      : index === 1
+                      : index === 1 ? "exhibitions.ends" : index === 2
                         ? "exhibitions.opens"
                         : "exhibitions.closes",
                   )}
                   <input
                     required
                     type="datetime-local"
-                    value={form[field]}
+                    value={form[field] || ""}
+                    min={field === "event_ends_at" ? form.event_at : undefined}
                     onChange={(event) =>
                       setForm({ ...form, [field]: event.target.value })
                     }

@@ -43,6 +43,13 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
+  it("shows persistent desktop home rail labels instead of hover tooltips",()=>{
+    const {container}=render(<MemoryRouter initialEntries={["/en"]}><AppSidebar/></MemoryRouter>);
+    const rail=container.querySelector(".app-sidebar-labeled")!;
+    expect(rail.querySelectorAll(".app-sidebar-label").length).toBeGreaterThanOrEqual(7);
+    expect(rail.querySelector("[data-tooltip]")).toBeNull();
+    expect(rail.querySelector(".app-sidebar-people-icon")).toBeTruthy();
+  });
   it("yields focus and dismissal to a native dialog opened above a slider",()=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name:"Notifications",exact:true}));

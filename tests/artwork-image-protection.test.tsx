@@ -51,7 +51,7 @@ it("covers profile, exhibition and moderation artwork while excluding local uplo
   const profile = source("profile/ProfilePage.tsx");
   expect(profile).toContain('<img {...artworkImageProtection} className="artwork-image"');
   expect(profile).toContain('<img {...artworkImageProtection} src={editing.image_url}');
-  expect(source("exhibitions/ExhibitionsPage.tsx")).toContain('<img {...artworkImageProtection}');
+  expect(source("exhibitions/ExhibitionArtworkCard.tsx")).toContain('<img {...artworkImageProtection}');
   const admin = source("admin/AdminReportsPage.tsx");
   expect(admin).toContain('item.target_type === "work" ? artworkImageProtection : {}');
   expect(admin).toContain('<img {...artworkImageProtection} className="moderation-preview"');

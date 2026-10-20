@@ -1,4 +1,5 @@
-import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, UserRound, X } from "lucide-react";
+import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, X } from "lucide-react";
+import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -64,6 +65,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
     }
     closeButtonRef.current?.focus();
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (document.querySelector('dialog[open]')) return;
       if (event.key === "Escape" && !event.defaultPrevented) requestClose();
       if (!mobile || event.key !== "Tab") return;
       const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>("*") ?? []).filter(element => element.matches('button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), video[controls], [tabindex="0"]'));
@@ -72,7 +74,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     const containFocus = (event: FocusEvent) => {
-      if (mobile && event.target instanceof Node && !dialogRef.current?.contains(event.target) && !document.querySelector('.report-dialog-backdrop, .moderation-dialog-backdrop')) closeButtonRef.current?.focus();
+      if (mobile && event.target instanceof Node && !dialogRef.current?.contains(event.target) && !document.querySelector('dialog[open], .report-dialog-backdrop, .moderation-dialog-backdrop')) closeButtonRef.current?.focus();
     };
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("focusin", containFocus);
@@ -103,7 +105,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           <h2 id="artwork-modal-title">{work.title}</h2>
           {extraDetails}
           <div className="artwork-modal-meta">
-            {readOnly ? <span className="artwork-modal-artist"><UserRound size={16}/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><UserRound size={16} />{t("home.by")} {work.artist_name}</Link>}
+            {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
             <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>
           </div>
           <div className="artwork-modal-description">

@@ -1,10 +1,27 @@
 import { Flag, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { usePageScrollLock } from "../layout/usePageScrollLock";
 import type { TranslationKey } from "../../i18n/resources";
 import { createReport, getReportingEligibility, type ReportReason } from "./reportsApi";
 
 const userReasons:ReportReason[]=["impersonation","harassment","spam","hate_speech","other"];
 const workReasons:ReportReason[]=["harassment","hate_speech","violence","spam","copyright","impersonation","other"];
+function ReportModal({ children, titleId, busy, onClose }: { children: ReactNode; titleId: string; busy: boolean; onClose: () => void }) {
+ const dialog = useRef<HTMLDialogElement>(null);
+ usePageScrollLock(true);
+ useEffect(() => {
+  const node = dialog.current, previous = document.activeElement as HTMLElement | null;
+  node?.showModal();
+  return () => { node?.close(); if(previous?.isConnected)previous.focus({preventScroll:true}); };
+ },[]);
+ useEffect(() => { dialog.current?.querySelector<HTMLElement>("button")?.focus(); },[titleId]);
+ return createPortal(<dialog ref={dialog} className="report-modal" aria-labelledby={titleId} onCancel={event=>{event.preventDefault();if(!busy)onClose();}} onClick={event=>{
+  if(event.target!==event.currentTarget||busy)return;
+  const bounds=event.currentTarget.getBoundingClientRect();
+  if(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom)onClose();
+ }}>{children}</dialog>,document.body);
+}
 export function ReportDialog({targetType,targetUserId,targetWorkId,onClose,t}:{targetType:"work"|"user";targetUserId:string;targetWorkId?:string;onClose:()=>void;t:(key:TranslationKey)=>string}){
  const [reason,setReason]=useState<ReportReason>(targetType==="user"?"impersonation":"harassment");const [details,setDetails]=useState("");const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [sent,setSent]=useState(false);
  const [eligibility,setEligibility]=useState<"loading"|"allowed"|"blocked"|"error">("loading");
@@ -14,9 +31,9 @@ export function ReportDialog({targetType,targetUserId,targetWorkId,onClose,t}:{t
  const detailsRequired=reason==="other";
  function reasonLabel(item:ReportReason){if(targetType==="user"&&item==="impersonation")return t("reports.userReason.impersonation");if(targetType==="user"&&item==="spam")return t("reports.userReason.spam");return t(`reports.reason.${item}` as TranslationKey);}
  async function submit(event:React.FormEvent){event.preventDefault();if(busy||eligibility!=="allowed")return;const normalizedDetails=details.trim().replace(/\s+/gu," ");if((detailsRequired&&!normalizedDetails)||(normalizedDetails&&Array.from(normalizedDetails).length<10)){setError(t("reports.detailsInvalid"));return;}setBusy(true);setError("");try{await createReport({targetType,targetUserId,targetWorkId,reasonCode:reason,details:normalizedDetails});setSent(true);}catch(error){if(error instanceof Error&&error.message.includes("reporting privileges")){setEligibility("blocked");}else{setError(error instanceof Error&&error.message.includes("already")?t("reports.duplicate"):t("reports.failed"));}}finally{setBusy(false)}}
- if(eligibility!=="allowed")return <div className="report-dialog-backdrop"><section className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-access-title"><h2 id="report-access-title">{t(eligibility==="blocked"?"reports.reportingBlocked":eligibility==="error"?"reports.failed":"reports.checkingAccess")}</h2>{eligibility==="error"&&<button type="button" onClick={()=>setAttempt(value=>value+1)}>{t("admin.refresh")}</button>}<button type="button" onClick={onClose}>{t("reports.cancel")}</button></section></div>;
- return <div className="report-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!busy&&onClose()}>
-  <form className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-dialog-title" onSubmit={submit}>
+ if(eligibility!=="allowed")return <ReportModal titleId="report-access-title" busy={busy} onClose={onClose}><section className="report-dialog"><h2 id="report-access-title">{t(eligibility==="blocked"?"reports.reportingBlocked":eligibility==="error"?"reports.failed":"reports.checkingAccess")}</h2>{eligibility==="error"&&<button type="button" onClick={()=>setAttempt(value=>value+1)}>{t("admin.refresh")}</button>}<button type="button" onClick={onClose}>{t("reports.cancel")}</button></section></ReportModal>;
+ return <ReportModal titleId="report-dialog-title" busy={busy} onClose={onClose}>
+  <form className="report-dialog" onSubmit={submit}>
    <button className="report-dialog-close" type="button" aria-label={t("reports.cancel")} disabled={busy} onClick={onClose}><X size={19}/></button>
    <span className="report-dialog-icon"><Flag size={24}/></span>
    <h2 id="report-dialog-title">{t(targetType==="work"?"reports.reportWork":"reports.reportUser")}</h2>
@@ -35,5 +52,5 @@ export function ReportDialog({targetType,targetUserId,targetWorkId,onClose,t}:{t
     <div className="report-dialog-actions"><button type="button" disabled={busy} onClick={onClose}>{t("reports.cancel")}</button><button className="danger-button" type="submit" disabled={busy}>{t(busy?"reports.submitting":"reports.submit")}</button></div>
    </>}
   </form>
- </div>;
+ </ReportModal>;
 }

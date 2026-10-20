@@ -10072,3 +10072,35 @@ Deploy user-system first, frontend next through existing main workflows. No migr
 ### Git
 
 Branch: fix/server-filtered-pagination. Subject: Use server-filtered pagination for administration lists. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hashes, push/merge/conflict and deployment results reported in handoff.
+
+## 2026-10-20 - Current exhibitions wall, home labels and fixed reporting
+
+### Request and changes
+
+- User chose an administrator-set exhibition end time. Added required end control to create/edit, using backend event_ends_at with legacy 24-hour fallback. Listing now has Current/Upcoming/Past with separate backend-filtered groups and cursors; current metadata includes end date. Start-inclusive/end-exclusive boundaries match backend. Incoming server-filtered pagination intent retained: loaded list rows are not reclassified/sorted by browser time.
+- Started exhibitions open with their name as page heading and no banner. Approved works appear in a distinct editorial grid: two large cards per desktop row, each with contain-fit artwork beside title, localized category, creator/avatar, description and publishing age. Whole-card links preserve dedicated artwork-page navigation/return origin and image interaction protection. Narrow screens adapt to one column/stacked sections. Subtle home-like hover/focus feedback, both themes, RTL and reduced-motion supported. Upcoming exhibition banner/details and all management/live/withdrawal behavior retained. Public list loading does not flash a false empty result.
+- Desktop home rail shows each icon's label below it instead of a tooltip; other routes and mobile three-button navigation unchanged. Badges, accessibility names, icon size and rail width retained; short-screen rail scrolling keeps all roles' controls reachable.
+- Shared ProfileAvatar shows a real picture or first initial for absent/failed pictures on artwork pages, existing modal previews and exhibition wall cards. Detail buttons gain restrained hover feedback with reduced-motion fallback. Existing feed performance, image sizing and heart/bookmark colors preserved.
+- ReportDialog now portals a native modal to document.body, independent of page transforms/navigation rail. Background is inert and scroll-locked from loading through allowed/blocked/error/success states; Cancel/Escape/backdrop, focus restoration and nested preview precedence retained. Compact two-column reasons and bounded textarea fit standard desktop/phone viewports without scrollbar/page movement. Safe internal overflow fallback on genuinely short/enlarged-content screens keeps fields reachable. Existing eligibility, duplicate/Other validation and server submission contracts retained.
+
+### Repositories and files
+
+All three repositories checked clean and pulled, retaining incoming artwork-page, media/color, reports and SEO changes. Matching feature/current-exhibition-gallery branches in frontend/main-system; user-system unchanged. Exhibition page/card/API, new ExhibitionArtworkCard/exhibitionPeriod, navigation, new profile/ProfileAvatar, artwork page/modal/CSS, report dialog, resources/styles, focused tests and this log.
+
+### API, database, permissions and scope
+
+Consumes companion main-system event_ends_at/current period and public description/category summary fields. Deploy migration 20261020_017_exhibition_end_time.sql/API first. No frontend dependencies, environment files, secrets, permission or SnapStart changes. Backend remains authoritative for management, approved public content and reporting. No live uploads/reviews/reports/deletions performed for verification.
+
+### Verification
+
+Pre-synchronization: 363 tests passed (91 Node/source and 272 component checks), strict TypeScript/Vite/SEO production build and git diff --check passed. New coverage includes date boundaries/legacy end, current pagination and no-banner wall, card navigation/metadata/initials, missing/broken detail avatars, home labels/no tooltips, native report portal/focus/scroll restoration and responsive bounds. Updated original-image coverage to its extracted card component and report tests to submit the inner form rather than the dialog wrapper; initial failures corrected. Final combined checks after synchronization recorded below/in handoff. Existing non-blocking bundle-size/jsdom notices remain.
+
+Headless Edge read-only fixtures of actual components/CSS checked light/dark desktop split-card wall, Arabic 390px stacked wall, desktop labels and native report modal. Desktop report measured 550px client/scroll height with page/body locked; Arabic phone dialog visibly fits all controls without scrolling. Visual review exposed generic exhibition rail overlap; corrected logical padding and rechecked. Fixture network blocked writes, used synthetic artwork/identities only; no physical-device certification. Temporary preview sources removed, no-refresh preview stopped, final build clears generated fixtures.
+
+### Deployment and Git
+
+Backend migration/API first, frontend existing Cloudflare workflow next. Branch: feature/current-exhibition-gallery. Commit subject: Build current exhibition gallery and refine artwork reporting. Fetch/rebase immediately before branch push, preserve concurrent server-pagination changes and both complete log entries, then previously authorized fast-forward main merge/push. Exact hashes, conflicts, final tests and production outcomes reported in handoff. Prior feature-log entries preserved.
+
+### Post-synchronization verification
+
+Rebased over 4840a3b server-filtered administration pagination. Resolved exhibition-page conflicts by extending the incoming separate server-owned groups/cursors with Current, retaining backend order and no browser-clock filtering. Preserved both entire feature-log entries in append order; resources/tests merged automatically. Complete combined verification passed: 375 tests (91 Node/source, 284 Vitest), strict TypeScript/Vite/SEO build and git diff --check. Companion backend migration/deployment run 39473166722 succeeded before frontend main publication. No failed checks bypassed; generated fixtures absent and preview stopped.

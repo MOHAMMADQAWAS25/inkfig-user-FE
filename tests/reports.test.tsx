@@ -7,7 +7,12 @@ import { translations as resources, type TranslationKey } from "../src/i18n/reso
 
 vi.mock("../src/features/reports/reportsApi", () => ({ createReport: vi.fn(), getReportingEligibility: vi.fn() }));
 afterEach(cleanup);
-beforeEach(() => { vi.clearAllMocks(); vi.mocked(createReport).mockResolvedValue(undefined); vi.mocked(getReportingEligibility).mockResolvedValue({allowed:true}); });
+beforeEach(() => {
+ vi.clearAllMocks(); vi.mocked(createReport).mockResolvedValue(undefined); vi.mocked(getReportingEligibility).mockResolvedValue({allowed:true});
+ Object.defineProperty(HTMLDialogElement.prototype,"showModal",{configurable:true,value:function(this:HTMLDialogElement){this.setAttribute("open","");}});
+ Object.defineProperty(HTMLDialogElement.prototype,"close",{configurable:true,value:function(this:HTMLDialogElement){this.removeAttribute("open");}});
+ vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
+});
 async function dialog(targetType: "user" | "work", language: "en" | "ar" = "en") {
   const view=render(<ReportDialog targetType={targetType} targetUserId="target" targetWorkId={targetType === "work" ? "work" : undefined}
     onClose={vi.fn()} t={(key: TranslationKey) => resources[language][key]} />);
@@ -15,6 +20,16 @@ async function dialog(targetType: "user" | "work", language: "en" | "ar" = "en")
 }
 
 describe("report reasons and required details", () => {
+  it("portals the native modal outside page layout and locks/restores background scroll",async()=>{
+    const close=vi.fn();const trigger=document.createElement("button");document.body.append(trigger);trigger.focus();
+    const view=render(<div className="app-page-with-sidebar"><ReportDialog targetType="work" targetUserId="target" onClose={close} t={key=>resources.en[key]}/></div>);
+    const modal=await screen.findByRole("dialog");
+    expect(modal.parentElement).toBe(document.body);
+    expect(modal.closest(".app-page-with-sidebar")).toBeNull();
+    expect(document.body.style.position).toBe("fixed");
+    fireEvent(modal,new Event("cancel",{cancelable:true}));expect(close).toHaveBeenCalledOnce();
+    view.unmount();expect(document.body.style.position).not.toBe("fixed");expect(document.activeElement).toBe(trigger);trigger.remove();
+  });
   it("shows blocked reporting access without allowing a submission",async()=>{
     vi.mocked(getReportingEligibility).mockResolvedValue({allowed:false});
     render(<ReportDialog targetType="user" targetUserId="target" onClose={vi.fn()} t={key=>resources.en[key]}/>);
@@ -33,13 +48,13 @@ describe("report reasons and required details", () => {
   it("handles a restriction imposed after the form was opened",async()=>{
     await dialog("work");
     vi.mocked(createReport).mockRejectedValue(new Error("Your reporting privileges have been blocked by an administrator."));
-    fireEvent.submit(screen.getByRole("dialog"));
+    fireEvent.submit(screen.getByRole("dialog").querySelector("form")!);
     await screen.findByText(resources.en["reports.reportingBlocked"]);
     expect(screen.queryByRole("radio")).toBeNull();
   });
   it("shows the duplicate error without a success message",async()=>{
     await dialog("user");vi.mocked(createReport).mockRejectedValue(new Error("You have already reported this subject."));
-    fireEvent.submit(screen.getByRole("dialog"));
+    fireEvent.submit(screen.getByRole("dialog").querySelector("form")!);
     await screen.findByText(resources.en["reports.duplicate"]);
     expect(screen.queryByText(resources.en["reports.success"])).toBeNull();
   });
@@ -66,12 +81,12 @@ describe("report reasons and required details", () => {
     expect(screen.getByText("Additional details (required)")).toBeTruthy();
     for (const value of ["", "    ", "short", "a     b"]) {
       fireEvent.change(textarea, {target:{value}});
-      fireEvent.submit(screen.getByRole("dialog"));
+      fireEvent.submit(screen.getByRole("dialog").querySelector("form")!);
       expect(createReport).not.toHaveBeenCalled();
       expect(screen.getByRole("alert").textContent).toContain("at least 10");
     }
     fireEvent.change(textarea, {target:{value:"  Please   check this  "}});
-    fireEvent.submit(screen.getByRole("dialog"));
+    fireEvent.submit(screen.getByRole("dialog").querySelector("form")!);
     await waitFor(() => expect(createReport).toHaveBeenCalledWith(expect.objectContaining({targetType:target,reasonCode:"other",details:"Please check this"})));
   });
   it("makes details optional again after leaving Other", async () => {
@@ -79,7 +94,7 @@ describe("report reasons and required details", () => {
     fireEvent.click(screen.getByRole("radio", {name:"Other"}));
     fireEvent.click(screen.getByRole("radio", {name:"Spam or scam"}));
     expect((screen.getByRole("textbox") as HTMLTextAreaElement).required).toBe(false);
-    fireEvent.submit(screen.getByRole("dialog"));
+    fireEvent.submit(screen.getByRole("dialog").querySelector("form")!);
     await waitFor(() => expect(createReport).toHaveBeenCalledWith(expect.objectContaining({reasonCode:"spam",details:""})));
   });
   it("localizes required details and user reasons in Arabic", async () => {

@@ -48,6 +48,12 @@ it("renders a full page, real metadata and existing homepage cards below", async
   expect(document.querySelector('.artwork-page-media-original')?.getAttribute("draggable")).toBe("false");
   expect(document.querySelector('.artwork-modal-media')).toBeNull();
 });
+it.each([null,"/broken.png"])("uses the artist initial for a missing or broken avatar (%s)",async url=>{
+ vi.mocked(getWork).mockResolvedValue({...sample,artist_avatar_url:url});
+ mount(); await screen.findByRole("heading",{name:sample.title});
+ if(url)fireEvent.error(document.querySelector(".artwork-page-creator img")!);
+ expect(document.querySelector(".artwork-page-creator .profile-avatar-initial")?.textContent).toBe("A");
+});
 
 it("paginates related artwork and navigates to another standalone page", async () => {
   mount();

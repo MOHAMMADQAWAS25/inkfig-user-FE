@@ -893,7 +893,7 @@ img { max-width: 100%; image-rendering: auto; }
 .app-sidebar-people-search,.app-sidebar-panel-button { display: grid; width: var(--nav-control-size); height: var(--nav-control-size); padding: 0; place-items: center; border: 1px solid transparent; border-radius: 14px; background: transparent; color: #59613c; cursor: pointer; transition: background-color 180ms ease,color 180ms ease,transform 180ms ease,border-color 180ms ease; }
 .app-sidebar-people-search:hover,.app-sidebar-panel-button:hover { border-color: rgb(97 125 43 / .22); background: rgb(97 125 43 / .1); color: #39431c; transform: translateY(-1px); }
 .app-sidebar-people-search.active,.app-sidebar-panel-button.active { border-color: rgb(97 125 43 / .34); background: #39431c; color: #fffdf0; box-shadow: 0 8px 20px rgb(57 67 28 / .2); }
-.app-sidebar-people-search > span { width: var(--nav-icon-size); height: var(--nav-icon-size); background: currentColor; -webkit-mask: url("./assets/user-avatar.png") center/contain no-repeat; mask: url("./assets/user-avatar.png") center/contain no-repeat; }
+.app-sidebar-people-search > .app-sidebar-people-icon, .app-sidebar-people-search > span:only-child { width: var(--nav-icon-size); height: var(--nav-icon-size); background: currentColor; -webkit-mask: url("./assets/user-avatar.png") center/contain no-repeat; mask: url("./assets/user-avatar.png") center/contain no-repeat; }
 .app-sidebar-people-search { color: #454d31; }
 .app-sidebar-logo img,.gallery-profile-menu > summary,.gallery-guest-avatar { transition: transform 180ms cubic-bezier(.22,.8,.24,1); }
 .app-sidebar-logo:hover img { transform: scale(1.13); }
@@ -2226,6 +2226,59 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .exhibition-back-button:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
 .exhibition-back-button:dir(rtl) svg { transform:scaleX(-1); }
 .exhibition-detail-card .exhibition-card-description { display:block; overflow:visible; white-space:pre-wrap; -webkit-line-clamp:unset; }
+/* An exhibition's public wall uses editorial split cards, not feed masonry. */
+.exhibitions-page.app-page-with-sidebar { padding-inline-start: calc(var(--app-rail-size) + 24px); padding-inline-end: 24px; }
+.exhibition-gallery-heading { margin-block: 24px 30px; }
+.exhibition-gallery-heading h1 { margin: 14px 0 0; font-size: clamp(2rem,4vw,3.5rem); line-height: 1.15; overflow-wrap: anywhere; }
+.exhibition-artwork-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+.exhibition-artwork-card { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); min-width: 0; min-height: 330px; overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--text); text-decoration: none; transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease; }
+.exhibition-artwork-media { min-width: 0; min-height: 300px; display: grid; place-items: center; overflow: hidden; background: var(--surface-raised); }
+.exhibition-artwork-media img { width: 100%; height: 100%; max-height: 440px; object-fit: contain; transition: transform 240ms ease, filter 200ms ease; }
+.exhibition-artwork-details { min-width: 0; padding: clamp(18px,2vw,28px); display: flex; align-items: flex-start; flex-direction: column; gap: 14px; border-inline-start: 1px solid var(--border); }
+.exhibition-artwork-details h3 { margin: 0; font-size: clamp(1.2rem,1.6vw,1.7rem); overflow-wrap: anywhere; }
+.exhibition-artwork-type { color: var(--primary); font-size: .72rem; font-weight: 750; letter-spacing: .04em; }
+.exhibition-artwork-artist { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; font-size: .85rem; }
+.exhibition-artwork-artist > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.profile-avatar-image { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; object-fit: cover; }
+.profile-avatar-initial { display: grid; place-items: center; background: var(--primary); color: var(--primary-ink); font-weight: 750; }
+.exhibition-artwork-details p { margin: 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; color: var(--muted); line-height: 1.6; font-size: .88rem; }
+.exhibition-artwork-details time { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .75rem; }
+.exhibition-artwork-open { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); color: var(--primary); font-size: .8rem; font-weight: 700; }
+.exhibition-artwork-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.artwork-modal-creator-avatar { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; object-fit: cover; }
+@media (hover:hover) and (pointer:fine) {
+  .exhibition-artwork-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 12px 30px rgb(25 36 12 / .15); }
+  .exhibition-artwork-card:hover img { transform: scale(1.035); filter: brightness(.96); }
+}
+@media (max-width:1100px) { .exhibition-artwork-grid { grid-template-columns: minmax(0,1fr); } }
+@media (max-width:480px) { .exhibition-artwork-card { grid-template-columns: minmax(0,1fr); }.exhibition-artwork-media { min-height: 220px; height: 260px; }.exhibition-artwork-details { border-inline-start: 0; border-top: 1px solid var(--border); } }
+@media (max-width:720px) { .exhibitions-page.app-page-with-sidebar { padding-inline: 12px; } }
+@media (prefers-reduced-motion:reduce) { .exhibition-artwork-card, .exhibition-artwork-media img { transition: none; }.exhibition-artwork-card:hover, .exhibition-artwork-card:hover img { transform: none; } }
+/* Labels replace hover tooltips on the desktop home rail. */
+@media (min-width:721px) {
+  .app-sidebar-labeled { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+  .app-sidebar-labeled .app-sidebar-nav { width: 100%; gap: 10px; margin-top: 12px; }
+  .app-sidebar-labeled .app-sidebar-nav > *, .app-sidebar-labeled .app-sidebar-settings { display: flex; position: relative; flex: 0 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 64px; height: auto; padding: 7px 2px; }
+  .app-sidebar-labeled .app-sidebar-label { display: block; max-width: 100%; font-size: .62rem; line-height: 1.25; font-weight: 650; overflow-wrap: anywhere; text-align: center; }
+  .app-sidebar-labeled .app-sidebar-settings { margin-top: auto; }
+  .app-sidebar-labeled [data-tooltip]::after { display: none; }
+}
+/* Native top-layer report modal is independent of the page's rail/transforms. */
+.report-modal { position: fixed; inset: 0; height: fit-content; width: min(560px,calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 0; margin: auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; border: 0; border-radius: 20px; background: var(--surface); color: var(--text); }
+.report-modal::backdrop { background: rgb(12 15 8 / .7); backdrop-filter: blur(5px); }
+.report-modal::-webkit-scrollbar { display: none; }
+.report-modal .report-dialog { width: 100%; max-height: none; overflow: visible; gap: 12px; padding: 22px; box-shadow: none; border-color: var(--border); }
+.report-modal .report-dialog-icon { width: 36px; height: 36px; }
+.report-modal .report-dialog h2 { font-size: 1.4rem; padding-inline-end: 28px; }
+.report-modal .report-dialog > p, .report-modal .report-dialog small { font-size: .82rem; }
+.report-modal .report-dialog fieldset { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+.report-modal .report-dialog fieldset label { padding: 8px; font-size: .82rem; }
+.report-modal .report-dialog textarea { height: 72px; min-height: 72px; resize: none; }
+.report-modal .report-dialog-actions button { min-height: 40px; }
+.report-modal button { transition: filter 160ms ease, transform 160ms ease; }
+@media (hover:hover) and (pointer:fine) { .report-modal button:hover:not(:disabled) { filter: brightness(.93); transform: translateY(-1px); } }
+@media (prefers-reduced-motion:reduce) { .report-modal button { transition: none; }.report-modal button:hover:not(:disabled) { transform: none; } }
+@media (max-width:360px), (max-height:620px) { .report-modal .report-dialog { gap: 8px; padding: 16px; }.report-modal .report-dialog-icon { display: none; }.report-modal .report-dialog fieldset label { padding: 6px; } }
 .exhibition-detail-card .exhibition-summary { border:0; border-radius:0; background:transparent; padding:0; margin-block:22px 0; overflow:visible; }
 .exhibition-detail-card .exhibition-summary dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-block:0 18px; }
 .exhibition-detail-card .exhibition-summary dl>div:first-child { grid-column:1 / -1; }

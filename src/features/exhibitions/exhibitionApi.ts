@@ -4,6 +4,7 @@ export type ExhibitionInput = {
   name: string;
   description: string;
   event_at: string;
+  event_ends_at?: string;
   participation_opens_at: string;
   participation_closes_at: string;
 };
@@ -21,6 +22,9 @@ export type Submission = {
   artist_name: string;
   artist_avatar_url?: string | null;
   title: string;
+  description?: string;
+  type_name_en?: string;
+  type_name_ar?: string;
   image_url: string;
   status: string;
   rejection_reason: string | null;
@@ -35,7 +39,7 @@ export type ExhibitionCounts={total:number;items:{exhibition_id:string;submissio
 export async function getExhibitionCounts(){return (await requestJson<ExhibitionCounts>(mainApiBaseUrl,"GET","/exhibitions/pending-counts")).data;}
 export async function listExhibitions(
   cursor = 0,
-  period: "all" | "upcoming" | "past" = "all",
+  period: "all" | "current" | "upcoming" | "past" = "all",
 ) {
   return (
     await requestJson<Page<Exhibition>>(
