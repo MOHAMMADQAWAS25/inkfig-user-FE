@@ -24,5 +24,7 @@ test("desktop report preview stays fixed while only the details column scrolls",
   assert.match(desktop, /\.moderation-detail-dialog \{ overflow-y:hidden/);
   assert.match(desktop, /\.moderation-detail-columns \{ min-height:0; max-height:calc\(100svh - 132px\)/);
   assert.match(desktop, /\.moderation-detail-media \{ position:relative; height:min\(65svh,620px,calc\(100svh - 132px\)\)/);
+  assert.match(desktop, /\.moderation-detail-media \{[^}]*align-self:center/);
+  assert.match(css, /\.moderation-detail-media \{[^}]*place-items:center/);
   assert.match(desktop, /\.moderation-detail-content \{[^}]*min-height:0[^}]*max-height:calc\(100svh - 132px\)[^}]*overflow-y:auto[^}]*scrollbar-gutter:stable/);
 });

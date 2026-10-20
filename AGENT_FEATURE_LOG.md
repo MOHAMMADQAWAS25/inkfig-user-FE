@@ -10170,3 +10170,25 @@ No API, migration, permission, dependency, secret, environment or SnapStart chan
 ### Deployment, rollback and Git
 
 Frontend existing main workflow only; no backend deployment/migration. Branch fix/report-reason-filters; subject Align report reason filters with selected report type. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and workflow outcomes in handoff. Revert only this ticket commit to undo, preserving fixed preview and unrelated work. Historical log entries unchanged.
+
+## 2026-10-20 - Center report popup preview column
+
+### Request and changes
+
+Vertically center the left artwork/profile preview within the desktop popup row using align-self:center. Existing inner horizontal/vertical image centering, bounded contain-fit preview, stationary left column, independent right-column scrolling, Arabic physical column placement and mobile stacking retained. No other styling or functionality changed.
+
+### Repositories and files
+
+inkfig-user-FE only: src/styles.css, tests/report-details-layout.test.mjs and this log. Clean main pulled and complete feature log read before editing; baseline a82be901381705e76d57089e9e3377ec88955ed7. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, permission, dependency, credential, environment or SnapStart changes. No production data mutations.
+
+### Verification
+
+380 checks passed (92 Node/source, 288 Vitest); strict TypeScript/Vite/SEO build and git diff --check passed. Regression assertions cover desktop preview self-centering and inner image centering alongside existing scroll bounds/mobile rules. No real-browser pixel certification; existing non-blocking bundle-size/jsdom warnings remain.
+
+### Deployment, rollback and Git
+
+Frontend main workflow only. Branch fix/report-preview-center; subject Center the report popup preview column. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore top alignment, preserving prior scrolling/filter changes. Historical entries untouched.
