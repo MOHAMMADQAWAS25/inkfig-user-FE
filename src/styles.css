@@ -1553,6 +1553,11 @@ img { max-width: 100%; image-rendering: auto; }
 .reports-admin-page .moderation-detail dd { overflow-wrap:anywhere; }
 .reports-admin-page .moderation-detail .moderation-reason { white-space:normal; line-height:1.4; }
 .reports-admin-page .moderation-actions button,.reports-admin-page .moderation-view-links a { min-height:42px; padding:9px; }
+.moderation-detail-dialog :is(.moderation-actions button,.moderation-view-links a,.moderation-detail-close) { transition:background-color 160ms ease,border-color 160ms ease,box-shadow 160ms ease; }
+.moderation-detail-dialog :is(.moderation-actions button,.moderation-view-links a,.moderation-detail-close):is(:hover,:focus-visible):not(:disabled) { background-color:color-mix(in srgb,var(--text) 8%,var(--surface)); box-shadow:0 2px 8px rgb(0 0 0 / .1); }
+.moderation-detail-dialog .moderation-actions button.danger:is(:hover,:focus-visible):not(:disabled) { background-color:color-mix(in srgb,currentColor 12%,var(--surface)); border-color:currentColor; }
+.moderation-detail-dialog :is(.moderation-actions button,.moderation-view-links a,.moderation-detail-close):focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+@media(prefers-reduced-motion:reduce){.moderation-detail-dialog :is(.moderation-actions button,.moderation-view-links a,.moderation-detail-close) { transition:none; }}
 .reports-admin-page .moderation-scope-note { margin:12px 0 0; }
 @media(max-width:1100px){.reports-admin-page .moderation-toolbar { align-items:stretch; }.reports-admin-page .moderation-filters { flex:1 1 100%; }}
 @media(max-width:600px){.reports-admin-page .moderation-toolbar { gap:12px; }.reports-admin-page .moderation-tabs { gap:6px; }.reports-admin-page .moderation-tabs button { padding-inline:9px; }.reports-admin-page .moderation-filters { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.reports-admin-page .moderation-filters select:last-child { grid-column:1 / -1; }.reports-admin-page .moderation-detail { padding:16px; }}

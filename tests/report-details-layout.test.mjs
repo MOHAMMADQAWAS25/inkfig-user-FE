@@ -2,6 +2,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+test("report popup controls have theme-aware hover, focus and reduced-motion states without activating disabled buttons", () => {
+  const css = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
+  assert.match(css, /\.moderation-detail-dialog :is\(\.moderation-actions button,\.moderation-view-links a,\.moderation-detail-close\) \{ transition:background-color 160ms/);
+  assert.match(css, /:is\(:hover,:focus-visible\):not\(:disabled\) \{ background-color:color-mix\(in srgb,var\(--text\) 8%,var\(--surface\)\)/);
+  assert.match(css, /button\.danger:is\(:hover,:focus-visible\):not\(:disabled\) \{[^}]*border-color:currentColor/);
+  assert.match(css, /\.moderation-detail-dialog[^\n]*:focus-visible \{ outline:2px solid currentColor/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)\{\.moderation-detail-dialog[^\n]*transition:none/);
+});
+
 test("report details use a bounded theme-aware native popup rather than a second table column", () => {
   const css = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
   const page = readFileSync(new URL("../src/features/admin/AdminReportsPage.tsx", import.meta.url), "utf8");

@@ -10214,3 +10214,25 @@ Frontend-only existing main workflow. Branch fix/exhibition-glow-and-sidebar-lab
 ### Post-synchronization verification
 
 Rebased over a82be90 report reason filtering. Only the feature-log append point conflicted; preserved both complete entries without altering previous history. Combined verification: 385 tests (94 Node/source, 291 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. No application conflict or unrelated change.
+
+## 2026-10-20 - Report details button hover feedback
+
+### Request and changes
+
+Added subtle 160ms theme-aware background/shadow feedback for report-detail action buttons, view links and close button. Destructive actions retain their red identity with tinted hover backgrounds/borders. Keyboard focus gets equivalent feedback and a visible outline; disabled buttons excluded and reduced-motion disables transitions. No movement/layout shift, handler, permission, preview, filter, mobile or localization changes.
+
+### Repositories and files
+
+inkfig-user-FE only: src/styles.css, tests/report-details-layout.test.mjs and this log. Clean main pulled and complete log read; baseline 34cb6ab984a45e4c9f905fa6a05b435c9cd3b158 includes incoming exhibition/navigation updates, preserved unchanged. Both backends unaffected.
+
+### API, database, permissions and scope
+
+No API, migration, dependency, permission, secret, environment or SnapStart changes. No production data mutations.
+
+### Verification
+
+386 checks passed (95 Node/source, 291 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Added regression checks for popup-scoped hover/focus, destructive treatment, disabled exclusion and reduced-motion support. Existing button-action/popup interaction tests pass. No real-browser pixel certification; existing non-blocking bundle-size/jsdom warnings remain.
+
+### Deployment, rollback and Git
+
+Frontend main workflow only. Branch fix/report-details-hover; subject Add hover feedback to report details controls. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit/push/conflict and deployment outcomes in handoff. Revert only this ticket commit to remove these hover styles without undoing prior changes. Historical entries preserved.
