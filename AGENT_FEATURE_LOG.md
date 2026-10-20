@@ -9992,3 +9992,29 @@ Frontend-only existing Cloudflare main workflow. No backend deployment, migratio
 ### Notes
 
 No guarantee or claim of a ranking change. Historical implementation record preserved. Deleted component remains recoverable from Git; no user content deleted. No backend/SnapStart changes.
+
+## 2026-10-20 - Hide upload category warning during loading
+
+### Request and changes
+
+Remove the brief Work types have not been configured message while category data is still loading. UploadWorkPage now distinguishes loading, successful readiness and failure. Loading renders neither warning nor error; a successful empty list alone shows the existing no-types message. Failure shows the existing localized load error with Retry, which clears the error immediately and restarts loading. Publish remains disabled until types are ready. Request completion is ignored after effect cleanup/unmount. Category data is already bilingual, so changing translation-function identity no longer refetches categories or restarts loading.
+
+### Repositories and files
+
+Frontend only: src/features/works/UploadWorkPage.tsx, new tests/upload-types-loading.test.tsx and this log. Clean main pulled and complete feature log read before changes. Baseline a91123177d1169bcc95906006b4503f572eaa647; retained incoming SEO/disclosure changes. Both backends unchanged. No upload styles/layout, file handling, category selection, publication or exhibition flow changes.
+
+### API, database, permissions and SnapStart
+
+No API contract, migration, storage/data, permissions, dependencies, configuration, credential or backend SnapStart changes. Uses the existing categories GET and English/Arabic message/retry strings. Existing backend remains authoritative for upload validation and authorization.
+
+### Verification
+
+345 frontend tests passed (88 Node/source checks and 257 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. Five new cases cover pending English/Arabic requests without warnings, successful empty data, failure/retry/recovery and stale completion after unmount. Existing upload/file preview/exhibition interaction regressions passed (60 targeted checks including new cases). Existing non-blocking bundle-size and jsdom scrollTo warnings remain. No real upload or production data mutations performed; no interactive browser review claimed.
+
+### Deployment and rollback
+
+Frontend-only existing main deployment workflow; no backend deployment or migration required. Revert this ticket's focused commit to restore the previous behavior, preserving unrelated changes and historical logs. Baseline is for reference, not a reset target.
+
+### Git
+
+Branch: fix/upload-types-loading. Commit subject: Hide upload category warning while loading. Fetch/rebase origin/main before branch push, then previously authorized fast-forward main merge/push. Exact commit hash, push/merge/conflict and workflow results reported in handoff.
