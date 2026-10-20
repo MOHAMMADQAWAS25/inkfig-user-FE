@@ -9854,3 +9854,76 @@ Computer-use skill/browser inventory returned no apps or browsers, so interactiv
 ### Deployment, Git and reversal
 
 Frontend-only existing main deployment workflow; no backend deployment/migration. Subject: Fix artwork page image fitting with isolated viewer. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and deployment result reported in final handoff. Revert only this ticket commit and redeploy to restore prior viewer behavior, keeping earlier red/yellow icons, related logic and unrelated work. Historical entries preserved.
+
+## 2026-10-20 - Strengthen InkFig brand recognition
+
+### Request
+
+Improve the website's association with the InkFig brand, rather than only its inkfig-hu domain, without promising Google ranking or timing.
+
+### Changes
+
+- Added one shared preferred brand name, InkFig, with InkFig-HU, inkfig-hu and InkFig Hebron University alternatives. Build-time and client WebSite structured data now use the same names and stable website ID.
+- Added a compact, expandable About InkFig introduction in English and Arabic with an honest graduation-project description and public gallery/exhibition links. The same introduction exists in initial homepage HTML and React; no crawler-only or fabricated content.
+- Preserved gallery cards, search, public indexing rules, canonicals, hreflang, sitemap scope, private routes and all backend behavior. This is not full SSR or artwork-level indexing.
+
+### Repositories
+
+- `inkfig-user-FE`: public homepage brand signals, tests and indexing documentation. Both backend repositories unchanged.
+
+### Files
+
+- `src/seo/brand.json`: shared brand names and localized introduction.
+- `src/seo/BrandIntroduction.tsx`: expandable, keyboard-accessible homepage introduction.
+- `src/features/home/HomePage.tsx`: mounts the introduction before gallery filters.
+- `src/seo/PageMetadata.tsx`: consistent client WebSite identity.
+- `scripts/build-seo.mjs`: initial localized introduction and matching structured data.
+- `src/styles.css`: compact responsive, theme-aware introduction styling.
+- `tests/seo-build.test.mjs`, `tests/seo.test.tsx`: generated/client brand identity, localization and disclosure regressions.
+- `docs/search-indexing.md`: brand configuration, owner recrawl and query-monitoring handoff.
+- `AGENT_FEATURE_LOG.md`: appended ticket record; earlier entries retained.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required. No database, storage, data or vector changes.
+
+### Permissions and scope
+
+- Introduction contains public, non-personal information, available to all visitors.
+- No permissions, roles or access scopes changed. Backend authorization remains authoritative and unchanged.
+
+### Frontend
+
+- English/Arabic homepage has a native collapsed About InkFig disclosure, heading, description and public links. Logical spacing, wrapping and existing light/dark tokens retained.
+- No form, modal, loading, error, feed pagination or navigation behavior changed. Static initial content is replaced by the normal React root, not duplicated.
+
+### Verification
+
+- `[passed] npm.cmd test -- --pool=threads --maxWorkers=2` - 87 Node/source checks and 254 component tests (341 total).
+- `[passed] npm.cmd run build` - strict TypeScript checks, Vite and SEO generation.
+- `[passed] node --test tests/seo-build.test.mjs`
+- `[passed] vitest run tests/seo.test.tsx --pool=threads --maxWorkers=1` - 14 SEO tests.
+- `[passed] generated root/en/ar HTML inspection` - introduction and brand aliases present; exhibition listing does not inherit the introduction.
+- `[passed] git diff --check`
+- `[failed] initial forks-worker verification` - worker startup timeout; complete suite passed with thread workers without changing test configuration.
+- `[failed] initial inline Node artifact inspection` - PowerShell quote handling; repeated successfully with native PowerShell inspection.
+- `[not run] interactive browser and signed-in Search Console checks` - browser controls/account session unavailable; no ranking outcome claimed.
+
+### Deployment
+
+- Existing main-branch frontend Cloudflare workflow; no backend deployment, migration, environment or dependency changes.
+- Owner can inspect root/localized homepages and request recrawling in Search Console after deployment. External social/university links require owner coordination and were not created.
+
+### Git
+
+- Branch: `main`
+- Commit: `406def6cdd954312ce00e777d55208e358307599` (implementation; log recorded separately).
+- Push: `successful` - implementation synchronized and pushed to origin/main without conflicts.
+
+### Notes
+
+Google controls indexing, site-name selection and ranking. No guarantee of appearing equally high for inkfig and inkfig-hu. No Search Console settings, DNS, analytics, social profiles or external endorsements changed. Existing non-blocking Vite bundle warning and jsdom scrollTo notices remain. No backend/SnapStart changes.
