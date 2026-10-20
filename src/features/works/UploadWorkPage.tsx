@@ -10,6 +10,7 @@ import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { getEligibleExhibitions, submitWork } from "../exhibitions/exhibitionApi";
 import { WorkTypePicker } from "./WorkTypePicker";
+import { WorkImageDimensionsError } from "./workImageDimensions";
 
 export function UploadWorkPage() {
  const {session}=useAuth(); const {language,t}=useI18n(); const navigate=useNavigate();
@@ -45,7 +46,7 @@ export function UploadWorkPage() {
    setFile(selected);setPreviewFile(selected);return true;
  }
  function updateLink(index:number,field:"label"|"url",value:string){setLinks(current=>current.map((link,i)=>i===index?{...link,[field]:value}:link));}
- async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(`/${language}`);}catch(cause){setError(cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
+ async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(`/${language}`);}catch(cause){setError(cause instanceof WorkImageDimensionsError?t(cause.issue==="too-small"?"works.imageTooSmall":"works.invalidImage"):cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
  return <main className="upload-page app-page-with-sidebar"><AppSidebar/>
    <form className="upload-workspace form-stack" onSubmit={submit} aria-labelledby="upload-title">
      <div className="upload-details-column"><section className="upload-card upload-details">
@@ -68,6 +69,7 @@ export function UploadWorkPage() {
          </button>
          <input ref={fileInputRef} className="sr-only" tabIndex={-1} id="artwork-file" disabled={busy} accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" type="file" onChange={handleFileChange}/>
          <small id="upload-file-hint">{t("works.fileFormats")}</small>
+         <small>{t("works.minimumDimensions")}</small>
          {previewFile&&<small className="work-file-name">{previewFile.name} · {(previewFile.size/1024/1024).toFixed(1)} MB</small>}
        </div>
        <fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>

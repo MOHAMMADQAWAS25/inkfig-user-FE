@@ -10236,3 +10236,69 @@ No API, migration, dependency, permission, secret, environment or SnapStart chan
 ### Deployment, rollback and Git
 
 Frontend main workflow only. Branch fix/report-details-hover; subject Add hover feedback to report details controls. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit/push/conflict and deployment outcomes in handoff. Revert only this ticket commit to remove these hover styles without undoing prior changes. Historical entries preserved.
+
+## 2026-10-20 - Minimum artwork upload dimensions
+
+### Request
+
+Require at least 200 pixels width and 300 pixels height for new artwork uploads, accepting exactly 200 x 300.
+
+### Changes
+
+- Decode selected images before uploadWork creates any backend draft/storage upload. Both minimum dimensions are inclusive and independent; unreadable images/timeouts fail with cleanup of object URLs/handlers/timers.
+- Normal and exhibition upload pages show the minimum hint and localized errors; rejected uploads release busy state and never submit exhibition membership.
+- Retained file-size/type/link validation, video-preview-only behavior, previews, signed uploads, successful publication flow and exhibition membership retry. Existing images, banners and avatars unchanged.
+- No changes to card widths, responsive feed, search, metadata or other UI.
+
+### Repositories
+
+- `inkfig-user-FE`: preflight validation, messages and tests.
+- `inkfig-main-system`: matching authoritative publication validation.
+
+### Files
+
+- `src/features/works/workImageDimensions.ts`: actual-image check, inclusive constants, typed errors, timeout/URL cleanup.
+- `src/features/works/worksApi.ts`: validates before creating drafts or uploading bytes.
+- `src/features/works/UploadWorkPage.tsx`: translates dimension/read failures and displays minimum hint.
+- `src/i18n/resources.ts`: English/Arabic width/height hints and errors.
+- `tests/work-image-dimensions.test.ts`: boundary, either-dimension failure, no orientation swap, decode failure/timeout, cleanup and no backend request on rejection.
+- `tests/gallery-interactions.test.tsx`: normal/exhibition error, retry-state and no submission regressions.
+- `AGENT_FEATURE_LOG.md`: appended ticket entry.
+
+### API
+
+No request/response shape changes. Companion `POST /api/v1/works/{id}/publish` returns dedicated 422 for undersized actual images. Backend validation remains mandatory for older/bypassing clients.
+
+### Database
+
+No migration required. No schema, indexes, data, storage deletion or backfill changes.
+
+### Permissions and scope
+
+Existing signed-in works.upload permission, ownership and exhibition-eligibility checks unchanged and enforced by backend. No role/scope changes. Minimum applies to newly uploaded artwork only, not existing assignments, profile images or banners.
+
+### Frontend
+
+Shared upload page shows width >=200 and height >=300 in English/Arabic. Submit checks before backend draft/storage creation and preserves chosen image/form on failure. Read timeout is 15 seconds to prevent stuck loading. Exactly 200 x 300 passes; 300 x 200 fails.
+
+### Verification
+
+- `[passed] final npm.cmd test -- --pool=threads --maxWorkers=2` - 95 Node/source checks and 303 component checks (398 total), including both final UI regressions.
+- `[passed] targeted minimum-dimensions test` - 10 checks.
+- `[passed] npm.cmd run build` - strict TypeScript, Vite and SEO generation after the expanded suite.
+- `[passed] git diff --check`
+- `[not run] interactive browser/real upload` - no real storage, account or provider writes. Existing non-blocking bundle warning/jsdom scrollTo notices remain.
+
+### Deployment
+
+Deploy companion main backend then frontend via existing main workflows. No migration, user-system deployment, dependencies, environment or configuration changes.
+
+### Git
+
+- Branch: `main`
+- Commit: ticket subject `Validate minimum artwork image size before upload` (hash in handoff).
+- Push: pending final synchronization at entry creation; result reported in handoff.
+
+### Notes
+
+Followed backend architecture skill for companion changes; shared pure domain rule and existing HTTP/service/processor boundaries retained. No backend SnapStart effects from browser validation. Original uploaded files and prior feature-log history preserved.

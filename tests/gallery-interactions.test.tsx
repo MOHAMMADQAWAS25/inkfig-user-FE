@@ -6,6 +6,7 @@ import { translations } from "../src/i18n/resources";
 import { relativeTime } from "../src/lib/relativeTime";
 import { AppSidebar } from "../src/features/navigation/AppSidebar";
 import { UploadWorkPage } from "../src/features/works/UploadWorkPage";
+import { WorkImageDimensionsError } from "../src/features/works/workImageDimensions";
 import { HomePage } from "../src/features/home/HomePage";
 import { PostCard } from "../src/features/feed/PostCard";
 import { ArtworkDetailModal } from "../src/features/home/ArtworkDetailModal";
@@ -401,6 +402,20 @@ describe("upload preview and card reset",()=>{
     expect(uploadWork).toHaveBeenCalledTimes(1);
     expect(getEligibleExhibitions).toHaveBeenCalledWith(0,undefined,"event");
     expect(container.querySelector('input[type="file"]')?.hasAttribute("multiple")).toBe(false);
+  });
+  it.each(["/en/upload", "/en/upload?exhibition=event"])("shows the minimum-resolution error without submitting a work in %s", async route => {
+    vi.mocked(uploadWork).mockRejectedValueOnce(new WorkImageDimensionsError("too-small"));
+    const { container } = render(<MemoryRouter initialEntries={[route]}><UploadWorkPage/></MemoryRouter>);
+    await screen.findByRole("radio", { name:"Digital art" });
+    if (route.includes("exhibition")) await screen.findByText("Spring exhibition");
+    expect(screen.getByText(translations.en["works.minimumDimensions"])).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Artwork image"), { target:{ files:[new File(["small"], "small.png", { type:"image/png" })] } });
+    fireEvent.change(screen.getByRole("textbox", { name:translations.en["works.title"] }), { target:{ value:"Small artwork" } });
+    fireEvent.click(screen.getByRole("radio", { name:"Digital art" }));
+    fireEvent.submit(container.querySelector("form")!);
+    expect((await screen.findByRole("alert")).textContent).toBe(translations.en["works.imageTooSmall"]);
+    expect(submitWork).not.toHaveBeenCalled();
+    expect(screen.getByRole<HTMLButtonElement>("button", { name:translations.en[route.includes("exhibition") ? "exhibitions.submit" : "works.publish"] }).disabled).toBe(false);
   });
   it("previews an image and revokes its object URL on unmount",async()=>{
     const view=render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);

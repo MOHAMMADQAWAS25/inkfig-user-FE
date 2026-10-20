@@ -1,4 +1,5 @@
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
+import { validateWorkImageDimensions } from "./workImageDimensions";
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
@@ -63,6 +64,7 @@ export async function getSavedWorks(cursor?:string): Promise<WorkPage> { return 
 export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
 export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<string> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
+  await validateWorkImageDimensions(input.file);
   const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label.trim()||null}));
   if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
   const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {body:{type_id:input.typeId,title:input.title,description:input.description,links,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
