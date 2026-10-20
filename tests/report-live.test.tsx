@@ -1,5 +1,5 @@
 import React from "react";
-import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -7,8 +7,9 @@ import { useReportCount } from "../src/features/reports/useReportCount";
 import { useReportsLive } from "../src/features/reports/useReportsLive";
 import { AppSidebar } from "../src/features/navigation/AppSidebar";
 import { AdminReportsPage } from "../src/features/admin/AdminReportsPage";
-import { getPendingReportCount, getReports, setReporterRestriction, type ReportItem } from "../src/features/reports/reportsApi";
+import { getPendingReportCount, getReports, reviewReport, setReporterRestriction, type ReportItem } from "../src/features/reports/reportsApi";
 import { translations } from "../src/i18n/resources";
+import { getWork } from "../src/features/works/worksApi";
 
 const state=vi.hoisted(()=>({permissions:["reports.manage"] as string[]}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"manager",role:"admin",permissions:state.permissions},signOut:vi.fn()})}));
@@ -40,6 +41,9 @@ beforeEach(()=>{
   vi.mocked(getPendingReportCount).mockResolvedValue({pending_count:4});
   vi.mocked(getReports).mockResolvedValue({items:[],next_cursor:null});
   vi.mocked(setReporterRestriction).mockResolvedValue(undefined);
+  Object.defineProperty(HTMLDialogElement.prototype,"showModal",{configurable:true,value:vi.fn(function(this:HTMLDialogElement){this.setAttribute("open","");})});
+  Object.defineProperty(HTMLDialogElement.prototype,"close",{configurable:true,value:vi.fn(function(this:HTMLDialogElement){this.removeAttribute("open");})});
+  vi.spyOn(window,"scrollTo").mockImplementation(()=>undefined);
 });
 afterEach(()=>{cleanup();for(const client of clients)client.clear();clients.length=0;vi.restoreAllMocks();vi.unstubAllGlobals();});
 const signal=()=>window.dispatchEvent(new Event("inkfig:reports-changed"));
@@ -108,4 +112,96 @@ it("blocks and restores the reporter, not the reported target",async()=>{
   await waitFor(()=>expect(setReporterRestriction).toHaveBeenCalledWith("reporter",true));
   fireEvent.click(await screen.findByRole("button",{name:translations.en["reports.unblockReporter"]}));
   await waitFor(()=>expect(setReporterRestriction).toHaveBeenCalledWith("reporter",false));
+});
+
+async function openReport(item=report) {
+  vi.mocked(getReports).mockResolvedValue({items:[item],next_cursor:null});
+  const view=render(<AdminReportsPage/>,{wrapper});
+  await waitFor(()=>expect(view.container.querySelector(".moderation-target")).not.toBeNull());
+  const trigger=view.container.querySelector<HTMLButtonElement>(".moderation-target")!;
+  fireEvent.click(trigger);
+  return {...view,trigger,dialog:screen.getByRole("dialog",{name:translations.en["reports.detailsTitle"]})};
+}
+
+it("opens report details in a native popup without shrinking/reloading the table and restores focus",async()=>{
+  const {container,trigger,dialog}=await openReport();
+  expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalledOnce();
+  expect(container.querySelector(".moderation-layout.has-selection")).toBeNull();
+  expect(container.querySelector("aside.moderation-detail")).toBeNull();
+  expect(dialog.getAttribute("aria-modal")).toBe("true");
+  expect(document.body.style.position).toBe("fixed");
+  const close=within(dialog).getByRole("button",{name:translations.en["reports.closeDetails"]});
+  expect(document.activeElement).toBe(close);
+  expect(within(dialog).queryByRole("button",{name:translations.en["reports.suspendUser"]})).toBeNull();
+  fireEvent.click(close);
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(trigger);
+  expect(document.body.style.position).toBe("");
+  expect(getReports).toHaveBeenCalledOnce();
+  expect(container.querySelector(".moderation-target")).toBe(trigger);
+});
+
+it("closes on native Escape cancellation without applying a moderation action",async()=>{
+  const {dialog}=await openReport();
+  fireEvent(dialog,new Event("cancel",{cancelable:true}));
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(reviewReport).not.toHaveBeenCalled();
+});
+
+it("closes only for backdrop clicks, not dialog content or its inside padding",async()=>{
+  const {dialog}=await openReport();
+  vi.spyOn(dialog,"getBoundingClientRect").mockReturnValue({left:100,right:600,top:100,bottom:700} as DOMRect);
+  fireEvent.click(within(dialog).getByRole("heading",{name:translations.en["reports.detailsTitle"]}));
+  fireEvent.click(dialog,{clientX:120,clientY:120});
+  expect(screen.getByRole("dialog")).toBe(dialog);
+  fireEvent.click(dialog,{clientX:20,clientY:20});
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+it("prevents dismissal during review and closes cleanly when the reviewed row leaves the pending filter",async()=>{
+  let finish!:()=>void;
+  vi.mocked(reviewReport).mockReturnValueOnce(new Promise<void>(resolve=>{finish=resolve;}));
+  const {dialog}=await openReport();
+  fireEvent.click(within(dialog).getByRole("button",{name:translations.en["reports.markReviewed"]}));
+  const close=within(dialog).getByRole<HTMLButtonElement>("button",{name:translations.en["reports.closeDetails"]});
+  expect(close.disabled).toBe(true);
+  fireEvent(dialog,new Event("cancel",{cancelable:true}));
+  fireEvent.click(dialog,{clientX:-1,clientY:-1});
+  expect(screen.getByRole("dialog")).toBe(dialog);
+  await act(async()=>finish());
+  expect(reviewReport).toHaveBeenCalledWith("report","reviewed");
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.body.style.position).toBe("");
+});
+
+it("shows moderation errors inside the popup rather than behind it",async()=>{
+  vi.mocked(reviewReport).mockRejectedValueOnce(new Error("Offline"));
+  const {dialog}=await openReport();
+  fireEvent.click(within(dialog).getByRole("button",{name:translations.en["reports.markReviewed"]}));
+  expect((await within(dialog).findByRole("alert")).textContent).toBe(translations.en["reports.actionFailed"]);
+  expect(screen.getAllByRole("alert")).toHaveLength(1);
+});
+
+it("keeps work deletion and account suspension controls permission-gated inside the popup",async()=>{
+  state.permissions=["reports.manage","works.delete_any","users.status.manage"];
+  vi.mocked(getWork).mockResolvedValue({work_id:"work",image_url:"/art.png",title:"Reported artwork",type_name_en:"Digital Art"} as Awaited<ReturnType<typeof getWork>>);
+  const {dialog}=await openReport({...report,target_type:"work",target_work_id:"work",target_work_title:"Reported artwork"});
+  expect(within(dialog).getByRole("button",{name:translations.en["reports.deleteWork"]})).toBeTruthy();
+  expect(within(dialog).getByRole("button",{name:translations.en["reports.suspendUser"]})).toBeTruthy();
+  expect(within(dialog).getByRole("link",{name:translations.en["reports.viewPost"]}).getAttribute("href")).toContain("work=work");
+});
+
+it("preserves selected filters and loaded pages when the popup closes",async()=>{
+  const second={...report,report_id:"second",target_user_name:"Second target"};
+  vi.mocked(getReports).mockResolvedValueOnce({items:[report],next_cursor:25}).mockResolvedValueOnce({items:[second],next_cursor:null});
+  const view=render(<AdminReportsPage/>,{wrapper});
+  fireEvent.click(await screen.findByRole("button",{name:translations.en["reports.loadMore"]}));
+  await waitFor(()=>expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2));
+  const reason=screen.getByRole<HTMLSelectElement>("combobox",{name:translations.en["reports.reason"]});
+  fireEvent.change(reason,{target:{value:"spam"}});
+  fireEvent.click(view.container.querySelectorAll(".moderation-target")[1]);
+  fireEvent.click(screen.getByRole("button",{name:translations.en["reports.closeDetails"]}));
+  expect(reason.value).toBe("spam");
+  expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2);
+  expect(getReports).toHaveBeenCalledTimes(2);
 });

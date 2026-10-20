@@ -10018,3 +10018,27 @@ Frontend-only existing main deployment workflow; no backend deployment or migrat
 ### Git
 
 Branch: fix/upload-types-loading. Commit subject: Hide upload category warning while loading. Fetch/rebase origin/main before branch push, then previously authorized fast-forward main merge/push. Exact commit hash, push/merge/conflict and workflow results reported in handoff.
+
+## 2026-10-20 - Report details in a centered popup
+
+### Request and changes
+
+Replace the selected report side panel with a centered popup while retaining existing information/actions and queue state. Added ReportDetailsDialog using native showModal/top-layer focus containment and background inertness, shared page scroll lock/restoration, focus on X and restoration to the opening report button. X, native Escape cancellation and backdrop clicks dismiss; clicks inside content/padding do not. Closing is blocked while a moderation action is pending. Dialog height is content-fit and viewport-bounded with internal scrolling, responsive width, theme colors and logical direction support.
+
+AdminReportsPage keeps the queue full-width instead of adding has-selection; selected report content/action handlers remain in place inside the dialog. Row activation focuses the opening button and exposes aria-haspopup=dialog. Existing filters, loaded pages, sort and pagination stay mounted. Errors/notices render inside the popup while selected, otherwise on the page. Existing filtering still removes resolved rows and closes their details when no longer visible. Reporter restriction, review/dismiss, deletion and suspension authorization and confirmation logic unchanged.
+
+### Repositories and files
+
+Frontend only: src/features/admin/AdminReportsPage.tsx, new src/features/reports/ReportDetailsDialog.tsx, scoped popup rules in src/styles.css, tests/report-live.test.tsx, new tests/report-details-layout.test.mjs, docs/report-moderation.md and this log. Clean main pulled; complete feature log read. Baseline 63a18865e1c9169dca50359c704be399d19df5f6. Both backends unchanged.
+
+### API, database, permissions and SnapStart
+
+No API contract, migration, data/storage mutation, permissions, dependencies, configuration, secrets or backend SnapStart changes. Backend remains authoritative for administration. English/Arabic strings, report preview image protection, list/live-update behavior and existing moderation controls retained; no public artwork or other popup changes.
+
+### Verification and limitations
+
+353 frontend tests passed (89 Node/source checks and 264 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. Seven added interaction cases cover modal/table behavior, focus/scroll-lock restoration, native cancel, backdrop versus inside clicks, pending-action dismissal guard, action errors, permission-gated controls and preserved loaded pages/filters. Existing reporter block/restore test passes inside popup. Layout regression checks bounded/theme-aware dialog, scroll lock/showModal and absence of side-panel activation. Native dialog APIs mocked in jsdom; no real-browser focus trap/pixel-layout or physical-device review claimed. No production moderation action or data mutation used for testing. Existing non-blocking bundle-size and jsdom scrollTo warnings remain.
+
+### Deployment, rollback and Git
+
+Frontend-only existing main deployment workflow; no backend deployment/migration. Branch: fix/report-details-popup. Commit subject: Open report details in a modal popup. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and workflow outcome reported in final handoff. Revert only this ticket commit and redeploy frontend to restore the side panel, preserving other work; rollback scope/baseline recorded in docs/report-moderation.md. Historical entries preserved.

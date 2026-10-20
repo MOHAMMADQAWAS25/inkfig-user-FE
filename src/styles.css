@@ -1135,7 +1135,6 @@ img { max-width: 100%; image-rendering: auto; }
 .moderation-tabs button span { padding:2px 8px; border-radius:999px; background:rgb(97 125 43 / .16); font-size:.8rem; }
 .moderation-filters select { min-height:40px; max-width:220px; padding:0 12px; border:1px solid #b4bf91; border-radius:9px; background:#fffdf0; color:#39431c; font:inherit; font-size:.85rem; }
 .moderation-layout { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:16px; }
-.moderation-layout.has-selection { grid-template-columns:minmax(0,1fr) minmax(290px,350px); }
 .moderation-table-panel,.moderation-detail { overflow:hidden; border:1px solid #c7ceac; border-radius:15px; background:rgb(255 253 240 / .8); }
 .moderation-table-scroll { overflow-x:auto; }
 .moderation-table { width:100%; border-collapse:collapse; font-size:.84rem; }
@@ -1531,6 +1530,10 @@ img { max-width: 100%; image-rendering: auto; }
 .reports-admin-page .moderation-target > span:last-child { max-width:230px; overflow-wrap:anywhere; }
 .reports-admin-page .moderation-table-footer { min-height:68px; padding:16px; flex-wrap:wrap; }
 .reports-admin-page .moderation-detail { padding:20px; gap:16px; }
+.reports-admin-page .moderation-detail-dialog { position:fixed; inset:0; top:0; margin:auto; width:min(700px,calc(100% - 32px)); max-width:none; height:fit-content; max-height:calc(100svh - 40px); box-sizing:border-box; overflow-y:auto; overflow-wrap:anywhere; overscroll-behavior:contain; color:var(--text); background:var(--surface); box-shadow:0 24px 80px rgb(0 0 0 / .3); }
+.reports-admin-page .moderation-detail-dialog:not([open]) { display:none; }
+.moderation-detail-dialog::backdrop { background:rgb(10 12 7 / .65); backdrop-filter:blur(5px); }
+.reports-admin-page .moderation-detail-dialog .moderation-detail-close { width:36px; height:36px; margin:0; }
 .reports-admin-page .moderation-detail-close { margin-block-end:-8px; }
 .reports-admin-page .moderation-detail-box { padding:16px; gap:14px; }
 .reports-admin-page .moderation-detail dl > div { min-width:0; }

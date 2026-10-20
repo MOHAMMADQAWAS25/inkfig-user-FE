@@ -31,3 +31,20 @@
 
 Deploy the user-system migration/backend first, then frontend. Main-system is
 unchanged. The additive API fields tolerate older frontend deployments.
+
+## Report details popup
+
+Selecting a report opens its existing details and authorized actions in a centered
+native modal dialog, not a second column beside the queue. The table retains its
+full width, loaded pages, filters and scroll position. The dialog scrolls internally,
+supports English/Arabic and both themes, and uses native focus containment/background
+inertness. Close with X, Escape or an outside click; dismissal is disabled while an
+action is pending. Focus returns to the opening row button when it still exists.
+Action errors and notices are shown inside the popup. Resolving a report that no
+longer matches the selected status closes its popup through existing filtering.
+
+Frontend-only change on `fix/report-details-popup`, baseline
+`63a18865e1c9169dca50359c704be399d19df5f6`. To restore the side-panel behavior, revert
+the commit titled `Open report details in a modal popup` and redeploy frontend;
+preserve other changes and append a rollback log. No database migration or backend
+deployment is needed.
