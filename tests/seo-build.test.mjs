@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { buildSeo } from "../scripts/build-seo.mjs";
+const brand = JSON.parse(await readFile(new URL("../src/seo/brand.json", import.meta.url), "utf8"));
 
 test("generates localized initial HTML, real crawl assets and private-route headers", async () => {
   const directory = await mkdtemp(join(tmpdir(), "inkfig-seo-"));
@@ -21,9 +22,22 @@ test("generates localized initial HTML, real crawl assets and private-route head
       assert.ok(html.includes("/assets/app.js"));
       assert.ok(html.includes("index, follow, max-image-preview:large"));
       assert.equal(html.includes('"@type":"WebSite"'), suffix === "");
+      if (suffix === "") {
+        const schema = JSON.parse(html.match(/<script data-seo type="application\/ld\+json">(.*?)<\/script>/s)[1]);
+        assert.equal(schema.name, "InkFig");
+        assert.deepEqual(schema.alternateName, brand.alternateName);
+        assert.equal(schema["@id"], "https://inkfig-hu.com/#website");
+        assert.ok(html.includes("<h1>InkFig</h1>"));
+        assert.ok(html.includes(brand[language].description));
+        assert.ok(html.includes(`href="/${language}/exhibition/"`));
+        assert.equal((html.match(/class="brand-introduction"/g) || []).length, 1);
+      } else {
+        assert.ok(!html.includes('class="brand-introduction"'));
+      }
     }
     const root = await readFile(new URL("index.html", output), "utf8");
     assert.ok(root.includes('"url":"https://inkfig-hu.com/"'));
+    assert.ok(root.includes(brand.en.description));
     const sitemap = await readFile(new URL("sitemap.xml", output), "utf8");
     assert.equal((sitemap.match(/<loc>/g) || []).length, 4);
     assert.equal((sitemap.match(/<xhtml:link/g) || []).length, 12);

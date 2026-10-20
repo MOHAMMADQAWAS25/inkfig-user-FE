@@ -7,6 +7,29 @@ social metadata, and home-page WebSite structured data. React updates metadata
 on navigation. The gallery contents still load through JavaScript; this is not
 full server rendering or an artwork-level sitemap.
 
+## InkFig brand recognition
+
+`src/seo/brand.json` defines the preferred name **InkFig** and alternate names
+**InkFig-HU**, **inkfig-hu**, and **InkFig Hebron University**. Build-time and SPA
+WebSite markup use the same names and stable website ID, including the domain
+root. These alternatives describe one website, not separate domains.
+
+The homepage includes a compact, expandable About InkFig introduction in English
+and Arabic, also present in initial HTML without JavaScript. It describes the
+university graduation project and links to the public gallery and exhibitions.
+React renders the same content for visitors; no crawler-only text, invented
+university endorsement, social profiles, or keyword stuffing is added. Artwork
+feeds still require JavaScript; this is not full-page SSR.
+
+After deployment, inspect the root and localized homepages in Search Console
+and request recrawling. In Performance, compare exact queries `inkfig` and
+`inkfig-hu` for impressions, clicks and average position over time. Indexing and
+ranking are different: appearing for the domain does not guarantee appearing
+equally high for the shorter brand. No code can guarantee a position or timing.
+Use InkFig consistently on genuine social profiles and seek relevant natural
+links, such as an approved university project listing; those external changes
+require owner access/approval and are not performed by this build.
+
 Only the four public discovery pages are submitted initially. Account pages,
 moderation, submissions and individual records are excluded from the sitemap;
 the React head uses noindex on other routes and query/filter URLs. Private

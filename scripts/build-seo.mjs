@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const pages = JSON.parse(await readFile(new URL("src/seo/pages.json", root), "utf8"));
+const brand = JSON.parse(await readFile(new URL("src/seo/brand.json", root), "utf8"));
 const escape = value => String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 const languages = ["en", "ar"];
 const kinds = ["home", "exhibition"];
@@ -22,8 +23,13 @@ export function seoHead(language, kind) {
     meta("og:title", page.title, "property"), meta("og:description", page.description, "property"),
     meta("og:url", canonical, "property"), meta("og:locale", language === "ar" ? "ar_PS" : "en_US", "property"),
     meta("twitter:card", "summary"), meta("twitter:title", page.title), meta("twitter:description", page.description),
-    ...(kind === "home" ? [`<script data-seo type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "InkFig", alternateName: ["Inkfig", "InkFig Hebron University"], url: pages.origin + "/", inLanguage: languages })}</script>`] : []),
+    ...(kind === "home" ? [`<script data-seo type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", "@id": pages.origin + "/#website", name: brand.name, alternateName: brand.alternateName, url: pages.origin + "/", inLanguage: languages }).replace(/</g, "\\u003c")}</script>`] : []),
   ].join("\n    ");
+}
+
+export function brandIntroduction(language) {
+  const copy = brand[language];
+  return `<details class="brand-introduction"><summary>${escape(copy.summary)}</summary><div><h1>${escape(brand.name)}</h1><p>${escape(copy.description)}</p><nav aria-label="${escape(copy.summary)}"><a href="/${language}/">${escape(copy.gallery)}</a><a href="/${language}/exhibition/">${escape(copy.exhibitions)}</a></nav></div></details>`;
 }
 
 export async function buildSeo(output = new URL("dist/", root)) {
@@ -31,7 +37,8 @@ export async function buildSeo(output = new URL("dist/", root)) {
   if (!shell.includes("<!-- seo:start -->") || !shell.includes("<!-- seo:end -->")) throw new Error("SEO head markers missing");
   const html = (language, kind) => shell
     .replace(/<html[^>]*>/, `<html lang="${language}" dir="${language === "ar" ? "rtl" : "ltr"}">`)
-    .replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, `<!-- seo:start -->\n    ${seoHead(language, kind)}\n    <!-- seo:end -->`);
+    .replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, `<!-- seo:start -->\n    ${seoHead(language, kind)}\n    <!-- seo:end -->`)
+    .replace('<div id="root"></div>', `<div id="root">${kind === "home" ? brandIntroduction(language) : ""}</div>`);
   // Keep the root usable, and serve localized metadata before JavaScript runs.
   await writeFile(new URL("index.html", output), html("en", "home"));
   const urls = [];

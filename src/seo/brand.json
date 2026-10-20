@@ -1,0 +1,16 @@
+{
+  "name": "InkFig",
+  "alternateName": ["InkFig-HU", "inkfig-hu", "InkFig Hebron University"],
+  "en": {
+    "summary": "About InkFig",
+    "description": "InkFig is an art community and graduation project for Hebron University. Discover student artwork, explore creative portfolios and take part in art exhibitions.",
+    "gallery": "Explore artwork",
+    "exhibitions": "Explore exhibitions"
+  },
+  "ar": {
+    "summary": "عن InkFig",
+    "description": "InkFig مجتمع فني ومشروع تخرج لجامعة الخليل. اكتشف أعمال الطلبة الفنية وملفاتهم الإبداعية وشارك في المعارض الفنية.",
+    "gallery": "استكشف الأعمال الفنية",
+    "exhibitions": "استكشف المعارض"
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import pages from "./pages.json";
+import brand from "./brand.json";
 
 /** Keep metadata correct during SPA navigation, not only on initial page loads. */
 export function PageMetadata() {
@@ -44,7 +45,7 @@ export function PageMetadata() {
     meta("twitter:card", "summary"); meta("twitter:title", page.title); meta("twitter:description", page.description);
     if (home) {
       const schema = document.createElement("script"); schema.dataset.seo = ""; schema.type = "application/ld+json";
-      schema.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "InkFig", alternateName: ["Inkfig", "InkFig Hebron University"], url: pages.origin + "/", inLanguage: ["en", "ar"] });
+      schema.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", "@id": pages.origin + "/#website", name: brand.name, alternateName: brand.alternateName, url: pages.origin + "/", inLanguage: ["en", "ar"] });
       document.head.append(schema);
     }
   }, [pathname, search]);

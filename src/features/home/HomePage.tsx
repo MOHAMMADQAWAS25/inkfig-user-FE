@@ -29,6 +29,7 @@ import { SmoothDetails } from "../layout/SmoothDetails";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { RecentSearches } from "./RecentSearches";
 import { useDismissOnly } from "../layout/useDismissOnly";
+import { BrandIntroduction } from "../../seo/BrandIntroduction";
 
 
 export function HomePage() {
@@ -186,6 +187,7 @@ export function HomePage() {
       </header>
 
       <section className="gallery-feed" aria-label={t("home.collectionTitle")}>
+        <BrandIntroduction />
         <div className="gallery-filters" role="group" aria-label={t("home.filters")}>
           <button className={activeCategory === "all" ? "active" : ""} type="button" aria-pressed={activeCategory === "all"} onClick={() => selectCategory("all")}>{t("home.filter.all")}</button>
           {workCategories.map((category) => (
