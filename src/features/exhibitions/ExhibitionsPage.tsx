@@ -47,7 +47,7 @@ export function ExhibitionsPage() {
     session &&
     ["supervisor", "admin", "system_administrator"].includes(session.role),
   );
-  const [items, setItems] = useState<Exhibition[]>([]);
+  const [items, setItems] = useState<{upcoming:Exhibition[];past:Exhibition[]}>({upcoming:[],past:[]});
   const [selected, setSelected] = useState<Exhibition | null>(null);
   const [cursor, setCursor] = useState<number | null>(null);
   const [pastCursor, setPastCursor] = useState<number | null>(null);
@@ -88,14 +88,7 @@ export function ExhibitionsPage() {
       listExhibitions(0, "past"),
     ]);
     return {
-      items: [
-        ...new Map(
-          [...upcoming.items, ...past.items].map((item) => [
-            item.exhibition_id,
-            item,
-          ]),
-        ).values(),
-      ],
+      items: {upcoming:upcoming.items,past:past.items},
       upcomingCursor: upcoming.next_cursor,
       pastCursor: past.next_cursor,
     };
@@ -280,15 +273,7 @@ export function ExhibitionsPage() {
             <p>{t("exhibitions.intro")}</p>
             {(["upcoming", "past"] as const).map((period) => {
               const past = period === "past";
-              const entries = items
-                .filter(
-                  (item) => new Date(item.event_at).getTime() <= now === past,
-                )
-                .sort((a, b) =>
-                  past
-                    ? Date.parse(b.event_at) - Date.parse(a.event_at)
-                    : Date.parse(a.event_at) - Date.parse(b.event_at),
-                );
+              const entries = items[period];
               const next = past ? pastCursor : cursor;
               return (
                 <section
@@ -339,14 +324,14 @@ export function ExhibitionsPage() {
                       onClick={() =>
                         void run(async () => {
                           const page = await listExhibitions(next, period);
-                          setItems((current) => [
+                          setItems((current) => ({...current,[period]:[
                             ...new Map(
-                              [...current, ...page.items].map((item) => [
+                              [...current[period], ...page.items].map((item) => [
                                 item.exhibition_id,
                                 item,
                               ]),
                             ).values(),
-                          ]);
+                          ]}));
                           if (past) setPastCursor(page.next_cursor);
                           else setCursor(page.next_cursor);
                         })

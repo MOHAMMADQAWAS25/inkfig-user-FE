@@ -90,8 +90,9 @@ test("provides a permission-driven system administrator workspace", () => {
   assert.match(adminUsersPage, /PAGE_SIZE=10/);
   assert.match(adminUsersPage, /role="alertdialog"/);
   assert.match(administrationApi, /GET",`\/admin\/users\?\$\{query\.toString\(\)\}`/);
-  assert.match(administrationApi, /query\.set\("cursor",String\(cursor\)\)/);
-  assert.match(administrationApi, /while\(cursor!==undefined\)/);
+  assert.match(administrationApi, /cursor:String\(cursor\)/);
+  assert.doesNotMatch(administrationApi, /while\(cursor!==undefined\)/);
+  assert.match(adminUsersPage, /getManagedUsersPage\(\(page-1\)\*PAGE_SIZE/);
   assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/role`/);
   assert.match(administrationApi, /PATCH",`\/admin\/users\/\$\{userId\}\/status`/);
   assert.match(styles, /\.admin-dialog-backdrop/);

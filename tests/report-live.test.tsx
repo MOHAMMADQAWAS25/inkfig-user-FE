@@ -193,15 +193,44 @@ it("keeps work deletion and account suspension controls permission-gated inside 
 
 it("preserves selected filters and loaded pages when the popup closes",async()=>{
   const second={...report,report_id:"second",target_user_name:"Second target"};
-  vi.mocked(getReports).mockResolvedValueOnce({items:[report],next_cursor:25}).mockResolvedValueOnce({items:[second],next_cursor:null});
+  vi.mocked(getReports).mockResolvedValueOnce({items:[report],next_cursor:25}).mockResolvedValueOnce({items:[report],next_cursor:25}).mockResolvedValueOnce({items:[second],next_cursor:null});
   const view=render(<AdminReportsPage/>,{wrapper});
-  fireEvent.click(await screen.findByRole("button",{name:translations.en["reports.loadMore"]}));
-  await waitFor(()=>expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2));
+  await screen.findByRole("button",{name:translations.en["reports.loadMore"]});
   const reason=screen.getByRole<HTMLSelectElement>("combobox",{name:translations.en["reports.reason"]});
   fireEvent.change(reason,{target:{value:"spam"}});
+  await waitFor(()=>expect(getReports).toHaveBeenCalledTimes(2));
+  fireEvent.click(await screen.findByRole("button",{name:translations.en["reports.loadMore"]}));
+  await waitFor(()=>expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2));
   fireEvent.click(view.container.querySelectorAll(".moderation-target")[1]);
   fireEvent.click(screen.getByRole("button",{name:translations.en["reports.closeDetails"]}));
   expect(reason.value).toBe("spam");
   expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2);
-  expect(getReports).toHaveBeenCalledTimes(2);
+  expect(getReports).toHaveBeenCalledTimes(3);
+});
+
+it("sends type/reason/sort to the server before loading the next filtered batch",async()=>{
+  const matched={...report,report_id:"matched",target_user_name:"Server match"};
+  vi.mocked(getReports).mockImplementation(async(_status,cursor,filters)=>({items:filters?.reasonCode==="copyright"?[{...matched,report_id:cursor?"next-match":"matched"}]:[],next_cursor:filters?.reasonCode==="copyright"&&cursor===0?25:null,total:50,type_counts:{all:50,work:40,user:10}}));
+  const view=render(<AdminReportsPage/>,{wrapper});
+  await screen.findByText("Showing 0 of 50 matching reports");
+  fireEvent.click(view.container.querySelectorAll(".moderation-tabs button")[1]);
+  await waitFor(()=>expect(getReports).toHaveBeenLastCalledWith("pending",0,expect.objectContaining({targetType:"work"})));
+  fireEvent.change(screen.getByRole("combobox",{name:translations.en["reports.reason"]}),{target:{value:"copyright"}});
+  await screen.findByText("Server match");
+  fireEvent.change(screen.getByRole("combobox",{name:translations.en["reports.sort"]}),{target:{value:"oldest"}});
+  await waitFor(()=>expect(getReports).toHaveBeenLastCalledWith("pending",0,{targetType:"work",reasonCode:"copyright",sort:"oldest"}));
+  fireEvent.click(await screen.findByRole("button",{name:translations.en["reports.loadMore"]}));
+  await waitFor(()=>expect(getReports).toHaveBeenLastCalledWith("pending",25,{targetType:"work",reasonCode:"copyright",sort:"oldest"}));
+  await waitFor(()=>expect(view.container.querySelectorAll(".moderation-target")).toHaveLength(2));
+});
+
+it("ignores old report batches when the filter changes during a request",async()=>{
+  let finish!:(value:{items:ReportItem[];next_cursor:null;total:number})=>void;
+  vi.mocked(getReports).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;})).mockResolvedValue({items:[{...report,target_user_name:"New report scope"}],next_cursor:null,total:1,type_counts:{all:1,work:0,user:1}});
+  render(<AdminReportsPage/>,{wrapper});
+  fireEvent.change(screen.getByRole("combobox",{name:translations.en["reports.reason"]}),{target:{value:"spam"}});
+  await screen.findByText("New report scope");
+  await act(async()=>finish({items:[{...report,target_user_name:"Stale report scope"}],next_cursor:null,total:900}));
+  expect(screen.queryByText("Stale report scope")).toBeNull();
+  expect(screen.getByText("Showing 1 of 1 matching reports")).toBeTruthy();
 });

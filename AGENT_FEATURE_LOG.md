@@ -10042,3 +10042,33 @@ No API contract, migration, data/storage mutation, permissions, dependencies, co
 ### Deployment, rollback and Git
 
 Frontend-only existing main deployment workflow; no backend deployment/migration. Branch: fix/report-details-popup. Commit subject: Open report details in a modal popup. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, push/merge/conflict and workflow outcome reported in final handoff. Revert only this ticket commit and redeploy frontend to restore the side panel, preserving other work; rollback scope/baseline recorded in docs/report-moderation.md. Historical entries preserved.
+
+## 2026-10-20 - Backend-scoped filtering, counts and pagination
+
+### Request and changes
+
+Correct Reports loaded-only type/reason/order and Admin Users fetch-all/client pagination, and audit similar issues. Reports sends status/type/reason/order on every initial, continuation and live request, resets scope when a filter changes, retains server ordering and ignores stale results via existing generation guards. Server metadata supplies matching total/tab counts. Adds repeated/non-advancing cursor protection. Local status recheck only removes a just-reviewed row immediately; it is not eligibility filtering for unloaded records. Popup, moderation permissions and actions retained. Legacy stored sexual-content reason available in the filter with existing translations. Errors do not falsely claim no matches.
+
+Admin Users requests one ten-user server page with debounced literal search/role/status; removes fetch-all helper and local filtering/slicing. Query scope includes viewer/filters/page and resets to page1 on scope change without an old-page query. Existing React Query cancellation/cache isolation guards stale requests. Server filtered total drives page count/results, global summary drives overview cards; old overview can remain during loading while rows are hidden. Mutations invalidate pages/summaries and shrinking counts clamp out-of-range pages. Search maxLength matches backend200. Existing control styling/role/status authorization preserved.
+
+Exhibitions preserves backend upcoming/past groups/order in separate state/cursors rather than reclassifying loaded rows with the browser clock. Remaining query filtering audited: homepage category/artist/search, profile/connection scope, find-users, exhibition status/eligibility, related eligibility and notification continuation already backend-scoped. Bounded option/history visibility, deduplication, virtualization and immediate mutation state cleanup remain frontend presentation work.
+
+### Repositories and files
+
+Clean main pulled and complete feature log read. Frontend baseline 398ea79706d0df068f1f3ced98465bd60006de9f; backend baseline 7262b4c0bc2034cda0d75ae48f501317840972b3. Matching fix/server-filtered-pagination branches in user-FE and user-system; main-system unchanged. Files: AdminReportsPage.tsx, AdminUsersPage.tsx, administrationApi.ts, reportsApi.ts, ExhibitionsPage.tsx, resources.ts, foundation/report-live/exhibitions tests, new admin-user-pagination/server-pagination-api tests, new docs/server-filtered-pagination.md and this log.
+
+### API, database, permissions and scope
+
+Consumes additive user-system filter parameters/page totals and summaries. No frontend schema/migration, dependency, environment, credential, permission or SnapStart changes. Backend remains authoritative. No CSS redesign; Arabic/English counts/scope explanatory strings updated to reflect all matching database rows. Main-system API unchanged.
+
+### Verification
+
+365 frontend tests passed (89 Node/source checks, 276 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. New tests cover backend-filtered batch parameters and continuation, remote matches, stable server group/order despite skewed browser time, scope resets, old-response races, server totals, user page navigation, mutation refresh, permissions, reduced page counts and fetch errors versus empty data. Updated source expectations that explicitly required removed fetch-all behavior and report popup test to set filters before loading pages; no checks bypassed. Corrected a heading-level test assumption and explicit React Query placeholder typing; complete checks rerun. Companion backend149 tests/mypy124 passed with isolated relational SQL fixtures. No real moderation/upload/user mutations or physical-device/browser rendering review. Existing bundle-size/jsdom warnings remain.
+
+### Deployment, limitations and rollback
+
+Deploy user-system first, frontend next through existing main workflows. No migration or main-system deployment. Existing numeric offset bounds and timestamp/keyset designs remain; concurrent inserts/deletions can shift offset pages, and separate aggregate/list reads may briefly disagree. This fixes filtering/order-before-pagination, not every possible snapshot/pagination redesign. Audit and limitations in docs/server-filtered-pagination.md; real PostgreSQL credentials unavailable locally, no production-query-plan claim. Revert frontend ticket commit first, then backend if requested, preserving unrelated work and historical entries; no data rollback/reset/force push.
+
+### Git
+
+Branch: fix/server-filtered-pagination. Subject: Use server-filtered pagination for administration lists. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hashes, push/merge/conflict and deployment results reported in handoff.

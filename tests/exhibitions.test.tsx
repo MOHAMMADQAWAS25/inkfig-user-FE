@@ -324,6 +324,17 @@ it("shows both empty sections when no exhibitions are available", async () => {
   expect(await screen.findByText("No upcoming exhibitions yet.")).toBeTruthy();
   expect(screen.getByText("No past exhibitions yet.")).toBeTruthy();
 });
+
+it("keeps the backend period and ordering even when the browser clock disagrees",async()=>{
+  vi.spyOn(Date,"now").mockReturnValue(Date.parse("2035-01-01T00:00:00Z"));
+  const nearer={...exhibition,exhibition_id:"near",name:"Backend first",event_at:"2026-11-01T00:00:00Z"};
+  const farther={...exhibition,exhibition_id:"far",name:"Backend second",event_at:"2026-12-01T00:00:00Z"};
+  vi.mocked(api.listExhibitions).mockImplementation(async(_cursor,period)=>({items:period==="upcoming"?[nearer,farther]:[],next_cursor:null}));
+  view("/en/exhibition");
+  const upcoming=await screen.findByRole("region",{name:"Upcoming Exhibitions"});
+  expect(within(upcoming).getAllByRole("heading").map(node=>node.textContent)).toEqual(["Upcoming Exhibitions","Backend first","Backend second"]);
+  expect(within(screen.getByRole("region",{name:"Past Exhibitions"})).queryByText("Backend first")).toBeNull();
+});
 it("opens a single-work exhibition upload and links to my submissions from the toolbar", async () => {
   view();
   const participate = await screen.findByRole("link", { name: "Participate" });
