@@ -1,5 +1,5 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
-import { CheckCircle2, Flag, RefreshCw, ShieldBan, Trash2, UserRound, FileImage, ExternalLink, X } from "lucide-react";
+import { CheckCircle2, Flag, ShieldBan, Trash2, UserRound, FileImage, ExternalLink, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 
@@ -75,7 +75,6 @@ export function AdminReportsPage(){
  const workPreview=preview&&"work_id" in preview?preview:null;
  const profilePreview=preview&&"avatar_url" in preview?preview:null;
  return <main className="admin-page reports-admin-page app-page-with-sidebar"><AppSidebar/><section className="admin-shell">
- <header className="admin-hero"><div><span><Flag size={17}/>{t("reports.adminArea")}</span><h1>{t("reports.adminTitle")}</h1><p>{t("reports.adminDescription")}</p></div><button className="admin-refresh" type="button" disabled={loading} onClick={()=>void load()}><RefreshCw size={18} className={loading?"spin":""}/>{t("admin.refresh")}</button></header>
  <section className="moderation-dashboard" aria-label={t("reports.queue")}>
  <div className="moderation-toolbar"><div className="moderation-tabs" role="group" aria-label={t("reports.filterType")}>{(["all","work","user"] as const).map(value=><button key={value} type="button" className={type===value?"active":""} aria-pressed={type===value} onClick={()=>changeType(value)}>{t(`reports.type.${value}`)}<span>{typeCounts[value]}</span></button>)}</div><div className="moderation-filters"><select aria-label={t("reports.reason")} value={reason} onChange={event=>setReason(event.target.value)}><option value="all">{t("reports.allReasons")}</option>{reasons.map(value=><option key={value} value={value}>{t(`reports.reason.${value}` as TranslationKey)}</option>)}</select><select aria-label={t("reports.filterStatus")} value={filter} onChange={event=>setFilter(event.target.value as Filter)}><option value="all">{t("reports.status.all")}</option>{(["pending","reviewed","dismissed","actioned"] as ReportStatus[]).map(value=><option key={value} value={value}>{t(`reports.status.${value}` as TranslationKey)}</option>)}</select><select aria-label={t("reports.sort")} value={oldest?"oldest":"newest"} onChange={event=>setOldest(event.target.value==="oldest")}><option value="newest">{t("reports.newest")}</option><option value="oldest">{t("reports.oldest")}</option></select></div></div>
  {!selected&&notice&&<p className="admin-notice" role="status"><CheckCircle2 size={17}/>{notice}</p>}{!selected&&error&&<p className="admin-error" role="alert">{error}</p>}

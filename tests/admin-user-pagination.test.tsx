@@ -70,7 +70,7 @@ it("returns to a valid page when a refresh reduces the number of matching pages"
   mount();await screen.findByText("Remote match");
   fireEvent.click(screen.getByRole("button",{name:translations.en["admin.next"]}));await screen.findByText("Page 2 of 4");
   vi.mocked(getManagedUsersPage).mockResolvedValue({...page,total:1,next_cursor:null});
-  fireEvent.click(screen.getByRole("button",{name:translations.en["admin.refresh"]}));
+  act(()=>{void clients[0].invalidateQueries({queryKey:["admin-users"]});});
   await waitFor(()=>expect(getManagedUsersPage).toHaveBeenLastCalledWith(0,expect.any(Object),expect.any(AbortSignal)));
   await screen.findByText("1 results");
   expect(screen.queryByRole("button",{name:translations.en["admin.next"]})).toBeNull();

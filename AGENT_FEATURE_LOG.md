@@ -10389,3 +10389,25 @@ Frontend-only existing main Cloudflare deployment workflow. No backend deploymen
 ### Notes
 
 Baseline 1265206 is a reference, not a reset target. Revert only this focused commit and redeploy to restore enlargement. Natural CSS size does not guarantee physical-pixel sharpness on high-density screens, improve a low-quality source or remove compression artifacts. No backend/SnapStart changes. Previous log entries preserved.
+
+## 2026-11-01 - Remove Users and Reports hero sections
+
+### Request and changes
+
+Removed the first heading/description/Refresh section from both admin Users and Reports pages, including the System administrator and Content safety labels. Removed unused RefreshCw imports. Users now starts with account statistics; Reports starts with existing filters. Sidebar, remaining sections, permission checks, API requests, pagination, report live updates, mutation invalidation and Users error retry remain unchanged. Shared hero styles/translations retained for other consumers; no CSS changes.
+
+### Repositories and files
+
+inkfig-user-FE only: src/features/admin/AdminUsersPage.tsx, src/features/admin/AdminReportsPage.tsx, tests/admin-page-headers.test.mjs, tests/admin-user-pagination.test.tsx and this log. Clean main pulled and complete feature log read; baseline f9923f5d781015d31a3e07f14abb0c8704a4dca4. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, authorization, dependency, credential, environment or SnapStart changes. No production data mutations. English/Arabic render the same section removal.
+
+### Verification
+
+410 checks passed (97 Node/source, 313 Vitest) and strict TypeScript/Vite/SEO production build passed; git diff --check passed. Added absence/preserved-content regression. Existing pagination test refreshed through query invalidation instead of the intentionally removed Refresh button, retaining the shrinking-total page-clamp check. Initial test failed only on that removed control; corrected and full default suite rerun successfully. A slower two-worker run was stopped; isolated pagination seven tests also passed. No real-browser pixel certification; existing non-blocking bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Frontend existing main deployment workflow only; no backend or migration. Branch chore/remove-admin-page-headers; subject Remove top sections from admin Users and Reports pages. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore both headers without undoing other work; previous log entries preserved.
