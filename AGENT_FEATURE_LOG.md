@@ -10411,3 +10411,25 @@ No API, migration, authorization, dependency, credential, environment or SnapSta
 ### Deployment and Git
 
 Frontend existing main deployment workflow only; no backend or migration. Branch chore/remove-admin-page-headers; subject Remove top sections from admin Users and Reports pages. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore both headers without undoing other work; previous log entries preserved.
+
+## 2026-11-01 - Center Users administration beside navigation rail
+
+### Request and changes
+
+Added a Users-only page class and scoped equal gutter rules. Navigation-side padding includes the current rail width plus the same gutter used at the outer viewport edge. Existing 1380px maximum-width shell stays centered in the remaining space. Arabic mirrors the rail side; mobile uses the existing responsive page-gutter token and zero-width rail. Content, typography, filters, account cards, pagination, actions and Reports layout unchanged.
+
+### Repositories and files
+
+inkfig-user-FE only: src/features/admin/AdminUsersPage.tsx, src/styles.css, tests/admin-page-headers.test.mjs and this log. Clean main pulled and complete log read; baseline 0fd74f9e5f1c3e37574530956598daec595694c1. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, permission, dependency, credential, environment or SnapStart changes. No production data mutations. Only Users page horizontal spacing changed.
+
+### Verification
+
+411 checks passed (98 Node/source, 313 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. Added scoped LTR/RTL rail-plus-gutter, preserved centered max-width and mobile-gutter regression checks. Existing administration interaction/pagination suites pass. No real-browser pixel certification; existing non-blocking bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Frontend main workflow only. Branch fix/admin-users-centered-spacing; subject Center admin Users content beside the navigation rail. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore previous spacing without undoing other work. Historical entries preserved.

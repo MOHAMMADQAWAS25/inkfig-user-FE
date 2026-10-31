@@ -1509,6 +1509,11 @@ img { max-width: 100%; image-rendering: auto; }
   .account-discovery-panel.sidebar-panel-exit,[dir="rtl"] .account-discovery-panel.sidebar-panel-exit { animation-name: sidebar-panel-out-mobile; }
 }
 @keyframes sidebar-panel-out-mobile { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(24px) scale(.985); } }
+/* Users-only spacing: equal gutters around the centered content beside the rail. */
+.users-admin-page.app-page-with-sidebar { --users-gutter:clamp(22px,3.2vw,48px); padding-left:calc(var(--app-rail-size) + var(--users-gutter)); padding-right:var(--users-gutter); }
+[dir="rtl"] .users-admin-page.app-page-with-sidebar { padding-right:calc(var(--app-rail-size) + var(--users-gutter)); padding-left:var(--users-gutter); }
+.users-admin-page .admin-shell { min-width:0; }
+@media(max-width:720px){.users-admin-page.app-page-with-sidebar { --users-gutter:var(--page-gutter,14px); }}
 /* Reports-only spacing: equal gutters around the content area beside the rail. */
 .reports-admin-page.app-page-with-sidebar { --reports-gutter:var(--page-gutter,20px); padding-left:calc(var(--app-rail-size) + var(--reports-gutter)); padding-right:var(--reports-gutter); }
 [dir="rtl"] .reports-admin-page.app-page-with-sidebar { padding-right:calc(var(--app-rail-size) + var(--reports-gutter)); padding-left:var(--reports-gutter); }
