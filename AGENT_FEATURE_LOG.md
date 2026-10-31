@@ -10433,3 +10433,25 @@ No API, migration, permission, dependency, credential, environment or SnapStart 
 ### Deployment and Git
 
 Frontend main workflow only. Branch fix/admin-users-centered-spacing; subject Center admin Users content beside the navigation rail. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit, push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore previous spacing without undoing other work. Historical entries preserved.
+
+## 2026-11-01 - Simplify vertical exhibition listing
+
+### Request and changes
+
+Removed visible Current/Upcoming/Past section headings, hints and empty-period messages. Empty groups no longer occupy space. Existing exhibition cards stack one per row in server-owned current, upcoming, past order; original card dimensions, internal design and status badges unchanged. Added list-scoped even spacing across period boundaries without altering overview-card sizing. Accessible period labels and separate continuation controls/cursors remain. Existing general page title/introduction and management controls retained; exhibition detail/gallery pages unchanged.
+
+### Repositories and files
+
+inkfig-user-FE only: ExhibitionsPage.tsx, src/styles.css, tests/exhibitions.test.tsx, new tests/exhibition-list-layout.test.mjs and this log. Clean main pulled and complete log read; baseline 88606893543f4caa4d3f20480736f4065a792c2a. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, permissions, dependencies, credentials, environment or SnapStart changes. Server filtering/order and separate period pagination retained; no browser-clock reclassification or production data mutations. English/Arabic and both themes share the listing rules.
+
+### Verification
+
+413 checks passed (99 Node/source, 314 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Added card-order/badge/no-period-text interaction and single-column/original-size/equal-gap source regressions. Updated empty-group and heading expectations to match requested removals while retaining backend-order, continuation and detail/gallery coverage. No real-browser pixel certification; existing non-blocking bundle-size/jsdom warnings remain.
+
+### Deployment and Git
+
+Frontend main workflow only. Branch fix/vertical-exhibition-list; subject Simplify exhibition listing into ordered vertical cards. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit/push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore period text/spacing without undoing previous changes. Historical log entries preserved.

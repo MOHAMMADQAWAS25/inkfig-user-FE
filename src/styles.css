@@ -2048,6 +2048,9 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibition-period-heading p { margin-block:8px 0; opacity:.75; }
 .exhibition-section-empty { padding:28px; border:1px dashed rgb(97 125 43 / .3); border-radius:18px; }
 .exhibition-period-section>.exhibitions-grid { grid-template-columns:minmax(0,1fr); }
+.exhibitions-list { display:grid; gap:22px; margin-block:24px; }
+.exhibitions-list > .exhibition-period-section { display:grid; gap:22px; margin:0; min-width:0; }
+.exhibitions-list > .exhibition-period-section > .exhibitions-grid { margin:0; }
 .exhibition-overview-card { display:grid; grid-template-columns:minmax(0,45fr) minmax(0,55fr); grid-template-rows:minmax(0,1fr); block-size:min(500px,calc(100vh - 96px)); block-size:min(500px,calc(100svh - 96px)); max-block-size:calc(100svh - 32px); min-block-size:0; transition:transform 420ms cubic-bezier(.22,1,.36,1),border-color 420ms ease,box-shadow 420ms ease; }
 .exhibition-overview-card:hover,.exhibition-overview-card:focus-visible { transform:translateY(-6px); border-color:#779439; box-shadow:0 18px 42px rgb(57 67 28 / .18); }
 .exhibition-overview-card>.exhibition-card-media { position:relative; isolation:isolate; overflow:hidden; padding:0; min-block-size:0; background:linear-gradient(145deg,#e8e8d2,#f7f3df); }

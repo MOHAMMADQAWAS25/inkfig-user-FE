@@ -318,15 +318,27 @@ it("separates upcoming and past exhibitions with independent pagination", async 
     expect(api.listExhibitions).toHaveBeenCalledWith(20, "past"),
   );
 });
-it("shows both empty sections when no exhibitions are available", async () => {
+it("omits period headings, hints and empty sections when no exhibitions are available", async () => {
   vi.mocked(api.listExhibitions).mockResolvedValue({
     items: [],
     next_cursor: null,
   });
-  view("/en/exhibition");
-  expect(await screen.findByText("No upcoming exhibitions yet.")).toBeTruthy();
-  expect(screen.getByText("No past exhibitions yet.")).toBeTruthy();
-  expect(screen.getByText("No exhibitions are currently running.")).toBeTruthy();
+  const {container}=view("/en/exhibition");
+  await waitFor(()=>expect(screen.queryByRole("status")).toBeNull());
+  expect(container.querySelector(".exhibition-period-section")).toBeNull();
+  for(const key of ["exhibitions.current","exhibitions.upcoming","exhibitions.past","exhibitions.currentHint","exhibitions.upcomingHint","exhibitions.pastHint","exhibitions.noCurrent","exhibitions.noUpcoming","exhibitions.noPast"] as const){
+    expect(screen.queryByText(translations.en[key])).toBeNull();
+  }
+});
+it("stacks current, upcoming and past cards in order without visible period text and preserves badges",async()=>{
+  vi.mocked(api.listExhibitions).mockImplementation(async(_cursor,period)=>({items:[{...exhibition,exhibition_id:String(period),name:`Card ${period}`}],next_cursor:null}));
+  const {container}=view("/en/exhibition");
+  await screen.findByRole("heading",{name:"Card current"});
+  const cards=Array.from(container.querySelectorAll(".exhibitions-list .exhibition-overview-card"));
+  expect(cards.map(card=>card.querySelector("h3")?.textContent)).toEqual(["Card current","Card upcoming","Card past"]);
+  expect(cards.every(card=>Boolean(card.querySelector(".exhibition-status")?.textContent))).toBe(true);
+  expect(container.querySelector(".exhibition-period-heading")).toBeNull();
+  expect(container.querySelector(".exhibition-section-empty")).toBeNull();
 });
 it("lists current exhibitions with an independent server-side cursor", async () => {
   vi.spyOn(Date,"now").mockReturnValue(Date.parse("2026-10-20T12:00:00Z"));
@@ -393,8 +405,8 @@ it("keeps the backend period and ordering even when the browser clock disagrees"
   vi.mocked(api.listExhibitions).mockImplementation(async(_cursor,period)=>({items:period==="upcoming"?[nearer,farther]:[],next_cursor:null}));
   view("/en/exhibition");
   const upcoming=await screen.findByRole("region",{name:"Upcoming Exhibitions"});
-  expect(within(upcoming).getAllByRole("heading").map(node=>node.textContent)).toEqual(["Upcoming Exhibitions","Backend first","Backend second"]);
-  expect(within(screen.getByRole("region",{name:"Past Exhibitions"})).queryByText("Backend first")).toBeNull();
+  expect(within(upcoming).getAllByRole("heading").map(node=>node.textContent)).toEqual(["Backend first","Backend second"]);
+  expect(screen.queryByRole("region",{name:"Past Exhibitions"})).toBeNull();
 });
 it("opens a single-work exhibition upload and links to my submissions from the toolbar", async () => {
   view();

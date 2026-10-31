@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  CalendarDays,
   Plus,
   Trophy,
 } from "lucide-react";
@@ -231,33 +230,19 @@ export function ExhibitionsPage() {
         {(exhibitionId ? gallery.loading : loading) ? (
           <p role="status">{t("exhibitions.loading")}</p>
         ) : !selected && !exhibitionId ? (
-          <>
+          <div className="exhibitions-list">
             <p>{t("exhibitions.intro")}</p>
             {(["current", "upcoming", "past"] as const).map((period: ExhibitionPeriod) => {
               const past = period === "past";
               const entries = items[period];
               const next = past ? pastCursor : period === "current" ? currentCursor : cursor;
+              if (!entries.length && next === null) return null;
               return (
                 <section
                   className="exhibition-period-section"
                   key={period}
-                  aria-labelledby={`exhibition-${period}-title`}
+                  aria-label={t(past ? "exhibitions.past" : period === "current" ? "exhibitions.current" : "exhibitions.upcoming")}
                 >
-                  <header className="exhibition-period-heading">
-                    <span>
-                      <CalendarDays size={20} aria-hidden="true" />
-                      <h2 id={`exhibition-${period}-title`}>
-                        {t(past ? "exhibitions.past" : period === "current" ? "exhibitions.current" : "exhibitions.upcoming")}
-                      </h2>
-                    </span>
-                    <p>
-                      {t(
-                        period === "current" ? "exhibitions.currentHint" : past
-                          ? "exhibitions.pastHint"
-                          : "exhibitions.upcomingHint",
-                      )}
-                    </p>
-                  </header>
                   <div className="exhibitions-grid">
                     {entries.map((item) => (
                       <ExhibitionCard
@@ -268,13 +253,6 @@ export function ExhibitionsPage() {
                       />
                     ))}
                   </div>
-                  {!entries.length && (
-                    <p className="exhibition-section-empty">
-                      {t(
-                        past ? "exhibitions.noPast" : period === "current" ? "exhibitions.noCurrent" : "exhibitions.noUpcoming",
-                      )}
-                    </p>
-                  )}
                   {next !== null && (
                     <button
                       disabled={busy}
@@ -307,7 +285,7 @@ export function ExhibitionsPage() {
                 </section>
               );
             })}
-          </>
+          </div>
         ) : (
           selected && (
             <>
