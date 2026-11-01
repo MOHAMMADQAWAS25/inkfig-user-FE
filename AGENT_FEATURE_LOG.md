@@ -10546,3 +10546,27 @@ No API, migration, authorization, dependency, credential, environment or SnapSta
 ### Deployment and Git
 
 Frontend main workflow only. Branch fix/remove-card-hover-ratings; subject Remove rating summaries from artwork card hover. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/deployment outcome in handoff. Revert only this removal commit to restore card summaries; no schema/data rollback. Previous log entries preserved.
+
+## 2026-11-01 - Exhibition-only artwork details popup
+
+### Request and changes
+
+Public exhibition gallery artwork image/title/View and non-interactive card content now open an in-place popup, not the artwork route. Rating forms/inputs excluded. Home/search/related/profile and exhibition overview navigation unchanged. Stable callback retains memoized gallery cards. Popup scoped to viewer/exhibition; native body portal supports one dialog, inert background, focus restoration and shared scroll locking through loading/error/retry/full detail. Abortable viewer/work query ignores closed requests. X/Escape/outside dismissal retains URL, gallery pages/ratings and scroll.
+
+Reuses ArtworkDetailModal through optional native-containment mode, avoiding duplicate dialog semantics/manual body locks while default consumers remain unchanged. Optional interactionBusy disables like/save without hiding Save; permitted mutations refetch confirmed data and update existing caches with unmount guards. Existing report eligibility, image protection, responsive media/themes/Arabic retained. Gallery rating controls unchanged; popup ratings are read-only. No added moderation/edit/delete authority.
+
+### Repositories and files
+
+inkfig-user-FE only; both backends unchanged. Clean main pulled and complete log read; baseline02f45fd82d9704dee4363bfbcf959d14efc324d2. Files: new ExhibitionArtworkPopup.tsx; ExhibitionArtworkCard/ExhibitionsPage; shared ArtworkDetailModal optional props; scoped styles; new popup interaction/layout tests, existing exhibition/rating/foundation assertions updated; docs/exhibition-artwork-popup.md, ratings doc and this log.
+
+### API, database, permissions and scope
+
+No API, migration, dependency, role/permission, environment, credential or SnapStart change. Existing work detail/like/save/report APIs and backend authorization reused. No production artwork/vote/report mutations for verification. Popup does not enable voting or change gallery voting windows.
+
+### Verification
+
+445 checks passed (102 Node/source,343 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. New coverage verifies single native portal dialog, unchanged route, read-only ratings, scroll/focus/continuation preservation, canceled loading/late responses, retry/backdrop/Escape/X, like/save refresh, noninteractive-card versus radio clicks, permissions, image protection and Arabic. Existing navigation/modal/voting/pagination suites pass. Updated literal-role foundation assertion to cover optional containment/default dialog; no checks bypassed. Native dialog methods mocked in jsdom; no real-browser pixel/focus trap or physical-device certification. Existing bundle-size/jsdom warnings remain.
+
+### Deployment and Git
+
+Frontend main workflow only; no backend or migration. Branch fix/exhibition-artwork-popup; subject Open exhibition artworks in an in-place details popup. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/merge/deployment outcome in handoff. Revert only this ticket commit to restore exhibition artwork routing without touching ratings data, prior features or historical logs. Rollback scope/baseline in docs.

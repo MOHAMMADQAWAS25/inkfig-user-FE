@@ -358,8 +358,8 @@ it("opens a current exhibition as a titled split-card wall without its banner", 
   const {container}=view();
   expect(await screen.findByRole("heading",{level:1,name:"Student exhibition"})).toBeTruthy();
   expect(container.querySelector(".exhibition-detail-card")).toBeNull();
-  const link=await screen.findByRole("link",{name:"View artwork details: Autumn art"});
-  expect(link.getAttribute("href")).toBe("/en/artwork/work");
+  const link=await screen.findByRole("button",{name:"View artwork details: Autumn art"});
+  expect(link.getAttribute("aria-haspopup")).toBe("dialog");
   expect(link.querySelector(".exhibition-artwork-media img")?.getAttribute("src")).toBe("/art.jpg");
   const card=link.closest(".exhibition-artwork-card");
   expect(card?.querySelector(".exhibition-artwork-details")?.textContent).toContain("A colorful autumn landscape");
@@ -377,7 +377,7 @@ it("keeps one loading screen until the initial exhibition wall is ready",async()
   expect(screen.getByRole("status").textContent).toBe(translations.en["exhibitions.loading"]);
   expect(screen.queryByText(translations.en["exhibitions.noSubmissions"])).toBeNull();
   await act(async()=>resolve({items:[record],next_cursor:null}));
-  await screen.findByRole("link",{name:"View artwork details: Painting"});
+  await screen.findByRole("button",{name:"View artwork details: Painting"});
   expect(screen.queryByRole("status")).toBeNull();
 });
 
@@ -385,7 +385,7 @@ it("does not unmount visible cards while a live background update is pending",as
   vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:"2020-01-01T00:00:00Z"});
   vi.mocked(api.getSubmissions).mockResolvedValue({items:[record],next_cursor:null});
   view();
-  const card=await screen.findByRole("link",{name:"View artwork details: Painting"});
+  const card=await screen.findByRole("button",{name:"View artwork details: Painting"});
   const image=card.querySelector("img");
   let resolve!:(page:api.Page<api.Submission>)=>void;
   vi.mocked(api.getSubmissions).mockImplementationOnce(()=>new Promise(done=>{resolve=done;}));
@@ -394,7 +394,7 @@ it("does not unmount visible cards while a live background update is pending",as
   expect(card.isConnected).toBe(true);
   expect(screen.queryByRole("status")).toBeNull();
   await act(async()=>resolve({items:[{...record,title:"Updated painting"}],next_cursor:null}));
-  const updated=await screen.findByRole("link",{name:"View artwork details: Updated painting"});
+  const updated=await screen.findByRole("button",{name:"View artwork details: Updated painting"});
   expect(updated).toBe(card);
   expect(updated.querySelector("img")).toBe(image);
 });

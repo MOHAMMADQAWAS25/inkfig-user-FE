@@ -61,3 +61,10 @@ voting/results and opened artwork/preview detail ratings remain available.
 Frontend-only branch `fix/remove-card-hover-ratings`, baseline `18d525a`.
 Revert only this removal commit to restore the hover summaries; no migration or
 backend data/permission changes.
+
+## Exhibition artwork popup (2026-11-01)
+
+Gallery artwork triggers now open an in-place native details popup rather than
+navigating away. Voting stays on gallery cards; popup results remain read-only.
+Homepage/profile artwork routes are unchanged. See exhibition-artwork-popup.md
+for scoped behavior, verification limits and revert-only instructions.

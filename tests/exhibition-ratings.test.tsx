@@ -19,12 +19,13 @@ vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>auth}));
 vi.mock("../src/features/exhibitions/exhibitionRatingsApi",()=>({changeExhibitionRating:vi.fn()}));
 const initial:RatingState={average:4.3,vote_count:28,my_rating:null,can_rate:true};
 const clients:QueryClient[]=[];
+const openArtwork=vi.fn();
 function Probe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 function mount(rating:RatingState=initial,options:{language?:"en"|"ar";open?:boolean;card?:boolean}={}){
   const language=options.language??"en";
   const client=new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}}); clients.push(client);
   render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/${language}/exhibition/event`]}><Routes><Route path="/:language/*" element={<I18nProvider>
-    {options.card?<ExhibitionArtworkCard exhibitionId="event" votingOpen={options.open??true} item={{submission_id:"submission",work_id:"art",user_id:"artist",artist_name:"Artist",title:"Painting",image_url:"/art.png",status:"approved",rejection_reason:null,created_at:"2026-11-01T10:00:00Z",rating}}/>:
+    {options.card?<ExhibitionArtworkCard onOpen={openArtwork} exhibitionId="event" votingOpen={options.open??true} item={{submission_id:"submission",work_id:"art",user_id:"artist",artist_name:"Artist",title:"Painting",image_url:"/art.png",status:"approved",rejection_reason:null,created_at:"2026-11-01T10:00:00Z",rating}}/>:
       <ExhibitionRatingControls exhibitionId="event" workId="art" rating={rating} votingOpen={options.open??true}/>}
     <Probe/>
   </I18nProvider>}/></Routes></MemoryRouter></QueryClientProvider>);
@@ -49,8 +50,10 @@ it("requires explicit submission and does not navigate or duplicate in-flight vo
   await act(async()=>finish({...initial,average:4.2,vote_count:29,my_rating:4}));
   expect(screen.getByText("4.2 / 5 · 29 votes")).toBeTruthy();
   expect(screen.getByText("Your rating: 4 / 5")).toBeTruthy();
-  fireEvent.click(screen.getByRole("link",{name:"View artwork details: Painting"}));
-  expect(screen.getByTestId("route").textContent).toBe("/en/artwork/art");
+  expect(openArtwork).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button",{name:"View artwork details: Painting"}));
+  expect(openArtwork).toHaveBeenCalledOnce();expect(openArtwork).toHaveBeenCalledWith("art");
+  expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
 });
 
 it("changes a vote without adding to its count and removes the existing vote",async()=>{

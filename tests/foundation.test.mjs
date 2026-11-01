@@ -340,8 +340,8 @@ test("keeps authentication tokens in secure backend cookies and refreshes expire
 });
 
 test("opens an accessible artwork detail modal with complete public metadata", () => {
-  assert.match(artworkDetailModal, /role="dialog"/);
-  assert.match(artworkDetailModal, /aria-modal="true"/);
+  assert.match(artworkDetailModal, /role=\{containedInDialog \? undefined : "dialog"\}/);
+  assert.match(artworkDetailModal, /aria-modal=\{containedInDialog \? undefined : true\}/);
   assert.match(artworkDetailModal, /work\.description/);
   assert.match(artworkDetailModal, /work\.created_at/);
   assert.match(artworkDetailModal, /work\.like_count/);

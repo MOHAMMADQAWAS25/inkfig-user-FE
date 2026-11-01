@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -15,6 +15,7 @@ import { DeleteExhibitionDialog } from "./DeleteExhibitionDialog";
 import { useExhibitionGallery } from "./useExhibitionGallery";
 import { exhibitionEnd, exhibitionPeriod, type ExhibitionPeriod } from "./exhibitionPeriod";
 import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
+import { ExhibitionArtworkPopup } from "./ExhibitionArtworkPopup";
 import {
   listExhibitions,
   saveExhibition,
@@ -37,6 +38,10 @@ export function ExhibitionsPage() {
   const { session } = useAuth();
   const { language, t } = useI18n();
   const { exhibitionId } = useParams();
+  const popupScope = JSON.stringify([exhibitionId, session?.userId ?? "guest"]);
+  const [artworkPopup, setArtworkPopup] = useState<{ scope: string; workId: string } | null>(null);
+  const openArtwork = useCallback((workId: string) => setArtworkPopup({scope:popupScope,workId}), [popupScope]);
+  useEffect(() => { setArtworkPopup(null); }, [popupScope]);
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
   const canDelete = Boolean(session && ["admin", "system_administrator"].includes(session.role));
@@ -310,7 +315,7 @@ export function ExhibitionsPage() {
               </ExhibitionCard>}
               {Date.parse(selected.event_at) <= now && <section className="exhibition-public-works" aria-label={t("exhibitions.works")}>
               <div className="exhibition-artwork-grid">
-                {submissions.map(item => <ExhibitionArtworkCard key={`${session?.userId ?? "guest"}:${item.submission_id}`} item={item} exhibitionId={selected.exhibition_id} votingOpen={exhibitionPeriod(selected, now) === "current"}/>)}
+                {submissions.map(item => <ExhibitionArtworkCard key={`${session?.userId ?? "guest"}:${item.submission_id}`} item={item} exhibitionId={selected.exhibition_id} votingOpen={exhibitionPeriod(selected, now) === "current"} onOpen={openArtwork}/>)}
               </div>
               {!submissions.length && !gallery.works.isError && <p>{t("exhibitions.noSubmissions")}</p>}
               {(gallery.works.isError || gallery.works.hasNextPage) && (
@@ -331,6 +336,7 @@ export function ExhibitionsPage() {
             </>
           )
         )}
+        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} onClose={() => setArtworkPopup(null)}/>}
         {editing && (
           <section className="exhibition-editor">
             <h2>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</h2>

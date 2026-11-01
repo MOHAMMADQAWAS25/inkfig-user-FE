@@ -28,10 +28,12 @@ type ArtworkDetailModalProps = {
   onDeleteOwnWork?: (work: Work) => void;
   extraDetails?: ReactNode;
   readOnly?: boolean;
+  containedInDialog?: boolean;
+  interactionBusy?: boolean;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, readOnly=false, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, readOnly=false, containedInDialog=false, interactionBusy=false, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
   const uploadedAt = relativeTime(work.created_at, language);
 
   useEffect(() => {
+    if (containedInDialog) { closeButtonRef.current?.focus({preventScroll:true}); return; }
     const previousOverflow = document.body.style.overflow;
     const mobile = Boolean(window.matchMedia?.("(max-width: 720px)").matches);
     const scrollY = window.scrollY;
@@ -90,13 +93,13 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
       }
     };
-  }, []);
+  }, [containedInDialog]);
 
   async function submitModeration(event:React.FormEvent){event.preventDefault();if(!onModerateDelete||reason.trim().length<10||deleting)return;setDeleting(true);setDeleteError(false);try{await onModerateDelete(work,reason.trim());}catch{setDeleteError(true);setDeleting(false);}}
 
   return (
     <div className={`artwork-modal-backdrop${closing?" artwork-modal-closing":""}`} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && requestClose()}>
-      <section ref={dialogRef} className="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="artwork-modal-title">
+      <section ref={dialogRef} className="artwork-modal" role={containedInDialog ? undefined : "dialog"} aria-modal={containedInDialog ? undefined : true} aria-labelledby="artwork-modal-title">
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
@@ -118,7 +121,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
             <h3><Link2 size={17} />{t("works.links")}</h3>
             <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
-          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count} {t("home.likes")}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
+          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count} {t("home.likes")}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
           {!readOnly && (onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
             {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
             {onDeleteOwnWork && <button type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}

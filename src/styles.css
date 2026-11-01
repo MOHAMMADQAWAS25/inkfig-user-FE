@@ -2287,6 +2287,15 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .exhibition-artwork-details time { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .75rem; }
 .exhibition-artwork-open { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); color: var(--primary); font-size: .8rem; font-weight: 700; }
 .exhibition-artwork-title { color:inherit; text-decoration:none; }
+.exhibition-artwork-card > button.exhibition-artwork-media { width:100%; padding:0; border:0; cursor:pointer; font:inherit; }
+.exhibition-artwork-card .exhibition-artwork-title { padding:0; border:0; background:transparent; color:inherit; font:inherit; text-align:start; cursor:pointer; }
+.exhibition-artwork-card button.exhibition-artwork-open { border-inline:0; border-bottom:0; border-radius:0; padding-inline:0; padding-bottom:0; background:transparent; font-family:inherit; text-align:start; cursor:pointer; }
+.exhibition-artwork-card :is(.exhibition-artwork-media,.exhibition-artwork-title,.exhibition-artwork-open):focus-visible { outline:2px solid var(--primary); outline-offset:-3px; }
+.exhibition-artwork-popup { position:fixed; inset:0; width:100%; height:100svh; max-width:none; max-height:none; margin:0; padding:0; border:0; overflow:hidden; background:transparent; color:var(--text); }
+.exhibition-artwork-popup:not([open]) { display:none; }
+.exhibition-artwork-popup::backdrop { background:transparent; }
+.exhibition-artwork-popup-state { display:block; width:min(480px,100%); padding:48px 24px 24px; }
+.exhibition-artwork-popup-state h2 { margin-top:0; }
 .exhibition-artwork-card a:focus-visible { outline:2px solid var(--primary); outline-offset:-3px; }
 .exhibition-artwork-open { text-decoration:none; }
 .exhibition-rating-summary { display:inline-flex; align-items:center; flex-wrap:wrap; gap:6px; color:var(--text); font-size:.8rem; line-height:1.5; }
