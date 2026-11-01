@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { RefreshCw, Star, Trophy } from "lucide-react";
+import { Image, RefreshCw, Star, Trophy, Users } from "lucide-react";
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
@@ -46,7 +46,7 @@ export function ExhibitionLeaderboardPage() {
         <button type="button" disabled={query.isFetching} onClick={() => setRevision(value => value + 1)}><RefreshCw size={17} aria-hidden="true"/>{ar ? "تحديث" : "Refresh"}</button>
       </ExhibitionNavbar>
       <header className="exhibition-leaderboard-heading">
-        <Trophy aria-hidden="true"/><h1>{label}</h1>
+        <span className="exhibition-leaderboard-emblem"><Trophy aria-hidden="true"/></span><h1>{label}</h1>
         {first && <><h2>{first.exhibition.name}</h2>
           <p>{!first.started ? (ar ? "سيظهر الترتيب عند بدء المعرض." : "Standings will be available when the exhibition starts.") : first.voting_open ? (ar ? "تزداد الإثارة" : "It becomes more exciting") : (ar ? "انتهى التصويت." : "Voting is closed.")}</p>
         </>}
@@ -54,19 +54,21 @@ export function ExhibitionLeaderboardPage() {
       {query.isPending && <p role="status">{t("works.loading")}</p>}
       {query.isError && <p role="alert">{t("works.loadFailed")} <button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button></p>}
       {first?.started && !entries.length && !query.isError && <p className="exhibition-leaderboard-empty">{ar ? "لا توجد أعمال حصلت على أصوات بعد." : "No artworks have counted votes yet."}</p>}
+      <div className="exhibition-leaderboard-board">
+      <div className="exhibition-leaderboard-columns" aria-hidden="true"><span>#</span><span>{ar ? "العمل الفني" : "Artwork"}</span><span>{ar ? "الفنان" : "Artist"}</span><span>{ar ? "الفئة" : "Category"}</span><span>{ar ? "متوسط التقييم" : "Average rating"}</span><span>{ar ? "الأصوات" : "Votes"}</span></div>
       <ol className="exhibition-leaderboard-list" aria-label={label}>
         {entries.map(entry => <li key={entry.work_id}>
-          <button type="button" className="exhibition-leaderboard-entry" onClick={() => setOpened(entry.work_id)} aria-label={`${ar ? "عرض العمل" : "View artwork"}: ${entry.title}`}>
-            <span className="exhibition-leaderboard-rank">#{integer.format(entry.rank)}</span>
-            <img className="exhibition-leaderboard-image" src={entry.image_url} alt="" loading="lazy" draggable={false} onContextMenu={event => event.preventDefault()} onDragStart={event => event.preventDefault()}/>
-            <span className="exhibition-leaderboard-info"><strong>{entry.title}</strong>
-              <span className="exhibition-leaderboard-artist"><ProfileAvatar name={entry.artist_name} url={entry.artist_avatar_url} language={language}/>{entry.artist_name}</span>
-              <small>{ar ? entry.type_name_ar : entry.type_name_en}</small>
-            </span>
-            <span className="exhibition-leaderboard-score"><span><Star size={18} aria-hidden="true"/>{number.format(entry.average)} / 5</span><small>{integer.format(entry.vote_count)} {ar ? "صوت" : entry.vote_count === 1 ? "vote" : "votes"}</small></span>
+          <button type="button" className="exhibition-leaderboard-entry" data-rank={entry.rank <= 3 ? entry.rank : undefined} onClick={() => setOpened(entry.work_id)} aria-label={`${ar ? "عرض العمل" : "View artwork"}: ${entry.title}`}>
+            <span className="exhibition-leaderboard-rank"><span>{integer.format(entry.rank)}</span>{entry.rank <= 3 && <Trophy size={14} aria-hidden="true"/>}</span>
+            <span className="exhibition-leaderboard-artwork"><img className="exhibition-leaderboard-image" src={entry.image_url} alt="" loading="lazy" draggable={false} onContextMenu={event => event.preventDefault()} onDragStart={event => event.preventDefault()}/><strong>{entry.title}</strong></span>
+            <span className="exhibition-leaderboard-artist"><ProfileAvatar name={entry.artist_name} url={entry.artist_avatar_url} language={language}/><span>{entry.artist_name}</span></span>
+            <span className="exhibition-leaderboard-category"><Image size={16} aria-hidden="true"/>{ar ? entry.type_name_ar : entry.type_name_en}</span>
+            <span className="exhibition-leaderboard-score"><span className="exhibition-leaderboard-stars" aria-hidden="true">{[1,2,3,4,5].map(star => <Star key={star} size={17} fill={entry.average >= star - .5 ? "currentColor" : "none"}/>)}</span><span>{number.format(entry.average)} / 5</span></span>
+            <span className="exhibition-leaderboard-votes"><Users size={18} aria-hidden="true"/><span>{integer.format(entry.vote_count)}<span className="exhibition-leaderboard-vote-label"> {ar ? "صوت" : entry.vote_count === 1 ? "vote" : "votes"}</span></span></span>
           </button>
         </li>)}
       </ol>
+      </div>
       {query.hasNextPage && <button type="button" className="primary-button" disabled={query.isFetching} onClick={() => void query.fetchNextPage()}>{query.isFetchingNextPage ? t("works.loading") : ar ? "تحميل المزيد" : "Load more"}</button>}
     </div>
     {opened && <ExhibitionArtworkPopup key={opened} workId={opened} onClose={() => setOpened(null)}/>}

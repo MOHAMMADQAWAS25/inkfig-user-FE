@@ -10662,3 +10662,17 @@ Only user-FE affected. Clean main pulled ff-only and complete feature log read b
 ### Deployment and Git
 
 Commit subject: Simplify exhibition leaderboard heading copy. Fetch/rebase, push feature branch, then previously authorized fast-forward merge/push main through existing frontend deployment. Exact hash, push and deployment status reported in handoff. Preserve historical entries; revert this focused ticket commit to restore prior copy.
+
+## 2026-11-01 - Reference-style exhibition leaderboard
+
+### Request and changes
+
+Frontend presentation only: trophy heading, aligned artwork/artist/category/rating/vote columns, contained thumbnails, creator avatars, category pills, decorative read-only stars and gold/silver/bronze highlights using server rank (including ties). Theme-relative surfaces, Arabic logical alignment, responsive stacked rows and reduced-motion support. No category dropdown or added filtering. Existing copy retained.
+
+### Scope and verification
+
+Only user-FE affected. Clean main pulled ff-only and complete feature log read before style/exhibition-leaderboard branch. Query, pagination, deduplication, refresh, ranks, vote counts, popup callback and voting restrictions unchanged. No backend, migration, API, permission or SnapStart changes. Strict TypeScript/Vite/SEO build and two existing leaderboard pagination/popup/empty-state tests passed; git diff --check passed. Existing bundle-size warning remains. No browser visual certification claimed.
+
+### Deployment and Git
+
+Commit subject: Style exhibition leaderboard with ranked artwork columns. Fetch/rebase then branch push and authorized fast-forward main merge/push through existing deployment. Exact hash, conflicts, push and deployment status in handoff. Revert this isolated ticket commit to restore previous presentation; preserve historical entries and unrelated changes.
