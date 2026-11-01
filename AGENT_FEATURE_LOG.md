@@ -10676,3 +10676,18 @@ Only user-FE affected. Clean main pulled ff-only and complete feature log read b
 ### Deployment and Git
 
 Commit subject: Style exhibition leaderboard with ranked artwork columns. Fetch/rebase then branch push and authorized fast-forward main merge/push through existing deployment. Exact hash, conflicts, push and deployment status in handoff. Revert this isolated ticket commit to restore previous presentation; preserve historical entries and unrelated changes.
+
+
+## 2026-11-01 - Leaderboard category and navigation improvements
+
+### Request and changes
+
+Remove leaderboard Refresh and reuse shared exhibition toolbar. Always show Exhibitions (labeled back arrow), Leaderboard, Participate and My submissions; guests link to sign-in and existing participation restrictions remain. Fetch existing public work types for themed category selector; category-specific query keys/requests prevent mixing pages. Expand leaderboard shell with balanced18px desktop/12px mobile gutters. Replace rounded decorative stars with proportional clipped fills (2.5 = two full plus half), keeping exact numeric score and Arabic/light/dark support.
+
+### Repositories and verification
+
+Matching fix/leaderboard-controls branches in main-system and user-FE, clean main pulled ff-only and complete logs read first. User-system unchanged. 106 Node checks and352 Vitest tests passed; production TypeScript/Vite/SEO build passed. Tests cover category selection restarting at cursor0, retained pagination/deduplication/popup, precise half-star widths and all navigation links for guests. Old icon-only back label/title assertions updated to requested labeled button. Existing jsdom/bundle warnings remain; no visual browser certification claimed. git diff --check passed. No credentials, generated output, dependencies, schema migration, permission bypass or import-time/SnapStart resource changes.
+
+### Deployment and Git
+
+Backend first, frontend second through existing main deployments. Commit subject: Improve leaderboard navigation width filters and fractional stars. Fetch/rebase before branch push and authorized fast-forward main merge/push. Exact hashes, conflicts, push and deployment results in handoff. Revert frontend ticket commit first then backend if requested; preserve votes/schema, logs and unrelated work. Live offset pagination limitations unchanged.

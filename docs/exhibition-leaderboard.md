@@ -8,11 +8,16 @@ The backend filters zero-vote entries and ranks before pagination; the client
 does not filter an incomplete batch or recompute ranks.
 
 Twenty rows per request, Load more appends server order with ID deduplication.
-Refresh resets to page one. No focus/reconnect polling or automatic reorder.
+Category selection sends type_id to the backend before ranking/pagination and
+uses separate query pages per category. No manual Refresh button, focus/reconnect
+polling or automatic reorder. The shared toolbar retains Exhibitions, Leaderboard,
+Participate and My submissions, with existing sign-in/participation restrictions.
 Loading/error/retry, upcoming, voting-open/closed and genuine no-votes states are
 provided. Open voting displays “It becomes more exciting” (localized in Arabic);
 ranking guidance and the fetch timestamp are not displayed. Live offset pages
-can skip moved rows between requests; Refresh obtains current standings again.
+can skip moved rows between requests; reopening the page obtains current standings.
+The page uses the available width with balanced side gutters. Decorative stars
+fill proportionally to the numeric average, including half and other fractions.
 
 Artwork rows open the shared ExhibitionArtworkPopup, keeping the page/list and
 scroll underneath. Deliberately omit exhibitionId/rating/votingOpen props so

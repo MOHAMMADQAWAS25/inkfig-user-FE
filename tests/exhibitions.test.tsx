@@ -215,11 +215,11 @@ it("uses an accessible arrow back control and one main exhibition title inside t
   const title = await screen.findByRole("heading", { level: 1, name: "Student exhibition" });
   expect(title.closest(".exhibition-detail-card")).toBeTruthy();
   expect(container.querySelectorAll("h1")).toHaveLength(1);
-  const back = screen.getByRole("link", { name: translations.en["exhibitions.back"] });
+  const back = screen.getByRole("link", { name: "Exhibitions" });
   expect(back.getAttribute("href")).toBe("/en/exhibition");
-  expect(back.textContent).toBe("");
+  expect(back.textContent).toBe("Exhibitions");
   expect(back.querySelector("svg")).toBeTruthy();
-  expect(back.getAttribute("title")).toBe(translations.en["exhibitions.back"]);
+  expect(back.getAttribute("title")).toBe("Exhibitions");
 });
 it("assigns one profile work to an eligible exhibition and shows pending confirmation", async () => {
   render(<MemoryRouter><AssignExhibitionDialog workId="mine" onClose={vi.fn()}/></MemoryRouter>);
