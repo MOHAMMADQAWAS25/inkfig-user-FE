@@ -50,6 +50,16 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();for(const client of clients)client.clear();clients.length=0;vi.restoreAllMocks();vi.unstubAllGlobals();});
 const signal=()=>window.dispatchEvent(new Event("inkfig:reports-changed"));
 
+it.each(["en","ar"] as const)("uses localized hover labels without captions for the administrator sidebar in %s",language=>{
+  state.language=language;
+  const {container}=render(<AppSidebar/>,{wrapper});
+  const sidebar=container.querySelector(".app-sidebar")!;
+  expect(sidebar.querySelector(".app-sidebar-label")).toBeNull();
+  const reports=screen.getByRole("link",{name:translations[language]["nav.reports"]});
+  expect(reports.getAttribute("data-tooltip")).toBe(translations[language]["nav.reports"]);
+  for(const item of sidebar.querySelectorAll("[data-tooltip]"))expect(item.getAttribute("data-tooltip")).toBe(item.getAttribute("aria-label"));
+});
+
 it.each(["en","ar"] as const)("shows unique type-scoped reasons and clears only incompatible selections in %s",async(language)=>{
   state.language=language;
   render(<AdminReportsPage/>,{wrapper});

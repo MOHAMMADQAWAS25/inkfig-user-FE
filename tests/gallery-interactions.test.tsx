@@ -44,11 +44,12 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 function RouteProbe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 
 describe("home and panel interactions",()=>{
-  it.each(["/en","/en/exhibition","/en/artwork/example","/en/settings"])("shows persistent desktop rail labels instead of hover tooltips on %s",route=>{
+  it.each(["/en","/en/exhibition","/en/artwork/example","/en/settings"])("shows icon-only desktop navigation with hover tooltips on %s",route=>{
     const {container}=render(<MemoryRouter initialEntries={[route]}><AppSidebar/></MemoryRouter>);
-    const rail=container.querySelector(".app-sidebar-labeled")!;
-    expect(rail.querySelectorAll(".app-sidebar-label").length).toBeGreaterThanOrEqual(7);
-    expect(rail.querySelector("[data-tooltip]")).toBeNull();
+    const rail=container.querySelector(".app-sidebar")!;
+    expect(rail.querySelector(".app-sidebar-label")).toBeNull();
+    expect(rail.querySelectorAll("[data-tooltip]").length).toBeGreaterThanOrEqual(7);
+    for(const item of rail.querySelectorAll("[data-tooltip]"))expect(item.getAttribute("data-tooltip")).toBe(item.getAttribute("aria-label"));
     expect(rail.querySelector(".app-sidebar-people-icon")).toBeTruthy();
   });
   it("yields focus and dismissal to a native dialog opened above a slider",()=>{

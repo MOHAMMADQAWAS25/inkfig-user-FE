@@ -13,5 +13,7 @@ test("native report modal is fixed, viewport bounded and permits safe small-scre
  assert.match(css,/\.report-modal \{ position: fixed;[^}]*max-height: calc\(100dvh - 24px\)/);
  assert.match(css,/\.report-modal \{[^}]*scrollbar-width: none/);
  assert.match(css,/\.report-modal \.report-dialog textarea \{[^}]*resize: none/);
- assert.match(css,/\.app-sidebar-labeled \[data-tooltip\]::after \{ display: none/);
+ assert.doesNotMatch(css,/\.app-sidebar-labeled/);
+ assert.match(css,/\[data-tooltip\]:hover::after/);
+ assert.match(css,/\[data-tooltip\]:focus-visible::after/);
 });

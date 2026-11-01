@@ -2330,15 +2330,6 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 @media (max-width:480px) { .exhibition-artwork-card { grid-template-columns: minmax(0,1fr); }.exhibition-artwork-media { min-height: 220px; height: 260px; }.exhibition-artwork-details { border-inline-start: 0; border-top: 1px solid var(--border); } }
 @media (max-width:720px) { .exhibitions-page.app-page-with-sidebar { padding-inline: 12px; } }
 @media (prefers-reduced-motion:reduce) { .exhibition-artwork-card, .exhibition-artwork-media img { transition: none; }.exhibition-artwork-card:hover, .exhibition-artwork-card:hover img { transform: none; } }
-/* Persistent labels replace hover tooltips on every desktop rail. */
-@media (min-width:721px) {
-  .app-sidebar-labeled { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
-  .app-sidebar-labeled .app-sidebar-nav { width: 100%; gap: 10px; margin-top: 12px; }
-  .app-sidebar-labeled .app-sidebar-nav > *, .app-sidebar-labeled .app-sidebar-settings { display: flex; position: relative; flex: 0 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 64px; height: auto; padding: 7px 2px; }
-  .app-sidebar-labeled .app-sidebar-label { display: block; max-width: 100%; font-size: .62rem; line-height: 1.25; font-weight: 650; overflow-wrap: anywhere; text-align: center; }
-  .app-sidebar-labeled .app-sidebar-settings { margin-top: auto; }
-  .app-sidebar-labeled [data-tooltip]::after { display: none; }
-}
 /* Native top-layer report modal is independent of the page's rail/transforms. */
 .report-modal { position: fixed; inset: 0; height: fit-content; width: min(560px,calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 0; margin: auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; border: 0; border-radius: 20px; background: var(--surface); color: var(--text); }
 .report-modal::backdrop { background: rgb(12 15 8 / .7); backdrop-filter: blur(5px); }

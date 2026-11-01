@@ -10570,3 +10570,25 @@ No API, migration, dependency, role/permission, environment, credential or SnapS
 ### Deployment and Git
 
 Frontend main workflow only; no backend or migration. Branch fix/exhibition-artwork-popup; subject Open exhibition artworks in an in-place details popup. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/merge/deployment outcome in handoff. Revert only this ticket commit to restore exhibition artwork routing without touching ratings data, prior features or historical logs. Rollback scope/baseline in docs.
+
+## 2026-11-01 - Restore icon-only sidebar hover labels
+
+### Request and changes
+
+Removed persistent captions under desktop sidebar icons for all account roles/routes. Removed labeled-rail rendering flag/spans/class and its CSS layout/tooltip-suppression overrides. Every existing desktop navigation control now uses its localized data-tooltip and retains accessible aria-label; existing hover/focus-visible tooltip CSS including RTL placement reused. Compact pre-caption rail layout restored. Permission-based administrator/report icons, badges, links, notifications/find-users behavior, branding and MobileNavigation unchanged.
+
+### Repositories and files
+
+inkfig-user-FE only: src/features/navigation/AppSidebar.tsx, src/styles.css, tests/gallery-interactions.test.tsx, tests/current-exhibition-layout.test.mjs, tests/report-live.test.tsx and this log. Clean main pulled and complete log read; baselinece52a77f8f7b1065642f9f229366f15bbe20f509. Both backend repositories unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, role/permission, dependency, credential, environment or SnapStart changes. No production data mutations. Only desktop sidebar labels/layout treatment changed; mobile bottom navigation remains intact.
+
+### Verification
+
+447 checks passed (102 Node/source,345 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. Tests verify absent caption nodes, localized tooltip/accessibility parity across user routes and English/Arabic administrator Reports navigation; CSS asserts old tooltip suppression absent and hover/focus rules present. Existing role/panel/badge/navigation tests pass. An unrelated first-login timing assertion failed once; targeted unchanged test and complete suite passed afterward, without skipping checks or unrelated edits. No real-browser pixel certification; existing non-blocking bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Frontend existing main workflow only. Branch fix/sidebar-hover-labels; subject Restore sidebar icon hover tooltips for all roles. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/merge/deployment outcomes in handoff. Revert only this ticket commit to restore captions; no data/schema rollback or destructive reset. Earlier log entries preserved.
