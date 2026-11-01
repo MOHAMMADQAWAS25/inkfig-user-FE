@@ -170,12 +170,27 @@ describe("sentinel and media", () => {
     const view = render(<Feed {...props}/>, {wrapper:Wrapper});
     function scroll(top:number) {
       Object.defineProperty(window,"scrollY",{configurable:true,value:top});
-      act(()=>{const callbacks=[...frames.values()];frames.clear();callbacks.forEach(callback=>callback(0));});
+      act(()=>{fireEvent.scroll(window);const callbacks=[...frames.values()];frames.clear();callbacks.forEach(callback=>callback(0));});
     }
+    expect(frames.size).toBe(0); // No continuously scheduled work while idle.
     renderItem.mockClear();
     for (let y=1;y<=100;y++) scroll(y);
     expect(renderItem).not.toHaveBeenCalled();
     scroll(800); expect(renderItem).toHaveBeenCalled();
+    // Buffered overlapping cards keep their subtree; only entrants/priority changes render.
+    expect(renderItem.mock.calls.some(([item])=>item.work_id==="10")).toBe(false);
+    expect(frames.size).toBe(0);
+    act(()=>{fireEvent.scroll(window);fireEvent.scroll(window);fireEvent.scroll(window);});
+    expect(frames.size).toBe(1);
+    act(()=>{const callbacks=[...frames.values()];frames.clear();callbacks.forEach(callback=>callback(0));});
+    expect(frames.size).toBe(0);
+    const hidden = vi.spyOn(document, "hidden", "get").mockReturnValue(true);
+    act(()=>document.dispatchEvent(new Event("visibilitychange")));
+    scroll(1200); expect(frames.size).toBe(0);
+    hidden.mockReturnValue(false);
+    act(()=>document.dispatchEvent(new Event("visibilitychange")));
+    expect(frames.size).toBe(0); // Resume refreshes once, not a polling loop.
+    hidden.mockRestore();
     const focused = view.container.querySelector<HTMLButtonElement>("button")!;
     act(()=>focused.focus());
     scroll(20_000);
@@ -184,7 +199,9 @@ describe("sentinel and media", () => {
     act(()=>focused.blur());
     expect(focused.isConnected).toBe(false);
     expect(view.container.textContent).toContain("Art 1");
+    act(()=>fireEvent.scroll(window)); expect(frames.size).toBe(1);
     view.unmount(); expect(frames.size).toBe(0);
+    fireEvent.scroll(window); expect(frames.size).toBe(0);
     Object.defineProperty(window,"scrollY",{configurable:true,value:0});
   });
   it("does not rerender the feed for unrelated parent updates but accepts new work data", () => {
@@ -205,6 +222,7 @@ describe("sentinel and media", () => {
     const Wrapper = ({ children }: { children: ReactNode }) => <React.StrictMode><MemoryRouter initialEntries={["/en"]}><I18nProvider>{children}</I18nProvider></MemoryRouter></React.StrictMode>;
     const first = render(<Feed {...props} />, {wrapper:Wrapper});
     Object.defineProperty(window, "scrollY", { configurable:true, value:1200 });
+    fireEvent.scroll(window);
     await act(async () => { await new Promise(resolve=>requestAnimationFrame(()=>resolve(undefined))); });
     first.unmount();
     Object.defineProperty(window, "scrollY", { configurable:true, value:0 });

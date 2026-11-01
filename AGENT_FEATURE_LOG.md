@@ -10751,3 +10751,36 @@ Frontend existing main workflow only; no migration/backend deployment. Branch fi
 ### Post-synchronization
 
 Rebased over79b7bcc and its leaderboard navigation/filter/heading predecessors. Only the feature-log append point conflicted; preserved all three incoming complete entries and this ticket entry in order. Application/test changes merged automatically. Combined tests, type/build and whitespace checks rerun before publication; exact final counts and deployment reported in handoff.
+
+## 2026-11-02 - Reduce home scrolling overhead on desktop and mobile
+
+### Request
+
+Fix the home gallery's scrolling delay on both desktop and phone without changing its presentation or interactions.
+
+### Changes and frontend
+
+- Replaced continuous feed animation-frame polling with a passive scroll listener and one coalesced frame per event burst. Initial layout, resize and visibility restoration still refresh the window; hidden tabs schedule no scrolling frames and unmount cancels pending work/removes listeners. Final sub-window gestures update scroll memory immediately.
+- Memoized each positioned card so buffered, unchanged artwork subtrees do not rerender on virtual-window shifts or focus changes. Existing two-screen overscan, bounded DOM, responsive images, focus retention, incremental layout, pagination, reactions and scroll restoration remain intact.
+- Isolated scroll-header state into ScrollHeader rather than HomePage; search/gallery children no longer rerender for header progress. Removed the continuously restarted320ms CSS transition so mobile movement tracks the gesture directly. Existing160px reveal/hide distance, overlay/search focus locks, themes, RTL and reduced-motion behavior remain.
+- Updated feed documentation and regression tests for idle scheduling, burst coalescing, hidden-tab resumption, listener/frame cleanup, overlapping-card reuse and isolated header updates.
+
+### Repositories and files
+
+All three repositories checked clean and pulled main ff-only before work. Only inkfig-user-FE changed: Feed.tsx, ScrollHeader.tsx, HomePage.tsx, styles.css, focused feed/mobile tests, docs/infinite-feed.md and this append-only log. Both backend repositories unchanged; no unrelated files/dependencies/generated output committed.
+
+### API, database, permissions and scope
+
+No API, database migration, authentication, permissions, backend/SnapStart, media processing or deployment configuration changes. Existing backend authorization remains authoritative. No production data mutations used for verification.
+
+### Verification
+
+471 checks passed (108 Node/source and363 Vitest), including desktop-sized1000-item feed scrolling, large jumps, reverse/focus behavior, no idle frames, cached navigation restoration, unchanged child render avoidance and mobile navigation/focus/locks. Strict TypeScript/Vite/SEO production build and git diff --check passed. Existing non-blocking chunk-size/jsdom scrollTo notices remain. These verify eliminated scheduling/render work, not a physical-device60fps guarantee or a measured production frame-rate improvement; legacy original-image decoding/network costs can still depend on device and media.
+
+### Deployment
+
+Existing frontend main-branch Cloudflare workflow only; no migration/backend deployment or deployment-order dependency.
+
+### Git
+
+Branch: fix/home-scroll-performance. Commit subject: Reduce gallery scroll work and remove header animation lag. Fetch/rebase before feature-branch push, then standing-authorized fast-forward main merge/push. Exact commit, conflicts, push/merge and deployment status reported in handoff. Revert this focused commit if necessary; preserve all prior log entries and other agents' work.

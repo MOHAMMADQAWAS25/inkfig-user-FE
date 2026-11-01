@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { MobileNavigation } from "../src/features/navigation/MobileNavigation";
 import { useProfileSwipe } from "../src/features/profile/useProfileSwipe";
 import { useScrollHeader } from "../src/features/home/useScrollHeader";
+import { ScrollHeader } from "../src/features/home/ScrollHeader";
 import { ProfilePager } from "../src/features/profile/ProfilePager";
 import { translations } from "../src/i18n/resources";
 
@@ -171,6 +172,19 @@ it("ignores multi-touch and prevents a swipe from opening an artwork", () => {
   fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
   swipe(area, -100);
   fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
+});
+it("updates only the header, not its parent or child tree, during scroll", () => {
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
+  vi.stubGlobal("cancelAnimationFrame", window.clearTimeout);
+  const parent = vi.fn(), child = vi.fn();
+  function Child() { child(); return <button>Search control</button>; }
+  function Page() { parent(); return <ScrollHeader><Child/></ScrollHeader>; }
+  const view = render(<Page/>);
+  parent.mockClear(); child.mockClear();
+  act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 80 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
+  expect(view.container.querySelector("header")?.style.getPropertyValue("--mobile-header-progress")).toBe("0.5");
+  expect(parent).not.toHaveBeenCalled(); expect(child).not.toHaveBeenCalled();
+  Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
 });
 it("moves the mobile header gradually with scroll distance in both directions", () => {
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
