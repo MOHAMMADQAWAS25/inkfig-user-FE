@@ -10524,3 +10524,25 @@ Consumes companion main-system migration20261101_018_create_exhibition_ratings.s
 ### Deployment and Git
 
 Backend migration/API first, frontend main workflow next; no user-system changes. Matching feature/exhibition-artwork-ratings branch; subject Add gallery-only artwork voting and read-only rating summaries. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commits/push/conflict/merge and deployment outcomes in handoff. Revert frontend commit first, backend application if needed, keeping/exporting live rating data rather than destructive automatic schema rollback. Baselines/policies in docs; historical entries retained.
+
+## 2026-11-01 - Remove ratings from card hover
+
+### Request and changes
+
+Removed RatingSummary rendering/imports from shared PostCard and profile artwork cards, covering home/search/related and profile posts/likes/saved including hover/focus/touch. Exhibition trophy/save icons and masonry dimensions unchanged. Gallery voting/results and opened-artwork/preview detail summaries retained. No backend/API/data changes or removal of stored votes.
+
+### Repositories and files
+
+inkfig-user-FE only: src/features/feed/PostCard.tsx, src/features/profile/ProfilePage.tsx, tests/exhibition-ratings-layout.test.mjs, docs/exhibition-artwork-ratings.md and this log. Clean main pulled and complete log read; baseline18d525aa0d9b7198c70f1c3399e03828f35b8a6c. Both backends unchanged.
+
+### API, database, permissions and scope
+
+No API, migration, authorization, dependency, credential, environment or SnapStart changes. No production data mutations. Only card rating presentation removed; rating functionality elsewhere intact.
+
+### Verification
+
+438 checks passed (101 Node/source,337 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Regression asserts no RatingSummary in card consumers while trophy and detail summaries/gallery controls remain. An existing first-login timing assertion failed once; targeted unchanged test and complete suite subsequently passed. No unrelated test/application edits or bypasses. No real-browser pixel certification; existing bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Frontend main workflow only. Branch fix/remove-card-hover-ratings; subject Remove rating summaries from artwork card hover. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/deployment outcome in handoff. Revert only this removal commit to restore card summaries; no schema/data rollback. Previous log entries preserved.

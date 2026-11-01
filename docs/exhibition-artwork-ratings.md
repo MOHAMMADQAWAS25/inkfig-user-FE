@@ -51,3 +51,13 @@ regressions accompany full test/build checks. No physical-device/pixel-layout or
 real production voting certification claimed. Backend enforces real permission,
 account, approval and time constraints; gallery-only is UI scope, not proof of the
 page that an HTTP client displayed. See companion backend doc for retention/cascades.
+
+## Card-hover removal (2026-11-01)
+
+User requested removing ratings from card hover. PostCard (home/search/related)
+and profile posts/likes/saved no longer render rating summaries, including touch
+or keyboard overlays. Exhibition trophy/save icons remain unchanged. Gallery
+voting/results and opened artwork/preview detail ratings remain available.
+Frontend-only branch `fix/remove-card-hover-ratings`, baseline `18d525a`.
+Revert only this removal commit to restore the hover summaries; no migration or
+backend data/permission changes.
