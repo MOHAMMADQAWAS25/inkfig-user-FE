@@ -10691,3 +10691,17 @@ Matching fix/leaderboard-controls branches in main-system and user-FE, clean mai
 ### Deployment and Git
 
 Backend first, frontend second through existing main deployments. Commit subject: Improve leaderboard navigation width filters and fractional stars. Fetch/rebase before branch push and authorized fast-forward main merge/push. Exact hashes, conflicts, push and deployment results in handoff. Revert frontend ticket commit first then backend if requested; preserve votes/schema, logs and unrelated work. Live offset pagination limitations unchanged.
+
+## 2026-11-01 - Hide leaderboard category filter heading
+
+### Request and changes
+
+Hide the visible Category/الفئة label above the leaderboard dropdown using scoped screen-reader-only CSS. Retain the existing aria-labelledby target, category options, keyboard interaction, filtering and pagination. Other selects unchanged.
+
+### Verification and scope
+
+Only user-FE affected. Clean main pulled ff-only, complete feature log read, branch fix/leaderboard-filter-label. Production TypeScript/Vite/SEO build and git diff --check verified before publication. No backend/schema/API/SnapStart changes or generated output committed.
+
+### Deployment and Git
+
+Commit subject: Hide leaderboard category heading accessibly. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Hash, conflicts, push and deployment status in handoff. Revert this focused commit to restore the visible label; preserve historical logs.

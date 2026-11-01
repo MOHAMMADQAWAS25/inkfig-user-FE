@@ -1,6 +1,7 @@
 .exhibitions-page.exhibition-leaderboard-page.app-page-with-sidebar { padding-inline-start:calc(var(--app-rail-size) + 18px); padding-inline-end:18px; }
 .exhibitions-shell.exhibition-leaderboard { max-width:none; width:100%; --leaderboard-columns:48px minmax(180px,2fr) minmax(125px,1.2fr) minmax(105px,.9fr) minmax(155px,1.1fr) 70px; }
 .exhibition-leaderboard-filter { width:min(100%,260px); margin-inline-start:auto; margin-block:16px; }
+.exhibition-leaderboard-filter .themed-select-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .exhibition-toolbar > .exhibition-back-button.exhibition-back-button-labeled { flex:0 0 auto; inline-size:auto; padding-inline:14px; gap:8px; }
 .exhibition-leaderboard-star { position:relative; display:block; width:17px; height:17px; flex:0 0 17px; }
 .exhibition-leaderboard-star > span { position:absolute; inset-block-start:0; inset-inline-start:0; height:17px; overflow:hidden; }
