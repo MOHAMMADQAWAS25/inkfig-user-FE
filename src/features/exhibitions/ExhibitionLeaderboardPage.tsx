@@ -46,10 +46,9 @@ export function ExhibitionLeaderboardPage() {
     <div className="exhibitions-shell exhibition-leaderboard">
       <ExhibitionToolbar id={exhibitionId} manage={false} signedIn={Boolean(session)} available={Boolean(first?.exhibition.participation_open)}/>
       <header className="exhibition-leaderboard-heading">
-        <span className="exhibition-leaderboard-emblem"><Trophy aria-hidden="true"/></span><h1>{label}</h1>
-        {first && <><h2>{first.exhibition.name}</h2>
-          <p>{!first.started ? (ar ? "سيظهر الترتيب عند بدء المعرض." : "Standings will be available when the exhibition starts.") : first.voting_open ? (ar ? "تزداد الإثارة" : "It becomes more exciting") : (ar ? "انتهى التصويت." : "Voting is closed.")}</p>
-        </>}
+        <span className="exhibition-leaderboard-emblem"><Trophy aria-hidden="true"/></span>
+        <h1>{ar ? "الأعمال الفنية الأعلى تقييماً" : "Top Rated Artworks"}</h1>
+        <p>{ar ? "مرتبة حسب تقييم المجتمع" : "Ranked by community rating"}</p>
       </header>
       <div className="exhibition-leaderboard-filter"><ThemedSelect label={ar ? "الفئة" : "Category"} value={category} onChange={setCategory} disabled={types.isPending || types.isError} options={[{value:"",label:ar ? "كل الفئات" : "All categories"},...(types.data ?? []).map(type => ({value:type.type_id,label:ar ? type.name_ar : type.name_en}))]}/>
       {types.isError && <button type="button" onClick={() => void types.refetch()}>{t("feed.retry")}</button>}</div>

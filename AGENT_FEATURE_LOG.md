@@ -10705,3 +10705,17 @@ Only user-FE affected. Clean main pulled ff-only, complete feature log read, bra
 ### Deployment and Git
 
 Commit subject: Hide leaderboard category heading accessibly. Fetch/rebase before branch push, then authorized fast-forward main merge/push. Hash, conflicts, push and deployment status in handoff. Revert this focused commit to restore the visible label; preserve historical logs.
+
+## 2026-11-02 - Simplify leaderboard trophy heading
+
+### Request and changes
+
+Replace the trophy-adjacent Leaderboard, exhibition name and event status text with Top Rated Artworks and Ranked by community rating, with Arabic equivalents. Adjust trophy grid span to two rows and subtitle spacing/contrast. Existing visually hidden Category label retained for accessibility; no visible category heading. Toolbar, filter, ranking, pagination, stars and popup unchanged.
+
+### Verification and scope
+
+User-FE only. Clean main pulled ff-only, complete feature log read, branch fix/leaderboard-heading. Production TypeScript/Vite/SEO build and git diff --check verified before publication. No backend, API, database, permissions or SnapStart changes. Existing bundle-size notice only.
+
+### Deployment and Git
+
+Commit subject: Update leaderboard trophy heading and subtitle. Fetch/rebase before branch push and authorized fast-forward main merge/push. Exact hash, conflicts, push and deployment status in handoff. Revert this focused commit to restore previous heading, preserving historical log entries.
