@@ -2010,6 +2010,18 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibitions-heading,.exhibitions-heading>div,.exhibition-actions,.exhibition-card footer { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .exhibitions-heading { justify-content:space-between; margin-bottom:24px; }
 .exhibitions-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr)); gap:22px; margin:24px 0; }
+.work-exhibition-badge { display:inline-flex; align-items:center; gap:6px; max-width:100%; min-width:0; padding:7px 10px; border:1px solid var(--primary); border-radius:999px; background:var(--surface); color:var(--text); font-size:.75rem; line-height:1.3; text-decoration:none; }
+.work-exhibition-badge svg { flex-shrink:0; color:var(--primary); }
+.work-exhibition-badge bdi { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.work-exhibition-overlay { position:absolute; top:12px; left:12px; z-index:5; max-width:calc(100% - 76px); opacity:0; pointer-events:none; transition:opacity 160ms ease; box-shadow:0 2px 8px rgb(0 0 0 / .15); }
+.feed-post-card:hover .work-exhibition-overlay,.artwork-card:hover .work-exhibition-overlay,.exhibition-artwork-card:hover .work-exhibition-overlay,.artwork-pin-media[data-focus-mode="keyboard"]:focus-within .work-exhibition-overlay,.exhibition-artwork-card:focus-visible .work-exhibition-overlay { opacity:1; }
+.work-exhibition-details { display:flex; flex-wrap:wrap; gap:8px; }
+.work-exhibition-details a:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+.work-exhibition-details a:hover { background:var(--surface-raised); }
+.work-exhibition-name { overflow-wrap:anywhere; }
+.exhibition-artwork-media { position:relative; }
+@media(hover:none){.work-exhibition-overlay { opacity:1; }}
+@media(prefers-reduced-motion:reduce){.work-exhibition-overlay { transition:none; }}
 .exhibition-card,.exhibition-summary,.exhibition-participation,.exhibition-editor,.exhibition-blocks { border:1px solid rgb(97 125 43 / .2); border-radius:18px; background:#fffdf2; overflow:hidden; }
 .exhibition-card { color:inherit; text-decoration:none; }
 .exhibition-card>img,.exhibition-card>a>img { display:block; width:100%; height:auto; }

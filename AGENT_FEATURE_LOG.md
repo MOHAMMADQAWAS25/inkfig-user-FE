@@ -10455,3 +10455,24 @@ No API, migration, permissions, dependencies, credentials, environment or SnapSt
 ### Deployment and Git
 
 Frontend main workflow only. Branch fix/vertical-exhibition-list; subject Simplify exhibition listing into ordered vertical cards. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commit/push/conflict and deployment outcome in handoff. Revert only this ticket commit to restore period text/spacing without undoing previous changes. Historical log entries preserved.
+## 2026-11-01 - Artwork exhibition year badges
+
+### Request and changes
+
+Implemented approved exhibition badge proposal with user-requested top-left card placement. Shared WorkExhibitionBadge displays latest event year and +N for additional distinct exhibitions, deduplicated by exhibition ID. Hover anywhere on home/related/profile/exhibition artwork cards reveals badge; keyboard media focus and touch/no-hover supported. Absolute non-intercepting overlay preserves masonry dimensions/save/navigation; reduced-motion disables fade. Opened artwork shows names/year badges with exhibition links beneath category; existing preview modal also supports metadata. Existing theme tokens, physical top-left in Arabic/English, and artwork design retained. No generated mockup asset integrated.
+
+### Repositories and files
+
+Companion main-system backend and user-FE only; user-system unchanged. Clean main pulled and complete log read; baseline aab22953bc3288d5da9ccb4214d8175b01a38c85. Files: new WorkExhibitionBadge.tsx, worksApi/exhibitionApi types, PostCard, ProfilePage, ExhibitionArtworkCard, ArtworkPage, ArtworkDetailModal, resources/styles, new badge interaction/layout tests, artwork-page test, docs/artwork-exhibition-badges.md and this log.
+
+### API, database, permissions and scope
+
+Consumes additive exhibitions array from backend page responses, with optional-field fallback for older API/caches. No per-card fetch, schema migration, dependency, permission, secret, environment or SnapStart change. Approved, started, unblocked membership eligibility and event year are backend-owned. Existing caches refresh normally; no new realtime invalidation promise. Opening details fetches fresh data. No production uploads/reviews/data mutations.
+
+### Verification
+
+419 frontend checks passed (100 Node/source,319 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. Coverage includes no membership/no markup, multiple/deduplicated exhibitions, English/Arabic links/years, actual opened-detail placement, top-left/whole-card hover, keyboard/touch/reduced-motion and shared consumer wiring. Existing masonry, image protection, navigation, pagination and interaction suites pass. Companion backend145 tests/mypy82 passed. No real-browser pixel/device certification; existing bundle-size/jsdom warnings remain.
+
+### Deployment and Git
+
+Backend first, frontend existing Cloudflare main workflow second; no migration/user-system change. Matching branch feature/artwork-exhibition-badges; frontend subject Show exhibition year badges on artwork cards and details. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commits, conflicts/push/merge and deployment outcomes in handoff. Revert only frontend ticket commit first, backend companion afterward if needed. Baseline/scope in docs; previous log entries preserved.

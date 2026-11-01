@@ -11,6 +11,7 @@ import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { ReportDialog } from "../reports/ReportDialog";
 import { relativeTime } from "../../lib/relativeTime";
 import { ArtworkMedia } from "./ArtworkMedia";
+import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
 
 type ArtworkDetailModalProps = {
   language: Language;
@@ -103,6 +104,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
+          {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail/>}
           {extraDetails}
           <div className="artwork-modal-meta">
             {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}

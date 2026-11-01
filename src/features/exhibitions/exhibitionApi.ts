@@ -1,4 +1,5 @@
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
+import type { WorkExhibition } from "../works/worksApi";
 
 export type ExhibitionInput = {
   name: string;
@@ -16,6 +17,7 @@ export type Exhibition = ExhibitionInput & {
   created_at: string;
 };
 export type Submission = {
+  exhibitions?: WorkExhibition[];
   submission_id: string;
   work_id: string;
   user_id: string;

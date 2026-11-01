@@ -21,6 +21,14 @@ vi.mock("../src/features/profile/profileApi", () => ({ getPublicProfile: vi.fn()
 vi.mock("../src/features/feed/Feed", () => ({ Feed: ({ items, renderItem, loadMore, hasNextPage, error, retry, restoreScroll }: any) => <section data-testid="related-feed" data-restore={String(restoreScroll)}>{items.map((item: FeedWork) => <div key={item.work_id}>{renderItem(item, 250, false)}</div>)}{hasNextPage && <button onClick={loadMore}>Load more related</button>}{error && <button onClick={retry}>Retry related</button>}</section> }));
 const sample: FeedWork = { work_id: "one", owner_user_id: "artist", artist_name: "Artist", artist_avatar_url: "/avatar.png", title: "Jerusalem’s Serenity", description: "A peaceful moment in Jerusalem.", type_id: "art", type_name_en: "Digital Art", type_name_ar: "فن رقمي", image_url: "/art.png", mime_type: "image/png", links: [{ url: "https://example.com", label: "Portfolio" }], created_at: "2026-10-11T12:00:00Z", like_count: 12, liked_by_me: false, saved_by_me: false };
 function Page() { const location = useLocation(); return <ArtworkPage key={location.pathname} />; }
+it("shows exhibition membership links below the category on the opened artwork",async()=>{
+  vi.mocked(getWork).mockResolvedValue({...sample,exhibitions:[{exhibition_id:"event",name:"Student exhibition",year:2026}]});
+  mount();
+  const badge=await screen.findByRole("link",{name:/Exhibition · 2026/});
+  expect(badge.getAttribute("href")).toBe("/en/exhibition/event");
+  expect(badge.closest(".artwork-page-info")).toBeTruthy();
+  expect(badge.closest(".work-exhibition-overlay")).toBeNull();
+});
 function Probe() { const location = useLocation(); return <output data-testid="route">{location.pathname}{location.search}</output>; }
 function mount(language = "en", state: object | null = null) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });

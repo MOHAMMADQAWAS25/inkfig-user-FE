@@ -10,6 +10,7 @@ import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ArtworkPageMedia } from "./ArtworkPageMedia";
+import { WorkExhibitionBadge } from "./WorkExhibitionBadge";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
 import { ReportDialog } from "../reports/ReportDialog";
@@ -111,6 +112,7 @@ export function ArtworkPage() {
           </div>
           <h1 id="artwork-title">{work.title}</h1>
           <span className="artwork-page-category">{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
+          <WorkExhibitionBadge exhibitions={work.exhibitions} detail/>
           <p className="artwork-page-description">{work.description || t("works.noDescription")}</p>
           <div className="artwork-page-date"><CalendarDays size={20} /><span>{t("artwork.created")}<time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{new Date(work.created_at).toLocaleDateString(language, { year: "numeric", month: "short", day: "numeric" })}</time></span></div>
           {work.links.length > 0 && <div className="artwork-page-links">{work.links.map((link, index) => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}</a>)}</div>}
