@@ -15,6 +15,7 @@ import { SettingsPage } from "../features/settings/SettingsPage";
 import { SiteFooter } from "../features/layout/SiteFooter";
 import { PageMetadata } from "../seo/PageMetadata";
 import { ExhibitionsPage } from "../features/exhibitions/ExhibitionsPage";
+import { ExhibitionLeaderboardPage } from "../features/exhibitions/ExhibitionLeaderboardPage";
 import { MyExhibitionSubmissionsPage, ReviewExhibitionSubmissionsPage } from "../features/exhibitions/MyExhibitionSubmissionsPage";
 
 export function AppRouter() {
@@ -32,6 +33,7 @@ export function AppRouter() {
       <Route path="/:language/profile/:userId" element={<ProfilePage />} />
       <Route path="/:language/exhibition" element={<ExhibitionsPage />} />
       <Route path="/:language/exhibition/:exhibitionId" element={<ExhibitionsPage />} />
+      <Route path="/:language/exhibition/:exhibitionId/leaderboard" element={<ExhibitionLeaderboardPage />} />
       <Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage />} />
       <Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage />} />
       <Route path="/:language/notifications" element={<FeaturePlaceholderPage feature="notifications" />} />

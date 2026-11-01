@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Pencil, Upload, Images, Trash2 } from "lucide-react";
+import { Pencil, Upload, Images, Trash2, Trophy } from "lucide-react";
 import { useI18n } from "../../i18n/I18nProvider";
 import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { ExhibitionNavbar } from "./ExhibitionNavbar";
@@ -14,6 +14,7 @@ export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdi
   const pending=(counts?.submissions??0)+(counts?.withdrawals??0);
   return <ExhibitionNavbar label={t("exhibitions.actions")}>
     <ExhibitionBackButton to={`/${language}/exhibition`} label={t("exhibitions.back")}/>
+    <Link to={`/${language}/exhibition/${id}/leaderboard`}><Trophy size={17} aria-hidden="true"/>{language === "ar" ? "لوحة الترتيب" : "Leaderboard"}</Link>
     {manage && onEdit && <button className="primary-button" disabled={busy} onClick={onEdit}><Pencil size={17} aria-hidden="true"/>{t("exhibitions.edit")}</button>}
     {onDelete && <button className="exhibition-delete-button" disabled={busy} onClick={onDelete}><Trash2 size={17} aria-hidden="true"/>{t("exhibitions.delete")}</button>}
     {manage && <Link to={`/${language}/exhibition/${id}/review`}>{t("exhibitions.reviewQueue")}{pending>0&&<span className="exhibition-count">{pending>99?"99+":pending}</span>}</Link>}

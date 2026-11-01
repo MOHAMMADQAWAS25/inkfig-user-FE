@@ -10625,3 +10625,26 @@ Backend first, frontend existing main workflow next; no migration/user-system de
 ### Synchronization
 
 Rebased over concurrent0f72634 sidebar tooltip restoration. Preserved its cleaner flag/span removal, caption-CSS removal, localized tooltip parity and administrator coverage; retained this ticket's creator-overlay test changes. Kept both complete feature-log entries in append order. Only sidebar/test/log overlap required resolution; remaining application changes merged automatically. Combined verification rerun before publication; exact final counts and deployment in handoff.
+
+
+## 2026-11-01 - Per-exhibition read-only leaderboard
+
+### Request and changes
+
+Add a leaderboard for each exhibition; omit artworks without counted votes entirely. Exhibition toolbar links to a dedicated localized leaderboard page. Responsive themed rows show rank, contained image, creator/avatar, category, two-decimal rating and votes. Twenty-row pagination appends/deduplicates server order; manual refresh starts page one. Loading/error/retry/upcoming/no-votes states and server last-fetched time. Existing details popup opens read-only for star voting, preserving list and scroll; gallery voting unchanged.
+
+### Repositories and scope
+
+Affected main-system and user-FE, matching feature/exhibition-leaderboard branches from updated clean main; baselines backend3162130 and frontend7d0f78a. Complete root feature logs read before changes. User-system unchanged. No credentials, generated assets, dependencies, unrelated files or historical log edits. Implementation and rollback notes in docs/exhibition-leaderboard.md.
+
+### API, database, permissions and SnapStart
+
+No migration or new write permission. Reuse existing rating/submission indexes. Backend filters and ranks complete eligible set before pagination. Public summaries contain no personal vote or voter identity. No startup connections/clock/state changes. Live offset pagination is not a frozen snapshot; moved rows may be skipped across requests, duplicates are hidden and Refresh restarts. Past results remain subject to moderation/account status; no winner declaration.
+
+### Verification
+
+106 Node checks and349 existing Vitest tests passed; two new leaderboard interaction tests passed for append/deduplication, read-only popup, refresh restart and no-vote empty state. Strict TypeScript/Vite/SEO production build passed. git diff --check passed. Initial sandbox access errors resolved by running authorized checks with required filesystem access. Existing non-blocking Vite bundle-size/jsdom notices remain. No browser visual/physical-device certification claimed. No production votes or data mutations used for testing.
+
+### Deployment and Git
+
+Deploy backend first, frontend second through existing main workflows; no user-system deployment. Commit subject: Add read-only exhibition leaderboard pages. Fetch/rebase before branch push; previously authorized fast-forward merge/push main. Exact commit hashes, conflicts, push/merge and workflow results in final handoff. Revert frontend ticket commit first, then backend ticket commit if requested, preserving historical logs, votes/schema and unrelated work; no reset or destructive rollback.
