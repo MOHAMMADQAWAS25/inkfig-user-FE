@@ -367,6 +367,16 @@ it("opens a current exhibition as a titled split-card wall without its banner", 
   expect(container.querySelector('[src="/banner.jpg"]')).toBeNull();
 });
 
+it("opens past exhibitions at the top without resetting scroll during live updates",async()=>{
+  vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:"2020-01-01T00:00:00Z",event_ends_at:"2020-01-02T00:00:00Z"});
+  view();await screen.findByRole("heading",{name:exhibition.name});
+  expect(window.scrollTo).toHaveBeenCalledWith({top:0,behavior:"instant"});
+  vi.mocked(window.scrollTo).mockClear();vi.mocked(api.getSubmissions).mockClear();
+  act(()=>window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}})));
+  await waitFor(()=>expect(api.getSubmissions).toHaveBeenCalled());
+  expect(window.scrollTo).not.toHaveBeenCalled();
+});
+
 it("keeps one loading screen until the initial exhibition wall is ready",async()=>{
   vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,event_at:"2020-01-01T00:00:00Z"});
   let resolve!:(page:api.Page<api.Submission>)=>void;

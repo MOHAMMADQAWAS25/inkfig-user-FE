@@ -91,7 +91,7 @@ it("preserves permission-gated like/save actions and refetches confirmed work da
   mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
   const dialog=await screen.findByRole("dialog",{name:"Full painting"});
   fireEvent.click(within(dialog).getByRole("button",{name:"0 likes"}));
-  await within(dialog).findByRole("button",{name:"1 likes"});
+  await within(dialog).findByRole("button",{name:"1 like"});
   expect(setWorkLike).toHaveBeenCalledWith("art",true);
   fireEvent.click(within(dialog).getByRole("button",{name:"Save"}));
   await waitFor(()=>expect(setWorkSave).toHaveBeenCalledWith("art",true));

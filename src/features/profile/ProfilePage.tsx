@@ -1,6 +1,7 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
 import { ProfileAvatar } from "./ProfileAvatar";
+import { likeCountLabel } from "../../lib/likeCount";
 import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trophy, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ProfilePager } from "./ProfilePager";
@@ -46,7 +47,7 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
       <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event=>{if(event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();onSelect(work);}}}><img {...artworkImageProtection} className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></Link>
       <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language}/><span>{work.artist_name}</span></Link>
-      <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={`${work.like_count} ${t("home.likes")}`} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
+      <button className={`artwork-pin-like ${work.liked_by_me?"liked":""}`} disabled={!canLike} aria-label={likeCountLabel(work.like_count,t)} type="button" onClick={()=>onLike(work)}><Heart size={18} fill={work.liked_by_me?"currentColor":"none"}/><span>{work.like_count}</span></button>
       {canSave&&<button className={`artwork-pin-save ${work.saved_by_me?"saved":""}`} aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} type="button" onClick={()=>onSave(work)}><Bookmark size={21} fill={work.saved_by_me?"currentColor":"none"}/></button>}
     </CardMedia>{canManage&&<SmoothDetails className="artwork-owner-menu"><summary aria-label={t("works.managePost")} title={t("works.managePost")}><MoreHorizontal size={19}/></summary><div>{onAssign&&<button type="button" onClick={()=>onAssign(work)}><Trophy size={16}/>{t("exhibitions.assign")}</button>}<button type="button" onClick={()=>onEdit(work)}><Pencil size={16}/>{t("works.editPost")}</button><button className="danger" type="button" onClick={()=>onDelete(work)}><Trash2 size={16}/>{t("works.deletePost")}</button></div></SmoothDetails>}</article>)}</div>;
 }
@@ -97,23 +98,28 @@ export function ProfilePage() {
 
   useEffect(()=>{
     if(!session||!profileUserId)return;
+    let active = true;
+    restoreY.current = null;
+    setFailed(false);
     const cached = client.getQueryData<ProfileSnapshot>(["profile-gallery", session.userId, profileUserId]);
     if (cached) {
       setProfile(cached.profile); setPosts(cached.posts); setLikes(cached.likes); setSaved(cached.saved);
       setCursors(cached.cursors); setSection(cached.section); restoreY.current = cached.y; setLoading(false);
-      void getPublicProfile(profileUserId).then(setProfile).catch(()=>undefined);
-      return;
+      void getPublicProfile(profileUserId).then(value=>{if(active)setProfile(value);}).catch(()=>undefined);
+      return () => { active=false; };
     }
     setLoading(true);setFailed(false);
     const requests:Promise<unknown>[]=[getPublicProfile(profileUserId),getUserWorks(profileUserId)];
     if(ownProfile)requests.push(getLikedWorks(),getSavedWorks());
     Promise.all(requests).then(([details,works,liked={items:[],next_cursor:null},savedWorks={items:[],next_cursor:null}])=>{
+      if(!active)return;
       const postsPage=works as WorkPage;const likesPage=liked as WorkPage;const savedPage=savedWorks as WorkPage;
       setProfile(details as PublicProfile);setPosts(postsPage.items);
       setLikes(likesPage.items);setSaved(savedPage.items);
       setCursors({posts:String(postsPage.next_cursor??"")||null,likes:String(likesPage.next_cursor??"")||null,saved:String(savedPage.next_cursor??"")||null});
-    }).catch(()=>setFailed(true)).finally(()=>setLoading(false));
-  },[ownProfile,profileUserId,session]);
+    }).catch(()=>{if(active)setFailed(true);}).finally(()=>{if(active)setLoading(false);});
+    return () => { active=false; };
+  },[ownProfile,profileUserId,session?.userId]);
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
   useEffect(()=>{setAvatarError(false);setAvatarUploadError(false);setAvatarRemoveError(false);},[profileUserId]);
   useEffect(()=>{if(ownProfile)void getWorkTypes().then(setWorkTypes).catch(()=>setWorkTypes([]));},[ownProfile]);

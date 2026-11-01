@@ -97,15 +97,26 @@ describe("home and panel interactions",()=>{
     fireEvent.change(input,{target:{value:""}});
     expect(container.querySelector(".search-hints")?.getAttribute("data-visible")).toBe("true");
   });
-  it("places the compact creator inside the artwork and falls back when the avatar fails",()=>{
+  it("places the creator and like control below the artwork and falls back when the avatar fails",()=>{
     const work={work_id:"work",title:"Art",artist_name:"Ahmad",artist_avatar_url:"/ahmad.png",owner_user_id:"ahmad",type_name_en:"Digital art",mime_type:"image/png",image_url:"/art.png",like_count:0} as FeedWork;
     const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={vi.fn()} onLike={vi.fn()} onSave={vi.fn()}/></MemoryRouter>);
     const creator=container.querySelector<HTMLAnchorElement>(".feed-creator")!;
-    expect(creator.closest(".artwork-pin-media")).toBeTruthy();
+    expect(creator.closest(".artwork-pin-media")).toBeNull();
+    expect(creator.closest(".feed-card-footer")).toBeTruthy();
+    expect(container.querySelector(".feed-card-footer .feed-card-like")?.textContent).toBe("0 likes");
     expect(creator.getAttribute("href")).toBe("/en/profile/ahmad");
     expect(creator.textContent).toBe("Ahmad");
     fireEvent.error(creator.querySelector("img")!);
     expect(creator.querySelector(".feed-creator-initial")?.textContent).toBe("A");
+  });
+  it.each([0,1,2])("uses the correct visible like count (%s) and never opens the artwork on a footer like",count=>{
+    const onOpen=vi.fn(),onLike=vi.fn();
+    const work={work_id:"work",title:"Art",artist_name:"Ahmad",owner_user_id:"ahmad",type_name_en:"Digital art",mime_type:"image/png",image_url:"/art.png",like_count:count} as FeedWork;
+    const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={onOpen} onLike={onLike} onSave={vi.fn()}/></MemoryRouter>);
+    const button=screen.getByRole("button",{name:`${count} ${count===1?"like":"likes"}`});
+    expect(button.closest(".feed-card-footer")).toBeTruthy();
+    fireEvent.click(button);expect(onLike).toHaveBeenCalledWith(work);expect(onOpen).not.toHaveBeenCalled();
+    expect(container.querySelector(".artwork-pin-media .artwork-pin-like")).toBeNull();
   });
   it.each(["Escape","submit"])("releases mobile search focus after %s so header scrolling can resume",async action=>{
     vi.stubGlobal("matchMedia",(query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()}));

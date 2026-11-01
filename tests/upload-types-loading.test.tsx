@@ -6,6 +6,7 @@ import { I18nProvider } from "../src/i18n/I18nProvider";
 import { translations } from "../src/i18n/resources";
 import { UploadWorkPage } from "../src/features/works/UploadWorkPage";
 import { getWorkTypes, type WorkType } from "../src/features/works/worksApi";
+import { cacheWorkTypes } from "../src/features/works/workTypesCache";
 
 vi.mock("../src/features/auth/AuthContext", () => ({ useAuth: () => ({ session: { userId: "viewer", permissions: ["works.upload"] } }) }));
 vi.mock("../src/features/navigation/AppSidebar", () => ({ AppSidebar: () => null }));
@@ -21,8 +22,8 @@ const types: WorkType[] = [{ type_id: "art", code: "digital-art", name_en: "Digi
 function mount(language: "en" | "ar" = "en") {
   return render(<MemoryRouter initialEntries={[`/${language}/upload`]}><I18nProvider><UploadWorkPage /></I18nProvider></MemoryRouter>);
 }
-beforeEach(() => { vi.resetAllMocks(); });
-afterEach(cleanup);
+beforeEach(() => { vi.resetAllMocks(); sessionStorage.clear(); });
+afterEach(()=>{cleanup();sessionStorage.clear();});
 
 it.each(["en", "ar"] as const)("does not flash an empty/error message while types load (%s)", async language => {
   const request = deferred(); vi.mocked(getWorkTypes).mockReturnValue(request.promise);
@@ -30,10 +31,18 @@ it.each(["en", "ar"] as const)("does not flash an empty/error message while type
   expect(screen.queryByText(translations[language]["works.noTypes"])).toBeNull();
   expect(screen.queryByRole("alert")).toBeNull();
   expect(screen.queryByRole("radio")).toBeNull();
+  expect(screen.getByRole("status").textContent).toBe(translations[language]["works.loadingTypes"]);
+  expect(document.querySelectorAll(".work-type-skeleton")).toHaveLength(9);
   expect(screen.getByRole<HTMLButtonElement>("button", { name: translations[language]["works.publish"] }).disabled).toBe(true);
   await act(async () => request.resolve(types));
   expect(screen.getByRole("radio", { name: language === "en" ? "Digital Art" : "فن رقمي" })).toBeTruthy();
   expect(screen.queryByText(translations[language]["works.noTypes"])).toBeNull();
+});
+
+it("renders cached official type buttons on the first render rather than waiting for an effect",()=>{
+  cacheWorkTypes(types);vi.mocked(getWorkTypes).mockReturnValue(new Promise(()=>{}));
+  mount();expect(screen.getByRole("radio",{name:"Digital Art"})).toBeTruthy();
+  expect(document.querySelector(".work-type-skeleton")).toBeNull();
 });
 
 it("shows the empty state only after a successful empty response", async () => {

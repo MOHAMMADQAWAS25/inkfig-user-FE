@@ -11,10 +11,11 @@ test("homepage footer follows document flow and both themes",()=>{
   assert.match(shared, /\.site-footer \{ position: static;[^}]*min-height: 76px/);
   assert.match(shared, /:root\[data-theme="dark"\] \.site-footer \{ background: #171d11/);
 });
-test("camera badge and hover-expanding logout are available on desktop",()=>{
+test("camera badge and fixed icon-only logout are available on desktop",()=>{
   assert.match(shared, /\.profile-avatar-actions \{ display: none/);
   assert.match(shared, /\.profile-avatar-camera \{[^}]*display: block/);
-  assert.match(shared, /@media \(min-width: 721px\)[\s\S]*\.profile-logout:hover[^}]*width: 128px/);
+  assert.match(shared, /\.profile-logout:is\(:hover,:focus-visible\) \{ width:44px/);
+  assert.match(shared, /\.profile-logout > span \{ display:none/);
   assert.match(shared, /\.app-sidebar-logo img \{ width: 58px/);
 });
 test("pointer focus cannot pin card overlays but keyboard focus remains supported",()=>{

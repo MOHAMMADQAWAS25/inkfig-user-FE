@@ -10719,3 +10719,35 @@ User-FE only. Clean main pulled ff-only, complete feature log read, branch fix/l
 ### Deployment and Git
 
 Commit subject: Update leaderboard trophy heading and subtitle. Fetch/rebase before branch push and authorized fast-forward main merge/push. Exact hash, conflicts, push and deployment status in handoff. Revert this focused commit to restore previous heading, preserving historical log entries.
+
+## 2026-11-02 - Profile controls, exhibition framing and visible artwork footers
+
+### Request and changes
+
+- Profile Report and Logout stay icon-only,44px and fixed-width on hover/focus, with theme-aware danger color/shadow feedback rather than expanding labels. Existing accessible names/actions remain. All three collection tabs align at column centers, with counters positioned separately so the icon and56px underline share a center in both directions; outer tabs move inward.
+- Exhibition gallery image panels layer a decorative blurred/saturated original behind the sharp contained image, filling aspect-ratio gaps without obscuring artwork. Hover targets only the sharp original; reduced-motion remains effective. Detail route resets window scroll to top when exhibition ID changes, not on live refreshes or popup dismissal.
+- Restored visible creator/avatar beneath shared home/search/related cards and placed a permission-gated heart/count action opposite it. Footer44px is included in virtual layout calculations independently of natural image proportions. Long names/counts are bounded; reactions do not open artwork. Shared localized likeCountLabel uses singular1 like across cards and opened views, preserving plural/Arabic labels.
+- Public work-type metadata uses a validated five-minute per-tab cache and shared in-flight request. Upload initializes real cached options synchronously across navigation/refresh. First-time uncached loads reserve the category grid with noninteractive localized placeholders, retaining loading/error/empty/retry/disabled-submit distinctions and real server IDs. Malformed/duplicate/expired/future records ignored; storage-disabled browsers fall back to requests; failed requests release the pending promise for retry. No user/private/file/credential data cached; backend still validates types and publication.
+- Fixed a related profile request race: late successes/failures/completions, including cached background refreshes, cannot overwrite a different viewed profile after route changes. Stable identity dependencies avoid repeated effects; previous error/scroll-restoration state resets for the new scope. Existing own-profile artwork return restoration retained.
+
+### Repositories and files
+
+All three repositories checked clean, main switched/pulled ff-only. Frontend only; both backends unchanged. Baseline09f4698 includes current leaderboard work, preserved. Changed scoped profile/exhibition/feed/upload components, feed geometry, work-type cache/API, like-label helper, localization/styles, focused tests and infinite-feed documentation. No unrelated files, dependencies, generated output or configuration committed. Historical log entries preserved.
+
+### API, database, permissions and scope
+
+No API contracts, migration, role/permission, auth, storage/image processing or backend/SnapStart changes. GET /works/types is public reference data; no private query cache persisted. Five-minute staleness is bounded and server validation remains authoritative. Profile/report/logout/likes/upload/exhibition eligibility and other users' access remain backend-enforced. No production writes/uploads/reports/votes used for verification.
+
+### Verification
+
+469 frontend checks passed (108 Node/source,361 Vitest); strict TypeScript/Vite/SEO production build and git diff --check passed. Added coverage for type-cache refresh/concurrency/TTL/retry/storage restrictions, first-frame cached options and nine placeholder tiles, stale profile response isolation, past exhibition top reset without live-update jumps, footer reactions/no navigation,0/1/2 like labels, centered tabs and independent blur. Existing popup, rating, leaderboard, upload, pagination, gesture, permissions and responsive regressions remain passing. Updated obsolete creator-overlay/read-only singular-label assertions to new behavior. No failed checks bypassed; existing non-blocking bundle-size/jsdom notices remain.
+
+Headless Edge read-only synthetic fixtures checked light own-profile, dark other-profile, Arabic390px profile, exhibition framing, uncached picker grid and card footers. Tab/icon centers match numerically, Report44px and measured desktop content stays within viewport. Original image sharp over blurred gaps; actual mobile stacks and footer placement reviewed. Temporary fixture needed a React resolution alias, corrected fixture only; animations disabled for final-state screenshots. No physical-device/animation certification or real-account mutation claims. Temporary sources removed, no-refresh preview stopped and final build clears fixture assets.
+
+### Deployment and Git
+
+Frontend existing main workflow only; no migration/backend deployment. Branch fix/profile-gallery-upload-polish. Commit subject Refine profile controls and restore artwork card footers. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hash, conflict/push/merge and deployment results in handoff. Revert only this ticket commit to restore prior presentation/cache behavior while preserving leaderboard, rating data and other work; no reset, force push, branch deletion or historical log rewrite.
+
+### Post-synchronization
+
+Rebased over79b7bcc and its leaderboard navigation/filter/heading predecessors. Only the feature-log append point conflicted; preserved all three incoming complete entries and this ticket entry in order. Application/test changes merged automatically. Combined tests, type/build and whitespace checks rerun before publication; exact final counts and deployment reported in handoff.

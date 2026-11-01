@@ -20,6 +20,7 @@ import { useRelatedArtworks } from "./useRelatedArtworks";
 import { artworkPath, safeArtworkReturn } from "./artworkNavigation";
 import { updateArtworkCache } from "./updateArtworkCache";
 import "./artworkPage.css";
+import { likeCountLabel } from "../../lib/likeCount";
 
 export function ArtworkPage() {
   const { workId = "" } = useParams();
@@ -116,7 +117,7 @@ export function ArtworkPage() {
           <p className="artwork-page-description">{work.description || t("works.noDescription")}</p>
           <div className="artwork-page-date"><CalendarDays size={20} /><span>{t("artwork.created")}<time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{new Date(work.created_at).toLocaleDateString(language, { year: "numeric", month: "short", day: "numeric" })}</time></span></div>
           {work.links.length > 0 && <div className="artwork-page-links">{work.links.map((link, index) => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}</a>)}</div>}
-          <div className="artwork-page-actions"><button type="button" disabled={!can("works.like")} aria-pressed={work.liked_by_me} onClick={() => like(work)}><Heart size={22} fill={work.liked_by_me ? "currentColor" : "none"} />{work.like_count} {t("home.likes")}</button><button type="button" disabled={!can("works.save")} aria-pressed={work.saved_by_me} onClick={() => save(work)}><Bookmark size={22} fill={work.saved_by_me ? "currentColor" : "none"} />{t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")}</button></div>
+          <div className="artwork-page-actions"><button type="button" disabled={!can("works.like")} aria-pressed={work.liked_by_me} onClick={() => like(work)}><Heart size={22} fill={work.liked_by_me ? "currentColor" : "none"} />{likeCountLabel(work.like_count,t)}</button><button type="button" disabled={!can("works.save")} aria-pressed={work.saved_by_me} onClick={() => save(work)}><Bookmark size={22} fill={work.saved_by_me ? "currentColor" : "none"} />{t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")}</button></div>
           <div className="artwork-page-share"><button type="button" onClick={() => void share(true)}><Copy size={19} />{t("artwork.copyLink")}</button><button type="button" onClick={() => void share()}><Share2 size={19} />{t("artwork.share")}</button></div>
           <div className="artwork-page-manage">
             {own && can("works.upload") && <><Link to={`/${language}/profile?edit=${encodeURIComponent(work.work_id)}`}><Pencil size={16} />{t("works.editPost")}</Link><button type="button" disabled={deleting} onClick={() => void remove()}><Trash2 size={16} />{t("works.deletePost")}</button></>}

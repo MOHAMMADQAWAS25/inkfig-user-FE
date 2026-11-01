@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -38,6 +38,7 @@ export function ExhibitionsPage() {
   const { session } = useAuth();
   const { language, t } = useI18n();
   const { exhibitionId } = useParams();
+  useLayoutEffect(() => { if (exhibitionId) window.scrollTo({top:0,behavior:"instant"}); }, [exhibitionId]);
   const popupScope = JSON.stringify([exhibitionId, session?.userId ?? "guest"]);
   const [artworkPopup, setArtworkPopup] = useState<{ scope: string; workId: string } | null>(null);
   const openArtwork = useCallback((workId: string) => setArtworkPopup({scope:popupScope,workId}), [popupScope]);

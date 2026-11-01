@@ -9,7 +9,8 @@ import type { WorkType } from "./worksApi";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { getEligibleExhibitions, submitWork } from "../exhibitions/exhibitionApi";
-import { WorkTypePicker } from "./WorkTypePicker";
+import { WorkTypePicker, WorkTypePickerSkeleton } from "./WorkTypePicker";
+import { readCachedWorkTypes } from "./workTypesCache";
 import { WorkImageDimensionsError } from "./workImageDimensions";
 
 export function UploadWorkPage() {
@@ -19,11 +20,11 @@ export function UploadWorkPage() {
  const [previewFile,setPreviewFile]=useState<File|null>(null); const [previewUrl,setPreviewUrl]=useState("");
  const [dragging,setDragging]=useState(false);
  useEffect(()=>{if(!previewFile){setPreviewUrl("");return;}const url=URL.createObjectURL(previewFile);setPreviewUrl(url);return()=>URL.revokeObjectURL(url);},[previewFile]);
- const [types,setTypes]=useState<WorkType[]>([]); const [file,setFile]=useState<File|null>(null); const [typeId,setTypeId]=useState(""); const [title,setTitle]=useState(""); const [description,setDescription]=useState(""); const [links,setLinks]=useState([{label:"",url:""}]); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
- const [typesStatus,setTypesStatus]=useState<"loading"|"ready"|"error">("loading");
+ const [types,setTypes]=useState<WorkType[]>(()=>readCachedWorkTypes() ?? []); const [file,setFile]=useState<File|null>(null); const [typeId,setTypeId]=useState(""); const [title,setTitle]=useState(""); const [description,setDescription]=useState(""); const [links,setLinks]=useState([{label:"",url:""}]); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
+ const [typesStatus,setTypesStatus]=useState<"loading"|"ready"|"error">(()=>readCachedWorkTypes() ? "ready" : "loading");
  const [typesRequest,setTypesRequest]=useState(0);
  useEffect(()=>{
-   let active=true;setTypesStatus("loading");
+   let active=true;if (!readCachedWorkTypes()) setTypesStatus("loading");
    getWorkTypes().then(items=>{if(active){setTypes(items);setTypesStatus("ready");}})
      .catch(()=>{if(active)setTypesStatus("error");});
    return()=>{active=false;};
@@ -53,6 +54,7 @@ export function UploadWorkPage() {
        <header className="upload-heading"><span className="upload-heading-icon"><ImagePlus size={34} aria-hidden="true"/></span><div><h1 id="upload-title">{t("works.uploadTitle")}</h1><p>{t("works.uploadDescription")}</p></div></header>
        <label className="upload-field"><span><Type size={18} aria-hidden="true"/>{t("works.title")} <span aria-hidden="true">*</span></span><input required maxLength={160} value={title} disabled={busy} onChange={event=>setTitle(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{title.length}/160</small></label>
        {typesStatus==="ready"&&(types.length ? <WorkTypePicker types={types} value={typeId} onChange={setTypeId} disabled={busy}/> : <p className="form-message error-message" role="status">{t("works.noTypes")}</p>)}
+       {typesStatus==="loading"&&<WorkTypePickerSkeleton/>}
        {typesStatus==="error"&&<div className="form-message error-message" role="alert"><p>{t("works.loadFailed")}</p><button type="button" className="text-button" disabled={busy} onClick={()=>{setTypesStatus("loading");setTypesRequest(value=>value+1);}}>{t("feed.retry")}</button></div>}
        <label className="upload-field"><span><FileText size={18} aria-hidden="true"/>{t("works.description")}</span><textarea maxLength={2000} value={description} disabled={busy} onChange={event=>setDescription(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{description.length}/2000</small></label>
        {error&&<p className="form-message error-message" role="alert">{error}</p>}

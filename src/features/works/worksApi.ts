@@ -1,5 +1,6 @@
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
 import { validateWorkImageDimensions } from "./workImageDimensions";
+import { cacheWorkTypes, readCachedWorkTypes } from "./workTypesCache";
 import type { RatingTotals, WorkRatingSummary } from "../exhibitions/exhibitionRatingTypes";
 export type WorkExhibition = { exhibition_id: string; name: string; year: number; rating?: RatingTotals };
 
@@ -63,7 +64,15 @@ export async function getMyWorks(cursor?:string): Promise<WorkPage> { return (aw
 export async function getUserWorks(userId:string,cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/users/${userId}${cursorSuffix(cursor)}`)).data; }
 export async function getLikedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/likes${cursorSuffix(cursor)}`)).data; }
 export async function getSavedWorks(cursor?:string): Promise<WorkPage> { return (await requestJson<WorkPage>(mainApiBaseUrl,"GET",`/works/saves${cursorSuffix(cursor)}`)).data; }
-export async function getWorkTypes(): Promise<WorkType[]> { return (await requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")).data; }
+let pendingWorkTypes: Promise<WorkType[]> | null = null;
+export function getWorkTypes(): Promise<WorkType[]> {
+  const cached = readCachedWorkTypes();
+  if (cached) return Promise.resolve(cached);
+  if (!pendingWorkTypes) pendingWorkTypes = requestJson<WorkType[]>(mainApiBaseUrl, "GET", "/works/types")
+    .then(({ data }) => { cacheWorkTypes(data); return data; })
+    .finally(() => { pendingWorkTypes = null; });
+  return pendingWorkTypes;
+}
 export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<string> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
   await validateWorkImageDimensions(input.file);

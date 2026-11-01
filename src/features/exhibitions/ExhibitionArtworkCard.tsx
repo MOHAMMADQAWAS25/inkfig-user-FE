@@ -14,7 +14,7 @@ export const ExhibitionArtworkCard = memo(function ExhibitionArtworkCard({ item,
   return <article className="exhibition-artwork-card" onClick={event => {
     if (event.target instanceof Element && !event.target.closest("button,a,input,label,form,.exhibition-rating-controls")) open();
   }}>
-    <button type="button" className="exhibition-artwork-media" onClick={open} aria-haspopup="dialog" aria-label={`${t("works.viewDetails")}: ${item.title}`}><img {...artworkImageProtection} src={item.image_url} alt="" loading="lazy" decoding="async"/></button>
+    <button type="button" className="exhibition-artwork-media" onClick={open} aria-haspopup="dialog" aria-label={`${t("works.viewDetails")}: ${item.title}`}><img {...artworkImageProtection} className="exhibition-artwork-blur" src={item.image_url} alt="" aria-hidden="true" draggable={false} loading="lazy" decoding="async"/><img {...artworkImageProtection} className="exhibition-artwork-original" src={item.image_url} alt="" loading="lazy" decoding="async"/></button>
     <div className="exhibition-artwork-details">
       {(item.type_name_en || item.type_name_ar) && <span className="exhibition-artwork-type">{language === "ar" ? item.type_name_ar : item.type_name_en}</span>}
       <h3><button type="button" className="exhibition-artwork-title" aria-haspopup="dialog" onClick={open}>{item.title}</button></h3>

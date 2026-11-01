@@ -31,7 +31,10 @@ filters across route navigation; detail overlays leave the feed mounted.
 ## Masonry and virtualization
 
 `FeedLayout` derives heights from stored dimensions before downloading images.
-Cards have no variable-height footer: existing controls overlay the media.
+Cards reserve a fixed44px creator/like footer below the media. Masonry adds this
+height independently of each image's natural aspect ratio. Creator links remain
+visible on touch and desktop; the permission-gated heart/count action is separate
+from artwork navigation. Save and exhibition badges remain media overlays.
 Each append goes into the shortest column. The layout cache preserves existing
 positions on append and interaction changes, rebuilding on geometry, order,
 dimensions or direction changes. Cards use absolute translate3d positions;

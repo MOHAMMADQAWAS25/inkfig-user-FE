@@ -15,13 +15,11 @@ test("rating stars preview without pointer focus rectangles and remain keyboard 
   assert.match(polish,/exhibition-rating-stars input \{[^}]*background:transparent; box-shadow:none; outline:0/);
   assert.match(polish,/artwork-modal-media-footer \.exhibition-rating-controls/);
 });
-test("creator overlay has no reserved row and touch scrolling cannot reveal it",()=>{
-  assert.match(readFileSync("src/features/feed/feedLayout.ts","utf8"),/CREATOR_ROW_HEIGHT = 0/);
-  assert.match(polish,/\.feed-post-card \{ grid-template-rows:minmax\(0,1fr\)/);
-  assert.match(polish,/opacity:0; pointer-events:none/);
-  assert.match(polish,/@media\(hover:hover\) and \(pointer:fine\)/);
-  assert.match(polish,/data-focus-mode="keyboard"/);
-  assert.match(polish,/width:22px; height:22px/);
+test("visible creator and likes row reserves space outside natural image proportions",()=>{
+  assert.match(readFileSync("src/features/feed/feedLayout.ts","utf8"),/CREATOR_ROW_HEIGHT = 44/);
+  assert.match(polish,/\.feed-post-card \{ grid-template-rows:minmax\(0,1fr\) 44px/);
+  assert.match(polish,/\.feed-card-footer \{ display:flex/);
+  assert.match(polish,/\.feed-card-footer \.feed-creator \{[^}]*opacity:1; pointer-events:auto/);
 });
 test("footer is centered and theme-relative, report/actions keep stable dimensions",()=>{
   assert.match(polish,/\.site-footer \{ position:static; justify-content:center/);

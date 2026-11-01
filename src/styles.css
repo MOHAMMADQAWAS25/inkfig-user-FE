@@ -2324,7 +2324,7 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .artwork-modal-creator-avatar { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; object-fit: cover; }
 @media (hover:hover) and (pointer:fine) {
   .exhibition-artwork-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 12px 30px rgb(25 36 12 / .15); }
-  .exhibition-artwork-card:hover .exhibition-artwork-media img { transform: scale(1.035); filter: brightness(.96); }
+  .exhibition-artwork-card:hover .exhibition-artwork-media .exhibition-artwork-original { transform: scale(1.035); filter: brightness(.96); }
 }
 @media (max-width:1100px) { .exhibition-artwork-grid { grid-template-columns: minmax(0,1fr); } }
 @media (max-width:480px) { .exhibition-artwork-card { grid-template-columns: minmax(0,1fr); }.exhibition-artwork-media { min-height: 220px; height: 260px; }.exhibition-artwork-details { border-inline-start: 0; border-top: 1px solid var(--border); } }
@@ -2430,3 +2430,29 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 @media(max-width:780px) { .artwork-modal-media-column { max-width:100%; width:100%; }.artwork-modal-media-column .artwork-media-original { max-height:42svh; }.artwork-modal-media-footer { padding:18px; } }
 @media(max-width:720px) { .exhibition-detail-page.app-page-with-sidebar { --exhibition-gutter:var(--page-gutter,14px); }.site-footer { min-height:104px; padding:22px 16px; gap:8px; }.site-footer p { font-size:.72rem; } }
 @media(prefers-reduced-motion:reduce) { .exhibition-artwork-artist,.exhibition-rating-stars label svg,.feed-post-card .feed-creator,.profile-artwork-grid .artwork-pin-media .artwork-artist-link,.profile-actions .profile-report-button,.artwork-modal-actions :is(.artwork-modal-like,.artwork-modal-save) { transition:none; }.exhibition-artwork-artist:hover,.feed-post-card .feed-creator:hover,.profile-artwork-grid .artwork-pin-media .artwork-artist-link:hover { transform:none; } }
+
+/* Visible card identities, stable profile controls and framed exhibition media. */
+.feed-post-card { grid-template-rows:minmax(0,1fr) 44px; }
+.feed-card-footer { display:flex; align-items:center; justify-content:space-between; gap:6px; height:44px; min-width:0; }
+.feed-post-card .feed-card-footer .feed-creator { position:static; display:flex; flex:1 1 0; min-width:0; max-width:100%; min-height:40px; height:auto; padding:0; border:0; border-radius:8px; background:transparent; color:var(--text); font-size:.74rem; opacity:1; pointer-events:auto; transform:none; }
+.feed-card-footer .feed-creator-name { min-width:0; max-width:100%; padding:0; }
+.feed-card-like { flex:0 0 auto; display:inline-flex; justify-content:center; align-items:center; gap:4px; min-height:40px; max-width:55%; padding:6px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.7rem; white-space:nowrap; cursor:pointer; transition:color 160ms ease,background-color 160ms ease; }
+.feed-card-like svg { flex:0 0 16px; color:var(--danger); transition:transform 160ms ease; }
+.feed-card-like span { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.feed-card-like.liked { color:var(--danger); }
+.feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,var(--danger) 10%,transparent); color:var(--danger); }
+.feed-card-like:hover:not(:disabled) svg { transform:scale(1.1); }
+.feed-card-like:disabled { cursor:default; }
+.feed-post-card .feed-card-footer .feed-creator:hover { color:var(--primary); background:transparent; transform:none; }
+.profile-page .profile-actions .profile-report-button,.profile-page .profile-intro .profile-logout { flex:0 0 44px; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; gap:0; justify-content:center; border-radius:12px; transform:none; transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease; }
+.profile-page .profile-actions .profile-report-button:is(:hover,:focus-visible),.profile-page .profile-intro .profile-logout:is(:hover,:focus-visible) { width:44px; padding:0; gap:0; background:var(--danger); border-color:var(--danger); color:var(--bg); transform:none; box-shadow:0 4px 14px color-mix(in srgb,var(--danger) 18%,transparent); }
+.profile-page .profile-actions .profile-report-button span,.profile-page .profile-intro .profile-logout > span { display:none; }
+.profile-page .profile-tabs button { justify-self:center; justify-content:center; width:min(100%,104px); min-width:0; padding:15px 20px; }
+.profile-page .profile-tabs button > span { position:absolute; inset-inline-start:calc(50% + 20px); top:50%; max-width:44px; overflow:hidden; transform:translateY(-50%); }
+.profile-page .profile-tabs button::after { left:50%; right:auto; width:56px; transform:translateX(-50%) scaleX(0); }
+.profile-page .profile-tabs button:is(:hover,:focus-visible,.active)::after { transform:translateX(-50%) scaleX(1); }
+.exhibition-artwork-media { isolation:isolate; }
+.exhibition-artwork-media .exhibition-artwork-blur { position:absolute; z-index:0; inset:-8%; width:116%; height:116%; max-height:none; object-fit:cover; filter:blur(24px) saturate(1.15) brightness(.85); opacity:.65; transform:scale(1.04); pointer-events:none; }
+.exhibition-artwork-media .exhibition-artwork-original { position:relative; z-index:1; }
+.work-type-skeleton { opacity:.45; cursor:wait; user-select:none; }
+@media(prefers-reduced-motion:reduce) { .feed-card-like,.feed-card-like svg,.profile-page .profile-actions .profile-report-button,.profile-page .profile-intro .profile-logout { transition:none; }.feed-card-like:hover:not(:disabled) svg,.exhibition-artwork-card:hover .exhibition-artwork-media .exhibition-artwork-original { transform:none; } }
