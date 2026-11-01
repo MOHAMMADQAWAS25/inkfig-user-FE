@@ -361,8 +361,9 @@ it("opens a current exhibition as a titled split-card wall without its banner", 
   const link=await screen.findByRole("link",{name:"View artwork details: Autumn art"});
   expect(link.getAttribute("href")).toBe("/en/artwork/work");
   expect(link.querySelector(".exhibition-artwork-media img")?.getAttribute("src")).toBe("/art.jpg");
-  expect(link.querySelector(".exhibition-artwork-details")?.textContent).toContain("A colorful autumn landscape");
-  expect(link.querySelector(".profile-avatar-initial")?.textContent).toBe("A");
+  const card=link.closest(".exhibition-artwork-card");
+  expect(card?.querySelector(".exhibition-artwork-details")?.textContent).toContain("A colorful autumn landscape");
+  expect(card?.querySelector(".profile-avatar-initial")?.textContent).toBe("A");
   expect(container.querySelector('[src="/banner.jpg"]')).toBeNull();
 });
 

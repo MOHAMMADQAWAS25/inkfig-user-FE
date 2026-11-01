@@ -310,7 +310,7 @@ export function ExhibitionsPage() {
               </ExhibitionCard>}
               {Date.parse(selected.event_at) <= now && <section className="exhibition-public-works" aria-label={t("exhibitions.works")}>
               <div className="exhibition-artwork-grid">
-                {submissions.map(item => <ExhibitionArtworkCard key={item.submission_id} item={item} exhibitionId={selected.exhibition_id}/>)}
+                {submissions.map(item => <ExhibitionArtworkCard key={`${session?.userId ?? "guest"}:${item.submission_id}`} item={item} exhibitionId={selected.exhibition_id} votingOpen={exhibitionPeriod(selected, now) === "current"}/>)}
               </div>
               {!submissions.length && !gallery.works.isError && <p>{t("exhibitions.noSubmissions")}</p>}
               {(gallery.works.isError || gallery.works.hasNextPage) && (

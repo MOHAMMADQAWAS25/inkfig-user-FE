@@ -10,6 +10,7 @@ import { CardMedia } from "./CardMedia";
 import { memo, useState } from "react";
 import { artworkPath } from "../works/artworkNavigation";
 import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
+import { RatingSummary } from "../exhibitions/RatingSummary";
 
 export const PostCard = memo(function PostCard({ work, width, priority, onOpen, onLike, onSave }: {
   work: FeedWork; width: number; priority: boolean;
@@ -21,6 +22,7 @@ export const PostCard = memo(function PostCard({ work, width, priority, onOpen, 
   const profileHref=session ? `/${language}/profile/${work.owner_user_id}` : `/${language}/login`;
   return <div className="feed-post-card"><CardMedia>
     <WorkExhibitionBadge hasExhibition={work.has_exhibition} exhibitions={work.exhibitions}/>
+    <RatingSummary rating={work.exhibition_rating} overlay year={work.exhibition_rating?.year}/>
     <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} data-work-id={work.work_id}
       aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onOpen(work); } }}>
       <LazyImage work={work} width={width} priority={priority} failureLabel={t("feed.imageFailed")} />

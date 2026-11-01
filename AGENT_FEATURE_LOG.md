@@ -10500,3 +10500,27 @@ Cards use lightweight boolean; full metadata only loaded by existing single-artw
 ### Deployment and Git
 
 Backend first, frontend next through existing main workflows; no migration. Matching branch fix/lightweight-exhibition-badges; subject Simplify exhibition trophies and arrange artwork details. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/deployment outcome in handoff. Revert only paired revision commits to restore previous full card badges, preserving earlier work; rollback notes in docs. Historical log entries untouched.
+
+## 2026-11-01 - Gallery-only exhibition artwork ratings
+
+### Request and changes
+
+Added native keyboard-accessible1–5 star selection with explicit Submit, Change and Remove controls only on public exhibition gallery artwork cards. Authoritative backend average/count/my vote/eligibility drive UI; no optimistic fake totals or keystroke auto-votes. Own/organizer/restricted/ended views are read-only, guests get sign-in prompt. Existing exhibition clock disables voting at end; backend rechecks eligibility/time. Busy/ref guards prevent repeat requests; failures retain confirmed scores, eligibility errors refresh scope, and unmount aborts stale UI updates. Card image/title/View links remain navigable with rating form outside anchors.
+
+Home/search/related and profile posts/likes/saved show read-only latest-exhibition summaries on hover/focus/touch without layout shifts. Opened artwork/preview membership entries show each event's own totals/link and no voting controls, regardless of opening origin. Shared RatingSummary handles empty scores, localized counts and display-only stars. Current viewer/exhibition/work cache updates preserve other scopes and cursors/pages. No new voter lists, notices, polling/broadcasts, leaderboard or winner selection. Themes, Arabic/English, reduced-motion and existing trophy/save/media protections preserved.
+
+### Repositories and files
+
+Companion main-system backend and user-FE; user-system unchanged. Clean main pulled and complete log read; frontend baselineca57072dacb3a5465b777de07b3db66daa1a423c. New ExhibitionRatingControls/RatingSummary/types/API/cache helper and interaction/layout/API tests; ExhibitionArtworkCard/ExhibitionsPage/API integration, PostCard/ProfilePage/worksApi/WorkExhibitionBadge, resources/styles, exhibition card test assertion update, docs/exhibition-artwork-ratings.md and this log.
+
+### API, database, permissions and scope
+
+Consumes companion main-system migration20261101_018_create_exhibition_ratings.sql and gallery-scoped PUT/DELETE. Session identity never comes from request body. Only gallery state includes private own vote/can_rate; other responses only public aggregates. New optional fields retain older API compatibility. No frontend dependency, environment, secret, role bypass or SnapStart changes. Gallery-only is UI placement, not unprovable HTTP page-origin authorization. Backend owns all eligibility and uniqueness. No production voting/data mutations used for verification.
+
+### Verification
+
+438 checks passed (101 Node/source,337 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. New tests cover explicit vote/no accidental navigation, repeat/busy prevention, change/remove confirmed totals, read-only restricted/guest/closed and non-gallery displays, Arabic, API methods/body/credentials, failed requests/retry/boundary refresh, abort and viewer/event cache isolation with pagination preservation. Updated wall test to inspect article details after separating navigation links from form. An unrelated first-login timing assertion failed once; targeted test and complete suite passed unchanged afterward. No checks skipped/bypassed. Backend176 tests/mypy89 passed; two existing optional DB checks skipped. No real-browser pixel/physical-device or production vote certification. Existing bundle-size/jsdom warnings remain.
+
+### Deployment and Git
+
+Backend migration/API first, frontend main workflow next; no user-system changes. Matching feature/exhibition-artwork-ratings branch; subject Add gallery-only artwork voting and read-only rating summaries. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commits/push/conflict/merge and deployment outcomes in handoff. Revert frontend commit first, backend application if needed, keeping/exporting live rating data rather than destructive automatic schema rollback. Baselines/policies in docs; historical entries retained.

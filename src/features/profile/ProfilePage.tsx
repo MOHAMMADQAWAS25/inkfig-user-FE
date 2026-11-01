@@ -1,5 +1,6 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
+import { RatingSummary } from "../exhibitions/RatingSummary";
 import { Bookmark, Camera, Flag, Grid2X2, Heart, Image, LogOut, MoreHorizontal, Pencil, Trophy, Trash2, UserRound, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ProfilePager } from "./ProfilePager";
@@ -42,6 +43,7 @@ function ArtworkGrid({ canLike, canManage, canSave, empty, language, onDelete, o
   return <div className="profile-artwork-grid">{works.map(work=>
     <article className={`artwork-card ${canManage?"artwork-card-manageable":""}`} key={work.work_id}><CardMedia>
       <WorkExhibitionBadge hasExhibition={work.has_exhibition} exhibitions={work.exhibitions}/>
+      <RatingSummary rating={work.exhibition_rating} overlay year={work.exhibition_rating?.year}/>
       <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event=>{if(event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();onSelect(work);}}}><img {...artworkImageProtection} className="artwork-image" src={work.image_url} alt={work.title} loading="lazy"/></Link>
       <span className={`artwork-type-tag artwork-card-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
       <Link className="artwork-artist-link" to={`/${language}/profile/${work.owner_user_id}`}><UserRound size={15}/>{work.artist_name}</Link>

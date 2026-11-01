@@ -1,4 +1,5 @@
 import { mainApiBaseUrl, requestJson } from "../../api/httpClient";
+import type { RatingState } from "./exhibitionRatingTypes";
 
 export type ExhibitionInput = {
   name: string;
@@ -16,6 +17,7 @@ export type Exhibition = ExhibitionInput & {
   created_at: string;
 };
 export type Submission = {
+  rating?: RatingState;
   submission_id: string;
   work_id: string;
   user_id: string;
