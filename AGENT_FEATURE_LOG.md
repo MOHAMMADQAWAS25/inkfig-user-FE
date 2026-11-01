@@ -10476,3 +10476,27 @@ Consumes additive exhibitions array from backend page responses, with optional-f
 ### Deployment and Git
 
 Backend first, frontend existing Cloudflare main workflow second; no migration/user-system change. Matching branch feature/artwork-exhibition-badges; frontend subject Show exhibition year badges on artwork cards and details. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact commits, conflicts/push/merge and deployment outcomes in handoff. Revert only frontend ticket commit first, backend companion afterward if needed. Baseline/scope in docs; previous log entries preserved.
+
+## 2026-11-01 - Icon-only exhibition cards and arranged detail badges
+
+### Request and changes
+
+Cards now show only a trophy, no visible word/year/count/name. Trophy SVG21px and42px circular frame match save size/top12 alignment on the opposite side;38px below600px matches existing save dimensions. Existing hover/keyboard/touch behavior and masonry geometry retained. Removed trophy component and metadata type from exhibition-page artwork cards. Other cards consume has_exhibition with fallback for older cached arrays.
+
+Opened artwork/preview details use separated bordered entries with localized Exhibition/معرض label and year link, wrapping custom name on its own line with automatic direction. Generic names such as معرض2026/Exhibition2026 omitted as redundant, avoiding the reported joined duplicate label. Accessible link name separates label/year. User-authored custom titles remain unmodified rather than machine-translated; badge interface follows selected language. Theme tokens/responsive/reduced-motion behavior retained.
+
+### Repositories and files
+
+Main-system companion and user-FE only; user-system unchanged. Clean main pulled and complete log read; frontend baselinef91fa72f17488ebf061285e13d93a34b6e9c0ced. Files: WorkExhibitionBadge, worksApi/exhibitionApi, PostCard/ProfilePage/ExhibitionArtworkCard, styles, badge interaction/layout and artwork-page tests, docs/artwork-exhibition-badges.md and this log.
+
+### API, database, permissions and scope
+
+Cards use lightweight boolean; full metadata only loaded by existing single-artwork request. No per-card fetch or new API route. No migration, dependency, permission, credential, environment or SnapStart changes. No production data mutation or new realtime channel. Existing caching and backend eligibility retained.
+
+### Verification
+
+422 checks passed (100 Node/source,322 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. Tests cover icon-only empty text,21px size, boolean without metadata, absent badge, English/Arabic localized separated details and redundant generic name omission,38/42px matching frames, no exhibition-wall trophy, and preserved opened-detail link. Companion backend147 tests/mypy82 passed. No real-browser pixel certification; existing bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Backend first, frontend next through existing main workflows; no migration. Matching branch fix/lightweight-exhibition-badges; subject Simplify exhibition trophies and arrange artwork details. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/deployment outcome in handoff. Revert only paired revision commits to restore previous full card badges, preserving earlier work; rollback notes in docs. Historical log entries untouched.

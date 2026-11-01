@@ -6,13 +6,12 @@ import { relativeTime } from "../../lib/relativeTime";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import type { Submission } from "./exhibitionApi";
-import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
 
 export const ExhibitionArtworkCard = memo(function ExhibitionArtworkCard({ item, exhibitionId }: { item: Submission; exhibitionId: string }) {
   const { language, t } = useI18n();
   return <Link className="exhibition-artwork-card" to={`/${language}/artwork/${item.work_id}`}
     state={{ returnTo: `/${language}/exhibition/${exhibitionId}` }} aria-label={`${t("works.viewDetails")}: ${item.title}`}>
-    <div className="exhibition-artwork-media"><img {...artworkImageProtection} src={item.image_url} alt="" loading="lazy" decoding="async"/><WorkExhibitionBadge exhibitions={item.exhibitions}/></div>
+    <div className="exhibition-artwork-media"><img {...artworkImageProtection} src={item.image_url} alt="" loading="lazy" decoding="async"/></div>
     <div className="exhibition-artwork-details">
       {(item.type_name_en || item.type_name_ar) && <span className="exhibition-artwork-type">{language === "ar" ? item.type_name_ar : item.type_name_en}</span>}
       <h3>{item.title}</h3>

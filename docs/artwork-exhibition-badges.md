@@ -24,3 +24,23 @@ Matching branches: `feature/artwork-exhibition-badges`. Frontend baseline
 `aab22953bc3288d5da9ccb4214d8175b01a38c85`. Revert only frontend badge ticket commit
 to remove the UI; revert backend companion afterward if required. Preserve prior
 feature-log entries and unrelated changes; no reset/data rollback needed.
+
+## Icon-only revision (2026-11-01)
+
+Supersedes the earlier year/+N card treatment. Cards show only a 21px trophy inside
+a 42px circular control, opposite the 21px save icon at top:12px; diameter follows
+the existing save control's 38px size below600px. No visible text/year/count. Keep
+localized accessible label. Exhibition gallery cards do not render the trophy.
+
+Cards consume `has_exhibition` with fallback to older cached arrays; names/years
+are selected only by the opened-artwork API. Details use separate bordered entries,
+a localized label/year link and custom exhibition title on a separate line with
+automatic text direction. A generic name such as Exhibition2026/معرض2026 is omitted
+as redundant in both languages, preventing mixed-language duplicate badge labels.
+Actual custom exhibition titles are user content, preserved without machine
+translation; interface text follows the selected language. Link accessible name
+separates label/year. Single-column entries wrap long names in both themes/RTL.
+
+Revision branch `fix/lightweight-exhibition-badges`, frontend baseline `f91fa72`.
+Backend first, frontend next; no migration. Revert only this revision's paired
+commits to restore prior full card metadata/year badges. No data rollback.

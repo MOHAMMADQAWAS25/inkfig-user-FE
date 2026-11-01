@@ -20,7 +20,7 @@ export const PostCard = memo(function PostCard({ work, width, priority, onOpen, 
   const [failedAvatar,setFailedAvatar]=useState<string|null>(null);
   const profileHref=session ? `/${language}/profile/${work.owner_user_id}` : `/${language}/login`;
   return <div className="feed-post-card"><CardMedia>
-    <WorkExhibitionBadge exhibitions={work.exhibitions}/>
+    <WorkExhibitionBadge hasExhibition={work.has_exhibition} exhibitions={work.exhibitions}/>
     <Link className="artwork-image-button" to={artworkPath(language, work.work_id)} data-work-id={work.work_id}
       aria-label={`${t("works.viewDetails")}: ${work.title}`} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); onOpen(work); } }}>
       <LazyImage work={work} width={width} priority={priority} failureLabel={t("feed.imageFailed")} />

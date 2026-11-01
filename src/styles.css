@@ -2013,12 +2013,15 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .work-exhibition-badge { display:inline-flex; align-items:center; gap:6px; max-width:100%; min-width:0; padding:7px 10px; border:1px solid var(--primary); border-radius:999px; background:var(--surface); color:var(--text); font-size:.75rem; line-height:1.3; text-decoration:none; }
 .work-exhibition-badge svg { flex-shrink:0; color:var(--primary); }
 .work-exhibition-badge bdi { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.work-exhibition-overlay { position:absolute; top:12px; left:12px; z-index:5; max-width:calc(100% - 76px); opacity:0; pointer-events:none; transition:opacity 160ms ease; box-shadow:0 2px 8px rgb(0 0 0 / .15); }
-.feed-post-card:hover .work-exhibition-overlay,.artwork-card:hover .work-exhibition-overlay,.exhibition-artwork-card:hover .work-exhibition-overlay,.artwork-pin-media[data-focus-mode="keyboard"]:focus-within .work-exhibition-overlay,.exhibition-artwork-card:focus-visible .work-exhibition-overlay { opacity:1; }
-.work-exhibition-details { display:flex; flex-wrap:wrap; gap:8px; }
+.work-exhibition-overlay { position:absolute; top:12px; left:12px; z-index:5; display:grid; place-items:center; width:42px; height:42px; padding:0; border:1px solid rgb(255 255 255 / .3); border-radius:50%; background:rgb(20 25 13 / .82); color:#fffdf0; opacity:0; pointer-events:none; transition:opacity 160ms ease; box-shadow:0 8px 22px rgb(0 0 0 / .26); }
+.feed-post-card:hover .work-exhibition-overlay,.artwork-card:hover .work-exhibition-overlay,.artwork-pin-media[data-focus-mode="keyboard"]:focus-within .work-exhibition-overlay { opacity:1; }
+.work-exhibition-details { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-block:4px 8px; }
+.work-exhibition-entry { display:grid; justify-items:start; gap:8px; min-width:0; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.work-exhibition-year { border-inline-start:1px solid var(--border); padding-inline-start:10px; margin-inline-start:4px; font-variant-numeric:tabular-nums; }
 .work-exhibition-details a:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
 .work-exhibition-details a:hover { background:var(--surface-raised); }
-.work-exhibition-name { overflow-wrap:anywhere; }
+.work-exhibition-name { overflow-wrap:anywhere; color:var(--muted); font-size:.85rem; line-height:1.5; text-align:start; }
+@media(max-width:600px){.work-exhibition-overlay { width:38px; height:38px; }}
 .exhibition-artwork-media { position:relative; }
 @media(hover:none){.work-exhibition-overlay { opacity:1; }}
 @media(prefers-reduced-motion:reduce){.work-exhibition-overlay { transition:none; }}

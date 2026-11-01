@@ -24,7 +24,7 @@ function Page() { const location = useLocation(); return <ArtworkPage key={locat
 it("shows exhibition membership links below the category on the opened artwork",async()=>{
   vi.mocked(getWork).mockResolvedValue({...sample,exhibitions:[{exhibition_id:"event",name:"Student exhibition",year:2026}]});
   mount();
-  const badge=await screen.findByRole("link",{name:/Exhibition · 2026/});
+  const badge=await screen.findByRole("link",{name:/Exhibition.*2026/});
   expect(badge.getAttribute("href")).toBe("/en/exhibition/event");
   expect(badge.closest(".artwork-page-info")).toBeTruthy();
   expect(badge.closest(".work-exhibition-overlay")).toBeNull();

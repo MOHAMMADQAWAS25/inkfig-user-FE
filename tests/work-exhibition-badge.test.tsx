@@ -14,19 +14,30 @@ it("omits badge markup entirely when there is no exhibition",()=>{
   const {container}=mount(false,"en",[]);
   expect(container.querySelector(".work-exhibition-badge")).toBeNull();
 });
-it("renders a compact year and extra-exhibition count without duplicate entries",()=>{
+it("renders only an accessible trophy without year, name or count on cards",()=>{
   const {container}=mount(false,"en",[...exhibitions,exhibitions[0]]);
-  expect(screen.getByText("Exhibition · 2026 +1")).toBeTruthy();
+  expect(screen.getByRole("img",{name:"Exhibition"})).toBeTruthy();
   expect(container.querySelectorAll(".work-exhibition-overlay")).toHaveLength(1);
   expect(screen.queryByRole("link")).toBeNull(); // underlying card retains its navigation
-  expect(container.querySelector(".work-exhibition-overlay")?.getAttribute("title")).toContain("Earlier exhibition · 2025");
+  expect(container.querySelector(".work-exhibition-overlay")?.textContent).toBe("");
+  expect(container.querySelector("svg")?.getAttribute("width")).toBe("21");
 });
 it.each(["en","ar"])("detail badges expose exhibition names/years and localized links in %s",language=>{
   const {container}=mount(true,language);
   const links=screen.getAllByRole("link");
   expect(links).toHaveLength(2);
   expect(links[0].getAttribute("href")).toBe(`/${language}/exhibition/one`);
-  expect(links[0].textContent).toContain(language==="ar"?"معرض · 2026":"Exhibition · 2026");
+  expect(links[0].textContent).toContain(language==="ar"?"معرض2026":"Exhibition2026");
   expect(screen.getByText("Annual exhibition")).toBeTruthy();
   expect(container.querySelector(".work-exhibition-overlay")).toBeNull();
+});
+it("renders the trophy from a lightweight boolean without needing detail metadata",()=>{
+  render(<MemoryRouter><I18nProvider><WorkExhibitionBadge hasExhibition/></I18nProvider></MemoryRouter>);
+  expect(screen.getByRole("img")).toBeTruthy();
+  expect(screen.queryByText("2026")).toBeNull();
+});
+it.each(["en","ar"])("does not repeat a generic Arabic exhibition name inside the %s badge",language=>{
+  const {container}=mount(true,language,[{exhibition_id:"one",name:"معرض 2026",year:2026}]);
+  expect(container.querySelector(".work-exhibition-name")).toBeNull();
+  expect(screen.getByRole("link").textContent).toBe(language==="ar"?"معرض2026":"Exhibition2026");
 });
