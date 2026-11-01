@@ -65,6 +65,7 @@ backend data/permission changes.
 ## Exhibition artwork popup (2026-11-01)
 
 Gallery artwork triggers now open an in-place native details popup rather than
-navigating away. Voting stays on gallery cards; popup results remain read-only.
+navigating away. Voting is available on gallery cards and below the popup image;
+both share the backend-provided exhibition/viewer eligibility and cached vote state.
 Homepage/profile artwork routes are unchanged. See exhibition-artwork-popup.md
 for scoped behavior, verification limits and revert-only instructions.

@@ -208,7 +208,7 @@ export function ExhibitionsPage() {
       timeStyle: "short",
     }).format(new Date(value));
   return (
-    <main className="exhibitions-page app-page-with-sidebar">
+    <main className={`exhibitions-page app-page-with-sidebar${exhibitionId ? " exhibition-detail-page" : ""}`}>
       <AppSidebar />
       <div className="exhibitions-shell">
         {!selected && !exhibitionId && <header className="exhibitions-heading">
@@ -336,7 +336,7 @@ export function ExhibitionsPage() {
             </>
           )
         )}
-        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} onClose={() => setArtworkPopup(null)}/>}
+        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={() => setArtworkPopup(null)}/>}
         {editing && (
           <section className="exhibition-editor">
             <h2>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</h2>

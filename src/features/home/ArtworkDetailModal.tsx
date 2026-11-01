@@ -27,13 +27,14 @@ type ArtworkDetailModalProps = {
   onEditOwnWork?: (work: Work) => void;
   onDeleteOwnWork?: (work: Work) => void;
   extraDetails?: ReactNode;
+  mediaFooter?: ReactNode;
   readOnly?: boolean;
   containedInDialog?: boolean;
   interactionBusy?: boolean;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, readOnly=false, containedInDialog=false, interactionBusy=false, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, readOnly=false, containedInDialog=false, interactionBusy=false, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -103,11 +104,11 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
-        <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>
+        {mediaFooter ? <div className="artwork-modal-media-column"><ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/><div className="artwork-modal-media-footer">{mediaFooter}</div></div> : <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>}
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
-          {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail/>}
+          {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail showVotingHint={!mediaFooter}/>}
           {extraDetails}
           <div className="artwork-modal-meta">
             {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}

@@ -71,6 +71,28 @@ it("changes a vote without adding to its count and removes the existing vote",as
   expect(screen.getByRole<HTMLButtonElement>("button",{name:"Submit rating"}).disabled).toBe(true);
 });
 
+it("previews all stars up to the hovered star without changing the selected score",()=>{
+  mount({...initial,my_rating:2});
+  const stars=screen.getAllByRole("radio");
+  const fills=()=>stars.map(star=>star.parentElement?.querySelector("svg")?.getAttribute("fill"));
+  fireEvent.pointerEnter(stars[3].parentElement!,{pointerType:"mouse"});
+  expect(fills()).toEqual(["currentColor","currentColor","currentColor","currentColor","none"]);
+  expect((stars[1] as HTMLInputElement).checked).toBe(true);
+  expect(changeExhibitionRating).not.toHaveBeenCalled();
+  fireEvent.pointerLeave(stars[0].closest(".exhibition-rating-stars")!);
+  expect(fills()).toEqual(["currentColor","currentColor","none","none","none"]);
+});
+
+it.each(["en","ar"])("links the exhibition card artist and avatar without opening the artwork (%s)",language=>{
+  mount(initial,{card:true,language:language as "en"|"ar"});
+  const artist=screen.getByRole("link",{name:"Artist"});
+  expect(artist.getAttribute("href")).toBe(`/${language}/profile/artist`);
+  expect(artist.querySelector(".profile-avatar-initial")).toBeTruthy();
+  fireEvent.click(artist);
+  expect(openArtwork).not.toHaveBeenCalled();
+  expect(screen.getByTestId("route").textContent).toBe(`/${language}/profile/artist`);
+});
+
 it.each(["own_work","organizer","restricted","closed"])("keeps %s galleries read-only",reason=>{
   mount({...initial,can_rate:false,unavailable_reason:reason},{open:reason!=="closed"});
   expect(screen.queryByRole("radio")).toBeNull();

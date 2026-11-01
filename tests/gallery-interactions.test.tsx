@@ -97,11 +97,11 @@ describe("home and panel interactions",()=>{
     fireEvent.change(input,{target:{value:""}});
     expect(container.querySelector(".search-hints")?.getAttribute("data-visible")).toBe("true");
   });
-  it("shows the creator below the artwork and falls back only when the avatar fails",()=>{
+  it("places the compact creator inside the artwork and falls back when the avatar fails",()=>{
     const work={work_id:"work",title:"Art",artist_name:"Ahmad",artist_avatar_url:"/ahmad.png",owner_user_id:"ahmad",type_name_en:"Digital art",mime_type:"image/png",image_url:"/art.png",like_count:0} as FeedWork;
     const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={vi.fn()} onLike={vi.fn()} onSave={vi.fn()}/></MemoryRouter>);
     const creator=container.querySelector<HTMLAnchorElement>(".feed-creator")!;
-    expect(creator.previousElementSibling?.classList.contains("artwork-pin-media")).toBe(true);
+    expect(creator.closest(".artwork-pin-media")).toBeTruthy();
     expect(creator.getAttribute("href")).toBe("/en/profile/ahmad");
     expect(creator.textContent).toBe("Ahmad");
     fireEvent.error(creator.querySelector("img")!);

@@ -4,7 +4,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import type { WorkExhibition } from "./worksApi";
 import { RatingSummary } from "../exhibitions/RatingSummary";
 
-export function WorkExhibitionBadge({ exhibitions, hasExhibition, detail = false }: { exhibitions?: readonly WorkExhibition[]; hasExhibition?: boolean; detail?: boolean }) {
+export function WorkExhibitionBadge({ exhibitions, hasExhibition, name, detail = false, showVotingHint = true }: { exhibitions?: readonly WorkExhibition[]; hasExhibition?: boolean; name?: string; detail?: boolean; showVotingHint?: boolean }) {
   const { language, t } = useI18n();
   const entries = Array.from(new Map((exhibitions ?? []).map(item => [item.exhibition_id, item])).values());
   if (detail ? !entries.length : !(hasExhibition ?? Boolean(entries.length))) return null;
@@ -16,10 +16,11 @@ export function WorkExhibitionBadge({ exhibitions, hasExhibition, detail = false
       </Link>
       {!new RegExp(`^(exhibition|معرض)\\s*[·-]?\\s*${item.year}$`, "iu").test(item.name.trim()) && <span className="work-exhibition-name" dir="auto">{item.name}</span>}
       <RatingSummary rating={item.rating}/>
-      {item.rating && <small className="exhibition-rating-readonly">{t("ratings.galleryOnly")}</small>}
+      {item.rating && showVotingHint && <small className="exhibition-rating-readonly">{t("ratings.galleryOnly")}</small>}
     </div>)}
   </div>;
-  return <span className="work-exhibition-overlay" role="img" aria-label={label} title={label}>
-    <Trophy size={21} aria-hidden="true"/>
+  const title = name?.trim() || entries[0]?.name || label;
+  return <span className="work-exhibition-overlay" role="img" aria-label={`${label}: ${title}`} title={title}>
+    <Trophy size={18} aria-hidden="true"/><span dir="auto">{title}</span>
   </span>;
 }

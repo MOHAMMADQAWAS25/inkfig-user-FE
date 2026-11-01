@@ -14,13 +14,13 @@ it("omits badge markup entirely when there is no exhibition",()=>{
   const {container}=mount(false,"en",[]);
   expect(container.querySelector(".work-exhibition-badge")).toBeNull();
 });
-it("renders only an accessible trophy without year, name or count on cards",()=>{
+it("renders the exhibition name beside the accessible trophy without adding another link",()=>{
   const {container}=mount(false,"en",[...exhibitions,exhibitions[0]]);
-  expect(screen.getByRole("img",{name:"Exhibition"})).toBeTruthy();
+  expect(screen.getByRole("img",{name:"Exhibition: Annual exhibition"})).toBeTruthy();
   expect(container.querySelectorAll(".work-exhibition-overlay")).toHaveLength(1);
   expect(screen.queryByRole("link")).toBeNull(); // underlying card retains its navigation
-  expect(container.querySelector(".work-exhibition-overlay")?.textContent).toBe("");
-  expect(container.querySelector("svg")?.getAttribute("width")).toBe("21");
+  expect(container.querySelector(".work-exhibition-overlay")?.textContent).toBe("Annual exhibition");
+  expect(container.querySelector("svg")?.getAttribute("width")).toBe("18");
 });
 it.each(["en","ar"])("detail badges expose exhibition names/years and localized links in %s",language=>{
   const {container}=mount(true,language);

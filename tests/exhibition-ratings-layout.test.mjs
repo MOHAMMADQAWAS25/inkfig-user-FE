@@ -17,6 +17,6 @@ test("rating controls are gallery-only and card hover ratings are absent while d
   const css=readFileSync(new URL("../src/styles.css",import.meta.url),"utf8");
   assert.match(css,/\.exhibition-rating-overlay \{ position:absolute/);
   assert.match(css,/\.exhibition-rating-stars input \{[^}]*opacity:0/);
-  assert.match(css,/\.exhibition-rating-stars label:focus-within/);
+  assert.match(css,/\.exhibition-rating-stars label:has\(input:focus-visible\)/);
   assert.match(css,/prefers-reduced-motion:reduce[^\n]*exhibition-rating-overlay/);
 });

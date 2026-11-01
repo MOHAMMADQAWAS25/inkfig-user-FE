@@ -6,5 +6,5 @@ export function SiteFooter() {
   const { t } = useI18n();
   const { pathname } = useLocation();
   if (!/^\/(en|ar)\/?$/.test(pathname)) return null;
-  return <footer className="site-footer"><img src={inkfigLogo} alt={t("app.name")}/><p>{t("home.footer")}</p></footer>;
+  return <footer className="site-footer"><img src={inkfigLogo} alt={t("app.name")}/><p>{t("home.footer").replace("{year}", String(new Date().getFullYear()))}</p></footer>;
 }

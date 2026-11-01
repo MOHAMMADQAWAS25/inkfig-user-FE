@@ -44,3 +44,12 @@ separates label/year. Single-column entries wrap long names in both themes/RTL.
 Revision branch `fix/lightweight-exhibition-badges`, frontend baseline `f91fa72`.
 Backend first, frontend next; no migration. Revert only this revision's paired
 commits to restore prior full card metadata/year badges. No data rollback.
+
+## Named hover labels (2026-11-01)
+
+Card badges now show the trophy and latest publicly eligible exhibition name in
+a small translucent dark rectangle. Name comes from the existing latest-exhibition
+rating summary, with older cached-array/localized fallback; no per-card request.
+Width is bounded away from Save and long names ellipsize. Existing display-only
+hover/keyboard/touch behavior and opened-detail metadata are retained. Deploy the
+companion backend additive summary name before frontend; no migration required.

@@ -2309,7 +2309,7 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .exhibition-rating-stars { display:flex; gap:3px; margin-top:6px; }
 .exhibition-rating-stars label { position:relative; display:grid; place-items:center; width:34px; height:36px; color:var(--primary); cursor:pointer; }
 .exhibition-rating-stars input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; margin:0; }
-.exhibition-rating-stars label:focus-within { outline:2px solid var(--primary); outline-offset:2px; border-radius:6px; }
+.exhibition-rating-stars label:has(input:focus-visible) { outline:2px solid var(--primary); outline-offset:2px; border-radius:50%; }
 .exhibition-rating-stars input:disabled { cursor:wait; }
 .exhibition-rating-buttons { display:flex; flex-wrap:wrap; gap:8px; }
 .exhibition-rating-buttons button { padding:8px 10px; border:1px solid var(--primary); border-radius:9px; background:var(--surface); color:var(--text); cursor:pointer; font:inherit; font-size:.78rem; }
@@ -2324,7 +2324,7 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .artwork-modal-creator-avatar { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; object-fit: cover; }
 @media (hover:hover) and (pointer:fine) {
   .exhibition-artwork-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 12px 30px rgb(25 36 12 / .15); }
-  .exhibition-artwork-card:hover img { transform: scale(1.035); filter: brightness(.96); }
+  .exhibition-artwork-card:hover .exhibition-artwork-media img { transform: scale(1.035); filter: brightness(.96); }
 }
 @media (max-width:1100px) { .exhibition-artwork-grid { grid-template-columns: minmax(0,1fr); } }
 @media (max-width:480px) { .exhibition-artwork-card { grid-template-columns: minmax(0,1fr); }.exhibition-artwork-media { min-height: 220px; height: 260px; }.exhibition-artwork-details { border-inline-start: 0; border-top: 1px solid var(--border); } }
@@ -2371,3 +2371,62 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 :root[data-theme=dark] .exhibition-card,:root[data-theme=dark] .exhibition-summary,:root[data-theme=dark] .exhibition-participation,:root[data-theme=dark] .exhibition-editor,:root[data-theme=dark] .exhibition-blocks,:root[data-theme=dark] .exhibition-action-dialog { background:#171e12; color:#f7f2d8; border-color:#39452b; }
 @media(max-width:720px) { .exhibitions-page { padding:18px 14px 110px; }.exhibition-summary,.exhibition-participation,.exhibition-editor { padding:18px; }.exhibitions-heading h1 { font-size:1.6rem; }.exhibition-summary dl { display:grid; gap:12px; }.exhibition-participation form>button { width:100%; } }
 .exhibition-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; margin-inline-start: 6px; padding: 0 5px; border-radius: 999px; background: #982824; color: #fff; font-size: .72rem; font-weight: 800; }
+
+/* Exhibition/community polish: shared theme tokens and logical page gutters. */
+.exhibition-detail-page.app-page-with-sidebar { --exhibition-gutter:clamp(22px,3.2vw,48px); padding-inline-start:calc(var(--app-rail-size) + var(--exhibition-gutter)); padding-inline-end:var(--exhibition-gutter); }
+.exhibition-detail-page .exhibitions-shell { width:100%; max-width:1800px; min-width:0; }
+.exhibition-detail-page .exhibition-artwork-grid { gap:clamp(20px,2vw,32px); }
+.exhibition-detail-page .exhibition-gallery-heading h1 { font-size:clamp(2rem,3vw,3rem); }
+.exhibition-artwork-card { box-shadow:0 6px 24px color-mix(in srgb,var(--primary) 12%,transparent),0 0 16px color-mix(in srgb,var(--primary) 8%,transparent); }
+.exhibition-artwork-artist { width:fit-content; max-width:100%; color:var(--text); text-decoration:none; cursor:pointer; border-radius:8px; transition:color 160ms ease,transform 160ms ease; transform-origin:left center; }
+[dir="rtl"] .exhibition-artwork-artist { transform-origin:right center; }
+.exhibition-artwork-artist:hover { color:var(--primary); transform:scale(1.025); text-decoration:none; }
+.exhibition-rating-stars { width:min(100%,232px); }
+.exhibition-rating-stars label { flex:1 1 0; min-width:0; max-width:44px; width:44px; height:44px; color:#ad840b; -webkit-tap-highlight-color:transparent; }
+:root[data-theme="dark"] .exhibition-rating-stars label { color:#ebc956; }
+.exhibition-rating-stars label svg { pointer-events:none; transition:fill 100ms ease,color 100ms ease; }
+.exhibition-rating-controls .exhibition-rating-stars input { min-height:0; height:100%; padding:0; border:0; border-radius:50%; background:transparent; box-shadow:none; outline:0; }
+.artwork-modal-media-column { display:flex; flex-direction:column; align-self:stretch; min-width:0; max-width:min(62vw,720px); background:var(--surface); }
+.artwork-modal-media-column > .artwork-modal-media { flex:0 0 auto; width:100%; }
+.artwork-modal-media-column .artwork-media-original { max-height:max(220px,calc(100svh - 340px)); }
+.artwork-modal-media-footer { padding:20px 24px; border-top:1px solid var(--border); color:var(--text); }
+.artwork-modal-media-footer .exhibition-rating-controls { border:0; padding:0; }
+.artwork-modal-meta .artwork-modal-creator-avatar.profile-avatar-initial { display:grid; place-items:center; }
+
+/* Compact identity overlays replace the permanent creator row. */
+.feed-post-card { grid-template-rows:minmax(0,1fr); }
+.feed-post-card .feed-creator,.profile-artwork-grid .artwork-pin-media .artwork-artist-link { position:absolute; z-index:5; inset:auto auto 12px 12px; display:flex; gap:7px; width:fit-content; max-width:calc(100% - 24px); height:auto; min-height:34px; padding:5px 9px 5px 5px; border:1px solid rgb(255 255 255 / .16); border-radius:11px; background:rgb(20 25 13 / .76); color:#fffdf0; font-size:.74rem; text-decoration:none; opacity:0; pointer-events:none; transform:translateY(4px); transition:opacity 160ms ease,transform 160ms ease,background-color 160ms ease; }
+[dir="rtl"] .feed-post-card .feed-creator,[dir="rtl"] .profile-artwork-grid .artwork-pin-media .artwork-artist-link { inset-inline-start:12px; inset-inline-end:auto; padding-inline:5px 9px; }
+.feed-post-card .feed-creator img,.feed-post-card .feed-creator-initial,.profile-artwork-grid .artwork-artist-link :is(img,.profile-avatar-initial) { width:22px; height:22px; flex:0 0 22px; border-radius:50%; object-fit:cover; }
+.profile-artwork-grid .artwork-artist-link .profile-avatar-initial { display:grid; place-items:center; background:var(--primary); color:var(--primary-ink); font-weight:700; }
+.feed-post-card .feed-creator-name { padding:0; }
+.profile-artwork-grid .artwork-artist-link > span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media(hover:hover) and (pointer:fine) {
+  .feed-post-card .artwork-pin-media:hover .feed-creator,.profile-artwork-grid .artwork-pin-media:hover .artwork-artist-link { opacity:1; pointer-events:auto; transform:none; }
+  .feed-post-card .feed-creator:hover,.profile-artwork-grid .artwork-pin-media .artwork-artist-link:hover { background:rgb(20 25 13 / .94); transform:scale(1.025); }
+}
+.artwork-pin-media[data-focus-mode="keyboard"]:focus-within .feed-creator,.profile-artwork-grid .artwork-pin-media[data-focus-mode="keyboard"]:focus-within .artwork-artist-link { opacity:1; pointer-events:auto; transform:none; }
+.work-exhibition-overlay { display:flex; align-items:center; justify-content:flex-start; gap:7px; width:max-content; max-width:calc(100% - 76px); height:auto; min-height:34px; padding:7px 10px; border-radius:10px; background:rgb(20 25 13 / .76); box-shadow:0 3px 12px rgb(0 0 0 / .12); }
+.work-exhibition-overlay svg { flex:0 0 18px; }
+.work-exhibition-overlay > span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.72rem; font-weight:650; }
+
+/* Stable action shapes: labels never slide or squeeze their icons. */
+.profile-actions .profile-report-button,.profile-actions .profile-report-button:hover,.profile-actions .profile-report-button:focus-visible { width:auto; min-width:44px; gap:7px; padding-inline:14px; transform:none; transition:color 160ms ease,background-color 160ms ease,border-color 160ms ease; }
+.profile-actions .profile-report-button span { max-width:none; opacity:1; transition:none; }
+.profile-actions .profile-report-button:is(:hover,:focus-visible) { background:var(--danger); border-color:var(--danger); color:var(--bg); }
+.artwork-modal-actions :is(.artwork-modal-like,.artwork-modal-save),.artwork-modal-actions .artwork-modal-save:is(:hover,:focus-visible) { width:auto; min-width:104px; min-height:46px; justify-content:center; gap:9px; padding:11px 16px; border-radius:14px; transform:none; transition:background-color 160ms ease,border-color 160ms ease,box-shadow 160ms ease; }
+.artwork-modal-actions .artwork-modal-save span,.artwork-modal-actions .artwork-modal-save:is(:hover,:focus-visible) span { max-width:none; opacity:1; transition:none; }
+.artwork-modal-actions :is(.artwork-modal-like,.artwork-modal-save) svg { flex-shrink:0; }
+.artwork-modal-actions :is(.artwork-modal-like,.artwork-modal-save):disabled { box-shadow:none; cursor:default; }
+.artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,var(--danger) 13%,var(--surface)); border-color:color-mix(in srgb,var(--danger) 45%,var(--border)); box-shadow:0 4px 12px color-mix(in srgb,var(--danger) 12%,transparent); }
+.artwork-modal-actions .artwork-modal-save:is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,#d9ad22 17%,var(--surface)); border-color:color-mix(in srgb,#d9ad22 55%,var(--border)); box-shadow:0 4px 12px rgb(169 129 0 / .12); }
+
+/* Reference footer: understated centered identity under an inset divider. */
+.site-footer { position:static; justify-content:center; flex-wrap:wrap; min-height:112px; gap:12px; padding:28px clamp(20px,4vw,60px); border-top:0; background:var(--bg); color:var(--muted); }
+.site-footer::before { content:""; flex:0 0 100%; height:1px; background:var(--border); margin-bottom:12px; }
+.site-footer img { width:36px; height:28px; }
+.site-footer p { max-width:100%; font-size:.8rem; line-height:1.7; text-align:center; overflow-wrap:anywhere; }
+:root[data-theme="dark"] .site-footer { background:var(--bg); color:var(--muted); }
+@media(max-width:780px) { .artwork-modal-media-column { max-width:100%; width:100%; }.artwork-modal-media-column .artwork-media-original { max-height:42svh; }.artwork-modal-media-footer { padding:18px; } }
+@media(max-width:720px) { .exhibition-detail-page.app-page-with-sidebar { --exhibition-gutter:var(--page-gutter,14px); }.site-footer { min-height:104px; padding:22px 16px; gap:8px; }.site-footer p { font-size:.72rem; } }
+@media(prefers-reduced-motion:reduce) { .exhibition-artwork-artist,.exhibition-rating-stars label svg,.feed-post-card .feed-creator,.profile-artwork-grid .artwork-pin-media .artwork-artist-link,.profile-actions .profile-report-button,.artwork-modal-actions :is(.artwork-modal-like,.artwork-modal-save) { transition:none; }.exhibition-artwork-artist:hover,.feed-post-card .feed-creator:hover,.profile-artwork-grid .artwork-pin-media .artwork-artist-link:hover { transform:none; } }

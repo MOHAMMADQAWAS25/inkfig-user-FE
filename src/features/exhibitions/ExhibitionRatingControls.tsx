@@ -16,6 +16,7 @@ export function ExhibitionRatingControls({ exhibitionId, workId, rating = empty,
 }) {
   const { session } = useAuth(); const { language, t } = useI18n(); const client = useQueryClient(); const id = useId();
   const [current, setCurrent] = useState(rating); const [score, setScore] = useState(rating.my_rating ?? 0);
+  const [preview, setPreview] = useState<number | null>(null);
   const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [notice, setNotice] = useState("");
   const pending = useRef<AbortController | null>(null);
   useEffect(() => { setCurrent(rating); }, [rating]);
@@ -44,10 +45,10 @@ export function ExhibitionRatingControls({ exhibitionId, workId, rating = empty,
     <RatingSummary rating={current}/>
     {current.my_rating !== null && <small>{t("ratings.yours").replace("{score}", String(current.my_rating))}</small>}
     {allowed ? <form onSubmit={event => { event.preventDefault(); void submit(score); }}>
-      <fieldset disabled={busy}><legend>{t("ratings.choose")}</legend><div className="exhibition-rating-stars">
-        {[1, 2, 3, 4, 5].map(value => <label key={value}>
-          <input type="radio" name={id} value={value} checked={score === value} aria-label={t("ratings.stars").replace("{score}", String(value))} onChange={() => { setScore(value); setNotice(""); }}/>
-          <Star size={24} fill={value <= score ? "currentColor" : "none"} aria-hidden="true"/>
+      <fieldset disabled={busy}><legend>{t("ratings.choose")}</legend><div className="exhibition-rating-stars" onPointerLeave={() => setPreview(null)}>
+        {[1, 2, 3, 4, 5].map(value => <label key={value} onPointerEnter={event => { if (!busy && event.pointerType !== "touch") setPreview(value); }}>
+          <input type="radio" name={id} value={value} checked={score === value} aria-label={t("ratings.stars").replace("{score}", String(value))} onChange={() => { setScore(value); setPreview(null); setNotice(""); }}/>
+          <Star size={24} fill={value <= (preview ?? score) ? "currentColor" : "none"} aria-hidden="true"/>
         </label>)}
       </div></fieldset>
       <div className="exhibition-rating-buttons"><button type="submit" disabled={busy || score < 1 || score === current.my_rating}>{t(busy ? "ratings.saving" : current.my_rating === null ? "ratings.submit" : "ratings.change")}</button>

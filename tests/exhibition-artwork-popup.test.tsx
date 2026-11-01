@@ -8,6 +8,8 @@ import { translations } from "../src/i18n/resources";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
 import { getWork, setWorkLike, setWorkSave, type FeedWork } from "../src/features/works/worksApi";
 import { ApiError } from "../src/api/httpClient";
+import { changeExhibitionRating } from "../src/features/exhibitions/exhibitionRatingsApi";
+vi.mock("../src/features/exhibitions/exhibitionRatingsApi",()=>({changeExhibitionRating:vi.fn()}));
 
 const auth=vi.hoisted(()=>({permissions:["works.like","works.save","reports.create"] as string[]}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"viewer",role:"user",permissions:auth.permissions}})}));
@@ -45,8 +47,10 @@ it("opens fetched details in one native popup without navigation and preserves g
   expect(dialog.parentElement).toBe(document.body);
   expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
   expect(within(dialog).getByText("Full fetched description")).toBeTruthy();
-  expect(within(dialog).getByText("4.5 / 5 · 2 votes")).toBeTruthy();
-  expect(within(dialog).queryByRole("radio")).toBeNull();
+  expect(within(dialog).getAllByText("4.5 / 5 · 2 votes").length).toBeGreaterThan(0);
+  expect(within(dialog).getAllByRole("radio")).toHaveLength(5);
+  expect(dialog.querySelector(".artwork-modal-media-footer .exhibition-rating-controls")).toBeTruthy();
+  expect(within(dialog).queryByText(translations.en["ratings.galleryOnly"])).toBeNull();
   expect(document.body.style.position).toBe("fixed");
   const image=within(dialog).getByRole("img",{name:"Full painting"});
   expect(image.getAttribute("draggable")).toBe("false");
@@ -99,6 +103,21 @@ it("opens the popup from non-interactive card content but not from rating stars"
   expect(screen.queryByRole("dialog")).toBeNull();
   fireEvent.click(screen.getByText("Card description"));
   expect(await screen.findByRole("dialog",{name:"Full painting"})).toBeTruthy();
+});
+
+it("submits a rating below the popup image and synchronizes the gallery without navigation",async()=>{
+  vi.mocked(changeExhibitionRating).mockResolvedValue({average:4.7,vote_count:3,my_rating:5,can_rate:true});
+  mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
+  const dialog=await screen.findByRole("dialog",{name:"Full painting"});
+  const footer=dialog.querySelector<HTMLElement>(".artwork-modal-media-footer")!;
+  fireEvent.click(within(footer).getByRole("radio",{name:"5 out of 5 stars"}));
+  fireEvent.click(within(footer).getByRole("button",{name:"Submit rating"}));
+  await within(footer).findByText("Your rating: 5 / 5");
+  expect(changeExhibitionRating).toHaveBeenCalledWith("event","art",5,expect.any(AbortSignal));
+  expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
+  fireEvent.click(within(dialog).getByRole("button",{name:"Close artwork details"}));
+  await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
+  expect(screen.getByText("Your rating: 5 / 5")).toBeTruthy();
 });
 
 it("supports Arabic popup content and Escape dismissal",async()=>{

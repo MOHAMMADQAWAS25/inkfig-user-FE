@@ -10,8 +10,10 @@ import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi";
 import { updateArtworkCache } from "../works/updateArtworkCache";
+import { ExhibitionRatingControls } from "./ExhibitionRatingControls";
+import type { RatingState } from "./exhibitionRatingTypes";
 
-export function ExhibitionArtworkPopup({ workId, onClose }: { workId: string; onClose: () => void }) {
+export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, votingOpen = false }: { workId: string; onClose: () => void; exhibitionId?: string; rating?: RatingState; votingOpen?: boolean }) {
   const { session } = useAuth(); const { language, t } = useI18n(); const client = useQueryClient();
   const dialog = useRef<HTMLDialogElement>(null); const close = useRef<HTMLButtonElement>(null);
   const active = useRef(true); const pending = useRef(false);
@@ -42,6 +44,7 @@ export function ExhibitionArtworkPopup({ workId, onClose }: { workId: string; on
     onCancel={event => { event.preventDefault(); onClose(); }}>
     {query.data && !query.isError ? <ArtworkDetailModal containedInDialog interactionBusy={busy} language={language} work={query.data} canLike={can("works.like")} canSave={can("works.save")}
       canReport={can("reports.create") && query.data.owner_user_id !== session?.userId} onClose={onClose} onToggleLike={work => void interact(work,"like")} onToggleSave={work => void interact(work,"save")} t={t}
+      mediaFooter={exhibitionId ? <ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={rating} votingOpen={votingOpen}/> : undefined}
       extraDetails={error ? <p className="error-message" role="alert">{error}</p> : undefined}/> :
       <div className="artwork-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
         <section className="artwork-modal exhibition-artwork-popup-state">

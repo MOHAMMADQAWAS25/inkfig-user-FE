@@ -796,7 +796,7 @@ test("provides public social profiles and follow controls", () => {
   assert.match(profilePage, /setProfileFollow/);
   assert.match(profilePage, /profile-account-list/);
   assert.match(profileApi, /\/profiles\/\$\{userId\}\/follow/);
-  assert.match(postCard, /artwork-artist-link/);
+  assert.match(postCard, /feed-creator/);
   assert.match(styles, /\.profile-social-stats/);
   assert.match(styles, /\.profile-connections-dialog/);
 });

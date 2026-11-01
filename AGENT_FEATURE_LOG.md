@@ -10592,3 +10592,36 @@ No API, migration, role/permission, dependency, credential, environment or SnapS
 ### Deployment and Git
 
 Frontend existing main workflow only. Branch fix/sidebar-hover-labels; subject Restore sidebar icon hover tooltips for all roles. Fetch/rebase before branch push then previously authorized fast-forward main merge/push. Exact hash/push/conflict/merge/deployment outcomes in handoff. Revert only this ticket commit to restore captions; no data/schema rollback or destructive reset. Earlier log entries preserved.
+
+## 2026-11-01 - Exhibition and community interface polish
+
+### Request and changes
+
+- Restored desktop icon-only rail with existing rounded delayed hover/keyboard names on all routes; mobile navigation/drawer and permission gates unchanged.
+- Opened exhibition pages use administration-sized logical gutters and an1800px bounded shell, larger title and evenly spaced large split cards with a soft external theme-relative glow. Artist/avatar now share a profile Link, pointer cursor and restrained hover feedback without opening the artwork.
+- Rating stars preview all values up to the hovered star, restore selection on exit and retain explicit Submit/Change/Remove behavior. Keyboard-only circular focus replaces the pointer green rectangle; star targets flex within narrow detail columns. Existing busy/error/abort and backend eligibility retained.
+- Exhibition popup shows the same scoped rating controls below the image, sharing gallery/cache state. Added optional media-footer slot to shared modal; other consumers unchanged. Bounded popup image height leaves room for stars; mobile stacks with whole-overlay scrolling, native inertness and page locking preserved.
+- Home/search/related and profile cards display smaller22px avatar/name overlays on pointer hover or keyboard media focus, not permanent outside rows. Touch scrolling does not reveal creator overlays. Virtual masonry reserves zero creator-row height, preserving natural image geometry. Exhibition badge now includes its name in a bounded dark translucent rounded rectangle, using existing summary name/cached-array/localized fallback without extra per-card requests.
+- Homepage footer uses a small centered logo/platform/copyright line below an inset thin divider, theme-relative colors, translated copy and dynamic year; normal document flow/home-only placement retained. Profile Report swaps colors without width animation; opened like/save actions now have stable padded rounded shapes, visible labels and subtle red/gold hover/focus surfaces without icon-shaped squeezing or expansion.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled ff-only. Main-system provides additive summary name; user-system unchanged. Frontend affected exhibition card/popup/rating/page/types, sidebar, feed card/layout, profile cards, shared detail modal, badge, artwork action CSS, SiteFooter, styles/resources, focused tests and exhibition docs. No unrelated files, dependencies, credentials, generated output or configuration committed; previous logs preserved.
+
+### API, database, permissions and scope
+
+Consumes additive exhibition_rating.name from companion backend; existing gallery-scoped rating APIs unchanged. No migration, new role/permission, user-system changes, private data persistence or backend/SnapStart effects. Public summaries never supply another user's private vote; popup uses current viewer/exhibition gallery state. Existing backend eligibility remains mandatory, including closed/own/organizer/blocked restrictions. No production mutation testing.
+
+### Verification
+
+453 checks passed (106 Node/source and347 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed before final synchronization. Coverage includes hover preview/no mutation, artist navigation without popup, below-image popup voting/cache synchronization, retained gallery pages/scroll/permissions, icon-only rail, named badge/backward fallback, zero creator row and responsive themed controls. Old source assertions and popup read-only expectations updated to requested behavior; initial footer alt failure corrected by retaining accessible logo text. No checks bypassed. Companion backend177 tests and mypy89 passed, two optional DB tests skipped.
+
+Headless Edge synthetic read-only fixtures visually checked light desktop exhibition wall, dark popup and Arabic390px popup. Found tall image hiding stars, reduced scoped image bound and rechecked all rating controls visible on desktop; phone stacks correctly. No horizontal overflow in measured desktop walls. First fixture lacked Vite env definitions; corrected fixture only. Animations disabled for final-state screenshots; no animation/physical-phone certification. Temporary sources removed and no-refresh preview stopped; final production build clears fixture assets. Existing non-blocking bundle-size/jsdom notices remain.
+
+### Deployment and Git
+
+Backend first, frontend existing main workflow next; no migration/user-system deployment. Matching branch fix/exhibition-community-polish. Frontend subject Refine exhibition ratings and community presentation. Fetch/rebase before branch push, then previously authorized fast-forward main merge/push. Exact hashes, conflicts/push/merge and workflows in handoff. Revert frontend ticket commit first and additive backend companion if required; preserve prior popup/votes and unrelated features. Historical entries untouched.
+
+### Synchronization
+
+Rebased over concurrent0f72634 sidebar tooltip restoration. Preserved its cleaner flag/span removal, caption-CSS removal, localized tooltip parity and administrator coverage; retained this ticket's creator-overlay test changes. Kept both complete feature-log entries in append order. Only sidebar/test/log overlap required resolution; remaining application changes merged automatically. Combined verification rerun before publication; exact final counts and deployment in handoff.

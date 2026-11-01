@@ -1,7 +1,8 @@
 export type LayoutItem = { work_id: string; media?: { width: number; height: number } | null };
 export type Position = { id: string; index: number; x: number; y: number; width: number; height: number; column: number };
 export type LayoutResult = { positions: Position[]; columns: Position[][]; height: number };
-export const CREATOR_ROW_HEIGHT = 40;
+// Creator identity now overlays the image, so masonry reserves no footer row.
+export const CREATOR_ROW_HEIGHT = 0;
 
 export function columnCount(width: number): number {
   if (width < 600) return width < 240 ? 1 : 2;

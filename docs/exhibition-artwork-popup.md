@@ -21,10 +21,11 @@ body locks. Existing image protection, responsive media, themes and Arabic remai
 Permission-gated like/save/report behavior is reused. Like/save mutations are
 guarded, followed by a confirmed refetch/cache update; optional interactionBusy
 disables controls without hiding Save. Other modal consumers default to previous
-behavior. No new moderation/edit/delete permission or voting surface introduced.
+behavior. No new moderation/edit/delete permission is introduced.
 
-Gallery voting remains on cards. Popup exhibition membership ratings are read-only,
-regardless of opening origin. Closing keeps loaded gallery pages, current ratings
+Gallery voting remains on cards and now also appears below the popup image using
+the same exhibition-scoped eligibility and mutation/cache flow. Other artwork
+routes remain read-only for exhibition ratings. Closing keeps loaded pages, current ratings
 and existing scroll position; backend ratings/authorization/API/schema unchanged.
 
 Branch `fix/exhibition-artwork-popup`, baseline
@@ -35,5 +36,5 @@ preserve rating votes, earlier feature-log entries and unrelated work.
 
 Tests exercise actual components with native dialog APIs mocked in jsdom. They
 verify one dialog, portal/URL/scroll/focus, loading cancellation, retry/dismissal,
-read-only ratings, permissions, image protection, gallery continuation and Arabic.
+popup rating synchronization, permissions, image protection, gallery continuation and Arabic.
 These are not real-browser pixel/focus-trap or physical-device certification.
