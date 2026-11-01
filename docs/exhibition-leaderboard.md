@@ -10,7 +10,8 @@ does not filter an incomplete batch or recompute ranks.
 Twenty rows per request, Load more appends server order with ID deduplication.
 Refresh resets to page one. No focus/reconnect polling or automatic reorder.
 Loading/error/retry, upcoming, voting-open/closed and genuine no-votes states are
-provided. Last fetched is the latest page's server timestamp. Live offset pages
+provided. Open voting displays “It becomes more exciting” (localized in Arabic);
+ranking guidance and the fetch timestamp are not displayed. Live offset pages
 can skip moved rows between requests; Refresh obtains current standings again.
 
 Artwork rows open the shared ExhibitionArtworkPopup, keeping the page/list and

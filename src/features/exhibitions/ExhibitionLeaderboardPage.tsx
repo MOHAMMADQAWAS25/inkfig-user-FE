@@ -35,7 +35,6 @@ export function ExhibitionLeaderboardPage() {
     if (seen.has(item.work_id)) return false;
     seen.add(item.work_id); return true;
   }) ?? [];
-  const latest = query.data?.pages.at(-1);
   const number = new Intl.NumberFormat(language, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const integer = new Intl.NumberFormat(language);
   const label = ar ? "لوحة الترتيب" : "Leaderboard";
@@ -49,9 +48,7 @@ export function ExhibitionLeaderboardPage() {
       <header className="exhibition-leaderboard-heading">
         <Trophy aria-hidden="true"/><h1>{label}</h1>
         {first && <><h2>{first.exhibition.name}</h2>
-          <p>{!first.started ? (ar ? "سيظهر الترتيب عند بدء المعرض." : "Standings will be available when the exhibition starts.") : first.voting_open ? (ar ? "التصويت مفتوح. قد تتغير النتائج." : "Voting is open. Results may change.") : (ar ? "انتهى التصويت." : "Voting is closed.")}</p>
-          <p>{ar ? "حسب متوسط التقييم، ثم عدد الأصوات. تظهر الأعمال التي حصلت على أصوات فقط." : "Ranked by average rating, then vote count. Only artworks with counted votes appear."}</p>
-          {latest && <small>{ar ? "آخر جلب للنتائج: " : "Last fetched: "}<time dateTime={latest.fetched_at}>{new Intl.DateTimeFormat(language, { dateStyle: "medium", timeStyle: "short" }).format(new Date(latest.fetched_at))}</time></small>}
+          <p>{!first.started ? (ar ? "سيظهر الترتيب عند بدء المعرض." : "Standings will be available when the exhibition starts.") : first.voting_open ? (ar ? "تزداد الإثارة" : "It becomes more exciting") : (ar ? "انتهى التصويت." : "Voting is closed.")}</p>
         </>}
       </header>
       {query.isPending && <p role="status">{t("works.loading")}</p>}

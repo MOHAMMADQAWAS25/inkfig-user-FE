@@ -10648,3 +10648,17 @@ No migration or new write permission. Reuse existing rating/submission indexes. 
 ### Deployment and Git
 
 Deploy backend first, frontend second through existing main workflows; no user-system deployment. Commit subject: Add read-only exhibition leaderboard pages. Fetch/rebase before branch push; previously authorized fast-forward merge/push main. Exact commit hashes, conflicts, push/merge and workflow results in final handoff. Revert frontend ticket commit first, then backend ticket commit if requested, preserving historical logs, votes/schema and unrelated work; no reset or destructive rollback.
+
+## 2026-11-01 - Simplify leaderboard heading copy
+
+### Request and changes
+
+Remove ranking explanation and last-fetched line from leaderboard pages in both languages. Replace open-voting message with "It becomes more exciting" / "تزداد الإثارة". Remove unused latest-page variable and update leaderboard documentation. Upcoming/closed states, ranking, votes, pagination, refresh, popup and API behavior preserved.
+
+### Scope and verification
+
+Only user-FE affected. Clean main pulled ff-only and complete feature log read before dedicated fix/leaderboard-copy branch. Strict TypeScript/Vite/SEO build and two existing leaderboard interaction tests passed; git diff --check passed. Existing bundle-size warning only. No backend, migration, permissions, dependencies or SnapStart changes.
+
+### Deployment and Git
+
+Commit subject: Simplify exhibition leaderboard heading copy. Fetch/rebase, push feature branch, then previously authorized fast-forward merge/push main through existing frontend deployment. Exact hash, push and deployment status reported in handoff. Preserve historical entries; revert this focused ticket commit to restore prior copy.
