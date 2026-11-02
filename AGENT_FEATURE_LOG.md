@@ -10826,3 +10826,49 @@ Existing frontend main-branch Cloudflare workflow only. No backend deployment or
 ### Git
 
 Branch: fix/rollback-home-scroll-performance. Commit subject: Roll back the home scrolling performance attempt. Fetch/rebase before branch push and standing-authorized fast-forward main merge/push. Exact commit, push/merge, conflict and deployment results in handoff. All historical log entries preserved; no reset, force push or branch deletion.
+
+## 2026-11-02 - Isolate the home background to eliminate scroll-wide repainting
+
+### Request
+
+Investigate and fix desktop home scrolling heaviness compared with the profile gallery after the earlier optimization and rollback did not resolve it.
+
+### Changes
+
+Moved the home texture out of the scrolling element's fixed background into a viewport-sized, composited, pointer-transparent ::before layer. A separate absolute ::after tint retains the original full-page cream/dark-green gradient coverage. Scoped isolation contains both negative-z decorative layers behind content. Original texture, tint colors/opacities, page height, card geometry and interactions remain unchanged. No gallery/card JavaScript, virtualization, header movement, pagination or profile implementation changed. Added a source regression test for layer bounds, theme palettes, noninteractive stacking and absence of fixed-background painting on the main element.
+
+### Repositories and files
+
+All three repositories checked clean and main pulled ff-only first. Frontend only: src/styles.css, tests/home-scroll-background.test.mjs and this append-only log. Both backend repositories unchanged. Prior logs and all card/footer/profile/upload/exhibition changes preserved. No dependencies, generated artifacts, credentials or diagnostic files committed.
+
+### API
+
+No API changes. Diagnostics read public feed/media only; fixture actions were inert.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, authorization, backend/SnapStart, storage, image processing or deployment configuration changes. Decorative layers cannot receive pointer events. No production account/data mutations performed.
+
+### Frontend and diagnosis
+
+Headless Edge traces with the same34 public artworks and identical1920x852 down/up gestures showed repeated document-wide painting from the home's background composition. Initial theories were tested rather than merged: removing per-card3D transforms/using flow increased compositor work; disabling small-feed scroll callbacks reduced JavaScript but did not eliminate the painting. Those experiments were discarded. The final implementation changes only background composition and retains the measured faster card positioning.
+
+### Verification
+
+471 checks passed (109 Node/source and362 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. Final updated background test and build rerun after preserving full-page gradient coverage. Existing non-blocking bundle-size/jsdom notices remain; no failed checks bypassed.
+
+Repeated final A/B traces, including the actual background texture, reduced Paint events from699-701 to14, paint time from104-191ms to3.3-5.2ms, Layerize time from393-700ms to11-14ms and raster work from41-86ms to5-7ms. These are controlled headless measurements, not guaranteed physical-device FPS. Both variants retained34 mounted/loaded images, identical page height2557px and unchanged card layout. Final1920x852 screenshots were pixel-identical across all RGB channels (mean difference0).
+
+Read-only production-page CSS injection checks at1920/en/light,1920/ar/dark,390/en/light and390/ar/dark preserved all measured card rectangles/page heights, produced no horizontal overflow, retained correct direction and left visible rail/header/search/mobile-menu/notification controls reachable by hit testing. Screenshots/traces and temporary diagnostic helpers remain outside the repos in the task's Temp directory; diagnostic browsers/servers closed. Logged-in panel workflows/physical phones were not newly exercised; existing navigation/overlay regressions passed.
+
+### Deployment
+
+Existing frontend main-branch Cloudflare workflow only; no backend deployment, migration or deployment-order dependency.
+
+### Git
+
+Branch: fix/home-background-scroll-repaint. Commit subject: Isolate home background to avoid full-page scroll repaints. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Exact commit, push/merge, conflicts and deployment results in handoff. Revert only this focused commit if needed, preserving all historical entries and unrelated work.

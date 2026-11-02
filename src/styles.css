@@ -364,7 +364,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 /* Public gallery */
-.gallery-home { min-height: 100vh; background: linear-gradient(rgb(238 231 189 / 0.82), rgb(238 231 189 / 0.94)), url("./assets/gallery-ivory-background.png") center top / cover fixed; color: #283014; }
+.gallery-home { --gallery-tint: linear-gradient(rgb(238 231 189 / 0.82), rgb(238 231 189 / 0.94)); position: relative; isolation: isolate; min-height: 100vh; background: transparent; color: #283014; }
+/* A viewport-sized composited layer avoids repainting the page for a fixed background on every scroll frame. */
+.gallery-home::before { content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none; background: url("./assets/gallery-ivory-background.png") center top / cover; transform: translateZ(0); }
+/* Keep the original tint's full-page gradient separate from the viewport-fixed texture. */
+.gallery-home::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--gallery-tint); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .gallery-header { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 140px minmax(220px, 600px) auto; align-items: center; justify-content: space-between; gap: clamp(16px, 3vw, 42px); min-height: 78px; padding: 10px clamp(20px, 5vw, 76px); border-bottom: 1px solid rgb(57 67 28 / 0.16); background: rgb(247 243 217 / 0.86); backdrop-filter: blur(18px); }
 .gallery-brand { display: inline-flex; width: fit-content; }
@@ -657,7 +661,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .gallery-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 34px clamp(24px, 6vw, 90px); border-top: 1px solid rgb(57 67 28 / 0.18); background: rgb(57 67 28 / 0.94); color: #eee7bd; }
 .gallery-footer img { width: 94px; filter: brightness(1.65); }
 .gallery-footer p { margin: 0; font-size: 0.85rem; }
-:root[data-theme="dark"] .gallery-home { background: linear-gradient(rgb(16 20 12 / 0.84), rgb(16 20 12 / 0.94)), url("./assets/gallery-ivory-background.png") center top / cover fixed; color: #f7f2d8; }
+:root[data-theme="dark"] .gallery-home { --gallery-tint: linear-gradient(rgb(16 20 12 / 0.84), rgb(16 20 12 / 0.94)); color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-header { border-color: #3b4828; background: rgb(16 20 12 / 0.84); }
 :root[data-theme="dark"] .gallery-header .theme-toggle { border-color: #3b4828; background: rgb(16 20 12 / 0.84); color: #f7f2d8; }
 :root[data-theme="dark"] .gallery-header .theme-toggle:hover { border-color: #617d2b; background: rgb(23 29 17 / 0.94); }
