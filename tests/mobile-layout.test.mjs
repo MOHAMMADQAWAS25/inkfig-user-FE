@@ -18,7 +18,6 @@ test("mobile search avoids input zoom and profile tracks cannot create horizonta
   assert.match(mobile, /\.profile-swipe-track \{[^}]*translate3d/);
   assert.match(mobile, /\.profile-swipe-area\[data-dragging\] \.profile-swipe-track \{ transition: none/);
   assert.doesNotMatch(mobile, /gallery-header\.mobile-header-hidden:focus-within/);
-  assert.match(mobile, /\.gallery-header, \[dir="rtl"\] \.gallery-header \{[^}]*--mobile-header-progress[^}]*transition: none;/);
   assert.match(mobile, /\.mobile-drawer-preferences \{[^}]*justify-content: flex-end[^}]*margin-top: 26px/);
 });
 test("phone has three mirrored navigation slots and a header notification slot",()=>{

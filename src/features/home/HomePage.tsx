@@ -1,10 +1,10 @@
 import { LogOut, Search, UserRound, X } from "lucide-react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
-import { ScrollHeader } from "./ScrollHeader";
+import { useScrollHeader } from "./useScrollHeader";
 import { SearchHints } from "./SearchHints";
 import { FirstLoginBackupPrompt } from "./FirstLoginBackupPrompt";
 import { workCategories } from "../works/workCategories";
@@ -32,6 +32,7 @@ import { useDismissOnly } from "../layout/useDismissOnly";
 
 
 export function HomePage() {
+  const headerProgress = useScrollHeader();
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const location = useLocation();
@@ -166,7 +167,7 @@ export function HomePage() {
     <main className="gallery-home">
       <FirstLoginBackupPrompt ready={!feed.loading} />
       <AppSidebar />
-      <ScrollHeader>
+      <header className={`gallery-header${headerProgress >= 1 ? " mobile-header-hidden" : ""}`} style={{ "--mobile-header-progress": headerProgress } as CSSProperties}>
         <span className="mobile-header-menu" id="mobile-menu-slot" />
         <span className="mobile-header-notifications" id="mobile-notifications-slot" />
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef} onClick={event=>{if(!(event.target instanceof Element)||event.target.closest('input, button, a, [role="listbox"], .recent-searches'))return;const input=event.currentTarget.querySelector<HTMLInputElement>("#gallery-search-input");if(document.activeElement===input)openHistory();else input?.focus();}}>
@@ -182,7 +183,7 @@ export function HomePage() {
           <AnimatedPresence open={mentionQuery!==null}>{mentionQuery!==null&&<div className="account-search-suggestions" id="account-search-suggestions" role="listbox">{mentionQuery.length===0?<p>{t("home.accountSearchHint")}</p>:accountSearchLoading?<p>{t("home.searchingAccounts")}</p>:accountSuggestions.length===0?<p>{t("home.noAccountsFound")}</p>:accountSuggestions.map((account,index)=><button className={index===activeSuggestion?"active":""} type="button" role="option" aria-selected={index===activeSuggestion} key={account.user_id} onPointerDown={event=>event.preventDefault()} onClick={()=>selectAccount(account)}><span>{account.avatar_url?<img src={account.avatar_url} alt=""/>:account.full_name.trim().charAt(0).toLocaleUpperCase(language)}</span><strong>{account.full_name}</strong></button>)}</div>}</AnimatedPresence>
         </form>
         <div className="gallery-header-actions">{session?<SmoothDetails className="gallery-profile-menu" ref={profileMenuRef}><summary aria-label={t("home.profileMenu")} title={t("home.profileMenu")}>{profileAvatar?<img src={profileAvatar} alt=""/>:<span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span>}</summary><div className="gallery-profile-popover"><Link className="gallery-profile-identity" to={`/${language}/profile`}>{profileAvatar?<img src={profileAvatar} alt=""/>:<span>{session.fullName.trim().charAt(0).toLocaleUpperCase(language)}</span>}<div><strong>{session.fullName}</strong><small>{session.email}</small></div></Link><div className="gallery-profile-preferences"><span>{t("home.preferences")}</span><div><LanguageToggle/><ThemeToggle/></div></div><button type="button" onClick={signOut}><LogOut aria-hidden="true" size={18}/>{t("nav.logout")}</button></div></SmoothDetails>:<Link className="gallery-guest-avatar" to={`/${language}/login`} aria-label={t("auth.signIn")} title={t("auth.signIn")}><UserRound aria-hidden="true" size={20}/></Link>}</div>
-      </ScrollHeader>
+      </header>
 
       <section className="gallery-feed" aria-label={t("home.collectionTitle")}>
         <div className="gallery-filters" role="group" aria-label={t("home.filters")}>

@@ -1725,7 +1725,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 /* Compact mobile glass navigation mirrors with the active language. */
 .mobile-header-menu, .mobile-header-notifications { display: none; }
 @media (max-width: 720px) {
-  .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; transform: translateY(calc(-110% * var(--mobile-header-progress, 0))); opacity: calc(1 - var(--mobile-header-progress, 0)); transition: none; }
+  .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; transform: translateY(calc(-110% * var(--mobile-header-progress, 0))); opacity: calc(1 - var(--mobile-header-progress, 0)); transition: transform 320ms ease-out, opacity 320ms ease-out; }
   .gallery-header.mobile-header-hidden { pointer-events: none; }
   .gallery-header:has([aria-controls="notifications-panel"][aria-expanded="true"]) { z-index: 54; transform: none; opacity: 1; pointer-events: auto; }
   .gallery-header:has(.gallery-search input:focus) { transform: none; opacity: 1; pointer-events: auto; }

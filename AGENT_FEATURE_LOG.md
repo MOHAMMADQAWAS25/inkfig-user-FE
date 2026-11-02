@@ -10784,3 +10784,45 @@ Existing frontend main-branch Cloudflare workflow only; no migration/backend dep
 ### Git
 
 Branch: fix/home-scroll-performance. Commit subject: Reduce gallery scroll work and remove header animation lag. Fetch/rebase before feature-branch push, then standing-authorized fast-forward main merge/push. Exact commit, conflicts, push/merge and deployment status reported in handoff. Revert this focused commit if necessary; preserve all prior log entries and other agents' work.
+
+## 2026-11-02 - Roll back only the scrolling-performance attempt
+
+### Request
+
+Roll back only the recent scrolling issue change, preserving unrelated work.
+
+### Changes
+
+Reversed the application, tests and documentation portion of83506c80128ec901904fefdd423f0e6b837bb873. Restored the earlier feed animation-frame monitor, card rendering and mobile header integration/transition; removed the ticket-only ScrollHeader wrapper and its associated regression assertion. No new optimization or visual redesign attempted. Both original feature-log entries remain unchanged; this rollback is recorded as a new append, not a history rewrite.
+
+### Repositories and files
+
+All three repos checked clean and pulled main ff-only. Only inkfig-user-FE affected: feed/home components, the one mobile header CSS rule, corresponding feed/mobile tests and infinite-feed documentation. Today's visible creator/like card footers,44px geometry, profile, exhibition, upload, cache and other agents' work remain intact. Backend repos unchanged.
+
+### API
+
+No API changes.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No authentication, authorization, backend/SnapStart, storage, dependency or deployment-configuration changes. No production data mutations. Removing the ticket-only wrapper is recoverable from Git.
+
+### Frontend
+
+Restores scrolling implementation to56c0b8a, not the entire website to an older version. This is a requested rollback, not a claim that the original desktop heaviness has been diagnosed or eliminated.
+
+### Verification
+
+Exact Git comparison confirms reverted source/tests/docs match the pre-performance baseline; separate comparison confirms card footers/profile/exhibition/upload files remain untouched. Full frontend tests, strict TypeScript/Vite/SEO build and git diff --check run before publication; results reported in handoff. Existing non-blocking bundle-size/jsdom notices remain. No physical-device smoothness certification claimed.
+
+### Deployment
+
+Existing frontend main-branch Cloudflare workflow only. No backend deployment or migration dependency.
+
+### Git
+
+Branch: fix/rollback-home-scroll-performance. Commit subject: Roll back the home scrolling performance attempt. Fetch/rebase before branch push and standing-authorized fast-forward main merge/push. Exact commit, push/merge, conflict and deployment results in handoff. All historical log entries preserved; no reset, force push or branch deletion.

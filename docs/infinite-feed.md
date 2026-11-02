@@ -48,21 +48,12 @@ position jumps on rotation. List cards are centered and at most 470px wide.
 
 `visiblePositions` binary-searches each ordered column to render only the viewport
 plus two screens (minimum 800px) in each direction. One keyboard-focused card may
-remain mounted outside the window. A passive scroll listener coalesces events into
-one requestAnimationFrame; resize and visibility restoration also refresh the
-window. There is no idle animation-frame polling. Layout reads/state updates happen
-only at half-viewport boundaries or height changes. Memoized positioned cards keep
-unchanged buffered subtrees from rendering again when that window moves. Hidden
-documents do not schedule frames; listeners/frames are cleaned up on unmount.
-This avoids per-artwork observers and scanning every loaded item on each frame.
+remain mounted outside the window. An inexpensive requestAnimationFrame monitor
+checks window position; layout reads/state updates happen only when scroll or
+viewport height changes. It stops in hidden documents. This avoids scroll event
+listeners, per-artwork observers, and scanning every loaded item on each frame.
 Loaded data/position arrays still grow with pages; DOM size depends on viewport,
 not total items. Query caches expire after five minutes without observers.
-
-On mobile, scroll-driven header progress belongs to a small header wrapper rather
-than HomePage. Its transform/opacity track the gesture directly without restarting
-a CSS transition on each frame; search controls and gallery do not rerender for
-header movement. The existing 160px hide/reveal distance and focus/overlay locks
-are preserved.
 
 ## Images and states
 

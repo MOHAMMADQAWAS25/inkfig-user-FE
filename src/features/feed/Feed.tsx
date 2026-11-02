@@ -13,20 +13,7 @@ type FeedProps = {
   restoreScroll?: boolean;
 };
 
-const PositionedCard = memo(function PositionedCard({ position, item, priority, renderItem, total, hasNextPage, onFocusChange }: {
-  position: Position; item: FeedWork; priority: boolean; renderItem: FeedProps["renderItem"];
-  total: number; hasNextPage: boolean; onFocusChange: (id: string | null) => void;
-}) {
-  return <article className="artwork-card feed-position" style={{ width: position.width, height: position.height,
-    transform: `translate3d(${position.x}px, ${position.y}px, 0)` }}
-    aria-posinset={position.index + 1} aria-setsize={hasNextPage ? -1 : total}
-    onFocusCapture={() => onFocusChange(position.id)}
-    onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) onFocusChange(null); }}>
-    {renderItem(item, position.width, priority)}
-  </article>;
-});
-
-/** Passive, frame-coalesced window virtualization; no idle polling/per-card observers. */
+/** Window-scroll virtualization without scroll event listeners or per-card observers. */
 export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem, restoreScroll = true }: FeedProps) {
   const { language, t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -103,27 +90,12 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
         setRange(current => current.top === start - buffer && current.bottom === start + step + lastHeight + buffer
           ? current : { top: start - buffer, bottom: start + step + lastHeight + buffer });
       }
-      frame = 0;
+      if (!document.hidden) frame = requestAnimationFrame(measure);
     };
-    const schedule = () => {
-      // Save even a final sub-window gesture before route unmount/scroll locking.
-      if (restored.current) lastScroll.current = window.scrollY;
-      if (!document.hidden && !frame) frame = requestAnimationFrame(measure);
-    };
-    const resume = () => {
-      cancelAnimationFrame(frame); frame = 0; measuredBucket = NaN;
-      if (!document.hidden) measure();
-    };
+    const resume = () => { cancelAnimationFrame(frame); measuredBucket = NaN; measure(); };
     measure();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
     document.addEventListener("visibilitychange", resume);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      document.removeEventListener("visibilitychange", resume);
-    };
+    return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", resume); };
   }, [width, cacheKey, positions]);
 
   const visible = visiblePositions(positions, range.top, range.bottom);
@@ -140,9 +112,11 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
       aria-label={t("home.collectionTitle")} aria-busy={loading || loadingMore} style={{ height: width ? positions.height : 0 }}>
       {width > 0 && visible.map(position => loading
         ? <div className="feed-position feed-skeleton" key={position.id} style={style(position)} aria-hidden="true" />
-        : <PositionedCard key={position.id} position={position} item={items[position.index]}
-            total={items.length} hasNextPage={hasNextPage} onFocusChange={setFocusedId} renderItem={renderItem}
-            priority={position.index >= firstVisible && position.index < firstVisible + 2} />)}
+        : <article className="artwork-card feed-position" key={position.id} style={style(position)}
+            aria-posinset={position.index + 1} aria-setsize={hasNextPage ? -1 : items.length}
+            onFocusCapture={() => setFocusedId(position.id)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocusedId(null); }}>
+            {renderItem(items[position.index], position.width, position.index >= firstVisible && position.index < firstVisible + 2)}
+          </article>)}
     </div>
     {!loading && !error && items.length === 0 && <p className="gallery-state">{emptyMessage}</p>}
     <p className="sr-only" aria-live="polite" aria-atomic="true">{loading ? t("works.loading") : `${items.length} ${t("feed.loaded")}`}</p>
