@@ -10990,3 +10990,27 @@ Headless Edge synthetic fixtures checked360x640 English/light,390x844 Arabic/dar
 ### Deployment and Git
 
 Branch fix/mobile-media-gestures-and-footer. Commit subject: Fix phone media resizing, swipe axes and footer bleed. Fetch/rebase before feature branch push, then standing-authorized fast-forward main merge/push. Existing main Cloudflare workflow tests/builds/deploys frontend only; no backend or migration dependency. Exact hash, push/merge, conflict and deployment outcomes reported in handoff. No reset, discarded work, force push or branch deletion.
+
+## 2026-11-06 - Phone filter, upload links and drawer control refinements
+
+### Request and frontend
+
+- Phone category buttons no longer acquire the hover appearance while swiping/touching inactive types. Selected category styling, keyboard focus, click/filter behavior and desktop hover remain intact in both themes.
+- Shared normal/exhibition upload uses one controlled Related Links fieldset. On phones it renders after Description and before errors/actions inside Share your work; above720px it stays beneath the media chooser. Link validation,10-link limit, add/remove/edit state, upload payload, file handling and eligibility checks unchanged.
+- Phone drawer is a flex column: header and preference controls do not shrink, middle menu rows scroll independently on short screens, and theme/language icons stay bottom-right with their existing gap and LTR preference direction in either language. Dismissal, focus handling, scroll locking and existing navigation unchanged.
+- Phone floating glass bar has no outer border or inset border-like highlight in either theme. Retained glass fill/blur, soft exterior shadow, dimensions, icons, active selection and keyboard outlines.
+- Phone related-artwork feed badges are hidden, matching existing home/profile closed-card rules. The opened artwork's own exhibition information remains available and desktop badges remain unchanged.
+
+### Repositories, API, database and permissions
+
+All three repos checked clean and main pulled ff-only; existing frontend feature log reviewed. Only inkfig-user-FE changed: UploadWorkPage, scoped CSS and regression tests. No API, database migration, backend/SnapStart, authorization, storage, dependency or deployment configuration changes. No production data mutations. Previous log entries and unrelated work preserved. The separately discussed scrolling-performance investigation is not implemented or claimed fixed by this ticket.
+
+### Verification
+
+497 checks passed (117 Node/source and380 Vitest across37 files), strict TypeScript/Vite/SEO build and git diff --check passed. Added English/Arabic phone/desktop tests for exactly one correctly positioned, editable links fieldset and add-link behavior. Scoped CSS checks cover inactive hover resets without removing active state, scrollable drawer middle/fixed preference region, borderless glass and related-only badge hiding. Existing non-blocking bundle-size/jsdom notices remain; no failed checks bypassed.
+
+Headless Edge synthetic fixtures checked390x844 English/light,390x640 Arabic/dark and1440px desktop. Related Links computed inside details only on phones and inside media only on desktop. Phone bar border0px with no inset shadow, related badges display:none (desktop flex); forced CSS hover kept inactive phone backgrounds identical in both themes while desktop changed to green. Preferences stayed15px from drawer bottom/right in both phone sizes; short Arabic menu retained internal scrolling without pushing preference controls away. No horizontal overflow. Screenshot review completed. Fixture-only template-string escaping corrected before measurements; no application impact. Helpers/screenshots outside repos under Temp/inkfig-mobile-polish-20261106; browser/server closed. No physical-device certification claimed.
+
+### Deployment and Git
+
+Branch fix/phone-controls-and-upload-links. Commit subject: Refine phone controls and relocate mobile upload links. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment or migration dependency. Exact hash, push/merge, conflicts and deployment status reported in handoff. No reset, discarded work, forced push or branch deletion.

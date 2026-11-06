@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useMobileViewport } from "../../lib/useMobileViewport";
 import type { ChangeEvent, FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CloudUpload, FileText, ImagePlus, Link2, Plus, Trash2, Type, X } from "lucide-react";
@@ -14,6 +15,7 @@ import { readCachedWorkTypes } from "./workTypesCache";
 import { WorkImageDimensionsError } from "./workImageDimensions";
 
 export function UploadWorkPage() {
+ const mobile = useMobileViewport();
  const {session}=useAuth(); const {language,t}=useI18n(); const navigate=useNavigate();
  const [searchParams]=useSearchParams();const exhibitionId=searchParams.get('exhibition');const [publishedId,setPublishedId]=useState<string|null>(null);
  const fileInputRef=useRef<HTMLInputElement>(null);
@@ -48,6 +50,10 @@ export function UploadWorkPage() {
  }
  function updateLink(index:number,field:"label"|"url",value:string){setLinks(current=>current.map((link,i)=>i===index?{...link,[field]:value}:link));}
  async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(`/${language}`);}catch(cause){setError(cause instanceof WorkImageDimensionsError?t(cause.issue==="too-small"?"works.imageTooSmall":"works.invalidImage"):cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
+ const relatedLinks = (<fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>
+         {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
+         {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
+       </fieldset>);
  return <main className="upload-page app-page-with-sidebar"><AppSidebar/>
    <form className="upload-workspace form-stack" onSubmit={submit} aria-labelledby="upload-title">
      <div className="upload-details-column"><section className="upload-card upload-details">
@@ -57,6 +63,7 @@ export function UploadWorkPage() {
        {typesStatus==="loading"&&<WorkTypePickerSkeleton/>}
        {typesStatus==="error"&&<div className="form-message error-message" role="alert"><p>{t("works.loadFailed")}</p><button type="button" className="text-button" disabled={busy} onClick={()=>{setTypesStatus("loading");setTypesRequest(value=>value+1);}}>{t("feed.retry")}</button></div>}
        <label className="upload-field"><span><FileText size={18} aria-hidden="true"/>{t("works.description")}</span><textarea maxLength={2000} value={description} disabled={busy} onChange={event=>setDescription(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{description.length}/2000</small></label>
+       {mobile&&relatedLinks}
        {error&&<p className="form-message error-message" role="alert">{error}</p>}
        <footer className="upload-actions"><button className="upload-cancel" type="button" disabled={busy} onClick={()=>navigate(exhibitionId?`/${language}/exhibition/${exhibitionId}`:`/${language}`)}><X size={17} aria-hidden="true"/>{t("works.cancelUpload")}</button><button className="primary-button" disabled={busy||typesStatus!=="ready"||!file||!typeId||Boolean(exhibitionId&&!exhibitionReady)} type="submit"><CloudUpload size={18} aria-hidden="true"/>{busy?t("works.uploading"):t(exhibitionId?"exhibitions.submit":"works.publish")}</button></footer>
      </section>
@@ -74,10 +81,7 @@ export function UploadWorkPage() {
          <small>{t("works.minimumDimensions")}</small>
          {previewFile&&<small className="work-file-name">{previewFile.name} · {(previewFile.size/1024/1024).toFixed(1)} MB</small>}
        </div>
-       <fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>
-         {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
-         {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
-       </fieldset>
+       {!mobile&&relatedLinks}
      </aside>
    </form>
  </main>;

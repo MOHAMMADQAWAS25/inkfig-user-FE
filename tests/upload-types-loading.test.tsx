@@ -23,7 +23,7 @@ function mount(language: "en" | "ar" = "en") {
   return render(<MemoryRouter initialEntries={[`/${language}/upload`]}><I18nProvider><UploadWorkPage /></I18nProvider></MemoryRouter>);
 }
 beforeEach(() => { vi.resetAllMocks(); sessionStorage.clear(); });
-afterEach(()=>{cleanup();sessionStorage.clear();});
+afterEach(()=>{cleanup();sessionStorage.clear();vi.unstubAllGlobals();});
 
 it.each(["en", "ar"] as const)("does not flash an empty/error message while types load (%s)", async language => {
   const request = deferred(); vi.mocked(getWorkTypes).mockReturnValue(request.promise);
@@ -75,4 +75,21 @@ it("ignores a previous page's pending request after unmount", async () => {
   expect(screen.queryByText(translations.en["works.noTypes"])).toBeNull();
   await act(async () => current.resolve(types));
   expect(screen.getByRole("radio", { name: "Digital Art" })).toBeTruthy();
+});
+it.each([["en",true],["ar",true],["en",false],["ar",false]] as const)("places one editable links section in the correct %s layout (phone=%s)",(language,mobile)=>{
+  vi.stubGlobal("matchMedia",()=>({matches:mobile,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+  cacheWorkTypes(types);vi.mocked(getWorkTypes).mockReturnValue(new Promise(()=>{}));
+  const {container}=mount(language);
+  const field=screen.getByRole("group",{name:translations[language]["works.links"]});
+  expect(container.querySelectorAll(".work-links-field")).toHaveLength(1);
+  expect(Boolean(field.closest(".upload-details"))).toBe(mobile);
+  expect(Boolean(field.closest(".upload-media-panel"))).toBe(!mobile);
+  if(mobile){
+    expect(field.previousElementSibling?.querySelector("textarea")).toBeTruthy();
+    expect(field.compareDocumentPosition(container.querySelector(".upload-actions")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  }
+  fireEvent.change(screen.getByRole("textbox",{name:translations[language]["works.linkLabel"]}),{target:{value:"Portfolio"}});
+  expect(screen.getByRole<HTMLInputElement>("textbox",{name:translations[language]["works.linkLabel"]}).value).toBe("Portfolio");
+  fireEvent.click(screen.getByRole("button",{name:translations[language]["works.addLink"]}));
+  expect(field.querySelectorAll(".work-link-row")).toHaveLength(2);
 });

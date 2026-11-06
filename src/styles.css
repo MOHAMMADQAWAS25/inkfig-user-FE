@@ -2496,6 +2496,18 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
   .artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:var(--surface-raised); border-color:var(--border); }
 }
 .mobile-gallery-background { display:none; }
+/* Phone control refinements; desktop hover and upload layout stay unchanged. */
+@media(max-width:720px) {
+  :root:not([data-theme="dark"]) .gallery-filters button:not(.active):hover { border-color:rgb(57 67 28 / .25); background:rgb(255 253 240 / .62); color:#58613d; transform:none; box-shadow:none; }
+  :root[data-theme="dark"] .gallery-filters button:not(.active):hover { border-color:#3b4828; background:rgb(23 29 17 / .86); color:#b7b59a; transform:none; box-shadow:none; }
+  .mobile-drawer { display:flex; flex-direction:column; }
+  .mobile-drawer-header { flex-shrink:0; }
+  .mobile-drawer-grid { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+  .mobile-drawer-preferences { flex-shrink:0; margin-top:26px; justify-content:flex-end; }
+  .mobile-bottom-nav { border:0; box-shadow:0 6px 24px rgb(40 49 20 / .12); }
+  [data-theme="dark"] .mobile-bottom-nav { box-shadow:0 6px 24px rgb(0 0 0 / .24); }
+  .artwork-page-related .feed-post-card .work-exhibition-overlay { display:none; pointer-events:none; }
+}
 @media(max-width:720px) {
   /* Clip only the decorative texture, not sticky headers or fixed navigation. */
   .gallery-home { z-index:1; }
