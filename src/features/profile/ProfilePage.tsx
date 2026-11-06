@@ -1,3 +1,4 @@
+import { useRouteActivity } from "../../app/RouteActivity";
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { WorkExhibitionBadge } from "../works/WorkExhibitionBadge";
 import { likeCountLabel } from "../../lib/likeCount";
@@ -14,7 +15,7 @@ import { SmoothDetails } from "../layout/SmoothDetails";
 import { AnimatedPresence } from "../layout/AnimatedPresence";
 import { CardMedia } from "../feed/CardMedia";
 import { useQueryClient } from "@tanstack/react-query";
-import { artworkPath } from "../works/artworkNavigation";
+import { artworkNavigationState, artworkPath } from "../works/artworkNavigation";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { ReportDialog } from "../reports/ReportDialog";
 import {
@@ -54,6 +55,7 @@ type ProfileSnapshot = { profile: PublicProfile; posts: Work[]; likes: Work[]; s
 export function ProfilePage() {
   const client = useQueryClient(); const navigate = useNavigate(); const location = useLocation();
   const restoreY = useRef<number | null>(null);
+  const routeActive = useRouteActivity();
   const {session,signOut}=useAuth();
   const {language,t}=useI18n();
   const {userId}=useParams();
@@ -94,8 +96,17 @@ export function ProfilePage() {
   const [reportingUser,setReportingUser]=useState(false);
   const avatarInputRef=useRef<HTMLInputElement>(null);
 
+  useLayoutEffect(()=>{
+    if(!routeActive||!session)return;
+    const cached=client.getQueryData<ProfileSnapshot>(["profile-gallery",session.userId,profileUserId]);
+    if(cached){
+      setProfile(cached.profile);setPosts(cached.posts);setLikes(cached.likes);setSaved(cached.saved);
+      setCursors(cached.cursors);setSection(cached.section);
+    }
+  },[routeActive,profileUserId,session?.userId,client]);
+
   useEffect(()=>{
-    if(!session||!profileUserId)return;
+    if(!routeActive||!session||!profileUserId)return;
     let active = true;
     restoreY.current = null;
     setFailed(false);
@@ -117,7 +128,7 @@ export function ProfilePage() {
       setCursors({posts:String(postsPage.next_cursor??"")||null,likes:String(likesPage.next_cursor??"")||null,saved:String(savedPage.next_cursor??"")||null});
     }).catch(()=>{if(active)setFailed(true);}).finally(()=>{if(active)setLoading(false);});
     return () => { active=false; };
-  },[ownProfile,profileUserId,session?.userId]);
+  },[ownProfile,profileUserId,session?.userId,routeActive]);
   useEffect(()=>{const value=searchParams.get("section");if(ownProfile&&(value==="posts"||value==="likes"||value==="saved"))setSection(value);if(!ownProfile)setSection("posts");},[ownProfile,searchParams]);
   useEffect(()=>{setAvatarError(false);setAvatarUploadError(false);setAvatarRemoveError(false);},[profileUserId]);
   useEffect(()=>{if(ownProfile)void getWorkTypes().then(setWorkTypes).catch(()=>setWorkTypes([]));},[ownProfile]);
@@ -152,7 +163,7 @@ export function ProfilePage() {
 
   function openArtwork(work: Work) {
     if (profile) client.setQueryData(["profile-gallery", session!.userId, profileUserId], { profile, posts, likes, saved, cursors, y: window.scrollY, section } satisfies ProfileSnapshot);
-    navigate(artworkPath(language, work.work_id), { state: { returnTo: location.pathname + location.search } });
+    navigate(artworkPath(language, work.work_id), { state: artworkNavigationState(location) });
   }
   async function toggleProfileFollow(){
     if(!profile||profile.is_self||followBusy)return;

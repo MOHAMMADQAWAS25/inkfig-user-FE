@@ -53,3 +53,19 @@
 .artwork-page .artwork-page-actions button:is(:hover,:focus-visible):not(:disabled) { transform:none; border-radius:14px; background:var(--surface-raised); box-shadow:0 4px 12px color-mix(in srgb,var(--primary) 10%,transparent); }
 .artwork-page .artwork-page-actions button:has(.lucide-heart):is(:hover,:focus-visible):not(:disabled) { background:transparent; border-color:transparent; box-shadow:none; }
 .artwork-page .artwork-page-actions button:has(.lucide-bookmark):is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,#d9ad22 17%,var(--surface)); border-color:color-mix(in srgb,#d9ad22 55%,var(--border)); }
+@media(max-width:720px) {
+  .artwork-page { padding-top:8px; }
+  .artwork-page-back { margin-bottom:8px; }
+  .artwork-page-hero { gap:12px; }
+  /* Small viewport units don't resize with the browser toolbar during a scroll. */
+  .artwork-page-media { height:clamp(160px,42svh,360px); transition:none; }
+  .artwork-page-creator { gap:10px; margin-bottom:0; }
+  .artwork-page-creator > a { gap:9px; }
+  .artwork-page-creator img,.artwork-creator-initial { width:44px; height:44px; flex-basis:44px; }
+  .artwork-page-creator .profile-avatar-initial { font-size:1.15rem; }
+  .artwork-page-creator strong { font-size:.9rem; }
+  .artwork-page-creator > button { padding:8px 16px; font-size:.85rem; }
+  .artwork-page h1 { font-size:1.6rem; }
+  .artwork-page .artwork-page-actions button:has(.lucide-heart) { background:var(--surface); border-color:var(--border); }
+  .artwork-page .artwork-page-actions button:has(.lucide-heart):is(:hover,:focus-visible):not(:disabled) { background:var(--surface-raised); border-color:var(--border); box-shadow:0 4px 12px color-mix(in srgb,var(--primary) 10%,transparent); }
+}

@@ -10938,3 +10938,30 @@ No API, database migration, backend/SnapStart, auth/permissions, storage, depend
 ### Deployment and Git
 
 Existing frontend Cloudflare main workflow; no backend deployment/migration dependency. Branch fix/exhibition-back-and-clear-likes. Commit subject: Restore back-first exhibition navigation and clear like backgrounds. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Exact hash, conflicts, push/merge and deployment results reported in handoff. Revert only this focused commit if required; no reset, force push, history rewrite or branch deletion.
+
+## 2026-11-06 - Phone navigation continuity, stable artwork and compact presentation
+
+### Request and frontend changes
+
+- Phone-only sign-in spacing/logo/form reduction keeps the sign-up link visible at normal small-screen heights. Inputs retain16px text to prevent automatic input zoom and the card keeps accessible overflow for unusually short screens, keyboard use and validation errors.
+- Phone feed/profile media hide exhibition and other informational overlays; home creator avatars shrink28 to24px and creator/count typography becomes smaller and regular weight. Desktop overlay/identity presentation unchanged. Ownership menus and detail-page information remain available.
+- Removed the phone header scroll-offset state, animation-frame/scroll listeners, transforms and fading. Header stays sticky/visible. Kept the independent keyboard-dismiss focus cleanup.
+- Opened phone artwork uses a smaller stable42svh media frame, tighter top spacing and slightly smaller creator/follow controls so its title is initially visible. Media dimensions do not respond to scrolling or toolbar-sized dynamic viewport changes. Opened phone likes use save-style framed controls with numeric-only counts, existing accessible localized labels, and existing white/red heart states. Desktop page/popup control styling unchanged.
+- Phone artwork navigation retains one inert, hidden home/profile route instead of unmounting/reconstructing it. History state stores a bounded validated background location/scroll position, inherited through related artwork. Back restores the existing gallery before paint. Paused virtual feeds stop frame tracking/sentinel pagination; profile caches synchronize reactions before becoming visible again. Inactive sidebar sockets/count listeners stop, avoiding duplicate socket activity. Manual phone history scroll restoration prevents browser restoration from fighting application restoration. Direct links, safe fallback navigation, other route remount boundaries and desktop routing remain intact.
+- Profile horizontal swipes now begin on actual artwork links/images and buttons, with axis thresholds/click suppression preserving vertical scroll and deliberate taps. Inputs, editable fields and controlled video gestures remain excluded.
+- Phone panels lock root/body overflow without fixing/unfixing the body. Reference-counted nesting, contained internal touch scrolling, overscroll blocking, dismissal-only clicks, focus handling and close animations remain. Restore scroll only if it actually drifted; desktop fixed-body behavior unchanged.
+- The apparent second footer was the legacy transparent bottom margin beneath the single existing footer. Removed that margin on phones and put floating-navigation clearance inside the opaque footer instead; kept its theme, divider, content and home-only placement.
+
+### Repositories, API, database and permissions
+
+All three repositories checked clean and main pulled ff-only before edits; complete frontend feature log read. Only inkfig-user-FE changed. No backend/SnapStart, API, database/migration, auth/authorization, storage, permissions, dependency or deployment configuration changes. No production data mutations. Historical logs and unrelated files preserved; no generated build output, local QA helpers or credentials committed.
+
+### Verification
+
+487 checks passed (114 Node/source and373 Vitest across37 files), strict TypeScript/Vite/SEO build and git diff --check passed. Targeted navigation/profile-isolation checks rerun after preserving normal cross-profile route remount boundaries. Coverage includes retained home/own/other-profile DOM identity and scroll on history/in-app Back, related history, desktop isolation, invalid background rejection, actual artwork-link swiping/tapping, stationary header/keyboard cleanup, suspended feed frame tracking, nested locks and phone internal scrolling/overscroll. Old hide-header/fixed-phone-body expectations were updated for the explicitly requested new behavior; no failed checks bypassed. Existing non-blocking chunk-size/jsdom notices remain.
+
+Headless Edge synthetic fixtures checked360x640 English/light,390x844 Arabic/dark and1440px desktop. Sign-in card client/scroll heights matched478/478 and481/481; sign-up line bottom565/668px was within each viewport. Artwork titles initially ended419/505px; media heights269/354px stayed identical after scrolling. Mobile exhibition overlays computed display:none, reaction text weight400, header top0 while scrolled, footer bottom margin0, no horizontal page overflow. Desktop fixture retained exhibition overlay and750-weight identities. Fixture-only raw-SVG/theme-provider omissions corrected before final measurement. Browser/server closed; screenshots/helper under Temp/inkfig-mobile-polish-20261106, outside repositories. These checks are not physical iOS/Safari certification or a claim that legitimate React route rendering has been eliminated.
+
+### Deployment and Git
+
+Branch fix/mobile-navigation-and-artwork-polish. Commit subject: Stabilize phone navigation and refine mobile artwork layouts. Fetch/rebase before branch push; standing-authorized fast-forward main merge/push follows. Existing frontend main Cloudflare test/build/deploy workflow only; both backends need no deployment. Exact commit, push/merge, conflicts and deployment status are reported in the handoff. No forced push, reset, discarded work or branch deletion.

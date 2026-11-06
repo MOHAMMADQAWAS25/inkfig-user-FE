@@ -17,8 +17,10 @@ import { useMobileViewport } from "../../lib/useMobileViewport";
 import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
 import { MobileNavigation } from "./MobileNavigation";
 import { useDismissOnly } from "../layout/useDismissOnly";
+import { useRouteActivity } from "../../app/RouteActivity";
 
 export function AppSidebar() {
+  const routeActive = useRouteActivity();
   const mobile = useMobileViewport();
   const { language, t } = useI18n();
   const { session } = useAuth();
@@ -55,7 +57,7 @@ export function AppSidebar() {
   const showSystemAdministration=session?.role==="system_administrator"&&hasPermission(session.permissions,"users.read");
   const showReportAdministration=Boolean(session&&hasPermission(session.permissions,"reports.manage"));
   const normalizedQuery=accountQuery.trim();
-  const inbox=useNotificationInbox(session?.userId,notificationsOpen&&!closingPanels.notifications);
+  const inbox=useNotificationInbox(routeActive ? session?.userId : undefined,notificationsOpen&&!closingPanels.notifications);
   const {items:notifications,unread:unreadCount,loading:notificationsLoading,cursor:notificationsCursor,loadingMore:notificationsLoadingMore}=inbox;
   const exhibitionCounts=useExhibitionCounts();
   const reportCount=useReportCount();
@@ -116,7 +118,7 @@ export function AppSidebar() {
   function setAccountsOpen(value:SetStateAction<boolean>){transitionPanel("accounts",value);}
   function setNotificationsOpen(value:SetStateAction<boolean>){transitionPanel("notifications",value);}
   useEffect(()=>{
-    if(!session)return;
+    if(!session||!routeActive)return;
     let active=true;let socket:WebSocket|null=null;let retry:number|undefined;let attempts=0;
     const changed=()=>{window.dispatchEvent(new Event("inkfig:notifications-changed"));window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed"));window.dispatchEvent(new Event("inkfig:reports-changed"));};
     const connect=async()=>{
@@ -137,7 +139,7 @@ export function AppSidebar() {
       }catch{if(active){attempts++;retry=window.setTimeout(()=>void connect(),Math.min(30000,1000*2**Math.min(attempts,5)));}}
     };
     void connect();return()=>{active=false;if(retry!==undefined)window.clearTimeout(retry);socket?.close();};
-  },[session?.userId]);
+  },[session?.userId,routeActive]);
   useEffect(()=>{if(!accountsOpen){return;}window.setTimeout(()=>searchInputRef.current?.focus(),0);},[accountsOpen]);
   useEffect(()=>{accountSearchGeneration.current+=1;setLoadingMore(false);if(!accountsOpen||normalizedQuery.length<1){setAccounts([]);setNextCursor(null);setLoading(false);setSearchFailed(false);return;}let active=true;setAccounts([]);setNextCursor(null);setLoading(true);setSearchFailed(false);const timer=window.setTimeout(()=>{searchProfilesPage(normalizedQuery).then(page=>{if(active){setAccounts(page.items);setNextCursor(page.next_cursor)}}).catch(()=>{if(active){setAccounts([]);setNextCursor(null);setSearchFailed(true)}}).finally(()=>{if(active)setLoading(false)});},SEARCH_DEBOUNCE_MS);return()=>{active=false;accountSearchGeneration.current+=1;window.clearTimeout(timer)};},[accountsOpen,normalizedQuery,accountQuery]);
   useEffect(()=>{setAccountsOpen(false);setNotificationsOpen(false);},[location.pathname,location.search]);

@@ -1729,8 +1729,7 @@ details[data-exiting="true"] > :not(summary) { opacity: 0; }
 /* Compact mobile glass navigation mirrors with the active language. */
 .mobile-header-menu, .mobile-header-notifications { display: none; }
 @media (max-width: 720px) {
-  .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; transform: translateY(calc(-110% * var(--mobile-header-progress, 0))); opacity: calc(1 - var(--mobile-header-progress, 0)); transition: transform 320ms ease-out, opacity 320ms ease-out; }
-  .gallery-header.mobile-header-hidden { pointer-events: none; }
+  .gallery-header, [dir="rtl"] .gallery-header { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; }
   .gallery-header:has([aria-controls="notifications-panel"][aria-expanded="true"]) { z-index: 54; transform: none; opacity: 1; pointer-events: auto; }
   .gallery-header:has(.gallery-search input:focus) { transform: none; opacity: 1; pointer-events: auto; }
   .gallery-header .gallery-header-actions { display: none; }
@@ -2468,4 +2467,30 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .exhibition-artwork-media .exhibition-artwork-blur { position:absolute; z-index:0; inset:-8%; width:116%; height:116%; max-height:none; object-fit:cover; filter:blur(24px) saturate(1.15) brightness(.85); opacity:.65; transform:scale(1.04); pointer-events:none; }
 .exhibition-artwork-media .exhibition-artwork-original { position:relative; z-index:1; }
 .work-type-skeleton { opacity:.45; cursor:wait; user-select:none; }
+/* Phone-only polish: stable page geometry, quiet cards and one continuous footer. */
+@media (max-width:720px) {
+  .site-content { animation:none; }
+  .site-content.mobile-route-background { position:fixed; inset:0; width:100%; overflow:hidden; visibility:hidden; pointer-events:none; }
+  .gallery-header, [dir="rtl"] .gallery-header { transform:none; opacity:1; transition:none; }
+  .gallery-home .feed-post-card .artwork-pin-media :is(.work-exhibition-overlay,.artwork-card-type-tag,.artwork-pin-save,.artwork-artist-link),
+  .profile-artwork-grid .artwork-pin-media :is(.work-exhibition-overlay,.artwork-card-type-tag,.artwork-pin-like,.artwork-pin-save,.artwork-artist-link) { display:none; pointer-events:none; }
+  .feed-post-card .feed-card-footer .feed-creator { font-size:.76rem; font-weight:400; }
+  .feed-post-card .feed-card-footer .feed-creator :is(img,.feed-creator-initial) { width:24px; height:24px; flex-basis:24px; }
+  .feed-post-card .feed-card-footer .feed-creator-initial { font-weight:400; }
+  .feed-card-like { font-size:.76rem; font-weight:400; }
+  .feed-card-like svg { width:18px; height:18px; flex-basis:18px; }
+  .site-footer { margin-block-end:0; padding-block-end:calc(22px + 76px + env(safe-area-inset-bottom)); }
+  .auth-photo-background.auth-signin { padding: max(64px,calc(env(safe-area-inset-top) + 52px)) 16px max(12px,env(safe-area-inset-bottom)); }
+  .site-content main.auth-signin { padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+  .auth-signin .login-card { padding:20px; }
+  .auth-signin .auth-logo { width:min(148px,50%); margin-bottom:8px; }
+  .auth-signin .auth-card h1 { margin:8px 0; font-size:1.65rem; }
+  .auth-signin .auth-card h1 + .muted-text { margin-bottom:12px; font-size:.85rem; }
+  .auth-signin .form-stack { margin-top:12px; gap:12px; }
+  .auth-signin .form-stack input { min-height:44px; }
+  .auth-signin .primary-button { min-height:44px; padding-block:10px; }
+  .auth-signin .auth-switch { margin-top:14px; font-size:.85rem; }
+  .artwork-modal-actions .artwork-modal-like { background:var(--surface); border-color:var(--border); }
+  .artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:var(--surface-raised); border-color:var(--border); }
+}
 @media(prefers-reduced-motion:reduce) { .feed-card-like,.feed-card-like svg,.profile-page .profile-actions .profile-report-button,.profile-page .profile-intro .profile-logout { transition:none; }.feed-card-like:hover:not(:disabled) svg,.exhibition-artwork-card:hover .exhibition-artwork-media .exhibition-artwork-original { transform:none; } }

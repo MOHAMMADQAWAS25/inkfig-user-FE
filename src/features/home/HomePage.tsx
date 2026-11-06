@@ -1,7 +1,7 @@
 import { LogOut, Search, UserRound, X } from "lucide-react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties, FormEvent } from "react";
+import type { FormEvent } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
 
 import { useScrollHeader } from "./useScrollHeader";
@@ -17,7 +17,7 @@ import { useInfiniteFeed } from "../feed/useInfiniteFeed";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
 import type { FeedWork } from "../works/worksApi";
-import { artworkPath } from "../works/artworkNavigation";
+import { artworkNavigationState, artworkPath } from "../works/artworkNavigation";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { LanguageToggle } from "../../i18n/LanguageToggle";
@@ -32,7 +32,7 @@ import { useDismissOnly } from "../layout/useDismissOnly";
 
 
 export function HomePage() {
-  const headerProgress = useScrollHeader();
+  useScrollHeader();
   const { session, signOut } = useAuth();
   const { language, t } = useI18n();
   const location = useLocation();
@@ -107,8 +107,8 @@ export function HomePage() {
     navigate(artworkPath(language, legacy), { replace: true, state: { returnTo: `/${language}${previous.size ? `?${previous}` : ""}` } });
   }, [searchParams, navigate, language]);
   const openWork = useCallback((work: Work) => {
-    navigate(artworkPath(language, work.work_id), { state: { returnTo: location.pathname + location.search } });
-  }, [language, navigate, location.pathname, location.search]);
+    navigate(artworkPath(language, work.work_id), { state: artworkNavigationState(location) });
+  }, [language, navigate, location]);
   function submitSearch(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
     if(mentionQuery!==null&&accountSuggestions.length){selectAccount(accountSuggestions[activeSuggestion]??accountSuggestions[0]);return;}
@@ -167,7 +167,7 @@ export function HomePage() {
     <main className="gallery-home">
       <FirstLoginBackupPrompt ready={!feed.loading} />
       <AppSidebar />
-      <header className={`gallery-header${headerProgress >= 1 ? " mobile-header-hidden" : ""}`} style={{ "--mobile-header-progress": headerProgress } as CSSProperties}>
+      <header className="gallery-header">
         <span className="mobile-header-menu" id="mobile-menu-slot" />
         <span className="mobile-header-notifications" id="mobile-notifications-slot" />
         <form className="gallery-search" role="search" onSubmit={submitSearch} ref={searchRef} onClick={event=>{if(!(event.target instanceof Element)||event.target.closest('input, button, a, [role="listbox"], .recent-searches'))return;const input=event.currentTarget.querySelector<HTMLInputElement>("#gallery-search-input");if(document.activeElement===input)openHistory();else input?.focus();}}>

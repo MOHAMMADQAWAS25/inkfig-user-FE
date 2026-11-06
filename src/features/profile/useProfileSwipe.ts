@@ -14,7 +14,7 @@ export function useProfileSwipe(enabled: boolean, section: Section, select: (sec
     "data-dragging": drag !== 0 || undefined,
     onTouchStart(event: TouchEvent) {
       suppressUntil.current = 0;
-      const control = (event.target as Element).closest?.('a, input, textarea, summary, button:not(.artwork-image-button), video[controls]');
+      const control = (event.target as Element).closest?.('input, textarea, select, [contenteditable="true"], video[controls]');
       start.current = enabled && mobile && !control && event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY, width: event.currentTarget.getBoundingClientRect().width || 360, axis: "pending" } : null;
     },
     onTouchMove(event: TouchEvent) {

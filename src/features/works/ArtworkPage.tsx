@@ -17,7 +17,7 @@ import { ReportDialog } from "../reports/ReportDialog";
 import { getPublicProfile, setProfileFollow } from "../profile/profileApi";
 import { deleteWork, deleteWorkAsModerator, getWork, setWorkLike, setWorkSave, type FeedWork } from "./worksApi";
 import { useRelatedArtworks } from "./useRelatedArtworks";
-import { artworkPath, safeArtworkReturn } from "./artworkNavigation";
+import { artworkNavigationState, artworkPath, safeArtworkReturn } from "./artworkNavigation";
 import { updateArtworkCache } from "./updateArtworkCache";
 import "./artworkPage.css";
 import { likeCountLabel } from "../../lib/likeCount";
@@ -60,7 +60,7 @@ export function ArtworkPage() {
   const returnTo = safeArtworkReturn(location.state?.returnTo, `/${language}`);
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [workId]);
   useEffect(() => { if (work) document.title = `${work.title} | InkFig`; }, [work?.title]);
-  const openWork = useCallback((item: FeedWork) => navigate(artworkPath(language, item.work_id), { state: { returnTo: location.pathname + location.search } }), [language, navigate, location.pathname, location.search]);
+  const openWork = useCallback((item: FeedWork) => navigate(artworkPath(language, item.work_id), { state: artworkNavigationState(location) }), [language, navigate, location]);
   const interact = useCallback(async (item: FeedWork, kind: "like" | "save") => {
     const permission = kind === "like" ? "works.like" : "works.save";
     const key = `${kind}:${item.work_id}`;

@@ -9,6 +9,7 @@ import { useInfiniteFeed } from "../src/features/feed/useInfiniteFeed";
 import { useFeedSentinel } from "../src/features/feed/useFeedSentinel";
 import { LazyImage } from "../src/features/feed/LazyImage";
 import { Feed } from "../src/features/feed/Feed";
+import { RouteActivity } from "../src/app/RouteActivity";
 import { getFeed, searchWorks, type FeedWork, type InfiniteFeedPage } from "../src/features/works/worksApi";
 
 vi.mock("../src/features/works/worksApi", () => ({ getFeed: vi.fn(), searchWorks: vi.fn() }));
@@ -45,6 +46,20 @@ beforeEach(() => {
 afterEach(() => { cleanup(); clients.forEach(client => client.clear()); clients.length = 0; vi.unstubAllGlobals(); });
 
 describe("precomputed masonry", () => {
+  it("pauses retained gallery frame tracking and restores scroll before resuming",()=>{
+    const frame=vi.fn(()=>42),cancel=vi.fn();
+    vi.stubGlobal("requestAnimationFrame",frame);vi.stubGlobal("cancelAnimationFrame",cancel);vi.stubGlobal("scrollY",1600);
+    const props={items:[work(1),work(2)],cacheKey:"retained-mobile",loading:false,loadingMore:false,error:null,hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem:(item:FeedWork)=><p>{item.title}</p>};
+    const tree=(active:boolean)=><MemoryRouter initialEntries={["/en"]}><I18nProvider><RouteActivity.Provider value={active}><Feed {...props}/></RouteActivity.Provider></I18nProvider></MemoryRouter>;
+    const view=render(tree(true));
+    expect(frame).toHaveBeenCalled();
+    view.rerender(tree(false));expect(cancel).toHaveBeenCalledWith(42);
+    frame.mockClear();vi.stubGlobal("scrollY",0);
+    fireEvent(document,new Event("visibilitychange"));expect(frame).not.toHaveBeenCalled();
+    view.rerender(tree(true));
+    expect(window.scrollTo).toHaveBeenLastCalledWith({top:1600,behavior:"instant"});
+    expect(frame).toHaveBeenCalled();
+  });
   it("reserves creator rows without moving existing cards on page append",()=>{
     const engine=new FeedLayout();const initial=[work(1,400,800),work(2,400,400),work(3,400,200)];
     const first=engine.compute(initial,400,"masonry",false,470,40);

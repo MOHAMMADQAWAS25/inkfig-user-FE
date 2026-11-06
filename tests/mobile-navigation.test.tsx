@@ -76,7 +76,7 @@ it("shows labeled drawer rows, restores Find users, and puts Settings before fin
   const preferences=document.querySelector(".mobile-drawer-preferences")!;
   expect(preferences.querySelectorAll("button")).toHaveLength(2);
   expect(preferences.textContent).toBe("");
-  expect(document.body.style.position).toBe("fixed"); expect(document.documentElement.style.overflow).toBe("hidden");
+  expect(document.body.style.position).toBe(""); expect(document.documentElement.style.overflow).toBe("hidden");
 });
 it("moves profile content with the finger, settles on the next page and keeps inactive pages inert",()=>{
   function Pager(){const [section,select]=React.useState<"posts"|"saved"|"likes">("posts");return <ProfilePager section={section} select={select} enabled>{page=><p>{page}</p>}</ProfilePager>;}
@@ -111,12 +111,12 @@ it("consumes an outside gesture and restores the page scroll position after clos
   Object.defineProperty(window,"scrollY",{configurable:true,value:350});
   const {container}=render(<MemoryRouter initialEntries={["/en"]}><MobileNavigation unreadCount={0} notificationsOpen={false} onNotifications={notifications} onAccounts={accounts} administration={false} reports={false}/><header><span id="mobile-menu-slot"/><span id="mobile-notifications-slot"/></header><button onClick={action}>Artwork</button></MemoryRouter>);
   fireEvent.click(screen.getByRole("button",{name:"Menu"}));
-  expect(document.body.style.top).toBe("-350px");
+  expect(document.body.style.top).toBe(""); expect(window.scrollY).toBe(350);
   const outside=screen.getByRole("button",{name:"Artwork"});
   fireEvent.pointerDown(outside);fireEvent.pointerUp(outside);fireEvent.click(outside);
   expect(action).not.toHaveBeenCalled();expect(document.querySelector(".is-closing")).toBeTruthy();
   act(()=>vi.advanceTimersByTime(240));
-  expect(document.body.style.position).toBe("");expect(window.scrollTo).toHaveBeenCalledWith({top:350,behavior:"instant"});
+  expect(document.body.style.position).toBe("");expect(window.scrollTo).not.toHaveBeenCalled();
   fireEvent.click(outside);expect(action).toHaveBeenCalledOnce();
   expect(container.querySelector(".mobile-drawer-layer")).toBeNull();
   Object.defineProperty(window,"scrollY",{configurable:true,value:0});
@@ -172,17 +172,17 @@ it("ignores multi-touch and prevents a swipe from opening an artwork", () => {
   swipe(area, -100);
   fireEvent.click(screen.getByRole("button", {name:"Artwork"})); expect(click).toHaveBeenCalledOnce();
 });
-it("moves the mobile header gradually with scroll distance in both directions", () => {
+it("keeps the mobile header visible while scrolling in both directions", () => {
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => window.setTimeout(callback, 0));
   vi.stubGlobal("cancelAnimationFrame", window.clearTimeout);
   function Header() { return <header data-testid="header" data-progress={useScrollHeader()}/>; }
   render(<Header/>);
   act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 80 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
-  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0.5");
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0");
   act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 200 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
-  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("1");
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0");
   act(() => { Object.defineProperty(window, "scrollY", { configurable: true, value: 120 }); fireEvent.scroll(window); vi.advanceTimersByTime(1); });
-  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0.5");
+  expect(screen.getByTestId("header").getAttribute("data-progress")).toBe("0");
   Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
 });
 it("does not interpret drawer scroll restoration as a downward gesture", () => {
@@ -191,14 +191,14 @@ it("does not interpret drawer scroll restoration as a downward gesture", () => {
   function Header() { return <output data-testid="progress">{useScrollHeader()}</output>; }
   render(<Header/>);
   const scroll = (y:number) => act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
-  scroll(200); expect(screen.getByTestId("progress").textContent).toBe("1");
+  scroll(200); expect(screen.getByTestId("progress").textContent).toBe("0");
   document.body.style.position="fixed"; scroll(0);
   document.body.style.position=""; scroll(200);
   expect(screen.getByTestId("progress").textContent).toBe("0");
-  scroll(280); expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  scroll(280); expect(screen.getByTestId("progress").textContent).toBe("0");
   Object.defineProperty(window,"scrollY",{configurable:true,value:0});
 });
-it.each(["notifications-panel","account-discovery-panel"])("resumes header tracking after %s closes, even with focus on a header button",id=>{
+it.each(["notifications-panel","account-discovery-panel"])("keeps the header stationary after %s closes, even with focus on a header button",id=>{
   vi.stubGlobal("requestAnimationFrame",(callback:FrameRequestCallback)=>window.setTimeout(callback,0));
   vi.stubGlobal("cancelAnimationFrame",window.clearTimeout);
   function Header({open}:{open:boolean}){return <><header className="gallery-header"><button>Header control</button><output data-testid="progress">{useScrollHeader()}</output></header>{open&&<div id={id}/>}</>;}
@@ -206,19 +206,19 @@ it.each(["notifications-panel","account-discovery-panel"])("resumes header track
   const scroll=(y:number)=>act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
   scroll(200);expect(screen.getByTestId("progress").textContent).toBe("0");
   view.rerender(<Header open={false}/>);screen.getByRole("button",{name:"Header control"}).focus();
-  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0");
   Object.defineProperty(window,"scrollY",{configurable:true,value:0});
 });
-it.each(["resize","pageshow","keyboard resize"])("rebases header tracking after %s and responds to the next gesture",event=>{
+it.each(["resize","pageshow","keyboard resize"])("keeps the header stationary after %s and later gestures",event=>{
   vi.stubGlobal("requestAnimationFrame",(callback:FrameRequestCallback)=>window.setTimeout(callback,0));vi.stubGlobal("cancelAnimationFrame",window.clearTimeout);
   const viewport=new EventTarget();vi.stubGlobal("visualViewport",viewport);
   function Header(){return <output data-testid="progress">{useScrollHeader()}</output>;}
   render(<Header/>);
   const scroll=(y:number)=>act(()=>{Object.defineProperty(window,"scrollY",{configurable:true,value:y});fireEvent.scroll(window);vi.advanceTimersByTime(1);});
-  scroll(200);expect(screen.getByTestId("progress").textContent).toBe("1");
+  scroll(200);expect(screen.getByTestId("progress").textContent).toBe("0");
   act(()=>{if(event==="keyboard resize")viewport.dispatchEvent(new Event("resize"));else window.dispatchEvent(new Event(event));});
   expect(screen.getByTestId("progress").textContent).toBe("0");
-  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0.5");
+  scroll(280);expect(screen.getByTestId("progress").textContent).toBe("0");
   Object.defineProperty(window,"scrollY",{configurable:true,value:0});
 });
 it("releases stale search focus when the phone keyboard closes",()=>{
@@ -227,4 +227,20 @@ it("releases stale search focus when the phone keyboard closes",()=>{
   render(<Header/>);const input=screen.getByRole("textbox");input.focus();expect(document.activeElement).toBe(input);
   act(()=>{viewport.height=720;viewport.dispatchEvent(new Event("resize"));});
   expect(document.activeElement).not.toBe(input);
+});
+it("swipes from artwork links and keeps deliberate taps usable",()=>{
+  const open=vi.fn();
+  function Pager(){const [section,select]=React.useState<"posts"|"saved"|"likes">("posts");return <ProfilePager section={section} select={select} enabled>{page=><a href="/en/artwork/work" className="artwork-image-button" onClick={event=>{event.preventDefault();open();}}><img alt={page}/></a>}</ProfilePager>;}
+  const {container}=render(<Pager/>);
+  let image=screen.getByAltText("posts");
+  fireEvent.touchStart(image,{touches:[{clientX:240,clientY:100}]});
+  fireEvent.touchMove(image,{touches:[{clientX:100,clientY:102}]});
+  fireEvent.touchEnd(image,{touches:[],changedTouches:[{clientX:100,clientY:102}]});
+  fireEvent.click(image);
+  expect(open).not.toHaveBeenCalled();
+  expect(container.querySelector('.profile-swipe-slide[data-active="true"] img')?.getAttribute("alt")).toBe("saved");
+  image=screen.getByAltText("saved");
+  fireEvent.touchStart(image,{touches:[{clientX:100,clientY:100}]});
+  fireEvent.touchEnd(image,{touches:[],changedTouches:[{clientX:100,clientY:100}]});
+  fireEvent.click(image); expect(open).toHaveBeenCalledOnce();
 });

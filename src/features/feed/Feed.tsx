@@ -1,3 +1,4 @@
+import { useRouteActivity } from "../../app/RouteActivity";
 import { memo, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { FeedWork } from "../works/worksApi";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -16,6 +17,7 @@ type FeedProps = {
 /** Window-scroll virtualization without scroll event listeners or per-card observers. */
 export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem, restoreScroll = true }: FeedProps) {
   const { language, t } = useI18n();
+  const active = useRouteActivity();
   const containerRef = useRef<HTMLDivElement>(null);
   const calculator = useRef(new FeedLayout());
   const [width, setWidth] = useState(0);
@@ -28,7 +30,19 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
   const previousWidth = useRef(0);
   const restored = useRef(false);
   const lastScroll = useRef(window.scrollY);
-  const sentinelRef = useFeedSentinel(!loading && !loadingMore && !error && hasNextPage, loadMore);
+  const suspendedScroll = useRef<number | null>(null);
+  const sentinelRef = useFeedSentinel(active && !loading && !loadingMore && !error && hasNextPage, loadMore);
+
+  useLayoutEffect(() => {
+    if (!active) {
+      suspendedScroll.current = window.scrollY;
+      lastScroll.current = window.scrollY;
+    } else if (suspendedScroll.current !== null) {
+      // Restore before the virtual range is measured, not after a blank frame.
+      if (restoreScroll) window.scrollTo({ top: suspendedScroll.current, behavior: "instant" });
+      suspendedScroll.current = null;
+    }
+  }, [active, restoreScroll]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -45,7 +59,7 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
 
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container || !width) return;
+    if (!active || !container || !width) return;
     const previous = previousLayout.current;
     if (previous && previousWidth.current !== width && !loading) {
       const top = -container.getBoundingClientRect().top;
@@ -55,14 +69,14 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
     }
     previousLayout.current = positions;
     previousWidth.current = width;
-  }, [width, positions, loading]);
+  }, [width, positions, loading, active]);
 
   useLayoutEffect(() => {
-    if (!width || loading || restored.current) return;
+    if (!active || !width || loading || restored.current) return;
     restored.current = true;
     lastScroll.current = scrollMemory.get(cacheKey) ?? 0;
     if (restoreScroll) window.scrollTo({ top: lastScroll.current, behavior: "instant" });
-  }, [cacheKey, width, loading, restoreScroll]);
+  }, [cacheKey, width, loading, restoreScroll, active]);
 
   useLayoutEffect(() => {
     return () => {
@@ -74,6 +88,7 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
   }, [cacheKey, restoreScroll]);
 
   useLayoutEffect(() => {
+    if (!active) return;
     let frame = 0, measuredBucket = NaN, lastHeight = 0;
     const measure = () => {
       const scroll = window.scrollY;
@@ -96,7 +111,7 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
     measure();
     document.addEventListener("visibilitychange", resume);
     return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", resume); };
-  }, [width, cacheKey, positions]);
+  }, [width, cacheKey, positions, active]);
 
   const visible = visiblePositions(positions, range.top, range.bottom);
   if (focusedId && !visible.some(position => position.id === focusedId)) {
