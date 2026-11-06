@@ -2426,8 +2426,8 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .artwork-modal-actions .artwork-modal-save:is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,#d9ad22 17%,var(--surface)); border-color:color-mix(in srgb,#d9ad22 55%,var(--border)); box-shadow:0 4px 12px rgb(169 129 0 / .12); }
 
 /* Reference footer: understated centered identity under an inset divider. */
-.site-footer { position:static; justify-content:center; flex-wrap:wrap; min-height:112px; gap:12px; padding:28px clamp(20px,4vw,60px); border-top:0; background:var(--bg); color:var(--muted); }
-.site-footer::before { content:""; flex:0 0 100%; height:1px; background:var(--border); margin-bottom:12px; }
+.site-footer { position:relative; isolation:isolate; justify-content:center; flex-wrap:wrap; min-height:112px; gap:12px; padding:28px clamp(20px,4vw,60px); border-top:1px solid #4b4d46; background:var(--bg); color:var(--muted); }
+.site-footer::before { display:none; }
 .site-footer img { width:36px; height:28px; }
 .site-footer p { max-width:100%; font-size:.8rem; line-height:1.7; text-align:center; overflow-wrap:anywhere; }
 :root[data-theme="dark"] .site-footer { background:var(--bg); color:var(--muted); }
@@ -2438,16 +2438,24 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 /* Visible card identities, stable profile controls and framed exhibition media. */
 .feed-post-card { grid-template-rows:minmax(0,1fr) 44px; }
 .feed-card-footer { display:flex; align-items:center; justify-content:space-between; gap:6px; height:44px; min-width:0; }
-.feed-post-card .feed-card-footer .feed-creator { position:static; display:flex; flex:1 1 0; min-width:0; max-width:100%; min-height:40px; height:auto; padding:0; border:0; border-radius:8px; background:transparent; color:var(--text); font-size:.74rem; opacity:1; pointer-events:auto; transform:none; }
+.feed-post-card .feed-card-footer .feed-creator { position:static; display:flex; flex:1 1 0; min-width:0; max-width:100%; min-height:40px; height:auto; padding:0; border:0; border-radius:8px; background:transparent; color:var(--text); font-size:.85rem; font-weight:750; opacity:1; pointer-events:auto; transform:none; }
+.feed-post-card .feed-card-footer .feed-creator :is(img,.feed-creator-initial) { width:28px; height:28px; flex:0 0 28px; }
 .feed-card-footer .feed-creator-name { min-width:0; max-width:100%; padding:0; }
-.feed-card-like { flex:0 0 auto; display:inline-flex; justify-content:center; align-items:center; gap:4px; min-height:40px; max-width:55%; padding:6px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.7rem; white-space:nowrap; cursor:pointer; transition:color 160ms ease,background-color 160ms ease; }
-.feed-card-like svg { flex:0 0 16px; color:var(--danger); transition:transform 160ms ease; }
+.feed-card-like { flex:0 0 auto; display:inline-flex; justify-content:center; align-items:center; gap:5px; min-height:40px; max-width:45%; padding:6px; border:0; border-radius:10px; background:#39431c; color:#fff; font:inherit; font-size:.85rem; font-weight:750; white-space:nowrap; cursor:pointer; transition:color 160ms ease,background-color 160ms ease; }
+.feed-card-like svg { flex:0 0 20px; color:#fff; stroke-width:2.5; transition:transform 160ms ease; }
 .feed-card-like span { min-width:0; overflow:hidden; text-overflow:ellipsis; }
-.feed-card-like.liked { color:var(--danger); }
-.feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,var(--danger) 10%,transparent); color:var(--danger); }
+.feed-card-like.liked,.feed-card-like.liked svg { color:#e53935; }
+.feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:#4c5928; }
 .feed-card-like:hover:not(:disabled) svg { transform:scale(1.1); }
 .feed-card-like:disabled { cursor:default; }
+.artwork-modal-actions .artwork-modal-like { background:#39431c; color:#fff; }
+.artwork-modal-actions .artwork-modal-like.liked { color:#e53935; }
+.artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:#4c5928; }
+.profile-artwork-grid .artwork-pin-like { background:#39431c; color:#fff; }
+.profile-artwork-grid .artwork-pin-like.liked { color:#e53935; }
 .feed-post-card .feed-card-footer .feed-creator:hover { color:var(--primary); background:transparent; transform:none; }
+.exhibition-personal-submissions .exhibition-record-actions { flex:0 0 auto; justify-content:flex-start; width:100%; }
+.exhibition-personal-submissions > :is(.pagination-load-more,.exhibition-section-empty) { grid-column:1 / -1; }
 .profile-page .profile-actions .profile-report-button,.profile-page .profile-intro .profile-logout { flex:0 0 44px; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; gap:0; justify-content:center; border-radius:12px; transform:none; transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease; }
 .profile-page .profile-actions .profile-report-button:is(:hover,:focus-visible),.profile-page .profile-intro .profile-logout:is(:hover,:focus-visible) { width:44px; padding:0; gap:0; background:var(--danger); border-color:var(--danger); color:var(--bg); transform:none; box-shadow:0 4px 14px color-mix(in srgb,var(--danger) 18%,transparent); }
 .profile-page .profile-actions .profile-report-button span,.profile-page .profile-intro .profile-logout > span { display:none; }

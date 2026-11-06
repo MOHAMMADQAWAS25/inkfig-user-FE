@@ -103,7 +103,7 @@ describe("home and panel interactions",()=>{
     const creator=container.querySelector<HTMLAnchorElement>(".feed-creator")!;
     expect(creator.closest(".artwork-pin-media")).toBeNull();
     expect(creator.closest(".feed-card-footer")).toBeTruthy();
-    expect(container.querySelector(".feed-card-footer .feed-card-like")?.textContent).toBe("0 likes");
+    expect(container.querySelector(".feed-card-footer .feed-card-like")?.textContent).toBe("0");
     expect(creator.getAttribute("href")).toBe("/en/profile/ahmad");
     expect(creator.textContent).toBe("Ahmad");
     fireEvent.error(creator.querySelector("img")!);
@@ -114,6 +114,8 @@ describe("home and panel interactions",()=>{
     const work={work_id:"work",title:"Art",artist_name:"Ahmad",owner_user_id:"ahmad",type_name_en:"Digital art",mime_type:"image/png",image_url:"/art.png",like_count:count} as FeedWork;
     const {container}=render(<MemoryRouter><PostCard work={work} width={200} priority={false} onOpen={onOpen} onLike={onLike} onSave={vi.fn()}/></MemoryRouter>);
     const button=screen.getByRole("button",{name:`${count} ${count===1?"like":"likes"}`});
+    expect(button.textContent).toBe(String(count));
+    expect(button.getAttribute("aria-label")).toBe(`${count} ${count===1?"like":"likes"}`);
     expect(button.closest(".feed-card-footer")).toBeTruthy();
     fireEvent.click(button);expect(onLike).toHaveBeenCalledWith(work);expect(onOpen).not.toHaveBeenCalled();
     expect(container.querySelector(".artwork-pin-media .artwork-pin-like")).toBeNull();

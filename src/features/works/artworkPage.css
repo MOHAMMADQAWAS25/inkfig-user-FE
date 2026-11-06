@@ -26,7 +26,9 @@
 .artwork-page-actions { border-top:1px solid var(--border); padding-block:18px; }
 .artwork-page-actions button,.artwork-page-manage button,.artwork-page-manage a { display:inline-flex; align-items:center; gap:8px; padding:8px 0; border:0; background:none; color:var(--text); cursor:pointer; text-decoration:none; }
 .artwork-page-actions button[aria-pressed=true] { color:var(--primary); }
-.artwork-page-actions .lucide-heart { color:var(--danger); }
+.artwork-page-actions .lucide-heart { color:#fff; }
+.artwork-page-actions button[aria-pressed=true] .lucide-heart { color:#e53935; }
+.artwork-page .artwork-page-actions button:has(.lucide-heart) { background:#39431c; color:#fff; }
 .artwork-page-actions .lucide-bookmark { color:#a98100; }
 :root[data-theme="dark"] .artwork-page-actions .lucide-bookmark { color:#f4c430; }
 .artwork-page-share button { display:inline-flex; justify-content:center; align-items:center; gap:10px; flex:1 1 130px; min-height:48px; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
@@ -49,5 +51,5 @@
 @media(max-width:900px) { .artwork-page-hero { grid-template-columns:minmax(0,1fr); gap:20px; }.artwork-page-media { height:min(65svh,640px); }.artwork-page-creator { margin-bottom:24px; }.artwork-page-info { display:contents; }.artwork-page-creator { grid-row:1; }.artwork-page-info>* { min-width:0; }.artwork-page-description,.artwork-page-date { margin-block:4px 12px; }.artwork-page h1 { margin-bottom:0; }.artwork-page-category { justify-self:start; }.artwork-page-actions { width:100%; box-sizing:border-box; }.artwork-page { padding-bottom:100px; } }
 .artwork-page-actions button { min-height:46px; min-width:104px; padding:11px 16px; justify-content:center; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
 .artwork-page .artwork-page-actions button:is(:hover,:focus-visible):not(:disabled) { transform:none; border-radius:14px; background:var(--surface-raised); box-shadow:0 4px 12px color-mix(in srgb,var(--primary) 10%,transparent); }
-.artwork-page .artwork-page-actions button:has(.lucide-heart):is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,var(--danger) 13%,var(--surface)); border-color:color-mix(in srgb,var(--danger) 45%,var(--border)); }
+.artwork-page .artwork-page-actions button:has(.lucide-heart):is(:hover,:focus-visible):not(:disabled) { background:#4c5928; border-color:color-mix(in srgb,var(--danger) 45%,var(--border)); }
 .artwork-page .artwork-page-actions button:has(.lucide-bookmark):is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,#d9ad22 17%,var(--surface)); border-color:color-mix(in srgb,#d9ad22 55%,var(--border)); }

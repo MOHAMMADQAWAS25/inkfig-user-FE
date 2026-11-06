@@ -10872,3 +10872,47 @@ Existing frontend main-branch Cloudflare workflow only; no backend deployment, m
 ### Git
 
 Branch: fix/home-background-scroll-repaint. Commit subject: Isolate home background to avoid full-page scroll repaints. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Exact commit, push/merge, conflicts and deployment results in handoff. Revert only this focused commit if needed, preserving all historical entries and unrelated work.
+
+## 2026-11-06 - Numeric reactions, stronger card identities and matching personal exhibition cards
+
+### Request
+
+Remove visible like/likes wording beside reaction hearts, enlarge/bolden card identities and counts, use white unliked/red liked hearts, make the home footer opaque with a grey divider, remove profile-card creator hover labels, match My Submissions to exhibition browsing cards and place Participate before Leaderboard.
+
+### Changes and frontend
+
+- Shared feed footers show only numeric counts while retaining localized singular/plural aria-labels and pressed states. Enlarged creator text/counts to.85rem/750 weight, avatars to28px and hearts to20px without changing the reserved44px footer or masonry geometry. White outlined hearts become red/filled when liked; solid olive reaction surfaces retain contrast in light mode without blur/filter effects. Opened artwork page/popup labels are also numeric-only with accessible names; profile/page/popup hearts follow the same state colors. Like/save permissions, optimistic updates, fallback avatars, routing and reaction isolation retained.
+- Home footer remains home-only and in document flow. Added an opaque theme-token surface in its own stacking context, a dark-grey top border and removed the previous generated inset divider. Existing home background composition/scroll repaint fix untouched.
+- Removed redundant artist hover overlays from own/other profile artwork collections; image opening, exhibition/save/like overlays and owner management remain.
+- Personal submission pages reuse ExhibitionArtworkCard rather than duplicating its wide image/details layout, blur framing, avatar fallback, author link, description/date, hover and responsive behavior. Additional details retain status, pending withdrawal and rejection feedback, and original remove/request-deletion actions. Status filtering, live refresh, pagination, dialogs and backend requests unchanged. Voting controls explicitly disabled in personal submissions; administrator review keeps its existing layout/actions. Added dedicated personal class rather than inheriting legacy review-card styling; withdrawal actions retain auto flex sizing inside the detail column.
+- Shared exhibition toolbar begins Participate, then Leaderboard, followed by existing applicable controls and back navigation. Guest login destinations, closed participation disabled states, review counts and manager permissions preserved in both directions.
+
+### Repositories and files
+
+All three repositories checked clean and pulled main ff-only. Frontend only: feed/profile/opened-artwork components, shared exhibition card/toolbar/personal submission presentation, scoped CSS and regression tests. Both backends unchanged. Historical logs and all unrelated work preserved; no dependency, generated output, configuration or credentials committed.
+
+### API
+
+No API changes or new requests. Submission data already includes required image, artist, description and status fields.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+No backend/SnapStart, authentication, authorization, storage, voting eligibility, publication, moderation or deletion-rule changes. No production data mutations during verification. Visual fixture callbacks/API responses were inert and synthetic.
+
+### Verification
+
+474 checks passed (112 Node/source and362 Vitest), strict TypeScript/Vite/SEO build and git diff --check passed. After final scoped hover/dead-branch cleanup,59 artwork/popup/submission checks and production build rerun successfully. Coverage includes numeric0/1/2 counts with spoken singular/plural names, reaction isolation, white/red icon rules, unchanged44px geometry, footer opacity/divider, creator overlay removal, shared personal-card rendering without rating controls, separate artist navigation, live status/withdrawal flows, preserved administrator records and Participate/Leaderboard order. Initial source assertion required an exact constant article class; updated it to verify the shared base class/click handler with the new optional personal class, then complete checks passed. No failed checks bypassed. Existing non-blocking chunk-size/jsdom notices remain.
+
+Headless Edge synthetic component fixtures checked1440px English/light and390px Arabic/dark home and personal-submission views. Confirmed numeric-only counts, computed white/red heart colors, opaque cream/dark footer colors and no horizontal page overflow. Shared cards measured628px split columns on desktop and366px stacked cards on phone; pending/approved/rejected actions/statuses reviewed. Long creator labels truncate without widening footers. Fixture-only SVG loader and viewport metadata omissions corrected before final QA; application unaffected. Screenshots/helper outside repos under Temp/inkfig-card-presentation-20261106; browser/server closed. No real-account workflow or physical-device certification claimed.
+
+### Deployment
+
+Existing frontend main Cloudflare workflow only; no backend deployment or migration dependency.
+
+### Git
+
+Branch: fix/community-card-presentation. Commit subject: Refine reactions and align personal exhibition cards. Fetch/rebase before feature push and standing-authorized fast-forward main merge/push. Exact commit, conflicts, push/merge and deployment outcomes in handoff. Revert this focused commit if required; preserve historical logs and unrelated work.

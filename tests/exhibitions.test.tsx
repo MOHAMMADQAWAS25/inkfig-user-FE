@@ -121,7 +121,7 @@ it("updates the mounted student list live and stops fetching after unmount",asyn
   const rendered=render(<MemoryRouter initialEntries={["/en/exhibition/event/submissions"]}><Routes><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);await screen.findByText("Painting");
   vi.mocked(api.getSubmissions).mockResolvedValue({items:[{...record,status:"approved"}],next_cursor:null});
   window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}}));
-  await waitFor(()=>expect(rendered.container.querySelector(".exhibition-submission-record .exhibition-status.approved")).toBeTruthy());
+  await waitFor(()=>expect(rendered.container.querySelector(".exhibition-personal-submission .exhibition-status.approved")).toBeTruthy());
   rendered.unmount();vi.mocked(api.getSubmissions).mockClear();
   window.dispatchEvent(new CustomEvent("inkfig:exhibitions-changed",{detail:{exhibition_id:"event"}}));
   await new Promise(resolve=>setTimeout(resolve,250));expect(api.getSubmissions).not.toHaveBeenCalled();
@@ -487,18 +487,25 @@ it("keeps a failed exhibition deletion open with retry and cancel", async () => 
   expect(screen.queryByRole("dialog")).toBeNull();
   expect(document.activeElement).toBe(trigger);
 });
-it.each([false, true])("opens submissions only from thumbnails and links artists separately (manage=%s)", async manage => {
+it.each([false, true])("keeps artist navigation separate and uses the gallery card only for personal submissions (manage=%s)", async manage => {
   state.role = manage ? "admin" : "user";
   vi.mocked(api.getSubmissions).mockResolvedValue({ items: [{ submission_id: "submission", work_id: "work", user_id: "student", artist_name: "Student", artist_avatar_url: "/avatar.png", title: "Painting", image_url: "/art.jpg", status: "pending", rejection_reason: null, created_at: "2026-10-18T12:00:00Z" }], next_cursor: null });
   const { container } = render(<MemoryRouter initialEntries={[`/en/exhibition/event/${manage ? "review" : "submissions"}`]}><Routes><Route path="/:language/exhibition/:exhibitionId/review" element={<ReviewExhibitionSubmissionsPage/>}/><Route path="/:language/exhibition/:exhibitionId/submissions" element={<MyExhibitionSubmissionsPage/>}/></Routes></MemoryRouter>);
   const artwork = await screen.findByRole("button", { name: `${translations.en["works.viewDetails"]}: Painting` });
-  const row = container.querySelector(".exhibition-submission-record")!;
-  fireEvent.click(row.querySelector(".exhibition-record-info > strong")!);
-  expect(getWork).not.toHaveBeenCalled();
+  const row = container.querySelector(manage ? ".exhibition-submission-record" : ".exhibition-personal-submission")!;
+  if(manage){
+    fireEvent.click(row.querySelector(".exhibition-record-info > strong")!);
+    expect(getWork).not.toHaveBeenCalled();
+  }else{
+    expect(row.classList.contains("exhibition-artwork-card")).toBe(true);
+    expect(row.querySelector(".exhibition-artwork-media .exhibition-artwork-original")).toBeTruthy();
+    expect(row.querySelector(".exhibition-rating-controls")).toBeNull();
+    expect(row.closest(".exhibition-artwork-grid")).toBeTruthy();
+  }
   const artist = within(row as HTMLElement).getByRole("link", {name:"Student"});
   expect(artist.getAttribute("href")).toBe("/en/profile/student");
   expect(artwork.contains(artist)).toBe(false);
-  expect(container.querySelector(".submission-profile-preview img")?.getAttribute("src")).toBe("/avatar.png");
+  expect((manage?container.querySelector(".submission-profile-preview img"):row.querySelector(".exhibition-artwork-artist img"))?.getAttribute("src")).toBe("/avatar.png");
   fireEvent.click(artwork);
   await waitFor(() => expect(getWork).toHaveBeenCalledWith("work"));
 });

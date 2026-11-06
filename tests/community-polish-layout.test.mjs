@@ -22,8 +22,8 @@ test("visible creator and likes row reserves space outside natural image proport
   assert.match(polish,/\.feed-card-footer \.feed-creator \{[^}]*opacity:1; pointer-events:auto/);
 });
 test("footer is centered and theme-relative, report/actions keep stable dimensions",()=>{
-  assert.match(polish,/\.site-footer \{ position:static; justify-content:center/);
-  assert.match(polish,/\.site-footer::before \{[^}]*height:1px/);
+  assert.match(polish,/\.site-footer \{ position:relative; isolation:isolate; justify-content:center/);
+  assert.match(polish,/\.site-footer \{[^}]*border-top:1px solid #4b4d46; background:var\(--bg\)/);
   assert.match(polish,/:root\[data-theme="dark"\] \.site-footer \{ background:var\(--bg\)/);
   assert.match(polish,/profile-report-button span \{ max-width:none; opacity:1; transition:none/);
   assert.match(polish,/artwork-modal-save\):?[^\n]*min-height:46px/);
