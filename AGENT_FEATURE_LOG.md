@@ -10965,3 +10965,28 @@ Headless Edge synthetic fixtures checked360x640 English/light,390x844 Arabic/dar
 ### Deployment and Git
 
 Branch fix/mobile-navigation-and-artwork-polish. Commit subject: Stabilize phone navigation and refine mobile artwork layouts. Fetch/rebase before branch push; standing-authorized fast-forward main merge/push follows. Existing frontend main Cloudflare test/build/deploy workflow only; both backends need no deployment. Exact commit, push/merge, conflicts and deployment status are reported in the handoff. No forced push, reset, discarded work or branch deletion.
+
+## 2026-11-06 - Phone browser-chrome media sizing, directional swipes and footer correction
+
+### Request and frontend
+
+Follow up on the supplied phone recording: stop opened artwork changing size during scrolling, make unliked hearts visible in light mode, prevent simultaneous horizontal/vertical profile movement, and correct the oversized footer/texture showing beyond the feed. All changes restricted to the existing720px phone breakpoint or phone-only hooks.
+
+- Reviewed the13.5-second384x832 recording via locally decoded frames. The browser's toolbars visibly change the opened image frame despite svh sizing. ArtworkPageMedia now measures its initial phone frame once and stores pixel height, ignoring height-only viewport/toolbar changes. Recalculates only after a real container-width change (rotation/resizing), cleans up observers/listeners and removes the override outside phone mode. Retains scale-down/contain, original media URL, failure handling and video controls; desktop sizing unchanged.
+- Phone light-theme unliked feed/detail/popup hearts use neutral grey#8c8c8c for contrast on cream. Liked hearts stay red and dark-theme unliked hearts stay white. Numeric counts, accessible labels, permissions and click logic unchanged.
+- Phone profile gestures commit to one axis. A scoped non-passive native touch listener prevents vertical panning during horizontal drags; ambiguous/vertical gestures remain native page scrolling. Preserve the starting vertical position if it drifts, disable scroll anchoring only within the phone pager, retain swipe thresholds, inert inactive panels, deliberate taps, controlled-video/input exclusions and cleanup. No desktop gesture handler installed.
+- Replaced the phone's fixed texture pseudo-element with a dedicated decorative clipping layer bounded by the home content, leaving the original desktop texture/tint composition intact. Only this decorative layer is clipped, not fixed navigation or sticky headers. The home/footer stacking order keeps the floating phone bar above the footer. Footer remains opaque and theme-relative, home-only, with its divider/content; compact single-row identity and reduced clearance restore an approximately106px footer rather than the previous oversized blank padding.
+
+### Repositories, API, database and permissions
+
+All three repos checked clean and main pulled ff-only before work; existing frontend log reviewed. Only inkfig-user-FE changed. No backend/SnapStart, API, database/migration, auth, permissions, storage, dependency or deployment configuration changes. Historical log entries preserved. No production mutations, generated build files, QA helpers or credentials committed.
+
+### Verification
+
+491 checks passed (115 Node/source and376 Vitest across37 files), strict TypeScript/Vite/SEO build and git diff --check passed. New tests cover pixel freezing across height changes, recalculation on width change, desktop non-measurement, non-passive horizontal cancellation, locked vertical diagonals, mobile-only grey states and compact/clipped footer rules. Existing navigation, reaction, profile, media and permission regressions retained. No failed checks bypassed; existing non-blocking bundle-size/jsdom notices remain.
+
+Headless Edge synthetic fixtures checked360x640 English/light,390x844 Arabic/dark and1440px desktop. A120px viewport-height increase kept phone image heights identical (268.796875px and354.46875px); an80px width increase correctly recalculated them. Actual browser touch dispatch changed posts to saved with scrollY remaining0 for a horizontal diagonal, while a vertical gesture scrolled165px without changing the section. Footer measured105.97px with no bottom margin, opaque cream/dark backgrounds, visible floating navigation and no horizontal overflow. Screenshot review confirmed the texture ends above the footer and compact content clears navigation. Desktop fixture retained white unliked hearts, original weights,112px footer and original background. QA-only smooth programmatic scrolling was removed before final gesture measurements; application unchanged by this fixture correction. Temporary browser/server closed; helpers/frames/screenshots remain outside repos under Temp/inkfig-mobile-polish-20261106. No physical iOS certification claimed.
+
+### Deployment and Git
+
+Branch fix/mobile-media-gestures-and-footer. Commit subject: Fix phone media resizing, swipe axes and footer bleed. Fetch/rebase before feature branch push, then standing-authorized fast-forward main merge/push. Existing main Cloudflare workflow tests/builds/deploys frontend only; no backend or migration dependency. Exact hash, push/merge, conflict and deployment outcomes reported in handoff. No reset, discarded work, force push or branch deletion.

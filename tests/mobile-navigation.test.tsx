@@ -244,3 +244,18 @@ it("swipes from artwork links and keeps deliberate taps usable",()=>{
   fireEvent.touchEnd(image,{touches:[],changedTouches:[{clientX:100,clientY:100}]});
   fireEvent.click(image); expect(open).toHaveBeenCalledOnce();
 });
+it("locks a horizontal profile swipe against vertical scrolling and leaves vertical diagonals alone",()=>{
+  render(<SwipeProbe/>);const area=screen.getByTestId("swipe");
+  fireEvent.touchStart(area,{touches:[{clientX:250,clientY:200}]});
+  expect(fireEvent.touchMove(area,{touches:[{clientX:150,clientY:160}]})).toBe(false);
+  expect(area.style.getPropertyValue("--profile-drag")).toBe("-100px");
+  expect(fireEvent.touchMove(area,{touches:[{clientX:120,clientY:90}]})).toBe(false);
+  fireEvent.touchCancel(area);
+  fireEvent.touchStart(area,{touches:[{clientX:250,clientY:200}]});
+  expect(fireEvent.touchMove(area,{touches:[{clientX:220,clientY:150}]})).toBe(true);
+  expect(area.style.getPropertyValue("--profile-drag")).toBe("0px");
+  expect(fireEvent.touchMove(area,{touches:[{clientX:100,clientY:140}]})).toBe(true);
+  expect(area.style.getPropertyValue("--profile-drag")).toBe("0px");
+  fireEvent.touchEnd(area,{touches:[],changedTouches:[{clientX:100,clientY:140}]});
+  expect(area.textContent).toBe("posts");
+});

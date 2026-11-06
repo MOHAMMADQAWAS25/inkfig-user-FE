@@ -1,9 +1,9 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, it } from "vitest";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, expect, it, vi } from "vitest";
 import { ArtworkPageMedia } from "../src/features/works/ArtworkPageMedia";
 
-afterEach(cleanup);
+afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();});
 
 it.each([
   ["portrait", 1200, 2400], ["landscape", 2400, 1200], ["square", 1200, 1200],
@@ -41,4 +41,27 @@ it("retains video controls, inline playback and metadata-only preloading", () =>
   expect(video.getAttribute("aria-label")).toBe("Clip");
   fireEvent.error(video);
   expect(screen.getByRole("status").textContent).toBe("Unavailable");
+});
+it("locks phone media in pixels across toolbar/height resizes but recalculates after width changes",()=>{
+  vi.stubGlobal("matchMedia",()=>({matches:true,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+  let width=350,height=300;
+  vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockImplementation(()=>({width,height}) as DOMRect);
+  let resized=()=>{};
+  const disconnect=vi.fn();
+  vi.stubGlobal("ResizeObserver",class {constructor(callback:()=>void){resized=callback;}observe(){}disconnect=disconnect;});
+  const view=render(<ArtworkPageMedia url="/portrait.png" title="Portrait" mimeType="image/png" failureLabel="Unavailable"/>);
+  const element=view.container.querySelector<HTMLElement>(".artwork-page-media")!;
+  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("300px");
+  height=340;fireEvent.resize(window);act(()=>resized());
+  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("300px");
+  width=650;height=280;act(()=>resized());
+  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("280px");
+  view.unmount();expect(disconnect).toHaveBeenCalledOnce();
+});
+it("does not measure or freeze desktop media",()=>{
+  vi.stubGlobal("matchMedia",()=>({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+  const rect=vi.spyOn(HTMLElement.prototype,"getBoundingClientRect");
+  const {container}=render(<ArtworkPageMedia url="/art.png" title="Art" mimeType="image/png" failureLabel="Unavailable"/>);
+  expect(rect).not.toHaveBeenCalled();
+  expect(container.querySelector<HTMLElement>(".artwork-page-media")!.style.getPropertyValue("--artwork-mobile-media-height")).toBe("");
 });

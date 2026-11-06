@@ -165,6 +165,7 @@ export function HomePage() {
 
   return (
     <main className="gallery-home">
+      <div className="mobile-gallery-background" aria-hidden="true" />
       <FirstLoginBackupPrompt ready={!feed.loading} />
       <AppSidebar />
       <header className="gallery-header">

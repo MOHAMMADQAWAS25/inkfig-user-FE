@@ -57,8 +57,9 @@
   .artwork-page { padding-top:8px; }
   .artwork-page-back { margin-bottom:8px; }
   .artwork-page-hero { gap:12px; }
-  /* Small viewport units don't resize with the browser toolbar during a scroll. */
-  .artwork-page-media { height:clamp(160px,42svh,360px); transition:none; }
+  /* CSS supplies the initial size; the measured pixel height survives browser chrome changes. */
+  .artwork-page-media { height:var(--artwork-mobile-media-height,clamp(160px,42svh,360px)); transition:none; }
+  :root:not([data-theme="dark"]) .artwork-page-actions button:not([aria-pressed="true"]) .lucide-heart { color:#8c8c8c; }
   .artwork-page-creator { gap:10px; margin-bottom:0; }
   .artwork-page-creator > a { gap:9px; }
   .artwork-page-creator img,.artwork-creator-initial { width:44px; height:44px; flex-basis:44px; }
