@@ -2441,17 +2441,18 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .feed-post-card .feed-card-footer .feed-creator { position:static; display:flex; flex:1 1 0; min-width:0; max-width:100%; min-height:40px; height:auto; padding:0; border:0; border-radius:8px; background:transparent; color:var(--text); font-size:.85rem; font-weight:750; opacity:1; pointer-events:auto; transform:none; }
 .feed-post-card .feed-card-footer .feed-creator :is(img,.feed-creator-initial) { width:28px; height:28px; flex:0 0 28px; }
 .feed-card-footer .feed-creator-name { min-width:0; max-width:100%; padding:0; }
-.feed-card-like { flex:0 0 auto; display:inline-flex; justify-content:center; align-items:center; gap:5px; min-height:40px; max-width:45%; padding:6px; border:0; border-radius:10px; background:#39431c; color:#fff; font:inherit; font-size:.85rem; font-weight:750; white-space:nowrap; cursor:pointer; transition:color 160ms ease,background-color 160ms ease; }
+.feed-card-like { flex:0 0 auto; display:inline-flex; justify-content:center; align-items:center; gap:5px; min-height:40px; max-width:45%; padding:6px; border:0; border-radius:10px; background:transparent; color:var(--text); font:inherit; font-size:.85rem; font-weight:750; white-space:nowrap; cursor:pointer; transition:color 160ms ease,background-color 160ms ease; }
 .feed-card-like svg { flex:0 0 20px; color:#fff; stroke-width:2.5; transition:transform 160ms ease; }
 .feed-card-like span { min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .feed-card-like.liked,.feed-card-like.liked svg { color:#e53935; }
-.feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:#4c5928; }
+.feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:transparent; }
 .feed-card-like:hover:not(:disabled) svg { transform:scale(1.1); }
 .feed-card-like:disabled { cursor:default; }
-.artwork-modal-actions .artwork-modal-like { background:#39431c; color:#fff; }
-.artwork-modal-actions .artwork-modal-like.liked { color:#e53935; }
-.artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:#4c5928; }
-.profile-artwork-grid .artwork-pin-like { background:#39431c; color:#fff; }
+.artwork-modal-actions .artwork-modal-like { background:transparent; border-color:transparent; box-shadow:none; color:var(--text); }
+.artwork-modal-actions .artwork-modal-like svg { color:#fff; }
+.artwork-modal-actions .artwork-modal-like.liked,.artwork-modal-actions .artwork-modal-like.liked svg { color:#e53935; }
+.artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:transparent; border-color:transparent; box-shadow:none; }
+.profile-artwork-grid .artwork-pin-like,.profile-artwork-grid .artwork-pin-like:hover { background:transparent; box-shadow:none; color:#fff; }
 .profile-artwork-grid .artwork-pin-like.liked { color:#e53935; }
 .feed-post-card .feed-card-footer .feed-creator:hover { color:var(--primary); background:transparent; transform:none; }
 .exhibition-personal-submissions .exhibition-record-actions { flex:0 0 auto; justify-content:flex-start; width:100%; }

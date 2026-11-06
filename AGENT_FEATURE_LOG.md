@@ -10916,3 +10916,25 @@ Existing frontend main Cloudflare workflow only; no backend deployment or migrat
 ### Git
 
 Branch: fix/community-card-presentation. Commit subject: Refine reactions and align personal exhibition cards. Fetch/rebase before feature push and standing-authorized fast-forward main merge/push. Exact commit, conflicts, push/merge and deployment outcomes in handoff. Revert this focused commit if required; preserve historical logs and unrelated work.
+
+## 2026-11-06 - Back-first exhibition navigation and transparent like controls
+
+### Request and changes
+
+Place the labelled return-to-Exhibitions control first in the shared exhibition bar, followed by Participate and Leaderboard. Remove like-button background effects. Reordered only the existing back control; destinations, eligibility/disabled states, language direction and manager controls unchanged. Made feed/profile/opened-page/popup like surfaces transparent at rest and on hover/focus, removing their decorative shadows/container borders where applicable. Retained white unliked/red liked hearts, numeric counts, readable theme-relative text, accessible names, hit areas, keyboard focus outlines and existing click/state logic. Save-button styling, footer, personal submissions and home scroll-background fix untouched.
+
+### Repositories and files
+
+All three repos checked clean and main pulled ff-only before changes; frontend feature log read. Only inkfig-user-FE changed: ExhibitionToolbar.tsx, styles.css, artworkPage.css and two targeted regression tests. Both backends unchanged; no unrelated files or generated output committed. Prior log entries preserved.
+
+### API, database, permissions and scope
+
+No API, database migration, backend/SnapStart, auth/permissions, storage, dependency or deployment configuration changes. No production data mutations during verification.
+
+### Verification
+
+474 checks passed (112 Node/source and362 Vitest), strict TypeScript/Vite/SEO production build and git diff --check passed. Tests verify back/participate/leaderboard DOM order, transparent rest/hover like surfaces, retained white/red icon state rules and existing reaction/navigation/permissions regressions. Existing non-blocking bundle-size/jsdom notices remain; no checks bypassed. No new physical-device or browser visual certification claimed for this small order/CSS follow-up.
+
+### Deployment and Git
+
+Existing frontend Cloudflare main workflow; no backend deployment/migration dependency. Branch fix/exhibition-back-and-clear-likes. Commit subject: Restore back-first exhibition navigation and clear like backgrounds. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Exact hash, conflicts, push/merge and deployment results reported in handoff. Revert only this focused commit if required; no reset, force push, history rewrite or branch deletion.

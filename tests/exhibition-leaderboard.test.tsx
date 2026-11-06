@@ -60,5 +60,5 @@ it("shows precisely two and a half stars and keeps all four navigation links vis
   expect(Array.from(document.querySelectorAll<HTMLElement>(".exhibition-leaderboard-star > span"),star=>star.style.width)).toEqual(["100%","100%","50%","0%","0%"]);
   for (const name of ["Exhibitions","Leaderboard","Participate","My submissions"]) expect(screen.getByRole("link",{name})).toBeTruthy();
   const toolbar=document.querySelector(".exhibition-toolbar")!;
-  expect(Array.from(toolbar.children).slice(0,2).map(node=>node.textContent)).toEqual(["Participate","Leaderboard"]);
+  expect(Array.from(toolbar.children).slice(0,3).map(node=>node.textContent)).toEqual(["Exhibitions","Participate","Leaderboard"]);
 });

@@ -8,6 +8,10 @@ test("card identities and numeric reactions grow without changing masonry footer
   assert.match(css,/\.feed-card-like svg \{ flex:0 0 20px; color:#fff/);
   assert.match(css,/\.feed-card-like\.liked,\.feed-card-like\.liked svg \{ color:#e53935/);
   assert.match(css,/\.feed-card-footer \{[^}]*height:44px/);
+  assert.match(css,/\.feed-card-like \{[^}]*background:transparent/);
+  assert.match(css,/\.feed-card-like:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:transparent/);
+  assert.match(css,/\.artwork-modal-actions \.artwork-modal-like:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:transparent; border-color:transparent; box-shadow:none/);
+  assert.match(css,/\.profile-artwork-grid \.artwork-pin-like:hover \{ background:transparent; box-shadow:none/);
 });
 test("footer is opaque and theme-relative, with one dark grey divider",()=>{
   assert.match(css,/\.site-footer \{[^}]*border-top:1px solid #4b4d46; background:var\(--bg\)/);
