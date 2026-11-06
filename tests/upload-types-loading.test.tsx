@@ -23,7 +23,7 @@ function mount(language: "en" | "ar" = "en") {
   return render(<MemoryRouter initialEntries={[`/${language}/upload`]}><I18nProvider><UploadWorkPage /></I18nProvider></MemoryRouter>);
 }
 beforeEach(() => { vi.resetAllMocks(); sessionStorage.clear(); });
-afterEach(()=>{cleanup();sessionStorage.clear();vi.unstubAllGlobals();});
+afterEach(()=>{cleanup();sessionStorage.clear();vi.unstubAllGlobals();vi.restoreAllMocks();});
 
 it.each(["en", "ar"] as const)("does not flash an empty/error message while types load (%s)", async language => {
   const request = deferred(); vi.mocked(getWorkTypes).mockReturnValue(request.promise);
@@ -92,4 +92,15 @@ it.each([["en",true],["ar",true],["en",false],["ar",false]] as const)("places on
   expect(screen.getByRole<HTMLInputElement>("textbox",{name:translations[language]["works.linkLabel"]}).value).toBe("Portfolio");
   fireEvent.click(screen.getByRole("button",{name:translations[language]["works.addLink"]}));
   expect(field.querySelectorAll(".work-link-row")).toHaveLength(2);
+});
+it.each([["en",true],["ar",true],["en",false],["ar",false]] as const)("starts the %s upload at the top only on phones (phone=%s), not on every edit",(language,mobile)=>{
+  vi.stubGlobal("matchMedia",()=>({matches:mobile,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
+  const scroll=vi.spyOn(window,"scrollTo").mockImplementation(()=>{});
+  cacheWorkTypes(types);vi.mocked(getWorkTypes).mockReturnValue(new Promise(()=>{}));
+  const {container}=mount(language);
+  if(mobile)expect(scroll).toHaveBeenCalledExactlyOnceWith({top:0,left:0,behavior:"instant"});
+  else expect(scroll).not.toHaveBeenCalled();
+  scroll.mockClear();
+  fireEvent.change(container.querySelector("textarea")!,{target:{value:"A description"}});
+  expect(scroll).not.toHaveBeenCalled();
 });

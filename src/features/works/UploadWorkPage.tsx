@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useMobileViewport } from "../../lib/useMobileViewport";
 import type { ChangeEvent, FormEvent } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
@@ -18,6 +18,9 @@ export function UploadWorkPage() {
  const mobile = useMobileViewport();
  const {session}=useAuth(); const {language,t}=useI18n(); const navigate=useNavigate();
  const [searchParams]=useSearchParams();const exhibitionId=searchParams.get('exhibition');const [publishedId,setPublishedId]=useState<string|null>(null);
+ useLayoutEffect(()=>{
+   if(mobile)window.scrollTo({top:0,left:0,behavior:"instant"});
+ },[mobile,exhibitionId]);
  const fileInputRef=useRef<HTMLInputElement>(null);
  const [previewFile,setPreviewFile]=useState<File|null>(null); const [previewUrl,setPreviewUrl]=useState("");
  const [dragging,setDragging]=useState(false);

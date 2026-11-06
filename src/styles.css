@@ -2498,6 +2498,10 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .mobile-gallery-background { display:none; }
 /* Phone control refinements; desktop hover and upload layout stay unchanged. */
 @media(max-width:720px) {
+  :root .mobile-drawer button:hover, :root[data-theme="dark"] .mobile-drawer button:hover { background:transparent; transform:none; box-shadow:none; }
+  .mobile-drawer-backdrop { backdrop-filter:blur(1px); -webkit-backdrop-filter:blur(1px); }
+  :root[data-theme="dark"] .mobile-drawer-backdrop { background:rgb(0 0 0 / .38); }
+  body:has(.mobile-drawer-layer) :is(.mobile-bottom-nav,.gallery-header) { filter:blur(3px); pointer-events:none; }
   :root:not([data-theme="dark"]) .gallery-filters button:not(.active):hover { border-color:rgb(57 67 28 / .25); background:rgb(255 253 240 / .62); color:#58613d; transform:none; box-shadow:none; }
   :root[data-theme="dark"] .gallery-filters button:not(.active):hover { border-color:#3b4828; background:rgb(23 29 17 / .86); color:#b7b59a; transform:none; box-shadow:none; }
   .mobile-drawer { display:flex; flex-direction:column; }

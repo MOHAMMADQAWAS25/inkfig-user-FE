@@ -16,3 +16,9 @@ test("phone drawer uses a scrollable middle with fixed bottom preferences and bo
   assert.doesNotMatch(css,/inset 0 1px/);
   assert.match(css,/\[data-theme="dark"\] \.mobile-bottom-nav \{ box-shadow:/);
 });
+test("phone drawer buttons do not hover-highlight and the background stays blurred through closing",()=>{
+  assert.match(css,/:root \.mobile-drawer button:hover, :root\[data-theme="dark"\] \.mobile-drawer button:hover \{ background:transparent; transform:none; box-shadow:none/);
+  assert.match(css,/\.mobile-drawer-backdrop \{ backdrop-filter:blur\(1px\); -webkit-backdrop-filter:blur\(1px\)/);
+  assert.match(css,/body:has\(\.mobile-drawer-layer\) :is\(\.mobile-bottom-nav,\.gallery-header\) \{ filter:blur\(3px\); pointer-events:none/);
+  assert.doesNotMatch(css,/mobile-drawer-layer:not\(\.is-closing\)/);
+});

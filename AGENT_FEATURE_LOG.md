@@ -11014,3 +11014,25 @@ Headless Edge synthetic fixtures checked390x844 English/light,390x640 Arabic/dar
 ### Deployment and Git
 
 Branch fix/phone-controls-and-upload-links. Commit subject: Refine phone controls and relocate mobile upload links. Fetch/rebase before branch push, then standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment or migration dependency. Exact hash, push/merge, conflicts and deployment status reported in handoff. No reset, discarded work, forced push or branch deletion.
+
+## 2026-11-06 - Phone drawer focus backdrop and top-first upload entry
+
+### Request and frontend
+
+- Removed phone drawer-button hover backgrounds, transforms and shadows in both themes, including preference controls; retained keyboard focus outlines, row separators and all button actions.
+- Added a1px backdrop blur behind the phone navigation drawer and3px blur/non-interaction for the background header/bottom bar, matching notification-slider focus treatment. Dark mode uses the notification backdrop dim level. The drawer-layer selector remains active throughout its closing animation; existing focus trapping, dismiss-only gestures and scroll locking retained.
+- Phone normal/exhibition upload performs an instant top/left scroll reset in a layout effect on entry or exhibition-target changes, preventing inherited bottom-of-home positioning before paint. Does not reset on form edits; desktop behavior unchanged.
+
+### Repositories, API, database and permissions
+
+All three repositories checked clean and main pulled ff-only; existing frontend log reviewed. Only inkfig-user-FE changed: UploadWorkPage, scoped phone CSS and regression tests. No API, database migration, backend/SnapStart, authentication/authorization, storage, dependency or deployment configuration changes. Historical log entries and unrelated work preserved. No production data mutations or generated/configuration files committed.
+
+### Verification
+
+502 checks passed (118 Node/source and384 Vitest across37 files), strict TypeScript/Vite/SEO build and git diff --check passed. Added English/Arabic phone/desktop entry-scroll tests and checks that editing does not trigger further resets; CSS coverage verifies hover neutralization, blur strengths and focus treatment through closing. Existing non-blocking chunk-size/jsdom notices remain; no failed checks bypassed.
+
+Headless Edge synthetic fixtures checked390x844 English/light and390x640 Arabic/dark: forced drawer-row hover computed transparent, backdrop blur1px, header and bottom-nav blur3px. Existing fixed-bottom preferences, short-menu scrolling, phone upload-link placement and no horizontal overflow preserved;1440px desktop control fixture unchanged. Temporary browser/server closed; helper/screenshots outside repositories under Temp/inkfig-mobile-polish-20261106. No physical-device certification claimed.
+
+### Deployment and Git
+
+Branch fix/phone-drawer-focus-and-upload-entry. Commit subject: Restore phone drawer focus and top-first upload entry. Fetch/rebase before feature push, followed by standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment/migration dependency. Exact hash, conflicts, push/merge and deployment outcome reported in handoff. No reset, forced push, discarded work or branch deletion.
