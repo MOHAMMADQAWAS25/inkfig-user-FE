@@ -18,7 +18,7 @@ vi.mock("../src/features/navigation/AppSidebar", () => ({ AppSidebar: () => <nav
 vi.mock("../src/features/works/worksApi", () => ({ getWork: vi.fn(), setWorkLike: vi.fn(), setWorkSave: vi.fn(), deleteWork: vi.fn(), deleteWorkAsModerator: vi.fn() }));
 vi.mock("../src/features/works/relatedArtworksApi", () => ({ getRelatedArtworks: vi.fn() }));
 vi.mock("../src/features/profile/profileApi", () => ({ getPublicProfile: vi.fn(), setProfileFollow: vi.fn() }));
-vi.mock("../src/features/feed/Feed", () => ({ Feed: ({ items, renderItem, loadMore, hasNextPage, error, retry, restoreScroll }: any) => <section data-testid="related-feed" data-restore={String(restoreScroll)}>{items.map((item: FeedWork) => <div key={item.work_id}>{renderItem(item, 250, false)}</div>)}{hasNextPage && <button onClick={loadMore}>Load more related</button>}{error && <button onClick={retry}>Retry related</button>}</section> }));
+vi.mock("../src/features/feed/Feed", () => ({ Feed: ({ items, renderItem, loadMore, hasNextPage, error, retry, restoreScroll, featured }: any) => <section data-testid="related-feed" data-restore={String(restoreScroll)}>{featured?.content}{items.map((item: FeedWork) => <div key={item.work_id}>{renderItem(item, 250, false)}</div>)}{hasNextPage && <button onClick={loadMore}>Load more related</button>}{error && <button onClick={retry}>Retry related</button>}</section> }));
 const sample: FeedWork = { work_id: "one", owner_user_id: "artist", artist_name: "Artist", artist_avatar_url: "/avatar.png", title: "Jerusalem’s Serenity", description: "A peaceful moment in Jerusalem.", type_id: "art", type_name_en: "Digital Art", type_name_ar: "فن رقمي", image_url: "/art.png", mime_type: "image/png", links: [{ url: "https://example.com", label: "Portfolio" }], created_at: "2026-10-11T12:00:00Z", like_count: 12, liked_by_me: false, saved_by_me: false };
 function Page() { const location = useLocation(); return <ArtworkPage key={location.pathname} />; }
 it("shows exhibition membership links below the category on the opened artwork",async()=>{
@@ -28,6 +28,20 @@ it("shows exhibition membership links below the category on the opened artwork",
   expect(badge.getAttribute("href")).toBe("/en/exhibition/event");
   expect(badge.closest(".artwork-page-info")).toBeTruthy();
   expect(badge.closest(".work-exhibition-overlay")).toBeNull();
+});
+it("uses a stacked featured card for wide media metadata, while retaining the detail actions",async()=>{
+  vi.mocked(getWork).mockResolvedValue({...sample,media:{width:1200,height:600,url:"/art.png",dominantColor:"#123456",sizes:[]}});
+  mount();await screen.findByRole("heading",{name:sample.title});
+  expect(document.querySelector(".artwork-page-hero--wide")).toBeTruthy();
+  expect(within(document.querySelector(".artwork-page-info")!).getByRole("button",{name:"12 likes"})).toBeTruthy();
+});
+it("detects wide legacy images from their natural dimensions when metadata is absent",async()=>{
+  mount();await screen.findByRole("heading",{name:sample.title});
+  const image=document.querySelector(".artwork-page-media-original")!;
+  expect(document.querySelector(".artwork-page-hero--wide")).toBeNull();
+  Object.defineProperties(image,{naturalWidth:{value:1600},naturalHeight:{value:900}});
+  fireEvent.load(image);
+  expect(document.querySelector(".artwork-page-hero--wide")).toBeTruthy();
 });
 function Probe() { const location = useLocation(); return <output data-testid="route">{location.pathname}{location.search}</output>; }
 function mount(language = "en", state: object | null = null) {

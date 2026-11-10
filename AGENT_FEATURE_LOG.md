@@ -11036,3 +11036,31 @@ Headless Edge synthetic fixtures checked390x844 English/light and390x640 Arabic/
 ### Deployment and Git
 
 Branch fix/phone-drawer-focus-and-upload-entry. Commit subject: Restore phone drawer focus and top-first upload entry. Fetch/rebase before feature push, followed by standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment/migration dependency. Exact hash, conflicts, push/merge and deployment outcome reported in handoff. No reset, forced push, discarded work or branch deletion.
+
+## 2026-11-10 - Integrated artwork detail and recommendation masonry
+
+### Request and frontend
+
+Implement the approved Pinterest-inspired opened-artwork layout: recommendations alongside and below the opened post, natural image proportions with less artificial empty framing, responsive phone layout and a focused reversible change.
+
+- Feed accepts an optional measured featured block. The existing masonry calculator reserves several logical-start columns for it; recommendations fill the remaining columns from the same top edge and flow across all columns below it. Under1000px available feed width, the featured block spans every column. RTL mirrors reservation/placement. Default home feeds have no reservation and retain their existing geometry, virtualization,44px creator row and pagination.
+- The featured detail stays mounted while recommendation cards virtualize. One additional ResizeObserver tracks its actual height after media loading, metadata/orientation changes, wrapping or feedback messages. Positions replan without overlap, append remains incremental, and resizing while reading the featured block does not jump to a recommendation anchor.
+- ArtworkPage embeds its existing creator/follow, title, category/exhibition information, description/date/links, numeric likes/save, share/copy and owner/report/moderation controls in that block. Existing query keys, APIs, ranking, permissions, optimistic cache updates, request locking, retry/empty states, direct URLs and Back/history behavior preserved.
+- Removed the fixed-height letterboxed image frame. Images/videos use intrinsic aspect ratio, automatic dimensions and bounded contain sizing; small originals are not enlarged or automatically cropped. Portrait/square media can share a row with details in a shrink-to-fit image column; wide media stacks above details, detected from existing metadata or natural loaded dimensions for legacy media. Phone maximum image height is captured in pixels until width changes, preserving browser-toolbar stability without forcing every image into a fixed rectangle. Related heading becomes visible when recommendations start below the full-width detail block.
+- Existing exhibition popup viewers and their shared media framing are separate and unchanged. Home/sidebar/header/footer/auth/upload/profile designs and the previously diagnosed home-scroll performance issue are not redesigned or claimed fixed.
+
+### Repositories, API, database, permissions and rollback
+
+All three repos checked clean and main pulled ff-only before work; existing frontend feature log reviewed. Baseline frontend79648c6; both backends unchanged. Only Feed/layout, opened-artwork components/styles, regression tests, docs/artwork-discovery-layout.md and this append changed. No API, database migration, stored-data changes, backend/SnapStart, permissions, dependencies, credentials or deployment configuration changes. No production account/content mutations.
+
+Keep this ticket in one commit. The rollback guide identifies its subject and baseline: reverse only this ticket's code/tests/docs on a clean dedicated branch, preserve all feature-log history, append a rollback entry and reverify. Do not reset main or blindly overwrite subsequent overlapping work. No database/backend rollback is needed, and earlier phone fixes remain outside this commit.
+
+### Verification
+
+516 checks passed (119 Node/source and397 Vitest across37 files), strict TypeScript/Vite/SEO production build and git diff --check passed. New coverage includes side/below reservation without overlap in LTR/RTL, full-width layouts at200/360/768/950px, append/height reflow,10,000-card bounded lookup, retained featured input identity across loading/measurement, resize anchoring while reading, wide metadata and legacy natural-dimension detection, intrinsic dimension reservation and stable phone maximum size. Existing reaction/follow/share/owner/report/permissions, media failures/video controls, default feed virtualization and mobile Back/history tests passed. Updated obsolete fixed-frame assertions to the explicitly requested natural-size behavior. No failed checks bypassed; existing non-blocking bundle-size/jsdom notices remain.
+
+Headless Edge synthetic fixtures checked1920 English/light portrait,1440 Arabic/dark landscape,1280 small original,1024 very tall,768 panorama,390 English/light portrait and360 Arabic/dark square views with45 related cards. Verified original aspect ratios, no horizontal overflow or post/card overlap before/after scrolling, one recommendation request per fixture, working optimistic likes and no browser exceptions. At wide widths, recommendations begin beside the detail block and fill beneath it; narrow layouts start below. Phone120px height-only viewport changes leave image dimensions identical. Resizing1920 to1024 while reading retained scrollY300 rather than jumping to recommendations. Visual review caught excess landscape-column space; wide media now stacks above details and small/tall originals use shrink-to-fit columns. Fixture data/callbacks inert; no live mutations or physical iOS/Safari certification. Helpers/screenshots outside repos under Temp/inkfig-artwork-discovery-20261110; browser/server closed.
+
+### Deployment and Git
+
+Branch feature/integrated-artwork-discovery. Commit subject: Integrate artwork detail into recommendation masonry. Fetch/rebase before feature push, then standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment or migration dependency. Exact hash, conflicts, push/merge and deployment outcome reported in handoff. No reset, forced push, discarded work, branch deletion or rewritten historical log entries.

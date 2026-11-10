@@ -12,20 +12,26 @@ type FeedProps = {
   loadMore: () => void; retry: () => void; emptyMessage: string;
   renderItem: (work: FeedWork, width: number, priority: boolean) => ReactNode;
   restoreScroll?: boolean;
+  /** Optional, always-mounted detail block; ordinary feeds keep their existing geometry. */
+  featured?: { key: string; content: ReactNode; minWidth?: number };
+  label?: string;
 };
 
 /** Window-scroll virtualization without scroll event listeners or per-card observers. */
-export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem, restoreScroll = true }: FeedProps) {
+export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", listMaxWidth = 470, loading, loadingMore, error, hasNextPage, loadMore, retry, emptyMessage, renderItem, restoreScroll = true, featured, label }: FeedProps) {
   const { language, t } = useI18n();
   const active = useRouteActivity();
   const containerRef = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
+  const [featuredHeight, setFeaturedHeight] = useState(0);
   const calculator = useRef(new FeedLayout());
   const [width, setWidth] = useState(0);
   const [range, setRange] = useState({ top: 0, bottom: window.innerHeight * 3 });
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const skeletons = useMemo(() => Array.from({ length: 12 }, (_, index) => ({ work_id: `skeleton-${index}`, media: { width: 4, height: index % 3 + 3 } })), []);
-  const positions = useMemo(() => calculator.current.compute(loading ? skeletons : items, width, layout, language === "ar", listMaxWidth, CREATOR_ROW_HEIGHT),
-    [items, width, layout, language, listMaxWidth, loading, skeletons]);
+  const positions = useMemo(() => calculator.current.compute(loading ? skeletons : items, width, layout, language === "ar", listMaxWidth, CREATOR_ROW_HEIGHT,
+    featured ? { height: featuredHeight, minWidth: featured.minWidth } : undefined),
+    [items, width, layout, language, listMaxWidth, loading, skeletons, featured?.key, featured?.minWidth, featuredHeight]);
   const previousLayout = useRef<LayoutResult | null>(null);
   const previousWidth = useRef(0);
   const restored = useRef(false);
@@ -58,6 +64,19 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
   }, []);
 
   useLayoutEffect(() => {
+    const element = featuredRef.current;
+    if (!element || !featured || !width) return;
+    const measure = () => {
+      const height = element.getBoundingClientRect().height;
+      setFeaturedHeight(current => Math.abs(current - height) < .5 ? current : height);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [width, featured?.key]);
+
+  useLayoutEffect(() => {
     const container = containerRef.current;
     if (!active || !container || !width) return;
     const previous = previousLayout.current;
@@ -65,7 +84,8 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
       const top = -container.getBoundingClientRect().top;
       const anchor = visiblePositions(previous, top, top + window.innerHeight)[0];
       const next = anchor && positions.positions.find(position => position.id === anchor.id);
-      if (anchor && next && top >= 0) window.scrollBy({ top: next.y - anchor.y, behavior: "instant" });
+      const readingFeatured = previous.featured && top < previous.featured.height;
+      if (anchor && next && top >= 0 && !readingFeatured) window.scrollBy({ top: next.y - anchor.y, behavior: "instant" });
     }
     previousLayout.current = positions;
     previousWidth.current = width;
@@ -124,7 +144,9 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
 
   return <>
     <div className={`artwork-virtual-feed artwork-virtual-feed--${layout}`} ref={containerRef} role="feed"
-      aria-label={t("home.collectionTitle")} aria-busy={loading || loadingMore} style={{ height: width ? positions.height : 0 }}>
+      aria-label={label ?? t("home.collectionTitle")} aria-busy={loading || loadingMore} style={{ height: width ? positions.height : 0 }}>
+      {featured && <div ref={featuredRef} key={featured.key} className="feed-featured" data-full-width={positions.featured?.fullWidth ?? true}
+        style={{ position: "absolute", top: 0, left: positions.featured?.x ?? 0, width: positions.featured?.width ?? "100%" }}>{featured.content}</div>}
       {width > 0 && visible.map(position => loading
         ? <div className="feed-position feed-skeleton" key={position.id} style={style(position)} aria-hidden="true" />
         : <article className="artwork-card feed-position" key={position.id} style={style(position)}

@@ -46,6 +46,74 @@ beforeEach(() => {
 afterEach(() => { cleanup(); clients.forEach(client => client.clear()); clients.length = 0; vi.unstubAllGlobals(); });
 
 describe("precomputed masonry", () => {
+  it("keeps the measured detail block mounted across recommendation loading, reactions and resizing",()=>{
+    let featuredHeight=600;
+    const callbacks=new Map<Element,()=>void>();
+    vi.stubGlobal("ResizeObserver",class {constructor(private callback:()=>void){}observe(element:Element){callbacks.set(element,this.callback);}disconnect(){}});
+    vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockImplementation(function(this:HTMLElement){return {width:1400,height:this.classList.contains("feed-featured")?featuredHeight:2000,top:0} as DOMRect;});
+    const props={items:Array.from({length:1000},(_,i)=>work(i)),cacheKey:"featured-dom",loading:true,loadingMore:false,error:null,hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem:(item:FeedWork)=><button>{item.title}</button>,
+      restoreScroll:false,featured:{key:"detail",content:<article><input aria-label="Featured field"/></article>},label:"Related"};
+    const wrap=(loading:boolean)=><MemoryRouter initialEntries={["/en"]}><I18nProvider><Feed {...props} loading={loading}/></I18nProvider></MemoryRouter>;
+    const view=render(wrap(true)),field=screen.getByRole<HTMLInputElement>("textbox",{name:"Featured field"});
+    fireEvent.change(field,{target:{value:"Retained"}});
+    view.rerender(wrap(false));
+    expect(screen.getByRole("textbox",{name:"Featured field"})).toBe(field);
+    expect(field.value).toBe("Retained");
+    expect(view.container.querySelectorAll(".feed-position").length).toBeLessThan(70);
+    expect(screen.getByRole("feed",{name:"Related"})).toBeTruthy();
+    const featured=view.container.querySelector(".feed-featured")!;
+    const oldHeight=parseFloat((screen.getByRole("feed") as HTMLElement).style.height);
+    featuredHeight=900;act(()=>callbacks.get(featured)!());
+    expect(parseFloat((screen.getByRole("feed") as HTMLElement).style.height)).toBeGreaterThan(oldHeight);
+    expect(screen.getByRole("textbox",{name:"Featured field"})).toBe(field);
+  });
+  it("does not jump to recommendation anchors when resizing while reading the featured detail",()=>{
+    let width=1400;
+    const callbacks=new Map<Element,ResizeObserverCallback>();
+    vi.stubGlobal("ResizeObserver",class {constructor(private callback:ResizeObserverCallback){}observe(element:Element){callbacks.set(element,this.callback);}disconnect(){}});
+    vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockImplementation(function(this:HTMLElement){return {width,height:this.classList.contains("feed-featured")?700:2000,top:-250} as DOMRect;});
+    const props={items:Array.from({length:40},(_,i)=>work(i)),cacheKey:"featured-resize-anchor",loading:false,loadingMore:false,error:null,hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem:(item:FeedWork)=><p>{item.title}</p>,restoreScroll:false,featured:{key:"detail",content:<article>Detail</article>}};
+    const {container}=render(<MemoryRouter initialEntries={["/en"]}><I18nProvider><Feed {...props}/></I18nProvider></MemoryRouter>);
+    const feed=container.querySelector(".artwork-virtual-feed")!;
+    vi.mocked(window.scrollBy).mockClear();
+    vi.useFakeTimers();
+    width=700;
+    act(()=>{callbacks.get(feed)!([{contentRect:{width}} as ResizeObserverEntry],{} as ResizeObserver);vi.advanceTimersByTime(81);});
+    expect(window.scrollBy).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+  it.each([false,true])("places recommendations beside and below a reserved detail block (rtl=%s)",rtl=>{
+    const items=Array.from({length:40},(_,i)=>work(i,400,600));
+    const result=new FeedLayout().compute(items,1800,"masonry",rtl,470,44,{height:700});
+    const block=result.featured!;
+    expect(block.span).toBe(4);expect(block.fullWidth).toBe(false);
+    const intersects=(p:{x:number;y:number;width:number;height:number})=>p.x<block.x+block.width-.1&&p.x+p.width>block.x+.1&&p.y<block.height-.1&&p.y+p.height>0;
+    expect(result.positions.some(intersects)).toBe(false);
+    expect(result.positions.some(p=>p.y===0)).toBe(true);
+    expect(result.positions.some(p=>p.y>=block.height+18&&p.column<block.span)).toBe(true);
+    if(rtl)expect(result.positions[0].x+result.positions[0].width).toBeLessThanOrEqual(block.x-18+.01);
+    else expect(result.positions[0].x).toBeGreaterThanOrEqual(block.width+18-.01);
+  });
+  it.each([200,360,768,950])("puts all recommendations below the detail block at %spx",width=>{
+    const result=new FeedLayout().compute([work(1),work(2),work(3)],width,"masonry",false,470,44,{height:560});
+    expect(result.featured!.fullWidth).toBe(true);
+    expect(result.featured!.width).toBeCloseTo(width);
+    expect(result.positions.every(p=>p.y>=560+(width<600?12:18))).toBe(true);
+  });
+  it("preserves reserved placement on append/reactions and replans safely when detail height changes",()=>{
+    const engine=new FeedLayout(),items=Array.from({length:20},(_,i)=>work(i));
+    const first=engine.compute(items,1440,"masonry",false,470,44,{height:550});
+    const appended=engine.compute([...items,work(30)],1440,"masonry",false,470,44,{height:550});
+    expect(appended.positions.slice(0,20)).toEqual(first.positions);
+    const changed=engine.compute(items,1440,"masonry",false,470,44,{height:900});
+    expect(changed.positions.filter(p=>p.column<changed.featured!.span).every(p=>p.y>=918)).toBe(true);
+    expect(engine.compute([],1440,"masonry",false,470,44,{height:900}).height).toBe(900);
+  });
+  it("keeps virtual lookup bounded around a featured block with ten thousand recommendations",()=>{
+    const result=new FeedLayout().compute(Array.from({length:10000},(_,i)=>work(i)),1600,"masonry",true,470,44,{height:800});
+    expect(visiblePositions(result,100000,104000).length).toBeLessThan(70);
+    expect(result.height).toBeGreaterThan(100000);
+  });
   it("pauses retained gallery frame tracking and restores scroll before resuming",()=>{
     const frame=vi.fn(()=>42),cancel=vi.fn();
     vi.stubGlobal("requestAnimationFrame",frame);vi.stubGlobal("cancelAnimationFrame",cancel);vi.stubGlobal("scrollY",1600);

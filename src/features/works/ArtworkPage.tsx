@@ -36,6 +36,12 @@ export function ArtworkPage() {
   const [reporting, setReporting] = useState(false); const [moderating, setModerating] = useState(false);
   const [reason, setReason] = useState(""); const [deleting, setDeleting] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
+  const [naturalMedia, setNaturalMedia] = useState<{ url: string; ratio: number } | null>(null);
+  const onMediaDimensions = useCallback((width: number, height: number) => {
+    if (work && width > 0 && height > 0) setNaturalMedia(current => current?.url === work.image_url && current.ratio === width / height ? current : { url: work.image_url, ratio: width / height });
+  }, [work?.image_url]);
+  const mediaRatio = work?.media && work.media.width > 0 && work.media.height > 0 ? work.media.width / work.media.height
+    : naturalMedia?.url === work?.image_url ? naturalMedia?.ratio ?? 1 : 1;
   const requests = useRef(new Set<string>());
   const moderationForm = useRef<HTMLFormElement>(null);
   usePageScrollLock(moderating);
@@ -101,11 +107,8 @@ export function ArtworkPage() {
     } catch { setError(t("artwork.actionFailed")); setDeleting(false); }
   }
   const back = () => location.state?.returnTo && returnTo === location.state.returnTo ? navigate(-1) : navigate(returnTo);
-  return <main className="artwork-page app-page-with-sidebar"><AppSidebar /><div className="artwork-page-shell">
-    <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>
-    {query.isPending ? <div className="artwork-page-skeleton" role="status">{t("works.loading")}</div> : !work || query.error ? <section className="artwork-page-unavailable" role="status"><h1>{t(query.error instanceof ApiError && query.error.status === 404 ? "artwork.unavailable" : "works.loadFailed")}</h1><button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button><Link to={`/${language}`}>{t("artwork.home")}</Link></section> : <>
-      <article className="artwork-page-hero">
-        <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} />
+  const featuredContent = work ? <><article className={`artwork-page-hero${mediaRatio > 1.35 ? " artwork-page-hero--wide" : ""}`}>
+        <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} dimensions={work.media ?? undefined} onDimensions={onMediaDimensions} />
         <section className="artwork-page-info" aria-labelledby="artwork-title">
           <div className="artwork-page-creator"><Link to={`/${language}/profile/${work.owner_user_id}`}>
             <ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-creator-initial"/><strong>{work.artist_name}</strong></Link>
@@ -125,10 +128,12 @@ export function ArtworkPage() {
             {can("works.delete_any") && <button type="button" onClick={() => setModerating(true)}><Trash2 size={16} />{t("works.moderateDelete")}</button>}
           </div>
         </section>
-      </article>
-      {error && <p role="alert" className="error-message">{error}</p>}{notice && <p role="status">{notice}</p>}
-      <section className="artwork-page-related" aria-labelledby="related-artworks-title"><h2 id="related-artworks-title">{t("artwork.related")}</h2>
-        <Feed key={workId} cacheKey={`related:${viewer}:${workId}`} restoreScroll={false} items={related.items} loading={related.isPending} loadingMore={related.isFetchingNextPage} error={related.error} hasNextPage={Boolean(related.hasNextPage)} loadMore={loadMore} retry={() => { if (related.items.length) loadMore(); else void related.refetch(); }} emptyMessage={t("artwork.noRelated")} renderItem={renderCard} />
+      </article>{error && <p role="alert" className="error-message">{error}</p>}{notice && <p role="status">{notice}</p>}<h2 id="related-artworks-title" className="sr-only artwork-page-related-title">{t("artwork.related")}</h2></> : null;
+  return <main className="artwork-page app-page-with-sidebar"><AppSidebar /><div className="artwork-page-shell">
+    <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>
+    {query.isPending ? <div className="artwork-page-skeleton" role="status">{t("works.loading")}</div> : !work || query.error ? <section className="artwork-page-unavailable" role="status"><h1>{t(query.error instanceof ApiError && query.error.status === 404 ? "artwork.unavailable" : "works.loadFailed")}</h1><button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button><Link to={`/${language}`}>{t("artwork.home")}</Link></section> : <>
+      <section className="artwork-page-related" aria-labelledby="related-artworks-title">
+        <Feed key={workId} label={t("artwork.related")} featured={{ key: workId, content: featuredContent }} cacheKey={`related:${viewer}:${workId}`} restoreScroll={false} items={related.items} loading={related.isPending} loadingMore={related.isFetchingNextPage} error={related.error} hasNextPage={Boolean(related.hasNextPage)} loadMore={loadMore} retry={() => { if (related.items.length) loadMore(); else void related.refetch(); }} emptyMessage={t("artwork.noRelated")} renderItem={renderCard} />
       </section>
       {reporting && <ReportDialog targetType="work" targetUserId={work.owner_user_id} targetWorkId={work.work_id} onClose={() => setReporting(false)} t={t} />}
       {moderating && <div className="moderation-dialog-backdrop" onMouseDown={event => { if (event.target === event.currentTarget && !deleting) setModerating(false); }}><form ref={moderationForm} className="moderation-dialog" role="dialog" aria-modal="true" aria-label={t("works.moderateDelete")} onSubmit={event => { event.preventDefault(); void remove(true); }}><h2>{t("works.moderateDelete")}</h2><label>{t("works.deletionReason")}<textarea autoFocus required minLength={10} maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label><button type="button" disabled={deleting} onClick={() => setModerating(false)}>{t("works.cancelModeration")}</button><button type="submit" disabled={deleting || reason.trim().length < 10}>{t("works.confirmModerateDelete")}</button>{error && <p role="alert">{error}</p>}</form></div>}

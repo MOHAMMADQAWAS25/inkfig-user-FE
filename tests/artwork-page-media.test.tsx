@@ -42,20 +42,21 @@ it("retains video controls, inline playback and metadata-only preloading", () =>
   fireEvent.error(video);
   expect(screen.getByRole("status").textContent).toBe("Unavailable");
 });
-it("locks phone media in pixels across toolbar/height resizes but recalculates after width changes",()=>{
+it("locks the phone maximum height, not the natural image frame, across toolbar changes",()=>{
   vi.stubGlobal("matchMedia",()=>({matches:true,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
   let width=350,height=300;
+  vi.stubGlobal("innerHeight",600);
   vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockImplementation(()=>({width,height}) as DOMRect);
   let resized=()=>{};
   const disconnect=vi.fn();
   vi.stubGlobal("ResizeObserver",class {constructor(callback:()=>void){resized=callback;}observe(){}disconnect=disconnect;});
   const view=render(<ArtworkPageMedia url="/portrait.png" title="Portrait" mimeType="image/png" failureLabel="Unavailable"/>);
   const element=view.container.querySelector<HTMLElement>(".artwork-page-media")!;
-  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("300px");
-  height=340;fireEvent.resize(window);act(()=>resized());
-  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("300px");
-  width=650;height=280;act(()=>resized());
-  expect(element.style.getPropertyValue("--artwork-mobile-media-height")).toBe("280px");
+  expect(element.style.getPropertyValue("--artwork-mobile-media-limit")).toBe("300px");
+  height=340;vi.stubGlobal("innerHeight",680);fireEvent.resize(window);act(()=>resized());
+  expect(element.style.getPropertyValue("--artwork-mobile-media-limit")).toBe("300px");
+  width=650;height=280;vi.stubGlobal("innerHeight",560);act(()=>resized());
+  expect(element.style.getPropertyValue("--artwork-mobile-media-limit")).toBe("280px");
   view.unmount();expect(disconnect).toHaveBeenCalledOnce();
 });
 it("does not measure or freeze desktop media",()=>{
@@ -63,5 +64,13 @@ it("does not measure or freeze desktop media",()=>{
   const rect=vi.spyOn(HTMLElement.prototype,"getBoundingClientRect");
   const {container}=render(<ArtworkPageMedia url="/art.png" title="Art" mimeType="image/png" failureLabel="Unavailable"/>);
   expect(rect).not.toHaveBeenCalled();
-  expect(container.querySelector<HTMLElement>(".artwork-page-media")!.style.getPropertyValue("--artwork-mobile-media-height")).toBe("");
+  expect(container.querySelector<HTMLElement>(".artwork-page-media")!.style.getPropertyValue("--artwork-mobile-media-limit")).toBe("");
+});
+it("reserves intrinsic image dimensions and drops the loading placeholder once ready",()=>{
+  const {container}=render(<ArtworkPageMedia url="/wide.png" title="Wide" mimeType="image/png" failureLabel="Unavailable" dimensions={{width:1200,height:600}}/>);
+  const image=screen.getByRole("img");
+  expect(image.getAttribute("width")).toBe("1200");expect(image.getAttribute("height")).toBe("600");
+  expect(container.querySelector(".artwork-page-media")?.getAttribute("data-ready")).toBe("false");
+  fireEvent.load(image);
+  expect(container.querySelector(".artwork-page-media")?.getAttribute("data-ready")).toBe("true");
 });

@@ -1,6 +1,8 @@
 export type LayoutItem = { work_id: string; media?: { width: number; height: number } | null };
 export type Position = { id: string; index: number; x: number; y: number; width: number; height: number; column: number };
-export type LayoutResult = { positions: Position[]; columns: Position[][]; height: number };
+export type FeaturedBlock = { height: number; minWidth?: number };
+export type FeaturedPosition = { x: number; width: number; height: number; span: number; fullWidth: boolean };
+export type LayoutResult = { positions: Position[]; columns: Position[][]; height: number; featured?: FeaturedPosition };
 // Keep the visible creator/like footer outside the image's natural aspect ratio.
 export const CREATOR_ROW_HEIGHT = 44;
 
@@ -14,21 +16,34 @@ export function imageRatio(item: LayoutItem): number {
   return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0 ? height / width : 1;
 }
 
+/** Reserve a multi-column detail block; narrow layouts put recommendations below it. */
+export function featuredPosition(width: number, count: number, gap: number, rtl: boolean, block: FeaturedBlock): FeaturedPosition {
+  const cardWidth = Math.max(1, (width - gap * (count - 1)) / count);
+  let span = width < 1000 ? count : Math.max(1, count - 2);
+  while (span < count && span * cardWidth + (span - 1) * gap < (block.minWidth ?? 720)) span++;
+  const blockWidth = span * cardWidth + (span - 1) * gap;
+  return { x: rtl ? Math.max(0, width - blockWidth) : 0, width: blockWidth, height: Math.max(0, block.height), span, fullWidth: span === count };
+}
+
 /** Incremental placement: appends do not move an existing card. */
 export class FeedLayout {
   private signature = "";
   private ratios: number[] = [];
   private result: LayoutResult = { positions: [], columns: [], height: 0 };
-  compute(items: LayoutItem[], width: number, layout: "list" | "masonry", rtl = false, maxListWidth = 470, footerHeight = 0): LayoutResult {
+  compute(items: LayoutItem[], width: number, layout: "list" | "masonry", rtl = false, maxListWidth = 470, footerHeight = 0, featured?: FeaturedBlock): LayoutResult {
     const count = layout === "list" ? 1 : columnCount(width);
     const gap = width < 600 ? 12 : 18;
     const cardWidth = layout === "list" ? Math.min(maxListWidth, width) : Math.max(1, (width - gap * (count - 1)) / count);
-    const signature = `${width}:${count}:${rtl}:${layout}:${maxListWidth}:${footerHeight}`;
+    const block = featured ? featuredPosition(width, count, gap, rtl, featured) : undefined;
+    const signature = `${width}:${count}:${rtl}:${layout}:${maxListWidth}:${footerHeight}:${block ? `${block.span}:${block.height}` : ""}`;
     const unchanged = this.signature === signature && this.result.positions.length <= items.length &&
       this.result.positions.every((position, i) => position.id === items[i].work_id && this.ratios[i] === imageRatio(items[i]));
     const positions = unchanged ? [...this.result.positions] : [];
     const columns = unchanged ? this.result.columns.map(column => [...column]) : Array.from({ length: count }, () => [] as Position[]);
-    const heights = columns.map(column => column.length ? column[column.length - 1].y + column[column.length - 1].height + gap : 0);
+    const heights = columns.map((column, index) => Math.max(
+      column.length ? column[column.length - 1].y + column[column.length - 1].height + gap : 0,
+      block && index < block.span ? block.height + gap : 0,
+    ));
     for (let index = positions.length; index < items.length; index++) {
       const shortest = heights.indexOf(Math.min(...heights));
       const height = cardWidth * imageRatio(items[index]) + footerHeight;
@@ -38,7 +53,7 @@ export class FeedLayout {
     }
     this.signature = signature;
     this.ratios = items.map(imageRatio);
-    return this.result = { positions, columns, height: Math.max(0, ...heights) - (positions.length ? gap : 0) };
+    return this.result = { positions, columns, height: Math.max(block?.height ?? 0, Math.max(0, ...heights) - (positions.length || block ? gap : 0)), ...(block ? { featured: block } : {}) };
   }
 }
 

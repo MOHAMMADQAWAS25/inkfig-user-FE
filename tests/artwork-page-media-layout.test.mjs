@@ -5,18 +5,22 @@ import test from "node:test";
 const css = readFileSync(new URL("../src/features/works/artworkPage.css", import.meta.url), "utf8");
 const page = readFileSync(new URL("../src/features/works/ArtworkPage.tsx", import.meta.url), "utf8");
 
-test("page-only viewer has definite responsive bounds, no popup selectors or intrinsic grid overflow", () => {
-  assert.match(css, /\.artwork-page-media \{[^}]*height:min\(76svh,900px\)[^}]*min-height:0[^}]*box-sizing:border-box/);
-  assert.match(css, /@media\(max-width:900px\)[\s\S]*\.artwork-page-media \{ height:min\(65svh,640px\); \}/);
-  assert.match(css, /\.artwork-page-media-original \{[^}]*position:absolute; inset:0[^}]*width:100%; height:100%[^}]*object-fit:contain; object-position:center/);
+test("page-only viewer uses natural responsive dimensions instead of a fixed letterboxed frame", () => {
+  assert.match(css, /\.artwork-page-media \{[^}]*height:auto[^}]*min-height:0[^}]*box-sizing:border-box/);
+  assert.match(css, /\.artwork-page-media-original \{[^}]*position:static[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*max-height:min\(78svh,860px\)[^}]*object-fit:contain; object-position:center/);
   assert.doesNotMatch(css, /artwork-modal-media|artwork-media-original|scale\(|blur\(/);
   assert.match(page, /<ArtworkPageMedia /);
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
 });
 
 test("opened artwork images shrink to fit without enlarging small originals; videos keep contain", () => {
-  assert.match(css, /\.artwork-page-media > img\.artwork-page-media-original \{ object-fit:scale-down; \}/);
-  assert.match(css, /\.artwork-page-media-original \{[^}]*width:100%; height:100%[^}]*object-fit:contain; object-position:center/);
+  assert.match(css, /\.artwork-page-media-original \{[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*object-fit:contain; object-position:center/);
   assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
-  assert.equal((css.match(/object-fit:scale-down/g) || []).length, 1);
+  assert.doesNotMatch(css, /\.artwork-page-media-original \{[^}]*position:absolute/);
+});
+test("detail block adapts its image column and headings without changing popup viewers",()=>{
+  assert.match(css,/grid-template-columns:fit-content\(55%\) minmax\(280px,1fr\)/);
+  assert.match(css,/\.artwork-page-hero--wide \{ grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(css,/\.feed-featured\[data-full-width="true"\] \.artwork-page-related-title/);
+  assert.match(page,/featured=\{\{ key: workId, content: featuredContent \}\}/);
 });
