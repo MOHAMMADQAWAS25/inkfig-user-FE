@@ -11064,3 +11064,41 @@ Headless Edge synthetic fixtures checked1920 English/light portrait,1440 Arabic/
 ### Deployment and Git
 
 Branch feature/integrated-artwork-discovery. Commit subject: Integrate artwork detail into recommendation masonry. Fetch/rebase before feature push, then standing-authorized fast-forward main merge/push. Existing frontend Cloudflare main workflow only; no backend deployment or migration dependency. Exact hash, conflicts, push/merge and deployment outcome reported in handoff. No reset, forced push, discarded work, branch deletion or rewritten historical log entries.
+
+## 2026-11-10 - Zoom-responsive artwork discovery and desktop like polish
+
+### Request
+
+Apply the approved zoom-responsive behavior demonstrated in the Pinterest recording, refine desktop likes and keep the follow-up independently reversible.
+
+### Changes
+
+- Opened-artwork masonry can add columns beyond six as available CSS width grows. Removed the detail page's 1800px outer cap; approximately 220px recommendation columns fill available side/below space instead of stretching six cards across the screen. The measured detail block is kept approximately 720-1280px wide when side-by-side placement is possible; narrow layouts still span all columns. RTL mirrors placement.
+- Featured feeds update width directly from their existing container ResizeObserver instead of the ordinary feed's 80ms debounce. No new scroll listener, per-card observer or network request. Existing featured measurement, incremental append, virtualization and resize anchoring retained. Ordinary home/list geometry and scheduling remain unchanged.
+- Desktop images keep intrinsic proportions and no-upscaling behavior while following the viewport-relative maximum height without the former 860px ceiling. Phone maximum-height locking, layout, navigation and interactions retained.
+- Desktop feed/detail/popup unliked hearts are grey in light mode and white in dark mode. Liked heart/count and fine-pointer hover use red; numeric labels, transparent backgrounds, reaction authorization/cache behavior and saved colors retained. Detail likes have a balanced 88px minimum hit area, inherited type and stable shape. Keyboard focus has explicit outlines. Fixed a shared artwork-page hover rule that otherwise gave recommendation likes a background/moving shape.
+- Documented this follow-up's baseline and separate rollback order. No change to recommendation ranking or stored content.
+
+### Repositories and files
+
+All three repositories checked clean on main and pulled ff-only before work. Only inkfig-user-FE changed: feedLayout.ts, Feed.tsx, artworkPage.css, styles.css, feed.test.tsx, artwork-page-media-layout.test.mjs, docs/artwork-discovery-layout.md and this append. Both backends unchanged. Historical log entries and unrelated work preserved.
+
+### API, database, permissions and scope
+
+No API, database/migration, backend/SnapStart, storage, authentication/authorization, dependency, environment or deployment configuration changes. No production content/account mutations. No credentials, generated build output or local QA helper files committed.
+
+### Verification
+
+522 checks passed: 121 Node/source checks and 401 Vitest checks across 37 files; strict TypeScript/Vite/SEO build and git diff --check passed. New coverage checks LTR/RTL widths through5760px, bounded detail/card dimensions, no overlap, append/zoom round trips, preserved home/list/phone columns, immediate featured resizing versus ordinary debounce, uncapped shell and desktop reaction styling. An initial hard-coded span expectation was corrected to the existing four-column result at1800px, preserving the 1280px bound; no failed checks bypassed. Existing non-blocking chunk-size/jsdom notices remain.
+
+Headless Edge automated synthetic fixtures checked360/390/768/1024/1280/1440/1920/2560/3840/5760px in light/dark and English/Arabic. These are equivalent available-layout widths, not an assertion of automated browser toolbar zoom or physical iOS testing. Actual components and CSS retained intrinsic image ratios, no horizontal overflow/hero overlap, one recommendation request, working optimistic likes, stable phone images through120px height-only changes and scrollY300 on detail resize. Real pointer tests verified red detail/recommendation hearts with transparent hover backgrounds; initial QA caught and led to correction of the shared hover rule. Screenshots reviewed; browser/server closed. Helpers/screenshots remain under Temp outside repositories.
+
+### Deployment
+
+Frontend-only existing Cloudflare main workflow; no backend deployment or migration dependency. Main deployment runs tests/build before publishing. Exact workflow result reported in handoff.
+
+### Git and rollback
+
+Branch: fix/zoom-responsive-artwork-and-desktop-likes. Baseline: e3f4d07. One focused commit with subject Refine zoom-responsive artwork discovery and desktop likes; exact hash in handoff. Fetch/rebase before branch push, followed by the standing-authorized fast-forward main merge/push. Push/merge/conflicts/deployment outcomes reported after execution. No reset, forced push, discarded work or branch deletion.
+
+Revert this follow-up commit alone to return to the previous integrated artwork layout. To undo that original layout too, reverse this follow-up first, then e3f4d07. Preserve every historical feature-log entry and append a rollback record; review any later overlapping work. No database/backend rollback required.

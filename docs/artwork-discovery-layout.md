@@ -32,3 +32,27 @@ through the authorized Git workflow. If later changes overlap, reconcile them
 instead of blindly overwriting them. Never reset main or overwrite other work.
 Both backends and database need no rollback. The prior mobile fixes are in earlier
 commits and are not reverted with this ticket.
+
+## Zoom-responsive follow-up (2026-11-10)
+
+Baseline `e3f4d07`; branch `fix/zoom-responsive-artwork-and-desktop-likes`.
+Opened artwork feeds now add approximately 220px-wide recommendation columns as
+available CSS width grows (including browser zoom-out), without the old six-column
+or 1800px outer-page limit. The detail reservation stays approximately 720–1280px
+wide where side-by-side placement is possible; narrow layouts still span every
+column. RTL mirrors the same geometry. Width changes replan directly from the
+container ResizeObserver rather than waiting for the ordinary-feed debounce.
+Desktop media follows its viewport-relative height limit without the former
+860px ceiling, while retaining intrinsic proportions and no-upscaling behavior.
+Home/list feed geometry, phone media height locking, pagination, virtualization,
+recommendation ranking and API behavior remain unchanged.
+
+Desktop numeric likes retain transparent backgrounds, gain visible light-theme
+unliked hearts, red liked heart/count, restrained pointer hover and keyboard focus
+outlines. Phone styling is unchanged. No new data/dependency/backend changes.
+
+This follow-up is one separate commit, `Refine zoom-responsive artwork discovery
+and desktop likes`. Revert that commit alone to return to `e3f4d07` behavior. To
+also undo the original integrated layout, reverse the follow-up first and then
+the original ticket. Preserve every historical feature-log entry and append the
+rollback record, as described above; never reset or overwrite unrelated changes.

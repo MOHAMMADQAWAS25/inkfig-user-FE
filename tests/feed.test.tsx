@@ -82,6 +82,26 @@ describe("precomputed masonry", () => {
     expect(window.scrollBy).not.toHaveBeenCalled();
     vi.useRealTimers();
   });
+  it("reflows featured columns immediately on resize while ordinary feeds keep their debounce",()=>{
+    const callbacks=new Map<Element,ResizeObserverCallback>();
+    vi.stubGlobal("ResizeObserver",class {constructor(private callback:ResizeObserverCallback){}observe(element:Element){callbacks.set(element,this.callback);}disconnect(){}});
+    vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockReturnValue({width:1800,height:700,top:0} as DOMRect);
+    const props={items:[work(1)],cacheKey:"zoom-resize",loading:false,loadingMore:false,error:null,hasNextPage:false,loadMore:vi.fn(),retry:vi.fn(),emptyMessage:"Empty",renderItem:(item:FeedWork)=><p>{item.title}</p>,restoreScroll:false};
+    const wrap=(featured:boolean)=><MemoryRouter initialEntries={["/en"]}><I18nProvider><Feed {...props} featured={featured?{key:"art",content:<article>Detail</article>}:undefined}/></I18nProvider></MemoryRouter>;
+    const view=render(wrap(true));
+    let feed=view.container.querySelector(".artwork-virtual-feed")!;
+    const cardWidth=()=>parseFloat((view.container.querySelector(".feed-position") as HTMLElement).style.width);
+    const resize=(width:number)=>callbacks.get(feed)!([{contentRect:{width}} as ResizeObserverEntry],{} as ResizeObserver);
+    vi.useFakeTimers();
+    const first=cardWidth();act(()=>resize(3840));
+    expect(cardWidth()).not.toBe(first);
+    expect(cardWidth()).toBeLessThan(260);
+    view.rerender(wrap(false));feed=view.container.querySelector(".artwork-virtual-feed")!;
+    const ordinary=cardWidth();act(()=>resize(2400));
+    expect(cardWidth()).toBe(ordinary);
+    act(()=>vi.advanceTimersByTime(81));expect(cardWidth()).not.toBe(ordinary);
+    vi.useRealTimers();
+  });
   it.each([false,true])("places recommendations beside and below a reserved detail block (rtl=%s)",rtl=>{
     const items=Array.from({length:40},(_,i)=>work(i,400,600));
     const result=new FeedLayout().compute(items,1800,"masonry",rtl,470,44,{height:700});
@@ -99,6 +119,38 @@ describe("precomputed masonry", () => {
     expect(result.featured!.fullWidth).toBe(true);
     expect(result.featured!.width).toBeCloseTo(width);
     expect(result.positions.every(p=>p.y>=560+(width<600?12:18))).toBe(true);
+  });
+  it.each([false,true])("fills zoomed-out widths without stretching details or overlapping recommendations (rtl=%s)",rtl=>{
+    const engine=new FeedLayout(),items=Array.from({length:200},(_,i)=>work(i,400,[300,600,900][i%3]));
+    let previousColumns=0;
+    for(const width of [1800,2560,3840,5760]) {
+      const result=engine.compute(items,width,"masonry",rtl,470,44,{height:800}),block=result.featured!;
+      expect(result.columns.length).toBeGreaterThan(previousColumns);
+      previousColumns=result.columns.length;
+      expect(block.width).toBeGreaterThanOrEqual(720);
+      expect(block.width).toBeLessThanOrEqual(1280);
+      expect(result.positions[0].width).toBeGreaterThanOrEqual(220);
+      expect(result.positions[0].width).toBeLessThan(260);
+      expect(result.positions.filter(p=>p.y===0).length).toBe(result.columns.length-block.span);
+      for(const p of result.positions) {
+        expect(p.x).toBeGreaterThanOrEqual(-.01);
+        expect(p.x+p.width).toBeLessThanOrEqual(width+.01);
+        expect(p.x<block.x+block.width-.1&&p.x+p.width>block.x+.1&&p.y<block.height-.1).toBe(false);
+      }
+      for(const col of result.columns)for(let i=1;i<col.length;i++)expect(col[i].y).toBeGreaterThanOrEqual(col[i-1].y+col[i-1].height+18-.01);
+    }
+    // Normal home/list feeds keep the old geometry, including their six-column cap.
+    expect(engine.compute(items,5760,"masonry").columns).toHaveLength(6);
+    expect(engine.compute(items,5760,"list",rtl,470,44,{height:800}).columns).toHaveLength(1);
+  });
+  it("retains wide-grid placement on append and supports a zoom-in round trip",()=>{
+    const engine=new FeedLayout(),items=Array.from({length:100},(_,i)=>work(i));
+    const base=engine.compute(items,1800,"masonry",false,470,44,{height:800});
+    const wide=engine.compute(items,5760,"masonry",false,470,44,{height:800});
+    const appended=engine.compute([...items,work(101)],5760,"masonry",false,470,44,{height:800});
+    expect(appended.positions.slice(0,items.length)).toEqual(wide.positions);
+    expect(engine.compute(items,1800,"masonry",false,470,44,{height:800})).toEqual(base);
+    for(const width of [200,360,768,950])expect(columnCount(width,true)).toBe(columnCount(width));
   });
   it("preserves reserved placement on append/reactions and replans safely when detail height changes",()=>{
     const engine=new FeedLayout(),items=Array.from({length:20},(_,i)=>work(i));

@@ -24,3 +24,19 @@ test("detail block adapts its image column and headings without changing popup v
   assert.match(css,/\.feed-featured\[data-full-width="true"\] \.artwork-page-related-title/);
   assert.match(page,/featured=\{\{ key: workId, content: featuredContent \}\}/);
 });
+
+test("opened artwork uses available desktop width without a fixed outer cap",()=>{
+  const shell=css.match(/\.artwork-page-shell \{([^}]+)\}/)?.[1]??"";
+  assert.match(shell,/width:100%/);
+  assert.match(shell,/min-width:0/);
+  assert.doesNotMatch(shell,/max-width/);
+  assert.match(css,/@media\(min-width:721px\) \{\s*\.artwork-page-media-original \{ max-height:78svh/);
+});
+
+test("desktop numeric likes have theme contrast and stable transparent hit areas",()=>{
+  assert.match(css,/@media\(min-width:721px\) \{[\s\S]*min-width:88px; gap:9px; font:inherit; font-weight:750/);
+  assert.match(css,/:root:not\(\[data-theme="dark"\]\) \.artwork-page-actions button:not\(\[aria-pressed="true"\]\) \.lucide-heart \{ color:#8c8c8c/);
+  assert.match(css,/button\[aria-pressed="true"\]:has\(\.lucide-heart\) \{ color:#e53935/);
+  assert.match(css,/button:has\(\.lucide-heart\):focus-visible \{ outline:2px solid var\(--primary\)/);
+  assert.match(css,/\.artwork-page \.feed-card-like:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:transparent; box-shadow:none; transform:none; border-radius:10px/);
+});

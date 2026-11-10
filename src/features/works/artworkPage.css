@@ -1,5 +1,5 @@
 .artwork-page { min-height:100svh; padding-block:16px 60px; color:var(--text); background:var(--bg); }
-.artwork-page-shell { width:100%; max-width:1800px; margin-inline:auto; padding-inline:clamp(16px,2.5vw,44px); box-sizing:border-box; }
+.artwork-page-shell { width:100%; min-width:0; margin-inline:auto; padding-inline:clamp(16px,2.5vw,44px); box-sizing:border-box; }
 .artwork-page-back { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; padding:8px 0; border:0; background:none; color:var(--muted); cursor:pointer; }
 [dir=rtl] .artwork-page-back svg { transform:rotate(180deg); }
 .artwork-page-hero { display:grid; grid-template-columns:fit-content(55%) minmax(280px,1fr); align-items:start; gap:0; overflow:hidden; border:1px solid var(--border); border-radius:20px; background:var(--surface); }
@@ -53,6 +53,18 @@
 .artwork-page .artwork-page-actions button:is(:hover,:focus-visible):not(:disabled) { transform:none; border-radius:14px; background:var(--surface-raised); box-shadow:0 4px 12px color-mix(in srgb,var(--primary) 10%,transparent); }
 .artwork-page .artwork-page-actions button:has(.lucide-heart):is(:hover,:focus-visible):not(:disabled) { background:transparent; border-color:transparent; box-shadow:none; }
 .artwork-page .artwork-page-actions button:has(.lucide-bookmark):is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,#d9ad22 17%,var(--surface)); border-color:color-mix(in srgb,#d9ad22 55%,var(--border)); }
+@media(min-width:721px) {
+  .artwork-page-media-original { max-height:78svh; }
+  .artwork-page .feed-card-like:is(:hover,:focus-visible):not(:disabled) { background:transparent; box-shadow:none; transform:none; border-radius:10px; }
+  .artwork-page .artwork-page-actions button:has(.lucide-heart) { min-width:88px; gap:9px; font:inherit; font-weight:750; }
+  :root:not([data-theme="dark"]) .artwork-page-actions button:not([aria-pressed="true"]) .lucide-heart { color:#8c8c8c; }
+  .artwork-page .artwork-page-actions button[aria-pressed="true"]:has(.lucide-heart) { color:#e53935; }
+  .artwork-page .artwork-page-actions button:has(.lucide-heart):focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+}
+@media(min-width:721px) and (hover:hover) and (pointer:fine) {
+  .artwork-page .artwork-page-actions button:has(.lucide-heart):hover:not(:disabled),
+  .artwork-page .artwork-page-actions button:has(.lucide-heart):hover:not(:disabled) .lucide-heart { color:#e53935; }
+}
 @media(max-width:720px) {
   .artwork-page { padding-top:8px; }
   .artwork-page-back { margin-bottom:8px; }

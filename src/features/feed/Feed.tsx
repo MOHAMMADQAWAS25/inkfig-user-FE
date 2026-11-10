@@ -24,6 +24,7 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
   const containerRef = useRef<HTMLDivElement>(null);
   const featuredRef = useRef<HTMLDivElement>(null);
   const [featuredHeight, setFeaturedHeight] = useState(0);
+  const expanded = Boolean(featured);
   const calculator = useRef(new FeedLayout());
   const [width, setWidth] = useState(0);
   const [range, setRange] = useState({ top: 0, bottom: window.innerHeight * 3 });
@@ -57,11 +58,14 @@ export const Feed = memo(function Feed({ items, cacheKey, layout = "masonry", li
     let timer = 0;
     const observer = new ResizeObserver(([entry]) => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => setWidth(entry.contentRect.width), 80);
+      // Opened artwork reflows with zoom/resize instead of waiting for zoom to
+      // settle. Ordinary feeds retain their existing resize scheduling.
+      if (expanded) setWidth(entry.contentRect.width);
+      else timer = window.setTimeout(() => setWidth(entry.contentRect.width), 80);
     });
     observer.observe(container);
     return () => { observer.disconnect(); window.clearTimeout(timer); };
-  }, []);
+  }, [expanded]);
 
   useLayoutEffect(() => {
     const element = featuredRef.current;

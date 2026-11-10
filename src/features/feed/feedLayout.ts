@@ -6,9 +6,10 @@ export type LayoutResult = { positions: Position[]; columns: Position[][]; heigh
 // Keep the visible creator/like footer outside the image's natural aspect ratio.
 export const CREATOR_ROW_HEIGHT = 44;
 
-export function columnCount(width: number): number {
+export function columnCount(width: number, expanded = false): number {
   if (width < 600) return width < 240 ? 1 : 2;
-  return Math.max(3, Math.min(6, Math.floor((width + 18) / 238)));
+  const count = Math.max(3, Math.floor((width + 18) / 238));
+  return expanded ? count : Math.min(6, count);
 }
 
 export function imageRatio(item: LayoutItem): number {
@@ -19,7 +20,10 @@ export function imageRatio(item: LayoutItem): number {
 /** Reserve a multi-column detail block; narrow layouts put recommendations below it. */
 export function featuredPosition(width: number, count: number, gap: number, rtl: boolean, block: FeaturedBlock): FeaturedPosition {
   const cardWidth = Math.max(1, (width - gap * (count - 1)) / count);
-  let span = width < 1000 ? count : Math.max(1, count - 2);
+  // Keep details readable rather than letting them consume every extra column
+  // revealed by desktop zoom-out. Recommendations use all remaining space.
+  const readableSpan = Math.max(1, Math.floor((1280 + gap) / (cardWidth + gap)));
+  let span = width < 1000 ? count : Math.max(1, Math.min(count - 2, readableSpan));
   while (span < count && span * cardWidth + (span - 1) * gap < (block.minWidth ?? 720)) span++;
   const blockWidth = span * cardWidth + (span - 1) * gap;
   return { x: rtl ? Math.max(0, width - blockWidth) : 0, width: blockWidth, height: Math.max(0, block.height), span, fullWidth: span === count };
@@ -31,7 +35,7 @@ export class FeedLayout {
   private ratios: number[] = [];
   private result: LayoutResult = { positions: [], columns: [], height: 0 };
   compute(items: LayoutItem[], width: number, layout: "list" | "masonry", rtl = false, maxListWidth = 470, footerHeight = 0, featured?: FeaturedBlock): LayoutResult {
-    const count = layout === "list" ? 1 : columnCount(width);
+    const count = layout === "list" ? 1 : columnCount(width, Boolean(featured));
     const gap = width < 600 ? 12 : 18;
     const cardWidth = layout === "list" ? Math.min(maxListWidth, width) : Math.max(1, (width - gap * (count - 1)) / count);
     const block = featured ? featuredPosition(width, count, gap, rtl, featured) : undefined;

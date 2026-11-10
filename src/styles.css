@@ -2453,6 +2453,15 @@ html:has(.auth-signup), body:has(.auth-signup) { overflow: hidden; overscroll-be
 .artwork-modal-actions .artwork-modal-like:is(:hover,:focus-visible):not(:disabled) { background:transparent; border-color:transparent; box-shadow:none; }
 .profile-artwork-grid .artwork-pin-like,.profile-artwork-grid .artwork-pin-like:hover { background:transparent; box-shadow:none; color:#fff; }
 .profile-artwork-grid .artwork-pin-like.liked { color:#e53935; }
+@media(min-width:721px) {
+  :root:not([data-theme="dark"]) .feed-card-like:not(.liked) svg,
+  :root:not([data-theme="dark"]) .artwork-modal-actions .artwork-modal-like:not(.liked) svg { color:#8c8c8c; }
+  .artwork-modal-actions .artwork-modal-like:focus-visible,.feed-card-like:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+}
+@media(min-width:721px) and (hover:hover) and (pointer:fine) {
+  .feed-card-like:hover:not(:disabled),:root .feed-card-like:not(.liked):hover:not(:disabled) svg,
+  .artwork-modal-actions .artwork-modal-like:hover:not(:disabled),:root .artwork-modal-actions .artwork-modal-like:not(.liked):hover:not(:disabled) svg { color:#e53935; }
+}
 .feed-post-card .feed-card-footer .feed-creator:hover { color:var(--primary); background:transparent; transform:none; }
 .exhibition-personal-submissions .exhibition-record-actions { flex:0 0 auto; justify-content:flex-start; width:100%; }
 .exhibition-personal-submissions > :is(.pagination-load-more,.exhibition-section-empty) { grid-column:1 / -1; }
