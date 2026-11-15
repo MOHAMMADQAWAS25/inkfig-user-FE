@@ -39,9 +39,20 @@ The platform will support multiple ways of presenting and discovering artwork. T
 5. If accepted, the artwork becomes part of the event.
 6. If rejected, the student receives the teacher's rejection reason.
 
-## Project status
+## Current state and collaboration
 
-This document records the initial product direction, not a complete specification. Detailed requirements, artwork presentation modes, algorithms, roles, permissions, and additional workflows will be defined as the project develops.
+The product vision above records the original direction, not an unimplemented-feature
+list or a current role specification. Supervisors, admins and system administrators
+now manage exhibitions; implemented scope and remaining work are summarized in
+[PROJECT_STATE](docs/agent/PROJECT_STATE.md).
+
+Agents start with [AGENTS.md](AGENTS.md), the active task handoff and relevant bounded
+memory. Three collaborators use independent checkouts and the existing approved
+direct-main workflow: [procedure](docs/collaboration/WORKFLOW.md),
+[repositories/contracts](docs/collaboration/RELATED_REPOS.md).
+Source/DTOs and current memory supersede stale historical prose; the existing
+AGENT_FEATURE_LOG.md stays append-only. Do not run manual deployments, migrations
+or production writes merely to initialize project memory.
 
 ## Development
 
@@ -52,7 +63,10 @@ npm install
 npm run dev
 ```
 
-Use `npm test` for source-level foundation checks and `npm run build` for the strict TypeScript production build.
+Use `npm test` for Node/source and Vitest component/interaction checks, and
+`npm run build` for strict TypeScript, Vite and SEO generation. A local thread-pool
+override is available when process workers cannot start:
+`npm test -- --pool=threads --maxWorkers=2`. Do not weaken assertions to fix failures.
 
 ## Account entry
 
