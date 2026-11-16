@@ -2,7 +2,7 @@
 
 Human/integration owner: a7mad.ishaq.
 Agent/session: /root, a7mad-leaderboard-scroll-2026-11-16 (local identifier).
-Status: implemented and verified, publication next. Independent branch/check-out: fix/leaderboard-panel-scroll /
+Status: completed and deployed. Independent branch/check-out: fix/leaderboard-panel-scroll /
 agent-leaderboard-panel-scroll from origin/main463ca44.
 Issue: unavailable (no authenticated issue-writing tool); public open issue list empty.
 Completed prior task: EXHIBITION-CARD-001; no known active overlap, unpublished work unknown.
@@ -19,4 +19,7 @@ passed after adding panel containment/append preservation/category reset asserti
 No live/device verification. npm locked install reported3 high advisories (unchanged).
 Implementation: viewport flex shell max1280px, reference-counted page lock, internal
 scroll panel including status/pagination, sticky columns, mobile safe-area/nav padding.
-Next: review diff, fetch/integrate and publish; existing CI auto-deploys on main push.
+Publication: commit46f1bff49041c55a79023fcd22181997f0e6c78a pushed to main;
+no conflicts. Automatic workflow43910091354 completed successfully (tests/build/deploy).
+No manual deployment or production writes. Browser/device visual check not performed.
+Next: owner review; no required implementation remains. Revert46f1bff for rollback.
