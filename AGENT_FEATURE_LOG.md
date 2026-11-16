@@ -11224,3 +11224,34 @@ No real-browser/device or production data mutation testing. Existing bundle/jsdo
 Commit: Simplify exhibition artwork card content. Fetch/integrate before authorized main push;
 existing pipeline auto-tests/builds/deploys frontend. Exact hash/push/deployment in handoff.
 No manual deployment or production writes. Revert focused ticket commit to restore.
+
+## 2026-11-16 - Internal scrolling for exhibition leaderboard
+
+### Request / Changes / Frontend
+Keep leaderboard toolbar/title/filter stationary; scroll only ranking panel and narrow
+its centered shell to max1280px. Viewport-bounded flex layout with min-height0,
+theme scrollbar, contained overscroll, sticky columns, keyboard-focusable region,
+mobile nav/safe-area clearance and compact short-screen heading.
+Move loading/error/empty states and Load more into panel. Reset panel scroll on
+category/event change; preserve on appended pages and popup open/close.
+Reuse reference-counted page scroll lock so nested popup cleanup remains compatible.
+
+### Repositories / Files / Scope
+User-FE only; human a7mad.ishaq, agent /root a7mad-leaderboard-scroll-2026-11-16.
+Independent fix/leaderboard-panel-scroll from463ca44; task INKFIG-LEADERBOARD-SCROLL-001.
+TSX/CSS, existing regression test, current memory/screens/docs and handoff.
+No migration required. No backend/API/auth/permission/SnapStart/dependency changes.
+Current public issue list empty; authenticated issue creation unavailable.
+
+### Verification
+121 Node plus401 Vitest passed; production TypeScript/Vite/SEO build passed.
+Additional targeted3 tests passed after assertions for panel-contained pagination,
+scroll preservation on append and reset on category. git diff --check passed.
+No actual browser/device visual verification claimed. Existing bundle/jsdom notices;
+locked npm install reported3 high advisories, dependencies unchanged.
+
+### Deployment / Git / Notes
+Commit: Contain exhibition leaderboard scrolling in centered panel.
+Fetch/integrate then authorized main push from independent checkout; existing frontend
+CI automatically tests/builds/deploys Cloudflare. No manual migration/release/data writes.
+Exact publication/deployment in handoff; revert this focused commit for rollback.

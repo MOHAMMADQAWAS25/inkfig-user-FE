@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Image, Star, Trophy, Users } from "lucide-react";
@@ -11,6 +11,7 @@ import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import { useAuth } from "../auth/AuthContext";
 import { getWorkTypes } from "../works/worksApi";
 import { ThemedSelect } from "../../components/ThemedSelect";
+import { usePageScrollLock } from "../layout/usePageScrollLock";
 import type { Exhibition } from "./exhibitionApi";
 import "./exhibitionLeaderboard.css";
 
@@ -23,6 +24,9 @@ export function ExhibitionLeaderboardPage() {
   const ar = language === "ar";
   const { session } = useAuth();
   const [category, setCategory] = useState("");
+  const rankingPanel = useRef<HTMLDivElement>(null);
+  usePageScrollLock(true);
+  useEffect(() => { if (rankingPanel.current) rankingPanel.current.scrollTop = 0; }, [category, exhibitionId]);
   const types = useQuery({ queryKey:["work-types"], queryFn:getWorkTypes, staleTime:300_000 });
   const [opened, setOpened] = useState<string | null>(null);
   // Each category has its own pages; changing categories starts at page one.
@@ -52,10 +56,10 @@ export function ExhibitionLeaderboardPage() {
       </header>
       <div className="exhibition-leaderboard-filter"><ThemedSelect label={ar ? "الفئة" : "Category"} value={category} onChange={setCategory} disabled={types.isPending || types.isError} options={[{value:"",label:ar ? "كل الفئات" : "All categories"},...(types.data ?? []).map(type => ({value:type.type_id,label:ar ? type.name_ar : type.name_en}))]}/>
       {types.isError && <button type="button" onClick={() => void types.refetch()}>{t("feed.retry")}</button>}</div>
+      <div ref={rankingPanel} className="exhibition-leaderboard-board" role="region" aria-label={label} tabIndex={0}>
       {query.isPending && <p role="status">{t("works.loading")}</p>}
       {query.isError && <p role="alert">{t("works.loadFailed")} <button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button></p>}
       {first?.started && !entries.length && !query.isError && <p className="exhibition-leaderboard-empty">{ar ? "لا توجد أعمال حصلت على أصوات بعد." : "No artworks have counted votes yet."}</p>}
-      <div className="exhibition-leaderboard-board">
       <div className="exhibition-leaderboard-columns" aria-hidden="true"><span>#</span><span>{ar ? "العمل الفني" : "Artwork"}</span><span>{ar ? "الفنان" : "Artist"}</span><span>{ar ? "الفئة" : "Category"}</span><span>{ar ? "متوسط التقييم" : "Average rating"}</span><span>{ar ? "الأصوات" : "Votes"}</span></div>
       <ol className="exhibition-leaderboard-list" aria-label={label}>
         {entries.map(entry => <li key={entry.work_id}>
@@ -69,8 +73,8 @@ export function ExhibitionLeaderboardPage() {
           </button>
         </li>)}
       </ol>
-      </div>
       {query.hasNextPage && <button type="button" className="primary-button" disabled={query.isFetching} onClick={() => void query.fetchNextPage()}>{query.isFetchingNextPage ? t("works.loading") : ar ? "تحميل المزيد" : "Load more"}</button>}
+      </div>
     </div>
     {opened && <ExhibitionArtworkPopup key={opened} workId={opened} onClose={() => setOpened(null)}/>}
   </main>;

@@ -16,7 +16,11 @@ Loading/error/retry, upcoming, voting-open/closed and genuine no-votes states ar
 provided. Open voting displays “It becomes more exciting” (localized in Arabic);
 ranking guidance and the fetch timestamp are not displayed. Live offset pages
 can skip moved rows between requests; reopening the page obtains current standings.
-The page uses the available width with balanced side gutters. Decorative stars
+The viewport-bounded page centers a maximum1280px shell. Only the ranking panel
+scrolls; its column heading is sticky and Load more/errors/empty states are inside.
+Toolbar, title and category filter remain stationary. Category changes reset panel
+scroll; pagination preserves it. Mobile bottom-nav/safe-area clearance is retained.
+Decorative stars
 fill proportionally to the numeric average, including half and other fractions.
 
 Artwork rows open the shared ExhibitionArtworkPopup, keeping the page/list and
