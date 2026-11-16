@@ -362,7 +362,9 @@ it("opens a current exhibition as a titled split-card wall without its banner", 
   expect(link.getAttribute("aria-haspopup")).toBe("dialog");
   expect(link.querySelector(".exhibition-artwork-media img")?.getAttribute("src")).toBe("/art.jpg");
   const card=link.closest(".exhibition-artwork-card");
-  expect(card?.querySelector(".exhibition-artwork-details")?.textContent).toContain("A colorful autumn landscape");
+  expect(card?.querySelector(".exhibition-artwork-details")?.textContent).not.toContain("A colorful autumn landscape");
+  expect(card?.querySelector("time")).toBeNull();
+  expect(card?.querySelector(".exhibition-artwork-open")).toBeNull();
   expect(card?.querySelector(".profile-avatar-initial")?.textContent).toBe("A");
   expect(container.querySelector('[src="/banner.jpg"]')).toBeNull();
 });

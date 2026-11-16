@@ -101,7 +101,11 @@ it("preserves permission-gated like/save actions and refetches confirmed work da
 it("opens the popup from non-interactive card content but not from rating stars",async()=>{
   mount();fireEvent.click(await screen.findByRole("radio",{name:"4 out of 5 stars"}));
   expect(screen.queryByRole("dialog")).toBeNull();
-  fireEvent.click(screen.getByText("Card description"));
+  expect(screen.queryByText("Card description")).toBeNull();
+  const card=screen.getByRole("button",{name:"Painting"}).closest("article")!;
+  expect(card.querySelector("time")).toBeNull();
+  expect(card.querySelector(".exhibition-artwork-open")).toBeNull();
+  fireEvent.click(card);
   expect(await screen.findByRole("dialog",{name:"Full painting"})).toBeTruthy();
 });
 
@@ -117,7 +121,8 @@ it("submits a rating below the popup image and synchronizes the gallery without 
   expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
   fireEvent.click(within(dialog).getByRole("button",{name:"Close artwork details"}));
   await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
-  expect(screen.getByText("Your rating: 5 / 5")).toBeTruthy();
+  expect(screen.queryByText("Your rating: 5 / 5")).toBeNull();
+  expect(screen.getByRole<HTMLInputElement>("radio",{name:"5 out of 5 stars"}).checked).toBe(true);
 });
 
 it("supports Arabic popup content and Escape dismissal",async()=>{

@@ -11194,3 +11194,33 @@ database migration, public release or production write dispatched.
 Partner-to-checkout/session/workstream mapping remains for the humans to choose; owner is
 default integration decision-maker until delegated. Published handoffs are not technical
 locks or automatic cross-agent context. Application source remains authoritative.
+
+## 2026-11-16 - Simplify exhibition artwork card content
+
+### Request / Changes
+Remove card description, date, details CTA and redundant numeric personal rating.
+Preserve image/title/card popup access, creator/category, aggregate totals and selected
+voting stars/buttons. Optional showPersonalScore defaults true for existing popup controls.
+
+### Repositories / Files
+Frontend only; independent fix/exhibition-card-content checkout from8c5fc40.
+Human a7mad.ishaq; agent /root a7mad-exhibition-card-2026-11-16.
+Card/rating components, three relevant test files, current state/screens and task handoff.
+No overlapping public issue; issue-writing tool unavailable. See INKFIG-EXHIBITION-CARD-001.
+
+### API / Database / Permissions and scope / Frontend
+No migration required. No API/auth/permission/SnapStart change; no dependency/config changes.
+Popup details and voting authorization preserved; shared card consumers use simplified content.
+
+### Verification
+121 Node and401 Vitest passed; strict production build verified before publication.
+Initial first-login failure passed baseline isolated run and full changed rerun unchanged;
+no claim it was proven pre-existing. Relevant expectations now verify removed elements
+and selected stars, retaining popup/rating tests. git diff --check passed.
+Locked npm install reports3 high advisories; no unsolicited dependency modifications.
+No real-browser/device or production data mutation testing. Existing bundle/jsdom notices.
+
+### Deployment / Git / Notes
+Commit: Simplify exhibition artwork card content. Fetch/integrate before authorized main push;
+existing pipeline auto-tests/builds/deploys frontend. Exact hash/push/deployment in handoff.
+No manual deployment or production writes. Revert focused ticket commit to restore.

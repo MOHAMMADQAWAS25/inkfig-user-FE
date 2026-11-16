@@ -11,8 +11,8 @@ import { RatingSummary } from "./RatingSummary";
 import type { RatingState } from "./exhibitionRatingTypes";
 
 const empty: RatingState = { average: null, vote_count: 0, my_rating: null, can_rate: false };
-export function ExhibitionRatingControls({ exhibitionId, workId, rating = empty, votingOpen }: {
-  exhibitionId: string; workId: string; rating?: RatingState; votingOpen: boolean;
+export function ExhibitionRatingControls({ exhibitionId, workId, rating = empty, votingOpen, showPersonalScore = true }: {
+  exhibitionId: string; workId: string; rating?: RatingState; votingOpen: boolean; showPersonalScore?: boolean;
 }) {
   const { session } = useAuth(); const { language, t } = useI18n(); const client = useQueryClient(); const id = useId();
   const [current, setCurrent] = useState(rating); const [score, setScore] = useState(rating.my_rating ?? 0);
@@ -43,7 +43,7 @@ export function ExhibitionRatingControls({ exhibitionId, workId, rating = empty,
   }
   return <section className="exhibition-rating-controls" aria-label={t("ratings.title")}>
     <RatingSummary rating={current}/>
-    {current.my_rating !== null && <small>{t("ratings.yours").replace("{score}", String(current.my_rating))}</small>}
+    {showPersonalScore && current.my_rating !== null && <small>{t("ratings.yours").replace("{score}", String(current.my_rating))}</small>}
     {allowed ? <form onSubmit={event => { event.preventDefault(); void submit(score); }}>
       <fieldset disabled={busy}><legend>{t("ratings.choose")}</legend><div className="exhibition-rating-stars" onPointerLeave={() => setPreview(null)}>
         {[1, 2, 3, 4, 5].map(value => <label key={value} onPointerEnter={event => { if (!busy && event.pointerType !== "touch") setPreview(value); }}>

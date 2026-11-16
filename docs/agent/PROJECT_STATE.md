@@ -6,8 +6,9 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: setup complete; no next application-implementation task has been claimed.
-Task: INKFIG-COLLAB-001; human: project owner; agent: owner-primary-2026-11-15 (/root).
+Status: exhibition card content simplification implemented; 522 checks passed.
+Task: [INKFIG-EXHIBITION-CARD-001](../collaboration/tasks/INKFIG-EXHIBITION-CARD-001.md).
+Human: a7mad.ishaq; agent: /root, a7mad-exhibition-card-2026-11-16.
 Default integration decision-maker: owner, until explicitly delegated.
 No partner workstreams or checkout/session assignments have been approved.
 

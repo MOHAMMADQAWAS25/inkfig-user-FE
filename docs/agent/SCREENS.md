@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Exhibition artwork cards omit description/date/details CTA and redundant personal
+  numeric score; image/title still open the popup, which retains full details.
 - Anonymous read-only/public views versus authenticated actions; backend enforces real access.
 - Light/dark, RTL/LTR, reduced motion, keyboard focus and mobile navigation must be retained.
 - Upload type loading/error/empty/retry distinct; videos remain preview-only publishing.

@@ -49,7 +49,8 @@ it("requires explicit submission and does not navigate or duplicate in-flight vo
   expect(changeExhibitionRating).toHaveBeenCalledWith("event","art",4,expect.any(AbortSignal));
   await act(async()=>finish({...initial,average:4.2,vote_count:29,my_rating:4}));
   expect(screen.getByText("4.2 / 5 · 29 votes")).toBeTruthy();
-  expect(screen.getByText("Your rating: 4 / 5")).toBeTruthy();
+  expect(screen.queryByText("Your rating: 4 / 5")).toBeNull();
+  expect(screen.getByRole<HTMLInputElement>("radio",{name:"4 out of 5 stars"}).checked).toBe(true);
   expect(openArtwork).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button",{name:"View artwork details: Painting"}));
   expect(openArtwork).toHaveBeenCalledOnce();expect(openArtwork).toHaveBeenCalledWith("art");
