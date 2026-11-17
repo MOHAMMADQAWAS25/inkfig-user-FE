@@ -455,17 +455,38 @@ it("keeps the manager edit action without a plus in the blurred toolbar", async 
   expect(edit.querySelector(".lucide-plus")).toBeNull();
   expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
 });
+it("groups admin actions in a trailing options menu with keyboard and outside dismissal",async()=>{
+  state.role="admin";
+  view();
+  const trigger=await screen.findByRole("button",{name:"Exhibition options"});
+  expect(screen.queryByRole("button",{name:"Edit exhibition"})).toBeNull();
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(trigger.closest(".exhibition-toolbar-options")?.parentElement?.lastElementChild).toBe(trigger.closest(".exhibition-toolbar-options"));
+  fireEvent.click(trigger);
+  const edit=screen.getByRole("menuitem",{name:"Edit exhibition"});
+  expect(document.activeElement).toBe(edit);
+  fireEvent.keyDown(edit,{key:"ArrowDown"});
+  expect(document.activeElement).toBe(screen.getByRole("menuitem",{name:"Delete exhibition"}));
+  fireEvent.keyDown(document.activeElement!,{key:"Escape"});
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(document.activeElement).toBe(trigger);
+  fireEvent.click(trigger);
+  fireEvent.pointerDown(document.body);
+  expect(screen.queryByRole("menu")).toBeNull();
+});
 it.each(["user", "supervisor"])("does not offer exhibition deletion to %s", async role => {
   state.role = role;
   view();
   await screen.findByText("Spring collection");
   expect(screen.queryByRole("button", { name: "Delete exhibition" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Exhibition options" })).toBeNull();
 });
 it.each(["admin", "system_administrator"])("requires %s confirmation before deleting an exhibition", async role => {
   state.role = role;
   vi.mocked(api.deleteExhibition).mockResolvedValue(undefined);
   view();
-  fireEvent.click(await screen.findByRole("button", { name: "Delete exhibition" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Exhibition options" }));
+  fireEvent.click(screen.getByRole("menuitem", { name: "Delete exhibition" }));
   const dialog = screen.getByRole("dialog", { name: "Delete exhibition" });
   expect(api.deleteExhibition).not.toHaveBeenCalled();
   expect(within(dialog).getByText(/Artists’ original posts are kept/)).toBeTruthy();
@@ -478,9 +499,10 @@ it("keeps a failed exhibition deletion open with retry and cancel", async () => 
   state.role = "admin";
   vi.mocked(api.deleteExhibition).mockRejectedValue(new Error("Banner cleanup failed"));
   view();
-  const trigger = await screen.findByRole("button", { name: "Delete exhibition" });
+  const trigger = await screen.findByRole("button", { name: "Exhibition options" });
   trigger.focus();
   fireEvent.click(trigger);
+  fireEvent.click(screen.getByRole("menuitem",{name:"Delete exhibition"}));
   const dialog = screen.getByRole("dialog");
   fireEvent.click(within(dialog).getByRole("button", { name: "Delete exhibition" }));
   expect((await within(dialog).findByRole("alert")).textContent).toBe("Banner cleanup failed");

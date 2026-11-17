@@ -11351,3 +11351,33 @@ Commit: Enlarge exhibition popup artwork and simplify rating details.
 Review/fetch/integrate before authorized main push; existing CI deploys Cloudflare.
 Exact hash/deployment in task handoff. No manual deployment/migration.
 Revert focused commit for rollback while preserving historical log entries.
+
+## 2026-11-17 - Administrator exhibition toolbar options
+
+### Request / Changes / Frontend
+Move admin/system-admin Edit/Delete into trailing MoreHorizontal options menu,
+opposite other toolbar buttons in LTR/RTL. Gate on existing admin-only delete
+callback; preserve supervisor edit, all links and existing delete confirmation.
+Translated accessible trigger, focused first item, arrows/Home/End, Escape focus
+restore, outside/tab/selection dismissal. Restore stable trigger focus before action
+so cancellation of deletion returns correctly. Theme-relative scoped dropdown CSS.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only; independent fix/exhibition-admin-menu fromaec3933.
+Human a7mad.ishaq; agent /root a7mad-menu-2026-11-17; task EXHIBITION-MENU-001.
+Toolbar/CSS/existing exhibition tests/current memory/handoff. No migration required.
+No API/backend/permission/dependency/SnapStart change. Public issue list empty;
+authenticated issue-writing unavailable. Unpublished partner overlap unknown.
+
+### Verification
+Full121 Node +402 Vitest passed; TypeScript/Vite/SEO build passed. Added menu
+keyboard/outside/permissions test afterward and targeted41 exhibition tests passed.
+Delete confirmation/failure/cancel-focus assertions retained with menu selection step.
+git diff --check passed; browser/device visual check not performed (bridges unavailable).
+Existing jsdom/bundle notices; locked install3 high advisories, package files unchanged.
+
+### Deployment / Git / Notes
+Commit: Group administrator exhibition actions in toolbar menu.
+Review/fetch/integrate before authorized main push; existing frontend CI auto-tests/
+builds/deploys Cloudflare. Exact hash/status in handoff. No manual deployment,
+migration or production data writes. Revert focused commit for rollback.

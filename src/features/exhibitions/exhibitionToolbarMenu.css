@@ -1,0 +1,9 @@
+.exhibition-toolbar-options { position:relative; margin-inline-start:auto; flex:0 0 auto; }
+.exhibition-options-trigger { display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid var(--border); border-radius:12px; color:var(--text); background:var(--surface); cursor:pointer; }
+.exhibition-options-trigger:is(:hover,:focus-visible),.exhibition-options-trigger[aria-expanded="true"] { border-color:var(--primary); background:color-mix(in srgb,var(--primary) 12%,var(--surface)); }
+.exhibition-options-trigger:focus-visible,.exhibition-options-menu button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.exhibition-options-menu { position:absolute; inset-inline-end:0; top:calc(100% + 8px); z-index:40; width:max-content; min-width:190px; max-width:calc(100vw - 48px); padding:6px; border:1px solid var(--border); border-radius:14px; background:var(--surface); color:var(--text); box-shadow:0 8px 24px rgb(0 0 0 / .18); }
+.exhibition-options-menu button { display:flex; align-items:center; gap:10px; width:100%; padding:11px 12px; border:0; border-radius:9px; background:transparent; color:inherit; font:inherit; text-align:start; cursor:pointer; }
+.exhibition-options-menu button:hover { background:color-mix(in srgb,var(--primary) 12%,var(--surface)); }
+.exhibition-options-menu button.exhibition-options-delete { color:var(--danger); }
+.exhibition-options-menu button:disabled { opacity:.5; cursor:not-allowed; }

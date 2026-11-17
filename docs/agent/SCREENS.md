@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Admin/system-admin exhibition toolbar places Edit/Delete inside trailing options;
+  supervisor edit remains available; original deletion confirmation retained.
 - Exhibition gallery popup: artwork only physically left; organized full details,
   actions/voting/share on right with independent desktop scroll. Mobile stacks;
   origin zoom retained and leaderboard presentation unchanged.
