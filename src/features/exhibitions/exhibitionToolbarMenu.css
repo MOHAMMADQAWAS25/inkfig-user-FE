@@ -1,4 +1,7 @@
 .exhibition-toolbar-options { position:relative; margin-inline-start:auto; flex:0 0 auto; }
+.exhibition-toolbar > a.exhibition-leaderboard-link { color:#896400; background:color-mix(in srgb,#c99b21 12%,var(--surface)); border:1px solid color-mix(in srgb,#c99b21 45%,var(--border)); }
+:root[data-theme="dark"] .exhibition-toolbar > a.exhibition-leaderboard-link { color:#f1d46a; }
+.exhibition-toolbar > a.exhibition-leaderboard-link:is(:hover,:focus-visible) { background:color-mix(in srgb,#c99b21 22%,var(--surface)); border-color:#c99b21; }
 .exhibition-options-trigger { display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid var(--border); border-radius:12px; color:var(--text); background:var(--surface); cursor:pointer; }
 .exhibition-options-trigger:is(:hover,:focus-visible),.exhibition-options-trigger[aria-expanded="true"] { border-color:var(--primary); background:color-mix(in srgb,var(--primary) 12%,var(--surface)); }
 .exhibition-options-trigger:focus-visible,.exhibition-options-menu button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }

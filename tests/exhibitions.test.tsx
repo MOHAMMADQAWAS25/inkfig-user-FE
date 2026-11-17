@@ -459,6 +459,8 @@ it("groups admin actions in a trailing options menu with keyboard and outside di
   state.role="admin";
   view();
   const trigger=await screen.findByRole("button",{name:"Exhibition options"});
+  const links=Array.from(trigger.closest(".exhibition-toolbar")!.querySelectorAll(':scope > a, :scope > button')).map(node=>node.textContent);
+  expect(links).toEqual(["Exhibitions","Leaderboard","Review submissions","My submissions","Participate"]);
   expect(screen.queryByRole("button",{name:"Edit exhibition"})).toBeNull();
   expect(screen.queryByRole("menu")).toBeNull();
   expect(trigger.closest(".exhibition-toolbar-options")?.parentElement?.lastElementChild).toBe(trigger.closest(".exhibition-toolbar-options"));

@@ -67,7 +67,8 @@ it("shows precisely two and a half stars and keeps all four navigation links vis
   for (const name of ["Exhibition","Leaderboard","Participate","My submissions"]) expect(screen.getByRole("link",{name})).toBeTruthy();
   expect(screen.getByRole("link",{name:"Exhibition"}).getAttribute("href")).toBe("/en/exhibition/show");
   const toolbar=document.querySelector(".exhibition-toolbar")!;
-  expect(Array.from(toolbar.children).slice(0,3).map(node=>node.textContent)).toEqual(["Exhibition","Participate","Leaderboard"]);
+  expect(Array.from(toolbar.children).map(node=>node.textContent)).toEqual(["Exhibition","Leaderboard","My submissions","Participate"]);
+  expect(screen.getByRole("link",{name:"Leaderboard"}).classList.contains("exhibition-leaderboard-link")).toBe(true);
 });
 
 it("links Arabic leaderboard back to its own exhibition gallery",async()=>{

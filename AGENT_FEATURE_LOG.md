@@ -11406,3 +11406,31 @@ Commit: Return exhibition leaderboard back link to its gallery.
 Review/fetch/integrate before authorized main push; existing CI tests/builds/deploys.
 Exact commit/deployment in task handoff. No manual release/migration or production
 writes. Revert focused commit for rollback; retain historical log entries.
+
+## 2026-11-17 - Exhibition toolbar order and gold leaderboard
+
+### Request / Changes / Frontend
+Order toolbar Back, gold Leaderboard, authorized Review submissions, My submissions,
+Participate. Keep admin options at trailing opposite end, supervisor Edit after main
+navigation, contextual back destinations and all role/window restrictions unchanged.
+Theme-specific readable gold foreground with subtle gold background/border/hover.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only; independent style/exhibition-toolbar-order from35dea55; human a7mad.ishaq,
+agent /root a7mad-order-2026-11-17, task TOOLBAR-ORDER-001. Toolbar/scoped CSS, existing
+order tests, state/screens/handoff. Public issues empty; issue-writing unavailable.
+No migration required; no API/backend/auth/dependency/SnapStart changes.
+
+### Verification
+Full npm test and production TypeScript/Vite/SEO build before publication; final
+results in task handoff. Initial run had first-login prompt assertion failure;
+rerun without changing that test. Not classified as proven pre-existing.
+Order tests cover full guest/administrator sequence, gold class and retained menu.
+git diff --check. No actual browser/device verification. Existing jsdom/bundle notices
+and locked-install3 high advisories; package files unchanged.
+
+### Deployment / Git / Notes
+Commit: Reorder exhibition toolbar and highlight leaderboard in gold.
+Review/fetch/integrate before authorized main push; existing pipeline deploys frontend.
+Exact hash/results in handoff; no manual release/migration or production writes.
+Revert focused commit for rollback, preserving historical records.
