@@ -8,9 +8,9 @@ import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { ExhibitionNavbar } from "./ExhibitionNavbar";
 import { useExhibitionCounts } from "./useExhibitionCounts";
 
-export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdit, onDelete }: {
+export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdit, onDelete, backToGallery = false }: {
   id: string; manage: boolean; signedIn: boolean; available: boolean;
-  busy?: boolean; onEdit?: () => void; onDelete?: () => void;
+  busy?: boolean; onEdit?: () => void; onDelete?: () => void; backToGallery?: boolean;
 }) {
   const { language, t } = useI18n();
   const [open,setOpen]=useState(false);
@@ -24,7 +24,7 @@ export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdi
   const counts=useExhibitionCounts()?.items.find(item=>item.exhibition_id===id);
   const pending=(counts?.submissions??0)+(counts?.withdrawals??0);
   return <ExhibitionNavbar label={t("exhibitions.actions")}>
-    <ExhibitionBackButton to={`/${language}/exhibition`} label={language === "ar" ? "المعارض" : "Exhibitions"} showLabel/>
+    <ExhibitionBackButton to={`/${language}/exhibition${backToGallery ? `/${id}` : ""}`} label={backToGallery ? (language === "ar" ? "المعرض" : "Exhibition") : (language === "ar" ? "المعارض" : "Exhibitions")} showLabel/>
     {signedIn ? (available ? <Link className="primary-button" to={`/${language}/upload?exhibition=${id}`}><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</Link> : <button disabled><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</button>) : <Link to={`/${language}/login`}><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</Link>}
     <Link to={`/${language}/exhibition/${id}/leaderboard`}><Trophy size={17} aria-hidden="true"/>{language === "ar" ? "لوحة الترتيب" : "Leaderboard"}</Link>
     {!onDelete && manage && onEdit && <button className="primary-button" disabled={busy} onClick={onEdit}><Pencil size={17} aria-hidden="true"/>{t("exhibitions.edit")}</button>}

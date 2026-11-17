@@ -48,7 +48,7 @@ export function ExhibitionLeaderboardPage() {
   return <main className="exhibitions-page app-page-with-sidebar exhibition-leaderboard-page">
     <AppSidebar/>
     <div className="exhibitions-shell exhibition-leaderboard">
-      <ExhibitionToolbar id={exhibitionId} manage={false} signedIn={Boolean(session)} available={Boolean(first?.exhibition.participation_open)}/>
+      <ExhibitionToolbar id={exhibitionId} manage={false} signedIn={Boolean(session)} available={Boolean(first?.exhibition.participation_open)} backToGallery/>
       <header className="exhibition-leaderboard-heading">
         <span className="exhibition-leaderboard-emblem"><Trophy aria-hidden="true"/></span>
         <h1>{ar ? "الأعمال الفنية الأعلى تقييماً" : "Top Rated Artworks"}</h1>

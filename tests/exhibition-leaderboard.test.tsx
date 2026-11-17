@@ -16,9 +16,9 @@ vi.mock("../src/features/exhibitions/ExhibitionArtworkPopup", () => ({ Exhibitio
 const entry = (id: string, rank: number) => ({ work_id: id, rank, title: `Art ${id}`, artist_name: "Artist", artist_avatar_url: "/avatar.png", image_url: "/image.png", type_name_en: "Digital Art", type_name_ar: "فن رقمي", average: 4.5, vote_count: 2 });
 const page = { exhibition: {name: "Show"}, fetched_at: "2026-11-01T12:00:00Z", started: true, voting_open: true, total: 2, items: [entry("a", 1)], next_cursor: 20 };
 let client: QueryClient;
-function mount() {
+function mount(language="en") {
   client = new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}});
-  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={["/en/exhibition/show/leaderboard"]}><Routes><Route path="/:language/exhibition/:exhibitionId/leaderboard" element={<I18nProvider><ExhibitionLeaderboardPage/></I18nProvider>}/></Routes></MemoryRouter></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/${language}/exhibition/show/leaderboard`]}><Routes><Route path="/:language/exhibition/:exhibitionId/leaderboard" element={<I18nProvider><ExhibitionLeaderboardPage/></I18nProvider>}/></Routes></MemoryRouter></QueryClientProvider>);
 }
 beforeEach(() => { vi.clearAllMocks(); vi.mocked(requestJson).mockResolvedValue({data:page,status:200}); });
 afterEach(() => { cleanup(); client.clear(); });
@@ -64,7 +64,15 @@ it("shows precisely two and a half stars and keeps all four navigation links vis
   mount();
   await screen.findByText("2.50 / 5");
   expect(Array.from(document.querySelectorAll<HTMLElement>(".exhibition-leaderboard-star > span"),star=>star.style.width)).toEqual(["100%","100%","50%","0%","0%"]);
-  for (const name of ["Exhibitions","Leaderboard","Participate","My submissions"]) expect(screen.getByRole("link",{name})).toBeTruthy();
+  for (const name of ["Exhibition","Leaderboard","Participate","My submissions"]) expect(screen.getByRole("link",{name})).toBeTruthy();
+  expect(screen.getByRole("link",{name:"Exhibition"}).getAttribute("href")).toBe("/en/exhibition/show");
   const toolbar=document.querySelector(".exhibition-toolbar")!;
-  expect(Array.from(toolbar.children).slice(0,3).map(node=>node.textContent)).toEqual(["Exhibitions","Participate","Leaderboard"]);
+  expect(Array.from(toolbar.children).slice(0,3).map(node=>node.textContent)).toEqual(["Exhibition","Participate","Leaderboard"]);
+});
+
+it("links Arabic leaderboard back to its own exhibition gallery",async()=>{
+  mount("ar");
+  const back=await screen.findByRole("link",{name:"المعرض"});
+  expect(back.getAttribute("href")).toBe("/ar/exhibition/show");
+  expect(back.querySelector("svg")).toBeTruthy();
 });

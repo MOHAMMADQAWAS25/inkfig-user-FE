@@ -11381,3 +11381,28 @@ Commit: Group administrator exhibition actions in toolbar menu.
 Review/fetch/integrate before authorized main push; existing frontend CI auto-tests/
 builds/deploys Cloudflare. Exact hash/status in handoff. No manual deployment,
 migration or production data writes. Revert focused commit for rollback.
+
+## 2026-11-17 - Contextual leaderboard back navigation
+
+### Request / Changes / Frontend
+Leaderboard toolbar now shows arrow Exhibition / المعرض and links directly to
+its exhibition gallery. Optional backToGallery defaults false, preserving gallery
+arrow Exhibitions / المعارض and listing destination. Other toolbar links/menu unchanged.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only, independent fix/leaderboard-back-link from3fcaf45; human a7mad.ishaq,
+agent /root a7mad-back-2026-11-17; task LEADERBOARD-BACK-001. Toolbar prop, leaderboard
+caller/test, current state/screens and handoff. Public issues empty; issue creation
+unavailable. No migration required. No API/auth/backend/dependency/SnapStart change.
+
+### Verification
+121 Node +404 Vitest passed; TypeScript/Vite/SEO build checked before publication.
+English/Arabic leaderboard href/arrow tests and existing gallery listing link test
+retained. git diff --check passed. No live/device visual verification performed.
+Existing bundle/jsdom notices and locked-install3 high advisories, packages unchanged.
+
+### Deployment / Git / Notes
+Commit: Return exhibition leaderboard back link to its gallery.
+Review/fetch/integrate before authorized main push; existing CI tests/builds/deploys.
+Exact commit/deployment in task handoff. No manual release/migration or production
+writes. Revert focused commit for rollback; retain historical log entries.
