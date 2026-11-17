@@ -59,15 +59,16 @@ it("shows a genuine empty state without unrated entries", async () => {
   expect(screen.queryByText("Load more")).toBeNull();
 });
 
-it("shows precisely two and a half stars and keeps all four navigation links visible for guests", async () => {
+it("shows precisely two and a half stars and only the exhibition and leaderboard navigation", async () => {
   vi.mocked(requestJson).mockResolvedValue({data:{...page,items:[{...entry("a",1),average:2.5}],next_cursor:null},status:200});
   mount();
   await screen.findByText("2.50 / 5");
   expect(Array.from(document.querySelectorAll<HTMLElement>(".exhibition-leaderboard-star > span"),star=>star.style.width)).toEqual(["100%","100%","50%","0%","0%"]);
-  for (const name of ["Exhibition","Leaderboard","Participate","My submissions"]) expect(screen.getByRole("link",{name})).toBeTruthy();
+  for (const name of ["Exhibition","Leaderboard"]) expect(screen.getByRole("link",{name})).toBeTruthy();
+  for (const name of ["Participate","My submissions","Review submissions"]) expect(screen.queryByRole("link",{name})).toBeNull();
   expect(screen.getByRole("link",{name:"Exhibition"}).getAttribute("href")).toBe("/en/exhibition/show");
   const toolbar=document.querySelector(".exhibition-toolbar")!;
-  expect(Array.from(toolbar.children).map(node=>node.textContent)).toEqual(["Exhibition","Leaderboard","My submissions","Participate"]);
+  expect(Array.from(toolbar.children).map(node=>node.textContent)).toEqual(["Exhibition","Leaderboard"]);
   expect(screen.getByRole("link",{name:"Leaderboard"}).classList.contains("exhibition-leaderboard-link")).toBe(true);
 });
 
@@ -76,4 +77,5 @@ it("links Arabic leaderboard back to its own exhibition gallery",async()=>{
   const back=await screen.findByRole("link",{name:"المعرض"});
   expect(back.getAttribute("href")).toBe("/ar/exhibition/show");
   expect(back.querySelector("svg")).toBeTruthy();
+  expect(document.querySelector(".exhibition-toolbar")?.children).toHaveLength(2);
 });

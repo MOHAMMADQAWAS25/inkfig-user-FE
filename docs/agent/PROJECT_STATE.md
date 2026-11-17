@@ -6,9 +6,9 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: toolbar order/gold Leaderboard pushed (5407478); 525 checks/build passed; deploy pending.
-Task: [INKFIG-TOOLBAR-ORDER-001](../collaboration/tasks/INKFIG-TOOLBAR-ORDER-001.md).
-Human: a7mad.ishaq; agent: /root, a7mad-order-2026-11-17.
+Status: leaderboard-only two-button toolbar implemented; checks running.
+Task: [INKFIG-LEADERBOARD-TOOLBAR-001](../collaboration/tasks/INKFIG-LEADERBOARD-TOOLBAR-001.md).
+Human: a7mad.ishaq; agent: /root, a7mad-lb-toolbar-2026-11-17.
 Default integration decision-maker: owner, until explicitly delegated.
 No partner workstreams or checkout/session assignments have been approved.
 

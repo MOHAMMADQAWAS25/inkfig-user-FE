@@ -26,6 +26,7 @@ export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdi
   return <ExhibitionNavbar label={t("exhibitions.actions")}>
     <ExhibitionBackButton to={`/${language}/exhibition${backToGallery ? `/${id}` : ""}`} label={backToGallery ? (language === "ar" ? "المعرض" : "Exhibition") : (language === "ar" ? "المعارض" : "Exhibitions")} showLabel/>
     <Link className="exhibition-leaderboard-link" to={`/${language}/exhibition/${id}/leaderboard`}><Trophy size={17} aria-hidden="true"/>{language === "ar" ? "لوحة الترتيب" : "Leaderboard"}</Link>
+    {!backToGallery && <>
     {manage && <Link to={`/${language}/exhibition/${id}/review`}>{t("exhibitions.reviewQueue")}{pending>0&&<span className="exhibition-count">{pending>99?"99+":pending}</span>}</Link>}
     <Link to={signedIn ? `/${language}/exhibition/${id}/submissions` : `/${language}/login`}><Images size={17} aria-hidden="true"/>{t("exhibitions.mySubmissions")}</Link>
     {signedIn ? (available ? <Link className="primary-button" to={`/${language}/upload?exhibition=${id}`}><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</Link> : <button disabled><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</button>) : <Link to={`/${language}/login`}><Upload size={17} aria-hidden="true"/>{t("exhibitions.participateAction")}</Link>}
@@ -45,5 +46,6 @@ export function ExhibitionToolbar({ id, manage, signedIn, available, busy, onEdi
         <button type="button" role="menuitem" className="exhibition-options-delete" disabled={busy} onClick={()=>{setOpen(false);trigger.current?.focus();onDelete();}}><Trash2 size={17} aria-hidden="true"/>{t('exhibitions.delete')}</button>
       </div>}
     </div>}
+    </>}
   </ExhibitionNavbar>;
 }

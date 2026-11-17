@@ -11434,3 +11434,32 @@ Commit: Reorder exhibition toolbar and highlight leaderboard in gold.
 Review/fetch/integrate before authorized main push; existing pipeline deploys frontend.
 Exact hash/results in handoff; no manual release/migration or production writes.
 Revert focused commit for rollback, preserving historical records.
+
+## 2026-11-17 - Two-button leaderboard toolbar
+
+### Request / Changes / Frontend
+Leaderboard context (existing backToGallery) renders only Back Exhibition and
+gold Leaderboard. Other shared toolbar children remain in default gallery context;
+permissions, full gallery order/admin menu, filter/pages/popup and links unchanged.
+
+### Repositories / Files / API / Database / Permissions and scope
+Frontend only, independent fix/leaderboard-toolbar fromf594885; human a7mad.ishaq,
+agent /root a7mad-lb-toolbar-2026-11-17; task LEADERBOARD-TOOLBAR-001.
+Toolbar conditional, existing English/Arabic tests, memory/screens/handoff.
+No migration required; no API/backend/auth/dependency/SnapStart changes.
+Public issue list empty; issue-writing unavailable; no known active overlap.
+
+### Verification
+121 Node +404 Vitest passed; production TypeScript/Vite/SEO build checked before push.
+Tests assert exact two-child toolbar and absent other links, Arabic two children;
+existing full gallery/admin order checks retained. git diff --check passed.
+No live/device visual verification. Existing jsdom/bundle notices and locked-install
+3 high advisories, package files unchanged.
+
+### Deployment / Git / Notes
+Prior order task workflow44098410908 failed at Deploy Cloudflare Worker after tests/
+build passed; not certified deployed. This ticket authorized main push uses existing
+pipeline (not manual release). Exact hash/new workflow status in task handoff.
+Commit: Limit exhibition leaderboard toolbar to two navigation buttons.
+Review/fetch/integrate before push; no production data writes or manual migration.
+Revert focused commit for rollback, retain historical logs.
