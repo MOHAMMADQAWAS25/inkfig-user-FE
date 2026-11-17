@@ -6,7 +6,7 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: reference-style inline exhibition editor implemented; final checks running.
+Status: reference-style inline editor deployed (c8f3f32); 526 checks/build passed.
 Task: [INKFIG-EXHIBITION-EDITOR-001](../collaboration/tasks/INKFIG-EXHIBITION-EDITOR-001.md).
 Human: a7mad.ishaq; agent: /root, a7mad-editor-2026-11-17.
 Default integration decision-maker: owner, until explicitly delegated.
