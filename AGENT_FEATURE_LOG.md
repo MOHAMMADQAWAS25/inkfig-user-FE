@@ -11463,3 +11463,35 @@ pipeline (not manual release). Exact hash/new workflow status in task handoff.
 Commit: Limit exhibition leaderboard toolbar to two navigation buttons.
 Review/fetch/integrate before push; no production data writes or manual migration.
 Revert focused commit for rollback, retain historical logs.
+
+## 2026-11-17 - Reference-style inline exhibition editor
+
+### Request / Changes / Frontend
+Restyle existing inline shared create/edit form: calendar/title/subtitle header,
+banner preview/change-image left, full-width name/description5000 counter right,
+four native date/time fields in pairs, Save/Cancel bottom. Theme-relative rounded
+controls, responsive stacked image/fields and single-column small-phone dates.
+Current banner shown until replacement; object URL preview cleaned on replace/
+unmount/cancel. No upload until existing Save flow. File hint/selected filename retained.
+Required fields/maxima, date/time conversion/hint/minimum and save/banner retry preserved.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only, independent style/exhibition-editor from930f685; human a7mad.ishaq,
+agent /root a7mad-editor-2026-11-17; task EXHIBITION-EDITOR-001.
+ExhibitionsPage/scoped CSS/existing tests/current state/screens/handoff.
+No migration required. No API/backend/auth/dependency/SnapStart changes.
+No public active overlapping issue; authenticated issue writing unavailable.
+
+### Verification
+Full npm test and TypeScript/Vite/SEO build before publication; final counts in handoff.
+Initial121 Node +404 Vitest/build passed; targeted42 exhibition tests passed after
+preview/field/cancel test. Final full verification rerun after all changes.
+git diff --check passed. No live browser/device visual certification (bridges unavailable
+in preceding tasks). Existing bundle/jsdom notices and locked-install3 high advisories,
+package files unchanged. No production mutations.
+
+### Deployment / Git / Notes
+Commit: Restyle inline exhibition editor with banner preview.
+Review/fetch/integrate before authorized main push triggers existing frontend pipeline.
+Exact hash/status in handoff. No manual release/migration/data writes.
+Revert focused ticket commit for rollback; preserve historical log entries.

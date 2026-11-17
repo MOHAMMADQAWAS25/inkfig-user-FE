@@ -455,6 +455,28 @@ it("keeps the manager edit action without a plus in the blurred toolbar", async 
   expect(edit.querySelector(".lucide-plus")).toBeNull();
   expect(container.querySelectorAll(".exhibition-detail-card")).toHaveLength(1);
 });
+it("shows the existing editor banner, previews a replacement and revokes it on cancel",async()=>{
+  state.role="supervisor";
+  vi.mocked(api.getExhibition).mockResolvedValue({...exhibition,banner_url:"/banner.jpg"});
+  const create=vi.fn(()=>"blob:replacement");const revoke=vi.fn();
+  const oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;
+  URL.createObjectURL=create;URL.revokeObjectURL=revoke;
+  try {
+    const {container}=view();
+    fireEvent.click(await screen.findByRole("button",{name:"Edit exhibition"}));
+    expect(screen.getByRole("img",{name:"Exhibition banner preview"}).getAttribute("src")).toBe("/banner.jpg");
+    const description=screen.getByRole<HTMLTextAreaElement>("textbox",{name:"Description"});
+    expect(description.maxLength).toBe(5000);
+    expect(container.querySelectorAll('.exhibition-editor-dates input[type="datetime-local"]')).toHaveLength(4);
+    const file=new File(["sample"],"replacement.png",{type:"image/png"});
+    fireEvent.change(screen.getByLabelText(translations.en["exhibitions.banner"]),{target:{files:[file]}});
+    await waitFor(()=>expect(screen.getByRole("img",{name:"Exhibition banner preview"}).getAttribute("src")).toBe("blob:replacement"));
+    expect(api.uploadBanner).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button",{name:"Cancel"}));
+    await waitFor(()=>expect(revoke).toHaveBeenCalledWith("blob:replacement"));
+    expect(container.querySelector(".exhibition-editor")).toBeNull();
+  } finally {URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;}
+});
 it("groups admin actions in a trailing options menu with keyboard and outside dismissal",async()=>{
   state.role="admin";
   view();

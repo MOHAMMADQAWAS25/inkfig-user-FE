@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Inline exhibition create/edit uses reference-style banner preview/change-image left,
+  name/description5000 counter/date-time pairs right, Save/Cancel below; mobile stacks.
 - Exhibition toolbar: Back, gold Leaderboard, authorized Review, My submissions,
   Participate; admin options remain trailing. Supervisor edit retained separately.
 - Leaderboard toolbar is limited to Back Exhibition and gold Leaderboard only.

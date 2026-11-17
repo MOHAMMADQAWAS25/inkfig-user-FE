@@ -4,7 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Plus,
   Trophy,
+  CalendarDays,
+  ImagePlus,
+  Save,
 } from "lucide-react";
+import "./exhibitionEditor.css";
 
 import { useAuth } from "../auth/AuthContext";
 import { useI18n } from "../../i18n/I18nProvider";
@@ -71,6 +75,13 @@ export function ExhibitionsPage() {
     participation_closes_at: "",
   });
   const [banner, setBanner] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (!banner) { setBannerPreview(null); return; }
+    const url = URL.createObjectURL(banner);
+    setBannerPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [banner]);
   const [createdId, setCreatedId] = useState<string | undefined>();
   useEffect(() => {
     if (editing)
@@ -340,10 +351,24 @@ export function ExhibitionsPage() {
         {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} origin={artworkPopup.origin} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={() => setArtworkPopup(null)}/>}
         {editing && (
           <section className="exhibition-editor">
-            <h2>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</h2>
-            <form className="form-stack" onSubmit={(event) => void save(event)}>
+            <header className="exhibition-editor-heading"><span><CalendarDays size={28} aria-hidden="true"/></span><div>
+              <h2>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</h2>
+              <p>{language === "ar" ? "حدّث تفاصيل معرضك" : "Update the details of your exhibition"}</p>
+            </div></header>
+            <form className="form-stack exhibition-editor-grid" onSubmit={(event) => void save(event)}>
+              <div className="exhibition-editor-banner-panel">
+                <div className="exhibition-editor-preview">
+                  {bannerPreview || selected?.banner_url ? <img src={bannerPreview || selected?.banner_url || ""} alt={language === "ar" ? "معاينة صورة المعرض" : "Exhibition banner preview"}/> : <div className="exhibition-editor-image-placeholder"><ImagePlus size={44} aria-hidden="true"/><span>{language === "ar" ? "أضف صورة للمعرض" : "Add an exhibition image"}</span></div>}
+                  <label className="exhibition-editor-image-picker"><ImagePlus size={18} aria-hidden="true"/><span>{language === "ar" ? "تغيير الصورة" : "Change image"}</span>
+                    <input className="sr-only" aria-label={t("exhibitions.banner")} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={event => setBanner(event.target.files?.[0] ?? null)}/>
+                  </label>
+                </div>
+                <small>{t("exhibitions.banner")}</small>
+                {banner && <small className="exhibition-editor-file-name">{banner.name}</small>}
+              </div>
+              <div className="exhibition-editor-fields">
               <label>
-                {t("exhibitions.name")}
+                <span>{t("exhibitions.name")} <span className="exhibition-editor-required" aria-hidden="true">*</span></span>
                 <input
                   required
                   maxLength={160}
@@ -356,6 +381,7 @@ export function ExhibitionsPage() {
               <label>
                 {t("exhibitions.description")}
                 <textarea
+                  aria-label={t("exhibitions.description")}
                   required
                   maxLength={5000}
                   value={form.description}
@@ -363,7 +389,9 @@ export function ExhibitionsPage() {
                     setForm({ ...form, description: event.target.value })
                   }
                 />
+                <small className="exhibition-editor-counter">{new Intl.NumberFormat(language).format(form.description.length)} / {new Intl.NumberFormat(language).format(5000)}</small>
               </label>
+              <div className="exhibition-editor-dates">
               {(
                 [
                   "event_at",
@@ -391,25 +419,18 @@ export function ExhibitionsPage() {
                   />
                 </label>
               ))}
+              </div>
               <small>{t("exhibitions.dateHint")}</small>
-              <label>
-                {t("exhibitions.banner")}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) =>
-                    setBanner(event.target.files?.[0] ?? null)
-                  }
-                />
-              </label>
-              <div className="exhibition-actions">
+              </div>
+              <div className="exhibition-actions exhibition-editor-actions">
                 <button disabled={busy} className="primary-button">
+                  <Save size={18} aria-hidden="true"/>
                   {t(busy ? "exhibitions.saving" : "exhibitions.save")}
                 </button>
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => setEditing(false)}
+                  onClick={() => { setEditing(false); setBanner(null); }}
                 >
                   {t("exhibitions.cancel")}
                 </button>
