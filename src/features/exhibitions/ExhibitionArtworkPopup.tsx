@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { Copy, Share2, X } from "lucide-react";
 import { useI18n } from "../../i18n/I18nProvider";
 import { hasPermission } from "../../lib/permissions";
 import { ApiError } from "../../api/httpClient";
@@ -12,12 +12,21 @@ import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi"
 import { updateArtworkCache } from "../works/updateArtworkCache";
 import { ExhibitionRatingControls } from "./ExhibitionRatingControls";
 import type { RatingState } from "./exhibitionRatingTypes";
+import "./exhibitionExpandedCard.css";
 
-export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, votingOpen = false }: { workId: string; onClose: () => void; exhibitionId?: string; rating?: RatingState; votingOpen?: boolean }) {
+export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, votingOpen = false, origin }: { workId: string; onClose: () => void; exhibitionId?: string; rating?: RatingState; votingOpen?: boolean; origin?: DOMRect }) {
   const { session } = useAuth(); const { language, t } = useI18n(); const client = useQueryClient();
   const dialog = useRef<HTMLDialogElement>(null); const close = useRef<HTMLButtonElement>(null);
   const active = useRef(true); const pending = useRef(false);
   const [busy, setBusy] = useState(false); const [error, setError] = useState("");
+  const [shareNotice,setShareNotice]=useState("");
+  async function share(copyOnly=false){
+    if(!query.data)return;
+    const url=`${window.location.origin}/${language}/artwork/${workId}`;
+    try { if(!copyOnly && navigator.share) await navigator.share({title:query.data.title,url});
+      else {await navigator.clipboard.writeText(url); if(active.current)setShareNotice(t("artwork.linkCopied"));}
+    } catch(failure) {if(active.current && !(failure instanceof DOMException && failure.name==="AbortError"))setShareNotice(t("artwork.actionFailed"));}
+  }
   const query = useQuery({ queryKey: ["artwork-detail", session?.userId ?? "guest", workId], queryFn: ({ signal }) => getWork(workId, signal), staleTime: 0, retry: false });
   usePageScrollLock(true);
   useLayoutEffect(() => {
@@ -40,11 +49,11 @@ export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, 
     } catch { if (active.current) setError(t("artwork.actionFailed")); }
     finally { pending.current = false; if (active.current) setBusy(false); }
   }
-  return createPortal(<dialog ref={dialog} className="exhibition-artwork-popup" aria-label={query.data?.title ?? t("works.viewDetails")} aria-modal="true"
-    onCancel={event => { event.preventDefault(); onClose(); }}>
+  return createPortal(<dialog ref={dialog} className={`exhibition-artwork-popup${exhibitionId ? " exhibition-expanded-card-popup" : ""}`} aria-label={query.data?.title ?? t("works.viewDetails")} aria-modal="true"
+    onCancel={event => { event.preventDefault(); const button=dialog.current?.querySelector<HTMLButtonElement>(".artwork-modal-close"); if(exhibitionId && button) button.click(); else onClose(); }}>
     {query.data && !query.isError ? <ArtworkDetailModal containedInDialog interactionBusy={busy} language={language} work={query.data} canLike={can("works.like")} canSave={can("works.save")}
-      canReport={can("reports.create") && query.data.owner_user_id !== session?.userId} onClose={onClose} onToggleLike={work => void interact(work,"like")} onToggleSave={work => void interact(work,"save")} t={t}
-      mediaFooter={exhibitionId ? <ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={rating} votingOpen={votingOpen}/> : undefined}
+      canReport={can("reports.create") && query.data.owner_user_id !== session?.userId} expandedFrom={exhibitionId ? origin : undefined} onClose={onClose} onToggleLike={work => void interact(work,"like")} onToggleSave={work => void interact(work,"save")} t={t}
+      mediaFooter={exhibitionId ? <><ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={rating} votingOpen={votingOpen}/><div className="exhibition-expanded-share"><button type="button" onClick={()=>void share(true)}><Copy size={17}/>{t("artwork.copyLink")}</button><button type="button" onClick={()=>void share()}><Share2 size={17}/>{t("artwork.share")}</button></div>{shareNotice && <p role="status">{shareNotice}</p>}</> : undefined}
       extraDetails={error ? <p className="error-message" role="alert">{error}</p> : undefined}/> :
       <div className="artwork-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
         <section className="artwork-modal exhibition-artwork-popup-state">

@@ -53,7 +53,7 @@ it("requires explicit submission and does not navigate or duplicate in-flight vo
   expect(screen.getByRole<HTMLInputElement>("radio",{name:"4 out of 5 stars"}).checked).toBe(true);
   expect(openArtwork).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button",{name:"View artwork details: Painting"}));
-  expect(openArtwork).toHaveBeenCalledOnce();expect(openArtwork).toHaveBeenCalledWith("art");
+  expect(openArtwork).toHaveBeenCalledOnce();expect(openArtwork).toHaveBeenCalledWith("art",expect.objectContaining({width:expect.any(Number),height:expect.any(Number)}));
   expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
 });
 

@@ -11255,3 +11255,37 @@ Commit: Contain exhibition leaderboard scrolling in centered panel.
 Fetch/integrate then authorized main push from independent checkout; existing frontend
 CI automatically tests/builds/deploys Cloudflare. No manual migration/release/data writes.
 Exact publication/deployment in handoff; revert this focused commit for rollback.
+
+## 2026-11-17 - Expanded exhibition gallery artwork popup
+
+### Request / Changes / Frontend
+Exhibition gallery popup resembles enlarged artwork card: themed split image/details,
+matching borders/radius/category, contained original media, full description/date/links.
+Pass clicked card rectangle through scoped gallery popup state; optional shared-modal
+WAAPI zoom from origin and reverse close. Native dialog/scroll lock/focus restoration,
+Escape/outside close and reduced-motion/unavailable-animation fallback preserved.
+Voting and Like/Save/Report retain existing permissions/state. Add Copy link/Share using
+existing artwork-page canonical URL/native-share-or-clipboard behavior.
+Existing owner edit/delete callbacks are not supplied by this popup; no destructive
+actions invented. Homepage/profile routes and leaderboard popup variant unchanged.
+
+### Repositories / Files / API / Database / Permissions and scope
+Frontend only; independent feature/exhibition-expanded-card from92cd10d.
+Human a7mad.ishaq; agent /root a7mad-expand-2026-11-17; task EXPAND-001.
+Card/gallery/popup/shared-modal optional prop, scoped CSS, regression tests/current memory.
+No migration required. No backend, permission, dependency, config or SnapStart change.
+No public overlapping issue found; authenticated issue creation unavailable.
+
+### Verification
+Full Node/Vitest suite and TypeScript/Vite/SEO build run before publication;
+exact final counts in task handoff. Tests assert gallery styling, passed rectangle,
+zoom/reverse close and retained popup data/voting; leaderboard tests retained.
+Source footer assertion updated to verify rating+sharing fragment (not removed).
+git diff --check passed. No actual browser/device visual certification claimed.
+Existing bundle/jsdom notices; locked install reported3 high advisories, no package changes.
+
+### Deployment / Git / Notes
+Commit: Expand exhibition artwork popup from gallery cards. Fetch/integrate before
+authorized main push; existing frontend pipeline tests/builds/deploys Cloudflare.
+No manual deployment, migration or production data writes. Exact hash/results in
+handoff. Revert focused ticket commit to restore prior popup; keep logs/history.

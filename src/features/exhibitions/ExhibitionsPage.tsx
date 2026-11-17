@@ -40,8 +40,8 @@ export function ExhibitionsPage() {
   const { exhibitionId } = useParams();
   useLayoutEffect(() => { if (exhibitionId) window.scrollTo({top:0,behavior:"instant"}); }, [exhibitionId]);
   const popupScope = JSON.stringify([exhibitionId, session?.userId ?? "guest"]);
-  const [artworkPopup, setArtworkPopup] = useState<{ scope: string; workId: string } | null>(null);
-  const openArtwork = useCallback((workId: string) => setArtworkPopup({scope:popupScope,workId}), [popupScope]);
+  const [artworkPopup, setArtworkPopup] = useState<{ scope: string; workId: string; origin?: DOMRect } | null>(null);
+  const openArtwork = useCallback((workId: string, origin?: DOMRect) => setArtworkPopup({scope:popupScope,workId,origin}), [popupScope]);
   useEffect(() => { setArtworkPopup(null); }, [popupScope]);
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
@@ -337,7 +337,7 @@ export function ExhibitionsPage() {
             </>
           )
         )}
-        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={() => setArtworkPopup(null)}/>}
+        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} origin={artworkPopup.origin} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={() => setArtworkPopup(null)}/>}
         {editing && (
           <section className="exhibition-editor">
             <h2>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</h2>

@@ -45,6 +45,7 @@ it("opens fetched details in one native popup without navigation and preserves g
   const dialog=await screen.findByRole("dialog",{name:"Full painting"});
   expect(screen.getAllByRole("dialog")).toHaveLength(1);
   expect(dialog.parentElement).toBe(document.body);
+  expect(dialog.classList.contains("exhibition-expanded-card-popup")).toBe(true);
   expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
   expect(within(dialog).getByText("Full fetched description")).toBeTruthy();
   expect(within(dialog).getAllByText("4.5 / 5 · 2 votes").length).toBeGreaterThan(0);
@@ -134,4 +135,22 @@ it("supports Arabic popup content and Escape dismissal",async()=>{
   expect(within(dialog).getByRole<HTMLButtonElement>("button",{name:/0/}).disabled).toBe(true);
   fireEvent(dialog,new Event("cancel",{cancelable:true}));
   await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
+});
+
+it("zooms from the clicked card and reverses the animation on close",async()=>{
+  vi.mocked(window.matchMedia).mockImplementation(()=>({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}) as unknown as MediaQueryList);
+  vi.spyOn(HTMLElement.prototype,"getBoundingClientRect").mockImplementation(function(this:HTMLElement){
+    return new DOMRect(this.classList.contains("exhibition-artwork-card")?40:100,80,this.classList.contains("exhibition-artwork-card")?300:900,500);
+  });
+  const animate=vi.fn(()=>({cancel:vi.fn()}));
+  Object.defineProperty(HTMLElement.prototype,"animate",{configurable:true,value:animate});
+  try {
+    mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
+    const dialog=await screen.findByRole("dialog",{name:"Full painting"});
+    await waitFor(()=>expect(animate).toHaveBeenCalled());
+    expect(animate.mock.calls[0]).toBeDefined();
+    fireEvent.click(within(dialog).getByRole("button",{name:"Close artwork details"}));
+    expect(animate).toHaveBeenCalledTimes(2);
+    await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
+  } finally { delete (HTMLElement.prototype as {animate?:unknown}).animate; }
 });

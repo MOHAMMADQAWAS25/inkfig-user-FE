@@ -11,7 +11,8 @@ test("exhibition cards open a scoped native popup while home/profile keep artwor
   const popup=read("exhibitions/ExhibitionArtworkPopup.tsx");
   assert.match(popup,/showModal\(\)/);assert.match(popup,/usePageScrollLock\(true\)/);
   assert.match(popup,/createPortal\(/);assert.match(popup,/ArtworkDetailModal containedInDialog/);
-  assert.match(popup,/mediaFooter=\{exhibitionId \? <ExhibitionRatingControls/);
+  assert.match(popup,/mediaFooter=\{exhibitionId \? <><ExhibitionRatingControls/);
+  assert.match(popup,/className="exhibition-expanded-share"/);
   assert.match(read("exhibitions/ExhibitionsPage.tsx"),/artworkPopup\?\.scope === popupScope/);
   for(const path of ["feed/PostCard.tsx","profile/ProfilePage.tsx"]){assert.match(read(path),/artworkPath\(language,/);assert.doesNotMatch(read(path),/ExhibitionArtworkPopup/);}
   const css=readFileSync(new URL("../src/styles.css",import.meta.url),"utf8");

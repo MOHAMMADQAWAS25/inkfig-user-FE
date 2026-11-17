@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Exhibition gallery popup expands from clicked card with matching themed split
+  layout, full details/voting/actions/share; leaderboard popup presentation unchanged.
 - Leaderboard uses a centered bounded-width panel with internal scrolling and
   pagination; toolbar/title/filter stay stationary, category changes reset list scroll.
 - Exhibition artwork cards omit description/date/details CTA and redundant personal

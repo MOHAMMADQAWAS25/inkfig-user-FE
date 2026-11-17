@@ -1,0 +1,22 @@
+.exhibition-expanded-card-popup .artwork-modal-backdrop { padding:28px; align-items:center; }
+.exhibition-expanded-card-popup .artwork-modal { width:min(1120px,100%); max-width:100%; max-height:calc(100dvh - 56px); display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,1fr); align-items:stretch; overflow:auto; border:1px solid var(--border); border-radius:20px; background:var(--surface); color:var(--text); transform-origin:top left; animation:none; box-shadow:0 12px 48px color-mix(in srgb,var(--primary) 20%,transparent); }
+.exhibition-expanded-card-popup .artwork-modal-media-column { width:100%; max-width:none; min-width:0; background:var(--surface-raised,var(--surface)); }
+.exhibition-expanded-card-popup .artwork-modal-media-column > .artwork-modal-media { display:grid; place-items:center; width:100%; max-width:none; min-height:250px; background:var(--surface-raised,var(--surface)); }
+.exhibition-expanded-card-popup .artwork-modal-media-column .artwork-media-original { width:auto; height:auto; max-width:100%; max-height:52dvh; object-fit:contain; }
+.exhibition-expanded-card-popup .artwork-modal-content { padding:28px; min-width:0; max-height:none; border-inline-start:1px solid var(--border); background:var(--surface); }
+.exhibition-expanded-card-popup .artwork-modal-type-tag { border:0; padding:0; border-radius:0; color:var(--primary); background:transparent; font-size:.75rem; font-weight:750; }
+.exhibition-expanded-card-popup .artwork-modal-content h2 { font-size:clamp(1.4rem,2vw,2rem); overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-description p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-media-footer { padding:22px; }
+.exhibition-expanded-card-popup .artwork-modal-close { z-index:3; }
+.exhibition-expanded-share { display:flex; gap:10px; margin-block-start:16px; flex-wrap:wrap; }
+.exhibition-expanded-share button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; flex:1; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
+.exhibition-expanded-share button:hover { border-color:var(--primary); background:color-mix(in srgb,var(--primary) 10%,var(--surface)); }
+.exhibition-expanded-share button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+@media(max-width:780px) {
+  .exhibition-expanded-card-popup .artwork-modal-backdrop { padding:12px; }
+  .exhibition-expanded-card-popup .artwork-modal { grid-template-columns:minmax(0,1fr); max-height:calc(100dvh - 24px); }
+  .exhibition-expanded-card-popup .artwork-modal-media-column .artwork-media-original { max-height:42dvh; }
+  .exhibition-expanded-card-popup .artwork-modal-content { padding:20px; border-inline-start:0; border-top:1px solid var(--border); }
+}
+@media(prefers-reduced-motion:reduce) { .exhibition-expanded-card-popup .artwork-modal-backdrop { animation:none; } }

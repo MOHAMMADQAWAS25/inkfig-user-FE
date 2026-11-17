@@ -6,9 +6,9 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: leaderboard internal scrolling/centered panel deployed (46f1bff); 522 checks/build passed.
-Task: [INKFIG-LEADERBOARD-SCROLL-001](../collaboration/tasks/INKFIG-LEADERBOARD-SCROLL-001.md).
-Human: a7mad.ishaq; agent: /root, a7mad-leaderboard-scroll-2026-11-16.
+Status: expanded exhibition gallery popup implemented; final checks running.
+Task: [INKFIG-EXHIBITION-EXPAND-001](../collaboration/tasks/INKFIG-EXHIBITION-EXPAND-001.md).
+Human: a7mad.ishaq; agent: /root, a7mad-expand-2026-11-17.
 Default integration decision-maker: owner, until explicitly delegated.
 No partner workstreams or checkout/session assignments have been approved.
 

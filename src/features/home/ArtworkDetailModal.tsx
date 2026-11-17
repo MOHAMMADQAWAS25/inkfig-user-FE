@@ -1,6 +1,6 @@
 import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, X } from "lucide-react";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -32,20 +32,39 @@ type ArtworkDetailModalProps = {
   readOnly?: boolean;
   containedInDialog?: boolean;
   interactionBusy?: boolean;
+  expandedFrom?: DOMRect;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, readOnly=false, containedInDialog=false, interactionBusy=false, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, readOnly=false, containedInDialog=false, interactionBusy=false, expandedFrom, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [closing,setClosing]=useState(false);
   const closeTimerRef=useRef<number|undefined>(undefined);
   const onCloseRef=useRef(onClose);
+  const zoom = useRef<Animation | null>(null);
+  const zoomTransform = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const node=dialogRef.current;
+    if(!node || !expandedFrom || expandedFrom.width<=0 || expandedFrom.height<=0 || !node.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const frame=requestAnimationFrame(()=>{
+    const target=node.getBoundingClientRect();
+    if(!target.width || !target.height) return;
+    const transform=`translate(${expandedFrom.left-target.left}px, ${expandedFrom.top-target.top}px) scale(${expandedFrom.width/target.width}, ${expandedFrom.height/target.height})`;
+    zoomTransform.current=transform;
+    zoom.current=node.animate([{transform,opacity:.6},{transform:"none",opacity:1}],{duration:280,easing:"cubic-bezier(.2,.8,.2,1)"});
+    });
+    return()=>{cancelAnimationFrame(frame);zoom.current?.cancel();};
+  }, [expandedFrom]);
   onCloseRef.current=onClose;
   function requestClose(afterClose?:()=>void){
     if(closeTimerRef.current!==undefined)return;
     setClosing(true);
+    if(zoomTransform.current && dialogRef.current?.animate && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
+      zoom.current?.cancel();
+      zoom.current=dialogRef.current.animate([{transform:"none",opacity:1},{transform:zoomTransform.current,opacity:0}],{duration:240,easing:"ease-in",fill:"forwards"});
+    }
     const duration=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?0:240;
     closeTimerRef.current=window.setTimeout(()=>{onCloseRef.current();afterClose?.();},duration);
   }
