@@ -29,6 +29,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 ## Important shared states
 - Inline exhibition create/edit uses reference-style banner preview/change-image left,
   name/description5000 counter/date-time pairs right, Save/Cancel below; mobile stacks.
+- Desktop editor shares grid rows: preview name-input top to final participation
+  input bottom; banner/date hints align below. No fixed preview height on desktop.
 - Exhibition toolbar: Back, gold Leaderboard, authorized Review, My submissions,
   Participate; admin options remain trailing. Supervisor edit retained separately.
 - Leaderboard toolbar is limited to Back Exhibition and gold Leaderboard only.

@@ -11495,3 +11495,31 @@ Commit: Restyle inline exhibition editor with banner preview.
 Review/fetch/integrate before authorized main push triggers existing frontend pipeline.
 Exact hash/status in handoff. No manual release/migration/data writes.
 Revert focused ticket commit for rollback; preserve historical log entries.
+
+## 2026-11-17 - Align editor banner and field rows
+
+### Request / Changes / Frontend
+Desktop preview starts at Exhibition name input and ends at participation date
+inputs; banner/date hints share next grid row. Flatten desktop layout wrappers with
+display:contents and explicit shared rows, remove desktop preview height cap and
+constrain original inside assigned area. Filename groups with banner hint.
+Existing mobile stacked layout, preview lifecycle, inputs/save/cancel preserved.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only, independent style/editor-banner-alignment from1ecd107.
+Human a7mad.ishaq; agent /root a7mad-align-2026-11-17; task EDITOR-ALIGN-001.
+Editor hint wrapper/scoped CSS/current memory/handoff. Public issues empty;
+authenticated issue-writing unavailable. No migration required. No backend/API/
+auth/dependency/SnapStart changes.
+
+### Verification
+121 Node +405 Vitest passed; TypeScript/Vite/SEO build passed; git diff --check passed.
+Existing preview/cancel/field tests retained. No real browser/device visual check
+(bridges unavailable in preceding tasks). Existing jsdom/bundle notices and
+locked-install3 high advisories; dependencies unchanged. No production writes.
+
+### Deployment / Git / Notes
+Commit: Align exhibition editor banner with name and date fields.
+Review/fetch/integrate before authorized main push triggers existing frontend CI.
+Exact commit/deployment in handoff. No manual release/migration.
+Revert focused commit for rollback, retain historical log entries.

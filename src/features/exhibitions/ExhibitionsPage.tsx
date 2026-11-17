@@ -363,8 +363,8 @@ export function ExhibitionsPage() {
                     <input className="sr-only" aria-label={t("exhibitions.banner")} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={event => setBanner(event.target.files?.[0] ?? null)}/>
                   </label>
                 </div>
-                <small>{t("exhibitions.banner")}</small>
-                {banner && <small className="exhibition-editor-file-name">{banner.name}</small>}
+                <div className="exhibition-editor-banner-hint"><small>{t("exhibitions.banner")}</small>
+                {banner && <small className="exhibition-editor-file-name">{banner.name}</small>}</div>
               </div>
               <div className="exhibition-editor-fields">
               <label>
