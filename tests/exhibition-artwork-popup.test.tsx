@@ -120,7 +120,9 @@ it("submits a rating below the popup image and synchronizes the gallery without 
   const footer=dialog.querySelector<HTMLElement>(".artwork-modal-details-footer")!;
   fireEvent.click(within(footer).getByRole("radio",{name:"5 out of 5 stars"}));
   fireEvent.click(within(footer).getByRole("button",{name:"Submit rating"}));
-  await within(footer).findByText("Your rating: 5 / 5");
+  await within(footer).findByText("Your rating was saved.");
+  expect(within(footer).queryByText("Your rating: 5 / 5")).toBeNull();
+  expect(within(footer).getByRole<HTMLInputElement>("radio",{name:"5 out of 5 stars"}).checked).toBe(true);
   expect(changeExhibitionRating).toHaveBeenCalledWith("event","art",5,expect.any(AbortSignal));
   expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
   fireEvent.click(within(dialog).getByRole("button",{name:"Close artwork details"}));

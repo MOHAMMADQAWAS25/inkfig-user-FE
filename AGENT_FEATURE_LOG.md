@@ -11321,3 +11321,33 @@ Commit: Correct exhibition popup artwork and details columns. Review/fetch/integ
 then authorized main push triggers existing frontend tests/build/Cloudflare pipeline.
 No manual deployment or migration. Exact hash/deploy status in task handoff.
 Revert focused commit to restore previous implementation; preserve historical entries.
+
+## 2026-11-17 - Enlarge exhibition popup artwork and simplify rating
+
+### Request / Changes / Frontend
+Hide gallery popup separate Your rating numeric text via existing optional prop;
+selected voting stars, totals, success feedback and buttons retained. Increase
+popup bounds to max1320x840 within viewport, favor media1.5:1 and reduce inset8px.
+Original fills available box with contain (no cropping/distortion), overriding
+decorative inline framing shrink. Mobile image allowance52dvh capped460.
+When no links section exists, omit adjacent description/action divider; linked works
+retain it. Left-only image/right details and non-gallery consumers preserved.
+
+### Repositories / Files / API / Database / Permissions and scope
+Frontend only; human a7mad.ishaq, agent /root a7mad-media-2026-11-17.
+Independent fix/exhibition-popup-media from0b076d3; task POPUP-MEDIA-001.
+Popup caller/scoped CSS/test, current state/screens/handoff. No migration required.
+No API/auth/permission/dependency/SnapStart change; no active public claim found.
+
+### Verification
+121 Node +402 Vitest passed; production TypeScript/Vite/SEO build checked before push.
+Popup test verifies saved feedback and selected star without duplicate numeric text.
+git diff --check passed. No browser/device visual certification (bridges unavailable
+in prior task). Existing bundle/jsdom notices; locked install3 high advisories with
+dependency files unchanged. No production writes.
+
+### Deployment / Git / Notes
+Commit: Enlarge exhibition popup artwork and simplify rating details.
+Review/fetch/integrate before authorized main push; existing CI deploys Cloudflare.
+Exact hash/deployment in task handoff. No manual deployment/migration.
+Revert focused commit for rollback while preserving historical log entries.
