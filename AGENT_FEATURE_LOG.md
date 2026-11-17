@@ -11289,3 +11289,35 @@ Commit: Expand exhibition artwork popup from gallery cards. Fetch/integrate befo
 authorized main push; existing frontend pipeline tests/builds/deploys Cloudflare.
 No manual deployment, migration or production data writes. Exact hash/results in
 handoff. Revert focused ticket commit to restore prior popup; keep logs/history.
+
+## 2026-11-17 - Correct expanded exhibition popup columns
+
+### Request / Changes / Frontend
+Correct previous layout: artwork ONLY physically left, full details/actions/voting/
+sharing right. Optional footerInDetails on shared modal defaults false; gallery opts
+in, retaining leaderboard and other consumers. Right column has bounded desktop scroll,
+nonshrinking spaced sections, normal-flow category, wrapped actions and long-text handling.
+Definite minmax0 grid bounds contain images of varying proportions without cropping;
+mobile stacks image then details with popup scrolling. Zoom/dismiss/focus retained.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only; independent fix/exhibition-popup-columns from5bc05b2.
+Human a7mad.ishaq; agent /root a7mad-columns-2026-11-17. Task POPUP-COLUMNS-001.
+Shared optional placement, gallery caller/scoped CSS, popup tests and current memory.
+No migration required; no backend/API/permission/dependency/SnapStart change.
+No active public overlapping issues; authenticated issue creation unavailable.
+
+### Verification
+121 Node +402 Vitest passed and TypeScript/Vite/SEO build passed; git diff --check.
+Assertions verify no image-area buttons/ratings/share and right-column controls;
+existing voting/popup/zoom tests retained. No assertion removed to hide failures.
+Attempted local synthetic-component visual preview: computer native pipe and browser
+host unavailable, so no actual visual/device certification. Preview sources removed.
+Locked install reports3 high advisories, dependency files unchanged. Existing bundle/
+jsdom notices remain. No production data mutations.
+
+### Deployment / Git / Notes
+Commit: Correct exhibition popup artwork and details columns. Review/fetch/integrate
+then authorized main push triggers existing frontend tests/build/Cloudflare pipeline.
+No manual deployment or migration. Exact hash/deploy status in task handoff.
+Revert focused commit to restore previous implementation; preserve historical entries.

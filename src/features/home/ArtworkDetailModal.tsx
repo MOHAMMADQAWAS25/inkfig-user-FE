@@ -29,6 +29,7 @@ type ArtworkDetailModalProps = {
   onDeleteOwnWork?: (work: Work) => void;
   extraDetails?: ReactNode;
   mediaFooter?: ReactNode;
+  footerInDetails?: boolean;
   readOnly?: boolean;
   containedInDialog?: boolean;
   interactionBusy?: boolean;
@@ -36,7 +37,7 @@ type ArtworkDetailModalProps = {
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, readOnly=false, containedInDialog=false, interactionBusy=false, expandedFrom, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, footerInDetails=false, readOnly=false, containedInDialog=false, interactionBusy=false, expandedFrom, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
-        {mediaFooter ? <div className="artwork-modal-media-column"><ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/><div className="artwork-modal-media-footer">{mediaFooter}</div></div> : <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>}
+        {mediaFooter && !footerInDetails ? <div className="artwork-modal-media-column"><ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/><div className="artwork-modal-media-footer">{mediaFooter}</div></div> : <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>}
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
@@ -143,6 +144,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
             <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
           {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
+          {footerInDetails && mediaFooter && <div className="artwork-modal-details-footer">{mediaFooter}</div>}
           {!readOnly && (onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
             {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
             {onDeleteOwnWork && <button type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}

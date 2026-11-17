@@ -1,12 +1,24 @@
 .exhibition-expanded-card-popup .artwork-modal-backdrop { padding:28px; align-items:center; }
-.exhibition-expanded-card-popup .artwork-modal { width:min(1120px,100%); max-width:100%; max-height:calc(100dvh - 56px); display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,1fr); align-items:stretch; overflow:auto; border:1px solid var(--border); border-radius:20px; background:var(--surface); color:var(--text); transform-origin:top left; animation:none; box-shadow:0 12px 48px color-mix(in srgb,var(--primary) 20%,transparent); }
+.exhibition-expanded-card-popup .artwork-modal { width:min(1120px,100%); max-width:100%; height:min(760px,calc(100dvh - 56px)); max-height:calc(100dvh - 56px); min-height:0; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); grid-template-rows:minmax(0,1fr); direction:ltr; align-items:stretch; overflow:hidden; border:1px solid var(--border); border-radius:20px; background:var(--surface); color:var(--text); transform-origin:top left; animation:none; box-shadow:0 12px 48px color-mix(in srgb,var(--primary) 20%,transparent); }
 .exhibition-expanded-card-popup .artwork-modal-media-column { width:100%; max-width:none; min-width:0; background:var(--surface-raised,var(--surface)); }
 .exhibition-expanded-card-popup .artwork-modal-media-column > .artwork-modal-media { display:grid; place-items:center; width:100%; max-width:none; min-height:250px; background:var(--surface-raised,var(--surface)); }
 .exhibition-expanded-card-popup .artwork-modal-media-column .artwork-media-original { width:auto; height:auto; max-width:100%; max-height:52dvh; object-fit:contain; }
-.exhibition-expanded-card-popup .artwork-modal-content { padding:28px; min-width:0; max-height:none; border-inline-start:1px solid var(--border); background:var(--surface); }
-.exhibition-expanded-card-popup .artwork-modal-type-tag { border:0; padding:0; border-radius:0; color:var(--primary); background:transparent; font-size:.75rem; font-weight:750; }
+.exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media { grid-column:1; grid-row:1; width:100%; max-width:none; height:100%; min-height:0; min-width:0; padding:20px; box-sizing:border-box; display:grid; place-items:center; overflow:hidden; background:var(--surface-raised,var(--surface)); }
+.exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media .artwork-media-original { width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; transform:none; background:transparent; }
+.exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media .artwork-media-backdrop { display:none; }
+.exhibition-expanded-card-popup .artwork-modal-content { grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:20px; padding:56px 28px 28px; min-width:0; min-height:0; max-height:none; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; border-left:1px solid var(--border); background:var(--surface); scrollbar-width:thin; scrollbar-color:var(--primary) var(--surface); }
+.exhibition-expanded-card-popup:dir(rtl) .artwork-modal-content { direction:rtl; }
+.exhibition-expanded-card-popup .artwork-modal-content > * { flex-shrink:0; min-width:0; max-width:100%; }
+.exhibition-expanded-card-popup .artwork-modal-type-tag { position:static; inset:auto; align-self:flex-start; flex:none; max-width:100%; border:0; padding:0; border-radius:0; color:var(--primary); background:transparent; box-shadow:none; backdrop-filter:none; white-space:normal; font-size:.75rem; font-weight:750; }
 .exhibition-expanded-card-popup .artwork-modal-content h2 { font-size:clamp(1.4rem,2vw,2rem); overflow-wrap:anywhere; }
 .exhibition-expanded-card-popup .artwork-modal-description p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-meta { display:flex; flex-direction:column; align-items:flex-start; gap:12px; margin:0; }
+.exhibition-expanded-card-popup .artwork-modal-content h2,.exhibition-expanded-card-popup .artwork-modal-description h3,.exhibition-expanded-card-popup .artwork-modal-description p { margin:0; }
+.exhibition-expanded-card-popup .artwork-modal-description { display:grid; gap:10px; line-height:1.65; }
+.exhibition-expanded-card-popup .artwork-modal-links { min-width:0; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-actions { display:flex; flex-wrap:wrap; gap:10px; margin:0; padding-block:16px; border-block:1px solid var(--border); }
+.exhibition-expanded-card-popup .artwork-modal-details-footer { display:grid; gap:18px; }
+.exhibition-expanded-card-popup .artwork-modal-details-footer .exhibition-rating-controls { border:0; padding:0; }
 .exhibition-expanded-card-popup .artwork-modal-media-footer { padding:22px; }
 .exhibition-expanded-card-popup .artwork-modal-close { z-index:3; }
 .exhibition-expanded-share { display:flex; gap:10px; margin-block-start:16px; flex-wrap:wrap; }
@@ -15,8 +27,9 @@
 .exhibition-expanded-share button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
 @media(max-width:780px) {
   .exhibition-expanded-card-popup .artwork-modal-backdrop { padding:12px; }
-  .exhibition-expanded-card-popup .artwork-modal { grid-template-columns:minmax(0,1fr); max-height:calc(100dvh - 24px); }
+  .exhibition-expanded-card-popup .artwork-modal { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; height:auto; max-height:calc(100dvh - 24px); overflow-y:auto; }
   .exhibition-expanded-card-popup .artwork-modal-media-column .artwork-media-original { max-height:42dvh; }
-  .exhibition-expanded-card-popup .artwork-modal-content { padding:20px; border-inline-start:0; border-top:1px solid var(--border); }
+  .exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media { grid-column:1; grid-row:1; height:min(44dvh,360px); padding:16px; }
+  .exhibition-expanded-card-popup .artwork-modal-content { grid-column:1; grid-row:2; overflow:visible; padding:24px 20px; border-left:0; border-top:1px solid var(--border); }
 }
 @media(prefers-reduced-motion:reduce) { .exhibition-expanded-card-popup .artwork-modal-backdrop { animation:none; } }

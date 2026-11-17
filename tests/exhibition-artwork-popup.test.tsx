@@ -50,7 +50,10 @@ it("opens fetched details in one native popup without navigation and preserves g
   expect(within(dialog).getByText("Full fetched description")).toBeTruthy();
   expect(within(dialog).getAllByText("4.5 / 5 · 2 votes").length).toBeGreaterThan(0);
   expect(within(dialog).getAllByRole("radio")).toHaveLength(5);
-  expect(dialog.querySelector(".artwork-modal-media-footer .exhibition-rating-controls")).toBeTruthy();
+  expect(dialog.querySelector(".artwork-modal-content .artwork-modal-details-footer .exhibition-rating-controls")).toBeTruthy();
+  const media=dialog.querySelector(".artwork-modal-media")!;
+  expect(media.querySelector("button,.exhibition-rating-controls,.exhibition-expanded-share")).toBeNull();
+  expect(dialog.querySelector(".artwork-modal-content .exhibition-expanded-share")).toBeTruthy();
   expect(within(dialog).queryByText(translations.en["ratings.galleryOnly"])).toBeNull();
   expect(document.body.style.position).toBe("fixed");
   const image=within(dialog).getByRole("img",{name:"Full painting"});
@@ -114,7 +117,7 @@ it("submits a rating below the popup image and synchronizes the gallery without 
   vi.mocked(changeExhibitionRating).mockResolvedValue({average:4.7,vote_count:3,my_rating:5,can_rate:true});
   mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
   const dialog=await screen.findByRole("dialog",{name:"Full painting"});
-  const footer=dialog.querySelector<HTMLElement>(".artwork-modal-media-footer")!;
+  const footer=dialog.querySelector<HTMLElement>(".artwork-modal-details-footer")!;
   fireEvent.click(within(footer).getByRole("radio",{name:"5 out of 5 stars"}));
   fireEvent.click(within(footer).getByRole("button",{name:"Submit rating"}));
   await within(footer).findByText("Your rating: 5 / 5");
