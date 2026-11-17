@@ -6,7 +6,7 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: image-only left/details-right popup correction verified; publication next.
+Status: image-only left/details-right popup correction deployed (c7b3321); 523 checks/build passed.
 Task: [INKFIG-POPUP-COLUMNS-001](../collaboration/tasks/INKFIG-POPUP-COLUMNS-001.md).
 Human: a7mad.ishaq; agent: /root, a7mad-columns-2026-11-17.
 Default integration decision-maker: owner, until explicitly delegated.

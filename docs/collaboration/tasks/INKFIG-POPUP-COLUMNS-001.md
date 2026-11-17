@@ -1,7 +1,7 @@
 # INKFIG-POPUP-COLUMNS-001
 
 Human/integration owner: a7mad.ishaq; agent /root, a7mad-columns-2026-11-17.
-Status: implemented and verified; publication next. Independent fix/exhibition-popup-columns from5bc05b2.
+Status: completed and deployed. Independent fix/exhibition-popup-columns from5bc05b2.
 Issue unavailable (no authenticated writing tool); public issue list empty.
 Corrects EXPAND-001 at owner's explicit request: artwork ONLY physically left,
 all full details/voting/share/actions right, ordered spacing/no overlap, mobile stack.
@@ -17,4 +17,7 @@ retained in RTL; right content direction restored. Mobile stacks with whole-pane
 Visual check blocked: native pipe unavailable and browser access host unavailable.
 Temporary synthetic preview source removed; no real-browser/device certification.
 Locked npm install reports3 high advisories, packages unchanged. No production writes.
-Next: review, fetch/integrate and authorized main push; existing frontend CI auto-deploys.
+Publication: c7b332120721a45ed06a2af6d416bef6a26e0b6b pushed to main without
+conflicts. Automatic workflow44089401231 completed successfully (tests/build/deploy).
+Next: owner visual review, since browser/native bridges were unavailable here.
+Revert c7b3321 for rollback. No manual deployment/migration/data mutation.
