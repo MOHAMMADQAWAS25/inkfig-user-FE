@@ -51,6 +51,8 @@ All language-prefixed routes use en/ar; English is the fallback.
   origin zoom retained and leaderboard presentation unchanged.
 - Gallery popup originals use absolute inset bounds with contain fitting so intrinsic
   portrait/square dimensions cannot expand and clip the media grid track.
+- Popup right column uses a consistent16px rhythm, grouped exhibition/rating panels,
+  aligned44px-minimum action buttons, wrapped text/links and stable scroll gutter.
 - Gallery popup media uses larger contain bounds; selected stars replace redundant
   numeric personal score, and absent links omit their adjacent divider.
 - Leaderboard uses a centered bounded-width panel with internal scrolling and

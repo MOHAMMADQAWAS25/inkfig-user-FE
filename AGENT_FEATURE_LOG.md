@@ -11648,3 +11648,24 @@ Independent feature/leaderboard-popup-rating; owner a7mad.ishaq, agent /root.
 Commit Enable voting in leaderboard artwork popups. Authorized main push triggers
 existing frontend tests/build/Cloudflare deployment; no manual releases or migrations.
 Exact hashes/results in task handoff; revert focused source commits for rollback.
+
+## 2026-11-22 — INKFIG-POPUP-DETAILS-001
+### Request / Changes / Frontend
+Improve artwork popup right-column alignment and spacing. Consistent section rhythm,
+grouped exhibition/rating panels, wrapped names/links, aligned actions/rating/share
+buttons with44px minimum targets and stable scroll gutter, using existing theme tokens.
+### Repositories / Files
+inkfig-user-FE: exhibitionExpandedCard.css, SCREENS.md, PROJECT_STATE.md,
+docs/collaboration/tasks/INKFIG-POPUP-DETAILS-001.md and this append-only log.
+### API / Database / Permissions and scope
+No API/data/auth/behavior changes. No migration required. Scoped popup CSS only;
+artwork fit, rating rules, details/data and other pages retained.
+### Verification
+121 Node +407 Vitest checks passed on full rerun; strict TS/Vite/SEO build passed.
+First full run failed first-login-prompt assertion93; unchanged tests passed rerun.
+No browser/device visual certification; preview bridge unavailable earlier.
+### Deployment / Git / Notes
+Independent style/exhibition-popup-details from4f97865; a7mad.ishaq integration owner,
+agent /root a7mad-popup-details-2026-11-22. Commit Align exhibition popup details.
+Authorized main push triggers existing frontend CI/Cloudflare deployment; exact
+hash/result in handoff. No manual release/migration. Revert focused commit to undo.

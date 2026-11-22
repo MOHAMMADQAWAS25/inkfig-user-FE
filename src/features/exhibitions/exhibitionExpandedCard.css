@@ -8,25 +8,44 @@
    The media box, rather than the image's natural height, defines the fit bounds. */
 .exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media .artwork-media-original { position:absolute; inset:8px; width:calc(100% - 16px); height:calc(100% - 16px); min-width:0; min-height:0; max-width:none; max-height:none; object-fit:contain; object-position:center; transform:none !important; background:transparent; }
 .exhibition-expanded-card-popup .artwork-modal > .artwork-modal-media .artwork-media-backdrop { display:none; }
-.exhibition-expanded-card-popup .artwork-modal-content { grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:20px; padding:56px 28px 28px; min-width:0; min-height:0; max-height:none; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; border-left:1px solid var(--border); background:var(--surface); scrollbar-width:thin; scrollbar-color:var(--primary) var(--surface); }
+.exhibition-expanded-card-popup .artwork-modal-content { grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:16px; padding:64px 28px 28px; min-width:0; min-height:0; max-height:none; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; border-left:1px solid var(--border); background:var(--surface); scrollbar-width:thin; scrollbar-color:var(--primary) var(--surface); scrollbar-gutter:stable; }
 .exhibition-expanded-card-popup:dir(rtl) .artwork-modal-content { direction:rtl; }
 .exhibition-expanded-card-popup .artwork-modal-content > * { flex-shrink:0; min-width:0; max-width:100%; }
 .exhibition-expanded-card-popup .artwork-modal-type-tag { position:static; inset:auto; align-self:flex-start; flex:none; max-width:100%; border:0; padding:0; border-radius:0; color:var(--primary); background:transparent; box-shadow:none; backdrop-filter:none; white-space:normal; font-size:.75rem; font-weight:750; }
-.exhibition-expanded-card-popup .artwork-modal-content h2 { font-size:clamp(1.4rem,2vw,2rem); overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-content h2 { font-size:clamp(1.4rem,2vw,2rem); line-height:1.2; text-align:start; overflow-wrap:anywhere; }
 .exhibition-expanded-card-popup .artwork-modal-description p { white-space:pre-wrap; overflow-wrap:anywhere; }
-.exhibition-expanded-card-popup .artwork-modal-meta { display:flex; flex-direction:column; align-items:flex-start; gap:12px; margin:0; }
+.exhibition-expanded-card-popup .artwork-modal-meta { display:flex; flex-direction:column; align-items:stretch; gap:10px; margin:0; }
+.exhibition-expanded-card-popup .artwork-modal-artist { display:flex; align-items:center; gap:10px; min-width:0; line-height:1.5; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-creator-avatar { flex-shrink:0; }
+.exhibition-expanded-card-popup .artwork-modal-meta > span { font-size:.8rem; line-height:1.5; color:var(--muted); }
+.exhibition-expanded-card-popup .artwork-modal-meta svg { flex-shrink:0; }
 .exhibition-expanded-card-popup .artwork-modal-content h2,.exhibition-expanded-card-popup .artwork-modal-description h3,.exhibition-expanded-card-popup .artwork-modal-description p { margin:0; }
-.exhibition-expanded-card-popup .artwork-modal-description { display:grid; gap:10px; line-height:1.65; }
-.exhibition-expanded-card-popup .artwork-modal-links { min-width:0; overflow-wrap:anywhere; }
-.exhibition-expanded-card-popup .artwork-modal-actions { display:flex; flex-wrap:wrap; gap:10px; margin:0; padding-block:16px; border-block:1px solid var(--border); }
+.exhibition-expanded-card-popup .artwork-modal-description { display:grid; gap:8px; padding-block:16px; border-color:var(--border); line-height:1.65; }
+.exhibition-expanded-card-popup :is(.artwork-modal-description,.artwork-modal-links) h3 { font-size:.75rem; line-height:1.5; letter-spacing:.04em; color:var(--muted); }
+.exhibition-expanded-card-popup .artwork-modal-links { display:grid; gap:10px; margin:0; min-width:0; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-links h3 { margin:0; }
+.exhibition-expanded-card-popup .artwork-modal-links a { max-width:100%; box-sizing:border-box; }
+.exhibition-expanded-card-popup .artwork-modal-links svg { flex-shrink:0; }
+.exhibition-expanded-card-popup .work-exhibition-details { margin:0; }
+.exhibition-expanded-card-popup .work-exhibition-entry { min-width:0; gap:8px; padding:14px; border-radius:14px; background:var(--surface-raised,var(--surface)); }
+.exhibition-expanded-card-popup .work-exhibition-name { line-height:1.5; overflow-wrap:anywhere; }
+.exhibition-expanded-card-popup .artwork-modal-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(110px,100%),1fr)); align-items:stretch; gap:8px; margin:0; padding-block:16px; border-block:1px solid var(--border); }
+.exhibition-expanded-card-popup .artwork-modal-content .artwork-modal-actions > button { display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; min-width:0; min-height:44px; margin:0; padding:10px 12px; box-sizing:border-box; border-radius:12px; font:inherit; font-size:.82rem; line-height:1.4; }
+.exhibition-expanded-card-popup .artwork-modal-actions > button svg { flex-shrink:0; }
+.exhibition-expanded-card-popup .artwork-modal-actions > button span { overflow-wrap:anywhere; }
 .exhibition-expanded-card-popup .artwork-modal-content:not(:has(.artwork-modal-links)) .artwork-modal-description { border-block-end:0; }
 .exhibition-expanded-card-popup .artwork-modal-content:not(:has(.artwork-modal-links)) .artwork-modal-actions { border-block-start:0; }
-.exhibition-expanded-card-popup .artwork-modal-details-footer { display:grid; gap:18px; }
-.exhibition-expanded-card-popup .artwork-modal-details-footer .exhibition-rating-controls { border:0; padding:0; }
+.exhibition-expanded-card-popup .artwork-modal-details-footer { display:grid; gap:16px; }
+.exhibition-expanded-card-popup .artwork-modal-details-footer .exhibition-rating-controls { display:grid; gap:12px; margin:0; padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--surface-raised,var(--surface)); }
+.exhibition-expanded-card-popup .exhibition-rating-controls form { display:grid; gap:12px; min-width:0; }
+.exhibition-expanded-card-popup .exhibition-rating-stars { margin:8px 0 0; }
+.exhibition-expanded-card-popup .exhibition-rating-buttons { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr)); gap:8px; }
+.exhibition-expanded-card-popup .exhibition-rating-buttons button { min-height:44px; padding:10px 12px; border-radius:10px; line-height:1.4; }
 .exhibition-expanded-card-popup .artwork-modal-media-footer { padding:22px; }
 .exhibition-expanded-card-popup .artwork-modal-close { z-index:3; }
-.exhibition-expanded-share { display:flex; gap:10px; margin-block-start:16px; flex-wrap:wrap; }
-.exhibition-expanded-share button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; flex:1; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
+.exhibition-expanded-share { display:flex; gap:10px; margin:0; flex-wrap:wrap; }
+.exhibition-expanded-share button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-width:0; min-height:44px; flex:1 1 120px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); font:inherit; font-size:.82rem; line-height:1.4; cursor:pointer; }
+.exhibition-expanded-share button svg { flex-shrink:0; }
 .exhibition-expanded-share button:hover { border-color:var(--primary); background:color-mix(in srgb,var(--primary) 10%,var(--surface)); }
 .exhibition-expanded-share button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
 @media(max-width:780px) {
