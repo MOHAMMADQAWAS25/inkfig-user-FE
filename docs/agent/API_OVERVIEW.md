@@ -37,6 +37,10 @@ Never place backend secrets in VITE_ variables.
   [server pagination](../server-filtered-pagination.md).
 
 ## Live and failure semantics
+Leaderboard popup reads GET /exhibitions/{id}/works/{workId}/rating from main API
+for session-specific RatingState; cached by viewer/exhibition/work, private no-store.
+Existing PUT/DELETE votes trigger server leaderboard refetch (all category variants).
+
 User WebSocket ticket -> API Gateway connect -> invalidation -> protected REST refresh.
 Signals include reports.changed, exhibitions.changed and notifications.changed.
 Coalesce bursts, preserve loaded rows, cancel stale scopes, recover on reconnect/open.

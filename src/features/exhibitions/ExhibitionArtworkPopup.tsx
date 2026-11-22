@@ -11,6 +11,7 @@ import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi";
 import { updateArtworkCache } from "../works/updateArtworkCache";
 import { ExhibitionRatingControls } from "./ExhibitionRatingControls";
+import { getExhibitionRating } from "./exhibitionRatingsApi";
 import type { RatingState } from "./exhibitionRatingTypes";
 import "./exhibitionExpandedCard.css";
 
@@ -28,6 +29,12 @@ export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, 
     } catch(failure) {if(active.current && !(failure instanceof DOMException && failure.name==="AbortError"))setShareNotice(t("artwork.actionFailed"));}
   }
   const query = useQuery({ queryKey: ["artwork-detail", session?.userId ?? "guest", workId], queryFn: ({ signal }) => getWork(workId, signal), staleTime: 0, retry: false });
+  const ratingQuery = useQuery({
+    queryKey: ["exhibition-artwork-rating", session?.userId ?? "guest", exhibitionId, workId],
+    queryFn: ({ signal }) => getExhibitionRating(exhibitionId!, workId, signal),
+    enabled: Boolean(exhibitionId && !rating), staleTime: 0, retry: false,
+  });
+  const currentRating = rating ?? (ratingQuery.isError ? undefined : ratingQuery.data);
   usePageScrollLock(true);
   useLayoutEffect(() => {
     active.current = true;
@@ -53,7 +60,7 @@ export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, 
     onCancel={event => { event.preventDefault(); const button=dialog.current?.querySelector<HTMLButtonElement>(".artwork-modal-close"); if(exhibitionId && button) button.click(); else onClose(); }}>
     {query.data && !query.isError ? <ArtworkDetailModal containedInDialog footerInDetails={Boolean(exhibitionId)} interactionBusy={busy} language={language} work={query.data} canLike={can("works.like")} canSave={can("works.save")}
       canReport={can("reports.create") && query.data.owner_user_id !== session?.userId} expandedFrom={exhibitionId ? origin : undefined} onClose={onClose} onToggleLike={work => void interact(work,"like")} onToggleSave={work => void interact(work,"save")} t={t}
-      mediaFooter={exhibitionId ? <><ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={rating} votingOpen={votingOpen} showPersonalScore={false}/><div className="exhibition-expanded-share"><button type="button" onClick={()=>void share(true)}><Copy size={17}/>{t("artwork.copyLink")}</button><button type="button" onClick={()=>void share()}><Share2 size={17}/>{t("artwork.share")}</button></div>{shareNotice && <p role="status">{shareNotice}</p>}</> : undefined}
+      mediaFooter={exhibitionId ? <>{currentRating ? <ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={currentRating} votingOpen={votingOpen} showPersonalScore={false}/> : ratingQuery.isError ? <p role="alert">{t("works.loadFailed")} <button type="button" onClick={() => void ratingQuery.refetch()}>{t("feed.retry")}</button></p> : <p role="status">{t("works.loading")}</p>}<div className="exhibition-expanded-share"><button type="button" onClick={()=>void share(true)}><Copy size={17}/>{t("artwork.copyLink")}</button><button type="button" onClick={()=>void share()}><Share2 size={17}/>{t("artwork.share")}</button></div>{shareNotice && <p role="status">{shareNotice}</p>}</> : undefined}
       extraDetails={error ? <p className="error-message" role="alert">{error}</p> : undefined}/> :
       <div className="artwork-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
         <section className="artwork-modal exhibition-artwork-popup-state">

@@ -76,6 +76,6 @@ export function ExhibitionLeaderboardPage() {
       {query.hasNextPage && <button type="button" className="primary-button" disabled={query.isFetching} onClick={() => void query.fetchNextPage()}>{query.isFetchingNextPage ? t("works.loading") : ar ? "تحميل المزيد" : "Load more"}</button>}
       </div>
     </div>
-    {opened && <ExhibitionArtworkPopup key={opened} workId={opened} onClose={() => setOpened(null)}/>}
+    {opened && <ExhibitionArtworkPopup key={opened} workId={opened} exhibitionId={exhibitionId} votingOpen={Boolean(first?.voting_open)} onClose={() => setOpened(null)}/>}
   </main>;
 }

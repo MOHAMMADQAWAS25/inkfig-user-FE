@@ -23,10 +23,10 @@ function mount(language="en") {
 beforeEach(() => { vi.clearAllMocks(); vi.mocked(requestJson).mockResolvedValue({data:page,status:200}); });
 afterEach(() => { cleanup(); client.clear(); });
 
-it("appends server order, deduplicates moved rows, opens read-only details and filters from page one", async () => {
+it("appends server order, deduplicates moved rows, opens exhibition voting details and filters from page one", async () => {
   mount();
   fireEvent.click(await screen.findByRole("button", {name:"View artwork: Art a"}));
-  expect(screen.getByRole("dialog").textContent).toContain("read only");
+  expect(screen.getByRole("dialog").textContent).toContain("voting enabled");
   fireEvent.click(screen.getByText("Close"));
   const panel=screen.getByRole("region",{name:"Leaderboard"});
   expect(panel.contains(screen.getByText("Load more"))).toBe(true);

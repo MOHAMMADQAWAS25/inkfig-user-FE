@@ -40,6 +40,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Exhibition toolbar: Back, gold Leaderboard, authorized Review, My submissions,
   Participate; admin options remain trailing. Supervisor edit retained separately.
 - Leaderboard toolbar is limited to Back Exhibition and gold Leaderboard only.
+- Leaderboard artwork popup uses exhibition details/voting controls. Viewer rating
+  and eligibility load on open; successful submit/change/remove refetches rankings.
 - Leaderboard back arrow: Exhibition -> current gallery; gallery back arrow:
   Exhibitions -> list. Arabic uses المعرض / المعارض respectively.
 - Admin/system-admin exhibition toolbar places Edit/Delete inside trailing options;

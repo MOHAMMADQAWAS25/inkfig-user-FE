@@ -11625,3 +11625,26 @@ agent /root a7mad-popup-fit-2026-11-22. Commit: Fix exhibition popup image cropp
 Authorized main push runs existing frontend tests/build/Cloudflare deployment.
 Exact hash and actual deployment result recorded in task handoff. Revert focused
 source commit for rollback; no manual deployment or migration performed.
+
+## 2026-11-22 — INKFIG-LEADERBOARD-VOTE-001
+### Request / Changes / Frontend
+Allow rating when artwork is opened from an exhibition leaderboard. Pass exhibition
+context to existing popup; load viewer-specific rating/eligibility, show loading/retry,
+reuse submit/change/remove controls and refresh server rankings after successful votes.
+### Repositories / Files
+inkfig-user-FE: ExhibitionArtworkPopup, ExhibitionLeaderboardPage, exhibitionRatingsApi,
+updateRatingCaches, popup/leaderboard tests, current memory/task and this log.
+Dependency: inkfig-main-system15f56a3 adds scoped read endpoint, deploy backend first.
+### API / Database / Permissions and scope
+Consume GET /exhibitions/{id}/works/{workId}/rating, keyed by viewer/exhibition/work.
+Existing backend voting authorization remains authoritative. No migration required.
+Home/profile rating remains read-only; filters/pagination remain server controlled.
+### Verification
+121 Node checks +407 Vitest tests passed; strict TypeScript/Vite/SEO build passed.
+Initial source-shape assertion updated to require new eligibility loading guard.
+No production votes/browser visual certification performed.
+### Deployment / Git / Notes
+Independent feature/leaderboard-popup-rating; owner a7mad.ishaq, agent /root.
+Commit Enable voting in leaderboard artwork popups. Authorized main push triggers
+existing frontend tests/build/Cloudflare deployment; no manual releases or migrations.
+Exact hashes/results in task handoff; revert focused source commits for rollback.

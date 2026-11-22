@@ -8,8 +8,9 @@ import { translations } from "../src/i18n/resources";
 import { ExhibitionsPage } from "../src/features/exhibitions/ExhibitionsPage";
 import { getWork, setWorkLike, setWorkSave, type FeedWork } from "../src/features/works/worksApi";
 import { ApiError } from "../src/api/httpClient";
-import { changeExhibitionRating } from "../src/features/exhibitions/exhibitionRatingsApi";
-vi.mock("../src/features/exhibitions/exhibitionRatingsApi",()=>({changeExhibitionRating:vi.fn()}));
+import { changeExhibitionRating, getExhibitionRating } from "../src/features/exhibitions/exhibitionRatingsApi";
+import { ExhibitionArtworkPopup } from "../src/features/exhibitions/ExhibitionArtworkPopup";
+vi.mock("../src/features/exhibitions/exhibitionRatingsApi",()=>({changeExhibitionRating:vi.fn(),getExhibitionRating:vi.fn()}));
 
 const auth=vi.hoisted(()=>({permissions:["works.like","works.save","reports.create"] as string[]}));
 vi.mock("../src/features/auth/AuthContext",()=>({useAuth:()=>({session:{userId:"viewer",role:"user",permissions:auth.permissions}})}));
@@ -24,6 +25,35 @@ vi.mock("../src/features/exhibitions/exhibitionApi",()=>({
 }));
 const work:FeedWork={work_id:"art",owner_user_id:"artist",artist_name:"Artist",title:"Full painting",description:"Full fetched description",type_id:"art",type_name_en:"Digital Art",type_name_ar:"فن رقمي",image_url:"/full.png",mime_type:"image/png",links:[],created_at:"2026-10-01T00:00:00Z",like_count:0,liked_by_me:false,saved_by_me:false,exhibitions:[{exhibition_id:"event",name:"Student show",year:2026,rating:{average:4.5,vote_count:2}}]};
 const clients:QueryClient[]=[];
+function mountLeaderboardPopup(votingOpen=true) {
+  const client=new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}});clients.push(client);
+  render(<QueryClientProvider client={client}><MemoryRouter><I18nProvider>
+    <ExhibitionArtworkPopup workId="art" exhibitionId="event" votingOpen={votingOpen} onClose={()=>undefined}/>
+  </I18nProvider></MemoryRouter></QueryClientProvider>);
+  return client;
+}
+
+it("loads viewer eligibility in leaderboard popup, changes a vote and refreshes rankings",async()=>{
+  vi.mocked(getExhibitionRating).mockResolvedValue({average:4,vote_count:2,my_rating:3,can_rate:true});
+  vi.mocked(changeExhibitionRating).mockResolvedValue({average:4.5,vote_count:2,my_rating:5,can_rate:true});
+  const client=mountLeaderboardPopup();const invalidate=vi.spyOn(client,"invalidateQueries");
+  const stars=await screen.findByRole<HTMLInputElement>("radio",{name:"3 out of 5 stars"});
+  expect(stars.checked).toBe(true);
+  expect(getExhibitionRating).toHaveBeenCalledWith("event","art",expect.any(AbortSignal));
+  fireEvent.click(screen.getByRole("radio",{name:"5 out of 5 stars"}));
+  fireEvent.click(screen.getByRole("button",{name:"Change rating"}));
+  await waitFor(()=>expect(changeExhibitionRating).toHaveBeenCalledWith("event","art",5,expect.any(AbortSignal)));
+  await waitFor(()=>expect(invalidate).toHaveBeenCalledWith({queryKey:["exhibition-leaderboard","event"]}));
+  expect(client.getQueryData(["exhibition-artwork-rating","viewer","event","art"])).toMatchObject({my_rating:5});
+});
+
+it("does not enable leaderboard voting after a failed eligibility read",async()=>{
+  vi.mocked(getExhibitionRating).mockRejectedValue(new Error("offline"));
+  mountLeaderboardPopup();
+  await screen.findByRole("alert");
+  expect(screen.queryByRole("radio")).toBeNull();
+  expect(changeExhibitionRating).not.toHaveBeenCalled();
+});
 function Probe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
 function mount(language="en"){
   const client=new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}});clients.push(client);

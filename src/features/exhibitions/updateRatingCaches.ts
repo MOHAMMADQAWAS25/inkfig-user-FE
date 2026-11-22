@@ -2,6 +2,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { RatingState } from "./exhibitionRatingTypes";
 
 export function updateRatingCaches(client: QueryClient, viewer: string, exhibitionId: string, workId: string, rating: RatingState) {
+  client.setQueryData(["exhibition-artwork-rating", viewer, exhibitionId, workId], rating);
+  // Server ranking/filtering/pagination must be recomputed after a vote changes.
+  void client.invalidateQueries({ queryKey: ["exhibition-leaderboard", exhibitionId] });
   const totals = { average: rating.average, vote_count: rating.vote_count };
   for (const [key, data] of client.getQueriesData({})) {
     if (key[1] !== viewer || !["artwork-feed", "artwork-detail", "related-artworks", "profile-gallery", "exhibition-public-works"].includes(String(key[0]))) continue;
