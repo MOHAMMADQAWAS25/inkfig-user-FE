@@ -12,5 +12,7 @@ Status: scoped1px var(--border) description bottom border restored for absent li
 Checks:121 Node +407 Vitest passed; TypeScript/Vite/SEO build and diff check passed.
 No additional tests needed for this single CSS value change; existing suite retained.
 Live browser visual verification not run (bridge unavailable earlier).
-Next: commit, synchronize, push main and check automatic frontend deployment.
+Source08a02ec0f3012f87ffe75c59eed651daf275524d pushed main without conflicts.
+Workflow45051055815 succeeded: tests/build/Cloudflare deployment/production check.
+Next: owner visual review; implementation complete. Revert source commit to undo.
 Standing main publication authorized; no manual deploy or production data writes.
