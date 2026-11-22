@@ -6,7 +6,7 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: Reports Type-column alignment implemented; checks running.
+Status: Reports Type-column alignment deployed (3e00abc); 526 checks/build passed.
 Task: [INKFIG-REPORT-TYPE-001](../collaboration/tasks/INKFIG-REPORT-TYPE-001.md).
 Human: a7mad.ishaq; agent: /root, a7mad-report-type-2026-11-22.
 Default integration decision-maker: owner, until explicitly delegated.
