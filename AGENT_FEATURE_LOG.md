@@ -11523,3 +11523,29 @@ Commit: Align exhibition editor banner with name and date fields.
 Review/fetch/integrate before authorized main push triggers existing frontend CI.
 Exact commit/deployment in handoff. No manual release/migration.
 Revert focused commit for rollback, retain historical log entries.
+
+## 2026-11-22 - Center Reports Type column
+
+### Request / Changes / Frontend
+Center only second-column header/cells in reports-admin-page moderation-table.
+Use centered column flex stack for existing Type icon/label, preserving5px gap,
+and block nonshrinking SVG. Table cells keep vertical middle alignment.
+No widths, colors, padding, responsive breakpoints, other columns or behavior changed.
+
+### Repositories / Files / API / Database / Permissions and scope
+Frontend only, independent fix/report-type-alignment from1274385; human a7mad.ishaq,
+agent /root a7mad-report-type-2026-11-22; task REPORT-TYPE-001. Three scoped CSS rules
+plus state/screens/handoff/log. Public issues empty, authenticated issue-writing unavailable.
+No migration required. No API/backend/auth/dependency/SnapStart change.
+
+### Verification
+121 Node +405 Vitest passed; production TypeScript/Vite/SEO build before publication.
+git diff --check passed; full application diff reviewed for alignment-only scope.
+No live browser/device visual certification. Existing jsdom/bundle notices and
+locked-install3 high advisories; package files unchanged. No production mutations.
+
+### Deployment / Git / Notes
+Commit: Center Reports Type column header icons and labels.
+Fetch/integrate before authorized main push; existing CI auto-deploys frontend.
+Exact source hash/workflow status in handoff. No manual release/migration.
+Revert focused commit for rollback; historical feature entries preserved.

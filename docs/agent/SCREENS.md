@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Reports Type column centers its header and vertically stacked icon/label without
+  changing table widths; responsive horizontal table scrolling remains unchanged.
 - Inline exhibition create/edit uses reference-style banner preview/change-image left,
   name/description5000 counter/date-time pairs right, Save/Cancel below; mobile stacks.
 - Desktop editor shares grid rows: preview name-input top to final participation
