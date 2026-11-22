@@ -16,7 +16,12 @@ Successful mutations update viewer cache and invalidate server leaderboard order
 Checks:121 Node +407 Vitest passed; strict TS/Vite/SEO build and diff checks passed.
 Updated source assertion for new loading guard; initial source assertion failed before
 that update. Added integration tests for preselected vote/update/refetch and read errors.
-Backend dependency15f56a3; workflow45029353802 pending. Local backend Python absent.
-Next: require backend CI/deployment success, then publish frontend and monitor pipeline.
+Backend15f56a3 workflow45029353802 succeeded (pytest/mypy/SAM/deploy/health/backfill).
+Frontend87e3f8f5c6d7a7c90c305de0622cf374087e33ce pushed main without conflicts;
+workflow45029562134 succeeded (tests/build/Cloudflare deploy/production verification).
+Backend deployed first. Local backend Python absent; CI verification passed.
+Read-only live anonymous rating GET returned200/private no-store/signed_out.
+No production votes changed. Next: owner authenticated interaction review;
+implementation complete. Revert focused source commits for rollback.
 Live interaction not tested; browser bridge unavailable earlier in session.
 Standing verified main publication authorized; no manual deployment/data writes.
