@@ -29,6 +29,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 ## Important shared states
 - Reports Type column centers its header and vertically stacked icon/label without
   changing table widths; responsive horizontal table scrolling remains unchanged.
+- Reports Status column centers its header and badges with middle row alignment;
+  widths, badge design/colors and other columns remain unchanged.
 - Inline exhibition create/edit uses reference-style banner preview/change-image left,
   name/description5000 counter/date-time pairs right, Save/Cancel below; mobile stacks.
 - Desktop editor shares grid rows: preview name-input top to final participation
