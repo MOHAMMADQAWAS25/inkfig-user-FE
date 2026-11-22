@@ -11669,3 +11669,21 @@ Independent style/exhibition-popup-details from4f97865; a7mad.ishaq integration 
 agent /root a7mad-popup-details-2026-11-22. Commit Align exhibition popup details.
 Authorized main push triggers existing frontend CI/Cloudflare deployment; exact
 hash/result in handoff. No manual release/migration. Revert focused commit to undo.
+
+## 2026-11-22 — INKFIG-POPUP-DIVIDER-001
+### Request / Changes / Frontend
+Show a line below the exhibition artwork popup description when related links
+are absent. Restore one scoped1px border using existing theme border color.
+### Repositories / Files
+inkfig-user-FE: exhibitionExpandedCard.css, SCREENS.md, PROJECT_STATE.md,
+docs/collaboration/tasks/INKFIG-POPUP-DIVIDER-001.md and this append-only log.
+### API / Database / Permissions and scope
+No API/auth/data/behavior changes. No migration required. Other styling retained.
+### Verification
+Required tests/build and actual results recorded in task handoff before publication.
+No live browser visual certification; preview bridge unavailable earlier in session.
+### Deployment / Git / Notes
+Independent style/popup-description-divider from5772eb9; owner a7mad.ishaq,
+agent /root a7mad-popup-divider-2026-11-22. Commit Restore popup description divider.
+Authorized main push uses existing frontend CI/Cloudflare deployment. Exact hash
+and workflow outcome in handoff; no manual release/migration. Revert focused commit.

@@ -33,7 +33,7 @@
 .exhibition-expanded-card-popup .artwork-modal-content .artwork-modal-actions > button { display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; min-width:0; min-height:44px; margin:0; padding:10px 12px; box-sizing:border-box; border-radius:12px; font:inherit; font-size:.82rem; line-height:1.4; }
 .exhibition-expanded-card-popup .artwork-modal-actions > button svg { flex-shrink:0; }
 .exhibition-expanded-card-popup .artwork-modal-actions > button span { overflow-wrap:anywhere; }
-.exhibition-expanded-card-popup .artwork-modal-content:not(:has(.artwork-modal-links)) .artwork-modal-description { border-block-end:0; }
+.exhibition-expanded-card-popup .artwork-modal-content:not(:has(.artwork-modal-links)) .artwork-modal-description { border-block-end:1px solid var(--border); }
 .exhibition-expanded-card-popup .artwork-modal-content:not(:has(.artwork-modal-links)) .artwork-modal-actions { border-block-start:0; }
 .exhibition-expanded-card-popup .artwork-modal-details-footer { display:grid; gap:16px; }
 .exhibition-expanded-card-popup .artwork-modal-details-footer .exhibition-rating-controls { display:grid; gap:12px; margin:0; padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--surface-raised,var(--surface)); }
