@@ -6,9 +6,9 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 Establish useful bounded project memory and three-person collaboration.
 Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
 preserving application behavior and existing work. No runtime/config/data changes.
-Status: Create exhibition button alignment deployed (fcb1ec7); 526 checks/build passed.
-Task: [INKFIG-CREATE-BUTTON-001](../collaboration/tasks/INKFIG-CREATE-BUTTON-001.md).
-Human: a7mad.ishaq; agent: /root, a7mad-create-button-2026-11-22.
+Status: Exhibition popup image containment fixed; 526 checks/build passed; publication pending.
+Task: [INKFIG-POPUP-FIT-001](../collaboration/tasks/INKFIG-POPUP-FIT-001.md).
+Human: a7mad.ishaq; agent: /root, a7mad-popup-fit-2026-11-22.
 Default integration decision-maker: owner, until explicitly delegated.
 No partner workstreams or checkout/session assignments have been approved.
 

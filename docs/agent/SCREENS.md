@@ -47,6 +47,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Exhibition gallery popup: artwork only physically left; organized full details,
   actions/voting/share on right with independent desktop scroll. Mobile stacks;
   origin zoom retained and leaderboard presentation unchanged.
+- Gallery popup originals use absolute inset bounds with contain fitting so intrinsic
+  portrait/square dimensions cannot expand and clip the media grid track.
 - Gallery popup media uses larger contain bounds; selected stars replace redundant
   numeric personal score, and absent links omit their adjacent divider.
 - Leaderboard uses a centered bounded-width panel with internal scrolling and

@@ -11602,3 +11602,26 @@ Commit: Align Create exhibition button icon and text.
 Fetch/integrate before authorized main push triggers existing frontend CI/deployment.
 Exact hash/outcome in handoff. No manual release/migration; revert focused commit
 for rollback and retain historical logs.
+
+## 2026-11-22 — INKFIG-POPUP-FIT-001 — Exhibition popup artwork containment
+### Request
+Fix cropped square/portrait artwork in exhibition popup screenshots.
+### Changes / Frontend
+Bound original media absolutely inside the existing left stage with 8px inset,
+proportional contain fitting and centered positioning. Intrinsic image sizes no
+longer enlarge the internal grid track. Desktop/mobile stage sizes retained.
+### Repositories / Files
+inkfig-user-FE: exhibitionExpandedCard.css, SCREENS.md, PROJECT_STATE.md,
+docs/collaboration/tasks/INKFIG-POPUP-FIT-001.md and this append-only log.
+### API / Database / Permissions and scope
+No API/auth/data changes. No migration required. Only exhibition gallery popup
+media styling changes; existing voting/actions/cards and other viewers retained.
+### Verification
+121 Node checks +405 Vitest tests passed; strict TypeScript/Vite/SEO build passed;
+git diff --check passed. Browser visual check unavailable: native pipe os error 2.
+### Deployment / Git / Notes
+Independent fix/exhibition-popup-image-fit from f52f086; human a7mad.ishaq,
+agent /root a7mad-popup-fit-2026-11-22. Commit: Fix exhibition popup image cropping.
+Authorized main push runs existing frontend tests/build/Cloudflare deployment.
+Exact hash and actual deployment result recorded in task handoff. Revert focused
+source commit for rollback; no manual deployment or migration performed.
