@@ -1,7 +1,7 @@
 import React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { I18nProvider } from "../src/i18n/I18nProvider";
 import { translations } from "../src/i18n/resources";
@@ -54,10 +54,10 @@ it("does not enable leaderboard voting after a failed eligibility read",async()=
   expect(screen.queryByRole("radio")).toBeNull();
   expect(changeExhibitionRating).not.toHaveBeenCalled();
 });
-function Probe(){const location=useLocation();return <output data-testid="route">{location.pathname}</output>;}
+function Probe(){const location=useLocation(),navigate=useNavigate();return <><output data-testid="route">{location.pathname}</output><button data-testid="browser-back" onClick={()=>navigate(-1)}>Browser Back</button></>;}
 function mount(language="en"){
   const client=new QueryClient({defaultOptions:{queries:{retry:false,gcTime:0}}});clients.push(client);
-  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/${language}/exhibition/event`]}><Routes><Route path="/:language/exhibition/:exhibitionId" element={<I18nProvider><ExhibitionsPage/><Probe/></I18nProvider>}/></Routes></MemoryRouter></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/${language}/exhibition`,`/${language}/exhibition/event`]}><Routes><Route path="/:language/exhibition/:exhibitionId" element={<I18nProvider><ExhibitionsPage/><Probe/></I18nProvider>}/><Route path="/:language/exhibition" element={<Probe/>}/><Route path="/:language/profile/:userId" element={<Probe/>}/></Routes></MemoryRouter></QueryClientProvider>);
 }
 beforeEach(()=>{
   vi.clearAllMocks();auth.permissions=["works.like","works.save","reports.create"];
@@ -69,7 +69,7 @@ beforeEach(()=>{
 });
 afterEach(()=>{cleanup();clients.forEach(client=>client.clear());clients.length=0;vi.restoreAllMocks();vi.unstubAllGlobals();});
 
-it("opens fetched details in one native popup without navigation and preserves gallery voting/pages",async()=>{
+it("opens fetched details in one native popup without changing URL and preserves gallery voting/pages",async()=>{
   mount();const open=await screen.findByRole("button",{name:"View artwork details: Painting"});open.focus();
   fireEvent.click(open);
   const dialog=await screen.findByRole("dialog",{name:"Full painting"});
@@ -94,6 +94,35 @@ it("opens fetched details in one native popup without navigation and preserves g
   expect(document.activeElement).toBe(open);expect(document.body.style.position).not.toBe("fixed");
   expect(screen.getAllByRole("radio")).toHaveLength(5);
   expect(screen.getByRole("button",{name:"Load more"})).toBeTruthy();
+});
+
+it.each(["2026-11-22","2050-01-01"])("browser Back closes current/past exhibition artwork before leaving the gallery (%s)",async day=>{
+  vi.spyOn(Date,"now").mockReturnValue(Date.parse(day));
+  mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
+  await screen.findByRole("dialog",{name:"Full painting"});
+  fireEvent.click(screen.getByTestId("browser-back"));
+  await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
+  expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event");
+  expect(getWork).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole("button",{name:"View artwork details: Painting"})).toBeTruthy();
+  fireEvent.click(screen.getByTestId("browser-back"));
+  await waitFor(()=>expect(screen.getByTestId("route").textContent).toBe("/en/exhibition"));
+});
+
+it("save remains an accessible icon-only toggle and profile navigation replaces the popup entry",async()=>{
+  mount();fireEvent.click(await screen.findByRole("button",{name:"View artwork details: Painting"}));
+  const dialog=await screen.findByRole("dialog",{name:"Full painting"});
+  const save=within(dialog).getByRole("button",{name:"Save",exact:true});
+  expect(save.textContent).toBe("");expect(save.getAttribute("aria-pressed")).toBe("false");
+  vi.mocked(getWork).mockResolvedValue({...work,saved_by_me:true});fireEvent.click(save);
+  const unsave=await within(dialog).findByRole("button",{name:"Unsave",exact:true});
+  expect(unsave.textContent).toBe("");expect(unsave.getAttribute("aria-pressed")).toBe("true");
+  expect(setWorkSave).toHaveBeenCalledWith("art",true);
+  fireEvent.click(within(dialog).getByRole("link",{name:/Artist/}));
+  await waitFor(()=>expect(screen.getByTestId("route").textContent).toBe("/en/profile/artist"));
+  fireEvent.click(screen.getByTestId("browser-back"));
+  await waitFor(()=>expect(screen.getByTestId("route").textContent).toBe("/en/exhibition/event"));
+  expect(screen.queryByRole("dialog")).toBeNull();
 });
 
 it("Escape closes during loading, cancels the old request and never displays its late result",async()=>{

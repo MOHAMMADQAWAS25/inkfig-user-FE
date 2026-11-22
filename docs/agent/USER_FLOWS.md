@@ -33,6 +33,9 @@ Updated: 2026-11-15. [Screens](SCREENS.md), [API](API_OVERVIEW.md).
 - My submissions show status/rejection/withdrawal state and backend-filtered pages.
 - Review managers use same-page preview, review reasons, blocks and approved-withdrawal decisions.
 - Approved public gallery may open exhibition-specific popup with eligibility-gated rating controls.
+- Gallery/leaderboard/submission previews push scoped same-page history; Back closes
+  the artwork, another Back follows normal navigation, and Forward restores it.
+  Profile links replace the preview entry so they do not race a second Back action.
 - Rating summaries/cache scope remain per event/work; leaderboard filters category before page.
 - No-vote, closed, blocked, own/organizer and unauthorized states retain explanatory UI.
 

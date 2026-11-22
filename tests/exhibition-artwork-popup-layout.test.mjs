@@ -13,7 +13,11 @@ test("exhibition cards open a scoped native popup while home/profile keep artwor
   assert.match(popup,/createPortal\(/);assert.match(popup,/ArtworkDetailModal containedInDialog/);
   assert.match(popup,/mediaFooter=\{exhibitionId \? <>\{currentRating \? <ExhibitionRatingControls/);
   assert.match(popup,/className="exhibition-expanded-share"/);
-  assert.match(read("exhibitions/ExhibitionsPage.tsx"),/artworkPopup\?\.scope === popupScope/);
+  assert.match(read("exhibitions/ExhibitionsPage.tsx"),/useExhibitionArtworkNavigation\(popupScope\)/);
+  const navigation=read("exhibitions/useExhibitionArtworkNavigation.ts");
+  assert.match(navigation,/entry\?\.scope === scope/);
+  assert.match(navigation,/navigate\(-1\)/);
+  assert.match(navigation,/preventScrollReset: true/);
   for(const path of ["feed/PostCard.tsx","profile/ProfilePage.tsx"]){assert.match(read(path),/artworkPath\(language,/);assert.doesNotMatch(read(path),/ExhibitionArtworkPopup/);}
   const css=readFileSync(new URL("../src/styles.css",import.meta.url),"utf8");
   assert.match(css,/\.exhibition-artwork-popup:not\(\[open\]\) \{ display:none/);

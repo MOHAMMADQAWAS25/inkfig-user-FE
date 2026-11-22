@@ -25,6 +25,9 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   leaderboard. Vote eligibility is backend-owned; gallery-only controls are presentation.
 - Notifications are persistent inbox + WebSocket signals; toasts do not mark read.
   Notifications route still a placeholder; panel is the actual implemented surface.
+- Sidebar sliders portal to body, isolating their dim/blur backdrop from page button
+  hover rules. Exhibition popup history uses React Router state, not patched native
+  history/listeners; preserve gallery DOM/cache and viewer/exhibition scope.
 - SEO build provides four localized discovery URLs and brand schema, not full SSR or
   guaranteed ranking. About InkFig disclosure removed at owner request, metadata retained.
   [Indexing](../search-indexing.md); Search Console diagnosis remains pending.

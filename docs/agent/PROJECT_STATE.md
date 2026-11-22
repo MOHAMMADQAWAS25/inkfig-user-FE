@@ -1,14 +1,16 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-15. Evidence: synchronized source at 5dd4ec9 plus this docs-only setup.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-COLLAB-001.md).
+Updated: 2026-11-22. Evidence: synchronized main8ea0bff and current verified ticket.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-CONTROLS-001.md).
 
 ## Current objective and approved scope
-Establish useful bounded project memory and three-person collaboration.
-Owner's attached 2026-11-15 workflow authorizes documentation/instruction changes,
-preserving application behavior and existing work. No runtime/config/data changes.
-Status: no-links popup divider deployed08a02ec; 528 checks/build and CI passed.
-Task: [INKFIG-POPUP-DIVIDER-001](../collaboration/tasks/INKFIG-POPUP-DIVIDER-001.md).
-Human: a7mad.ishaq; agent: /root, a7mad-popup-divider-2026-11-22.
+Owner approved artwork controls, exhibition popup Back, card typography/cursors
+and slider background isolation. Preserve the recently pulled popup/rating work.
+Status: implemented;537 checks/build and automated browser fixtures passed.
+Task: [INKFIG-ARTWORK-CONTROLS-001](../collaboration/tasks/INKFIG-ARTWORK-CONTROLS-001.md).
+Integration owner: user of this session; agent /root, artwork-controls-2026-11-22.
+Frontend-only; no migration/API/authorization/dependency changes.
+One focused source commit/publication follows verification; exact hash and automatic
+deployment outcome reported in handoff. No manual deployment/production mutations.
 Default integration decision-maker: owner, until explicitly delegated.
 No partner workstreams or checkout/session assignments have been approved.
 
@@ -22,9 +24,14 @@ No partner workstreams or checkout/session assignments have been approved.
 - Mobile background-route recovery/swipes, no-upscale natural media and theme/localization.
 - Latest e3f4d07 integrated discovery + 5dd4ec9 zoom-responsive detail/desktop likes.
   These supersede this session's earlier fixed-box description; do not restore it accidentally.
+- Artwork viewers use icon-only unframed accessible saves; card identities/counts
+  keep their sizes but use regular weight. Exhibition previews have scoped same-URL
+  history entries; Back closes/Forward restores without remounting their gallery.
+- Notification/find-user panels portal to body, avoiding artwork hover inheritance;
+  backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline branch main, origin/main synchronized at 5dd4ec9.
+- Baseline main8ea0bff; independent fix/artwork-controls-history-and-overlay.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -34,10 +41,11 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- This setup passed documentation links, memory size bounds, selected secret/path
-  patterns, staged Markdown-only review and whitespace checks; see handoff.
-- Application suites NOT rerun for docs-only changes. Last recorded results:
-  522 checks (121 Node/source + 401 Vitest), strict build, per 2026-11-10 log. Historical reports are not a new verification claim.
+- Current ticket:537 checks (123 Node/source +414 Vitest/38 files), strict TS/Vite/SEO
+  build and whitespace checks passed. Real browser history tested in inert fixtures;
+  desktop1440/light,1180/Arabic/dark,390/phone use actual components with mocked data.
+- No live production mutations or physical Safari/iOS certification. Temporary
+  browser/server closed; no helpers/screenshots/build output committed.
 - Configured workflow: [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml).
 - No manual migrations, deployment, production writes or live browser tests authorized/run.
 - [skip ci] on setup commits avoids existing automatic production workflows.
@@ -61,8 +69,7 @@ Do not run manual migrations/deployments or production fixtures without explicit
 - Physical-device and real PostgreSQL concurrency/plan certification are not implied by tests.
 
 ## Exact next actions
-1. Setup is documented/published; preserve existing local files, do not repeat it.
-2. Owner/partners each establish independent clones and publish one bounded task claim.
-3. Confirm human -> checkout/session mappings and integration owner for shared changes.
-4. On next implementation, inspect current source and relevant memory; update its handoff.
-5. Request explicit approval for manual migration/deploy/production mutation if needed.
+1. Fetch/integrate safely, publish the verified focused ticket and inspect automatic CI.
+2. Report exact hash, conflicts/push/merge/deployment separately; owner visual review next.
+3. Retain independent checkouts, scoped handoffs and earlier unresolved limits.
+4. Rollback by reverting the focused source commit while preserving feature-log history.

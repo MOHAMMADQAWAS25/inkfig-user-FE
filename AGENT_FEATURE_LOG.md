@@ -11687,3 +11687,80 @@ Independent style/popup-description-divider from5772eb9; owner a7mad.ishaq,
 agent /root a7mad-popup-divider-2026-11-22. Commit Restore popup description divider.
 Authorized main push uses existing frontend CI/Cloudflare deployment. Exact hash
 and workflow outcome in handoff; no manual release/migration. Revert focused commit.
+
+## 2026-11-22 - INKFIG-ARTWORK-CONTROLS-001
+
+### Request
+Icon-only unframed saves across opened artworks; wider Back/report hover areas;
+browser Back closes exhibition artwork rather than leaving its gallery; pointer
+cursors across exhibition cards; regular-weight card creators/like counts; blurred,
+inactive notification background without artwork-page hover effects.
+
+### Changes
+Added scoped same-URL React Router preview history for gallery, leaderboard and
+submission/review viewers. Back closes and Forward restores previews while gallery
+DOM/cache/filter state remains mounted. Profile navigation replaces the preview
+entry instead of racing a simultaneous Back. Existing in-app close animations retained.
+Sidebar panels/backdrops portal to body, isolating them from artwork button-hover
+rules while retaining focus/scroll locking, outside-gesture consumption and closing.
+
+### Repositories
+All three clean main branches pulled ff-only before implementation. Frontend baseline
+8ea0bff; main/user backends564bc38/1bb532d unchanged by this task. Recent partner popup
+layout, media fitting, description divider, editor and rating work preserved.
+
+### Files
+Shared ArtworkDetailModal/ArtworkPage, artworkPage.css/styles.css, AppSidebar,
+ExhibitionsPage/ExhibitionLeaderboardPage/MyExhibitionSubmissionsPage, new
+useExhibitionArtworkNavigation, focused regression tests, four relevant memory files,
+docs/collaboration/tasks/INKFIG-ARTWORK-CONTROLS-001.md and this append.
+
+### API
+No API changes. Existing fetch/save/like/rating/report contracts retained.
+
+### Database
+No migration required. No database/storage/embedding changes or production writes.
+
+### Permissions and scope
+Backend authorization remains authoritative; existing guards, disabled/busy states,
+read-only reviewer behavior, query scope and voting eligibility retained. No dependencies,
+credentials, generated output, environment/configuration or backend/SnapStart changes.
+
+### Frontend
+Saves show the bookmark only, no label rectangle; translated accessible name and
+pressed state retained with44px-wide minimum hit area, gold saved state and keyboard
+outline. Back/report use generous stable padding. Card creator/count sizes retained
+with weight400; exhibition-card non-control areas inherit pointer. Both themes,
+English/Arabic, phone/tablet/desktop layouts and reduced-motion behavior preserved.
+
+### Verification
+537 checks passed:123 Node/source plus414 Vitest across38 files. Strict TypeScript,
+Vite/SEO build and git diff --check passed. Tests cover current/past browser Back,
+Forward, repeated opens, viewer/query/hash scope, profile navigation, accessible
+icon-only toggles, rating/cache preservation and portal closing/focus/dismissal.
+Updated obsolete container/local-state assertions to enforce body portal/history
+scope rather than weaken behavior. Existing non-blocking bundle/jsdom notices remain.
+
+Headless Edge synthetic fixtures used actual components with inert mocked data at
+1440 English/light,1180 Arabic/dark and390 phone. Checked transparent borderless
+44px save controls including hover, weight400, pointer cursor, stable dim/blur on
+backdrop hover, body portal and inactive sidebar. Native browser history Back left
+the exhibition URL/gallery DOM intact and closed its popup. No browser exceptions;
+screenshots reviewed; temporary browser/server closed. No production mutations or
+physical Safari/device certification; local helpers/screenshots outside repositories.
+
+### Deployment
+Frontend-only existing main test/build/Cloudflare/health workflow. No manual release,
+backend deployment, migration or data operation. Actual workflow outcome in handoff.
+
+### Git
+Independent branch fix/artwork-controls-history-and-overlay; integration decision-maker
+is the user of this session, agent /root. Commit subject: Refine artwork controls,
+popup history and slider isolation. Fetch/rebase unpublished commit before branch
+push, then standing-authorized fast-forward main merge/push. Exact hash and actual
+push/merge/conflict/deployment results reported after execution.
+
+### Notes
+Public issues empty; no authenticated issue-writing tool, no issue URL claimed.
+Rollback by reverting this focused source commit while preserving all feature-log
+history and later overlapping work. No reset, stash, forced push or branch deletion.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -20,6 +20,7 @@ import { useExhibitionGallery } from "./useExhibitionGallery";
 import { exhibitionEnd, exhibitionPeriod, type ExhibitionPeriod } from "./exhibitionPeriod";
 import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
 import { ExhibitionArtworkPopup } from "./ExhibitionArtworkPopup";
+import { useExhibitionArtworkNavigation } from "./useExhibitionArtworkNavigation";
 import {
   listExhibitions,
   saveExhibition,
@@ -44,9 +45,8 @@ export function ExhibitionsPage() {
   const { exhibitionId } = useParams();
   useLayoutEffect(() => { if (exhibitionId) window.scrollTo({top:0,behavior:"instant"}); }, [exhibitionId]);
   const popupScope = JSON.stringify([exhibitionId, session?.userId ?? "guest"]);
-  const [artworkPopup, setArtworkPopup] = useState<{ scope: string; workId: string; origin?: DOMRect } | null>(null);
-  const openArtwork = useCallback((workId: string, origin?: DOMRect) => setArtworkPopup({scope:popupScope,workId,origin}), [popupScope]);
-  useEffect(() => { setArtworkPopup(null); }, [popupScope]);
+  const artworkPopup = useExhibitionArtworkNavigation(popupScope);
+  const openArtwork = artworkPopup.open;
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
   const canDelete = Boolean(session && ["admin", "system_administrator"].includes(session.role));
@@ -348,7 +348,7 @@ export function ExhibitionsPage() {
             </>
           )
         )}
-        {artworkPopup?.scope === popupScope && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} origin={artworkPopup.origin} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={() => setArtworkPopup(null)}/>}
+        {artworkPopup.workId && <ExhibitionArtworkPopup key={`${popupScope}:${artworkPopup.workId}`} workId={artworkPopup.workId} origin={artworkPopup.origin} exhibitionId={exhibitionId} rating={submissions.find(item => item.work_id === artworkPopup.workId)?.rating} votingOpen={Boolean(selected && exhibitionPeriod(selected, now) === "current")} onClose={artworkPopup.close}/>}
         {editing && (
           <section className="exhibition-editor">
             <header className="exhibition-editor-heading"><span><CalendarDays size={28} aria-hidden="true"/></span><div>

@@ -12,6 +12,7 @@ import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi"
 import { ExhibitionBackButton } from "./ExhibitionBackButton";
 import { ExhibitionNavbar } from "./ExhibitionNavbar";
 import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
+import { useExhibitionArtworkNavigation } from "./useExhibitionArtworkNavigation";
 import { useExhibitionLive } from "./useExhibitionLive";
 import { SubmissionArtist, SubmissionThumbnail } from "./SubmissionIdentity";
 import { getExhibition, getSubmissions, reviewSubmission, withdrawSubmission, reviewWithdrawal, blockParticipant, getBlocks, unblockParticipant, type Block, type Exhibition, type Submission } from "./exhibitionApi";
@@ -32,7 +33,8 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [revision, setRevision] = useState(0);
-  const [selected, setSelected] = useState<Submission | null>(null);
+  const artworkPopup = useExhibitionArtworkNavigation(JSON.stringify([exhibitionId, session?.userId ?? "guest", manage, filter]));
+  const selected = items.find(item => item.work_id === artworkPopup.workId) ?? null;
   const [work, setWork] = useState<Work | null>(null);
   const [workLoading, setWorkLoading] = useState(false);
   const [action, setAction] = useState<Action | null>(null);
@@ -77,7 +79,6 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
     }).catch(cause => { if (active) setError(message(cause)); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; generation.current += 1; };
   }, [exhibitionId, scope, filter, revision, authorized, language, liveRevision]);
-  useEffect(()=>{setSelected(current=>current?items.find(item=>item.submission_id===current.submission_id)??null:null);},[items]);
   useEffect(() => {
     if (!manage || !authorized) return;
     let active = true;
@@ -88,7 +89,7 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
     setWork(null);
     if (!selected) return;
     let active = true; setWorkLoading(true);
-    getWork(selected.work_id).then(value => { if (active) setWork(value); }).catch(cause => { if (active) { setError(message(cause)); setSelected(null); } }).finally(() => { if (active) setWorkLoading(false); });
+    getWork(selected.work_id).then(value => { if (active) setWork(value); }).catch(cause => { if (active) { setError(message(cause)); artworkPopup.close(); } }).finally(() => { if (active) setWorkLoading(false); });
     return () => { active = false; };
   }, [selected?.submission_id]);
   useEffect(() => {
@@ -146,11 +147,11 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   if (!authorized) return <Navigate replace to={`/${language}/exhibition/${exhibitionId}`}/>;
   return <main className="exhibitions-page app-page-with-sidebar exhibition-records-page"><AppSidebar/><div className="exhibitions-shell">
     <ExhibitionNavbar label={t("exhibitions.actions")}><ExhibitionBackButton to={`/${language}/exhibition/${exhibitionId}`} label={t("exhibitions.backToExhibition")}/><strong>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</strong></ExhibitionNavbar>
-    <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><ThemedSelect label={t("exhibitions.filterStatus")} value={filter} disabled={busy} onChange={value => { setFilter(value as Status); setSelected(null); }} options={(["all","approved","rejected","pending"] as const).map(status => ({ value: status, label: status === "all" ? t("exhibitions.allStatuses") : label(status) }))}/></header>
+    <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><ThemedSelect label={t("exhibitions.filterStatus")} value={filter} disabled={busy} onChange={value => { setFilter(value as Status); artworkPopup.close(); }} options={(["all","approved","rejected","pending"] as const).map(status => ({ value: status, label: status === "all" ? t("exhibitions.allStatuses") : label(status) }))}/></header>
     {error && <p className="error-message" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     {loading ? <p role="status">{t("exhibitions.loading")}</p> : <section className={`exhibition-record-list${manage ? "" : " exhibition-artwork-grid exhibition-personal-submissions"}`} aria-label={t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}>
       {!items.length && <p className="exhibition-section-empty">{t("exhibitions.noSubmissions")}</p>}
-      {items.map(item => !manage ? <ExhibitionArtworkCard key={item.submission_id} item={item} exhibitionId={exhibitionId} showRating={false} className="exhibition-personal-submission" onOpen={() => { setSelected(item); setError(""); }} details={<>
+      {items.map(item => !manage ? <ExhibitionArtworkCard key={item.submission_id} item={item} exhibitionId={exhibitionId} showRating={false} className="exhibition-personal-submission" onOpen={() => { artworkPopup.open(item.work_id); setError(""); }} details={<>
         <span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>
         {item.rejection_reason && <p className="exhibition-submission-feedback"><strong>{t("exhibitions.rejectionReason")}: </strong>{item.rejection_reason}</p>}
         {item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}
@@ -160,7 +161,7 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
         </div>
       </>}/> : <article className="exhibition-submission-record" data-review={manage} key={item.submission_id}>
         <div className="exhibition-record-summary">
-          <button className="exhibition-record-open" onClick={() => { setSelected(item); setError(""); }} aria-label={`${t("works.viewDetails")}: ${item.title}`}><SubmissionThumbnail url={item.image_url}/></button>
+          <button className="exhibition-record-open" onClick={() => { artworkPopup.open(item.work_id); setError(""); }} aria-label={`${t("works.viewDetails")}: ${item.title}`}><SubmissionThumbnail url={item.image_url}/></button>
           <div className="exhibition-record-info"><strong>{item.title}</strong><SubmissionArtist name={item.artist_name} avatar={item.artist_avatar_url} language={language} userId={item.user_id}/><span className={`exhibition-status ${item.status}`}>{label(item.status)}</span>{item.withdrawal_status === "pending" && <small className="exhibition-withdrawal-badge"><Clock3 size={14}/>{t("exhibitions.deletionPending")}</small>}</div>
         </div>
         <div className="exhibition-record-actions">
@@ -176,7 +177,7 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
     </section>}
     {manage && <section className="exhibition-blocks"><h2>{t("exhibitions.blocked")}</h2>{blocks.map(item => <div key={item.user_id}><Link to={`/${language}/profile/${item.user_id}`}>{item.full_name}</Link><p>{item.reason}</p><button disabled={busy} onClick={() => void run(() => unblockParticipant(exhibitionId,item.user_id))}>{t("exhibitions.unblock")}</button></div>)}{!blocks.length && <p>{t("exhibitions.noBlocks")}</p>}{blockCursor !== null && <button disabled={busy} onClick={() => void moreBlocks()}>{t("exhibitions.more")}</button>}</section>}
     {workLoading && <p role="status">{t("exhibitions.loading")}</p>}
-    {selected && work && <ArtworkDetailModal readOnly={manage} language={language} work={work} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} onClose={() => setSelected(null)} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t} extraDetails={<section className="exhibition-submission-context"><span className={`exhibition-status ${selected.status}`}>{label(selected.status)}</span>{selected.rejection_reason && <div><h3>{t("exhibitions.rejectionReason")}</h3><p>{selected.rejection_reason}</p></div>}{selected.withdrawal_reason && <div><h3>{t("exhibitions.deletionReason")}</h3><p>{selected.withdrawal_reason}</p><p>{t(selected.withdrawal_status === "pending" ? "exhibitions.deletionPending" : "exhibitions.deletionRejected")}</p>{selected.withdrawal_review_reason && <p>{selected.withdrawal_review_reason}</p>}</div>}</section>}/>}
+    {selected && work && <ArtworkDetailModal historyPreview readOnly={manage} language={language} work={work} canLike={hasPermission(session.permissions,"works.like")} canSave={hasPermission(session.permissions,"works.save")} onClose={() => artworkPopup.close()} onToggleLike={toggleLike} onToggleSave={toggleSave} t={t} extraDetails={<section className="exhibition-submission-context"><span className={`exhibition-status ${selected.status}`}>{label(selected.status)}</span>{selected.rejection_reason && <div><h3>{t("exhibitions.rejectionReason")}</h3><p>{selected.rejection_reason}</p></div>}{selected.withdrawal_reason && <div><h3>{t("exhibitions.deletionReason")}</h3><p>{selected.withdrawal_reason}</p><p>{t(selected.withdrawal_status === "pending" ? "exhibitions.deletionPending" : "exhibitions.deletionRejected")}</p>{selected.withdrawal_review_reason && <p>{selected.withdrawal_review_reason}</p>}</div>}</section>}/>}
     {action && <div className="profile-connections-backdrop" onMouseDown={event => { if (event.target === event.currentTarget && !busy) setAction(null); }}><form ref={decision} className="exhibition-action-dialog form-stack" role="dialog" aria-modal="true" aria-labelledby="submission-action-title" onSubmit={event => { event.preventDefault(); void perform(); }} onKeyDown={event => {
       if (event.key === "Escape" && !busy) setAction(null);
       if (event.key === "Tab") { const nodes = Array.from(decision.current?.querySelectorAll<HTMLElement>("textarea,button:not(:disabled)") ?? []); const first = nodes[0], last = nodes[nodes.length-1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } }

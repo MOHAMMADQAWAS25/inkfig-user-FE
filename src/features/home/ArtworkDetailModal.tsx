@@ -32,12 +32,13 @@ type ArtworkDetailModalProps = {
   footerInDetails?: boolean;
   readOnly?: boolean;
   containedInDialog?: boolean;
+  historyPreview?: boolean;
   interactionBusy?: boolean;
   expandedFrom?: DOMRect;
   t: (key: TranslationKey) => string;
 };
 
-export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, footerInDetails=false, readOnly=false, containedInDialog=false, interactionBusy=false, expandedFrom, t }: ArtworkDetailModalProps) {
+export function ArtworkDetailModal({ language, work, canLike, canSave, canModerateDelete=false, canReport=false, onClose, onToggleLike, onToggleSave, onModerateDelete, onEditOwnWork, onDeleteOwnWork, extraDetails, mediaFooter, footerInDetails=false, readOnly=false, containedInDialog=false, historyPreview=containedInDialog, interactionBusy=false, expandedFrom, t }: ArtworkDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
     return()=>{cancelAnimationFrame(frame);zoom.current?.cancel();};
   }, [expandedFrom]);
   onCloseRef.current=onClose;
-  function requestClose(afterClose?:()=>void){
+  function requestClose(afterClose?:()=>void, closeParent=true){
     if(closeTimerRef.current!==undefined)return;
     setClosing(true);
     if(zoomTransform.current && dialogRef.current?.animate && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
@@ -67,7 +68,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
       zoom.current=dialogRef.current.animate([{transform:"none",opacity:1},{transform:zoomTransform.current,opacity:0}],{duration:240,easing:"ease-in",fill:"forwards"});
     }
     const duration=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?0:240;
-    closeTimerRef.current=window.setTimeout(()=>{onCloseRef.current();afterClose?.();},duration);
+    closeTimerRef.current=window.setTimeout(()=>{if(closeParent)onCloseRef.current();afterClose?.();},duration);
   }
   useEffect(()=>()=>{if(closeTimerRef.current!==undefined)window.clearTimeout(closeTimerRef.current);},[]);
   const [moderating,setModerating]=useState(false);const [reason,setReason]=useState("");const [deleting,setDeleting]=useState(false);const [deleteError,setDeleteError]=useState(false);
@@ -132,7 +133,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail showVotingHint={!mediaFooter}/>}
           {extraDetails}
           <div className="artwork-modal-meta">
-            {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`));}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
+            {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`,{replace:historyPreview}),!historyPreview);}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
             <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>
           </div>
           <div className="artwork-modal-description">
@@ -143,7 +144,7 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
             <h3><Link2 size={17} />{t("works.links")}</h3>
             <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
-          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-modal-save ${work.saved_by_me?"saved":""}`} type="button" disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark size={20} fill={work.saved_by_me?"currentColor":"none"}/><span>{t(work.saved_by_me?"home.unsaveWork":"home.saveWork")}</span></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
+          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-modal-save artwork-save-icon ${work.saved_by_me?"saved":""}`} type="button" aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} aria-pressed={work.saved_by_me} disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark aria-hidden="true" size={20} fill={work.saved_by_me?"currentColor":"none"}/></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
           {footerInDetails && mediaFooter && <div className="artwork-modal-details-footer">{mediaFooter}</div>}
           {!readOnly && (onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
             {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}

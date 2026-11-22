@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import test from "node:test";
 const css=readFileSync("src/styles.css","utf8");
-test("card identities and numeric reactions grow without changing masonry footer height",()=>{
-  assert.match(css,/\.feed-post-card \.feed-card-footer \.feed-creator \{[^}]*font-size:\.85rem; font-weight:750/);
+test("card identities and numeric reactions retain their size with regular-weight text",()=>{
+  assert.match(css,/\.feed-post-card \.feed-card-footer \.feed-creator \{[^}]*font-size:\.85rem; font-weight:400/);
+  assert.match(css,/\.feed-card-like \{[^}]*font-size:\.85rem; font-weight:400/);
   assert.match(css,/\.feed-card-footer \.feed-creator :is\(img,\.feed-creator-initial\) \{ width:28px; height:28px/);
   assert.match(css,/\.feed-card-like svg \{ flex:0 0 20px; color:#fff/);
   assert.match(css,/\.feed-card-like\.liked,\.feed-card-like\.liked svg \{ color:#e53935/);

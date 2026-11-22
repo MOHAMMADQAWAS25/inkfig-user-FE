@@ -56,6 +56,14 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Gallery popup media uses larger contain bounds; selected stars replace redundant
   numeric personal score. Description keeps a theme-colored bottom divider even
   without related links; actions omit their extra top divider in that state.
+- All artwork viewers show save as an icon-only, unframed44px-wide accessible toggle;
+  saved state/labels remain available to assistive technology. Back/report targets
+  have wider padding. Card creator/count text uses regular weight without shrinking.
+- Exhibition gallery/leaderboard/submission previews use scoped same-URL history:
+  browser Back closes the preview before leaving its page; Forward restores it.
+  Clickable exhibition-card areas inherit pointer cursors; rating/profile controls retained.
+- Notification/find-user panels portal outside page containers so artwork hover
+  rules cannot affect their backdrop; the blurred background stays inactive.
 - Leaderboard uses a centered bounded-width panel with internal scrolling and
   pagination; toolbar/title/filter stay stationary, category changes reset list scroll.
 - Exhibition artwork cards omit description/date/details CTA and redundant personal

@@ -7,6 +7,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { ExhibitionArtworkPopup } from "./ExhibitionArtworkPopup";
+import { useExhibitionArtworkNavigation } from "./useExhibitionArtworkNavigation";
 import { ExhibitionToolbar } from "./ExhibitionToolbar";
 import { useAuth } from "../auth/AuthContext";
 import { getWorkTypes } from "../works/worksApi";
@@ -28,7 +29,8 @@ export function ExhibitionLeaderboardPage() {
   usePageScrollLock(true);
   useEffect(() => { if (rankingPanel.current) rankingPanel.current.scrollTop = 0; }, [category, exhibitionId]);
   const types = useQuery({ queryKey:["work-types"], queryFn:getWorkTypes, staleTime:300_000 });
-  const [opened, setOpened] = useState<string | null>(null);
+  const artworkPopup = useExhibitionArtworkNavigation(JSON.stringify([exhibitionId, session?.userId ?? "guest", "leaderboard"]));
+  const opened = artworkPopup.workId;
   // Each category has its own pages; changing categories starts at page one.
   const query = useInfiniteQuery({
     queryKey: ["exhibition-leaderboard", exhibitionId, category], initialPageParam: 0,
@@ -63,7 +65,7 @@ export function ExhibitionLeaderboardPage() {
       <div className="exhibition-leaderboard-columns" aria-hidden="true"><span>#</span><span>{ar ? "العمل الفني" : "Artwork"}</span><span>{ar ? "الفنان" : "Artist"}</span><span>{ar ? "الفئة" : "Category"}</span><span>{ar ? "متوسط التقييم" : "Average rating"}</span><span>{ar ? "الأصوات" : "Votes"}</span></div>
       <ol className="exhibition-leaderboard-list" aria-label={label}>
         {entries.map(entry => <li key={entry.work_id}>
-          <button type="button" className="exhibition-leaderboard-entry" data-rank={entry.rank <= 3 ? entry.rank : undefined} onClick={() => setOpened(entry.work_id)} aria-label={`${ar ? "عرض العمل" : "View artwork"}: ${entry.title}`}>
+          <button type="button" className="exhibition-leaderboard-entry" data-rank={entry.rank <= 3 ? entry.rank : undefined} onClick={() => artworkPopup.open(entry.work_id)} aria-label={`${ar ? "عرض العمل" : "View artwork"}: ${entry.title}`}>
             <span className="exhibition-leaderboard-rank"><span>{integer.format(entry.rank)}</span>{entry.rank <= 3 && <Trophy size={14} aria-hidden="true"/>}</span>
             <span className="exhibition-leaderboard-artwork"><img className="exhibition-leaderboard-image" src={entry.image_url} alt="" loading="lazy" draggable={false} onContextMenu={event => event.preventDefault()} onDragStart={event => event.preventDefault()}/><strong>{entry.title}</strong></span>
             <span className="exhibition-leaderboard-artist"><ProfileAvatar name={entry.artist_name} url={entry.artist_avatar_url} language={language}/><span>{entry.artist_name}</span></span>
@@ -76,6 +78,6 @@ export function ExhibitionLeaderboardPage() {
       {query.hasNextPage && <button type="button" className="primary-button" disabled={query.isFetching} onClick={() => void query.fetchNextPage()}>{query.isFetchingNextPage ? t("works.loading") : ar ? "تحميل المزيد" : "Load more"}</button>}
       </div>
     </div>
-    {opened && <ExhibitionArtworkPopup key={opened} workId={opened} exhibitionId={exhibitionId} votingOpen={Boolean(first?.voting_open)} onClose={() => setOpened(null)}/>}
+    {opened && <ExhibitionArtworkPopup key={opened} workId={opened} exhibitionId={exhibitionId} votingOpen={Boolean(first?.voting_open)} onClose={artworkPopup.close}/>}
   </main>;
 }

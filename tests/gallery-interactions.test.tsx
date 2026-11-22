@@ -60,7 +60,7 @@ describe("home and panel interactions",()=>{
       button.focus();expect(document.activeElement).toBe(button);
       expect(fireEvent.keyDown(button,{key:"Tab"})).toBe(true);
       fireEvent.click(button);fireEvent.keyDown(button,{key:"Escape"});
-      expect(container.querySelector(".account-discovery-panel")?.classList.contains("sidebar-panel-exit")).toBe(false);
+      expect(document.querySelector(".account-discovery-panel")?.classList.contains("sidebar-panel-exit")).toBe(false);
     } finally {modal.remove();}
   });
   it.each(["Find users","Notifications"])("locks page scroll and contains focus in the %s slider until its closing animation ends",async name=>{
@@ -80,7 +80,7 @@ describe("home and panel interactions",()=>{
     expect(document.activeElement).toBe(controls[controls.length-1]);
     fireEvent.click(trigger);
     expect(document.body.style.position).toBe("fixed");
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
     expect(document.body.style.position).not.toBe("fixed");
   });
   it("keeps the animated search area clickable and hides decorative hints when typing",()=>{
@@ -163,7 +163,7 @@ describe("home and panel interactions",()=>{
     try {
       const {container,unmount}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
       fireEvent.click(screen.getByRole("button",{name:"Find users",exact:true}));
-      const input=container.querySelector("#account-discovery-panel input")!;
+      const input=document.querySelector("#account-discovery-panel input")!;
       fireEvent.change(input,{target:{value:"a"}});
       await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
       fireEvent.change(input,{target:{value:"ahmad"}});
@@ -194,9 +194,9 @@ describe("home and panel interactions",()=>{
     vi.stubGlobal("matchMedia",(query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()}));
     const {container}=render(<MemoryRouter initialEntries={["/en"]}><HomePage/></MemoryRouter>);
     const bell=screen.getByRole("button",{name:"Notifications",exact:true});
-    fireEvent.click(bell);expect(container.querySelector(".notifications-panel")).toBeTruthy();
-    fireEvent.click(bell);expect(container.querySelector(".sidebar-panel-exit")).toBeTruthy();
-    await waitFor(()=>expect(container.querySelector(".notifications-panel")).toBeNull());
+    fireEvent.click(bell);expect(document.querySelector(".notifications-panel")).toBeTruthy();
+    fireEvent.click(bell);expect(document.querySelector(".sidebar-panel-exit")).toBeTruthy();
+    await waitFor(()=>expect(document.querySelector(".notifications-panel")).toBeNull());
   });
   it.each(["Notifications","Find users"])("consumes outside taps while dismissing %s",async name=>{
     const action=vi.fn();
@@ -205,7 +205,7 @@ describe("home and panel interactions",()=>{
     const outside=screen.getByRole("button",{name:"Underlying action"});
     fireEvent.pointerDown(outside);fireEvent.pointerUp(outside);fireEvent.click(outside);
     expect(action).not.toHaveBeenCalled();
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
     fireEvent.click(outside);expect(action).toHaveBeenCalledOnce();
   });
   it.each(["top","bottom","icon"])("focuses the input and opens history from the search bar %s",async area=>{
@@ -232,8 +232,8 @@ describe("home and panel interactions",()=>{
   it.each(["Notifications","Find users"])("mounts %s outside the navigation bar",async name=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name,exact:true}));
-    const panel=container.querySelector(".account-discovery-panel");
-    expect(panel).toBeTruthy();expect(panel?.closest("aside")).toBeNull();
+    const panel=document.querySelector(".account-discovery-panel");
+    expect(panel).toBeTruthy();expect(panel?.parentElement).toBe(document.body);expect(panel?.closest("aside")).toBeNull();
     expect(panel?.classList.contains("sidebar-panel-enter")).toBe(true);
   });
   it("preserves a known avatar when Enter selects history for the same artist",async()=>{
@@ -322,14 +322,14 @@ describe("home and panel interactions",()=>{
     const {container}=render(<MemoryRouter><AppSidebar/><button>Outside control</button></MemoryRouter>);
     const trigger=screen.getByRole("button",{name,exact:true});
     fireEvent.click(trigger);
-    const panel=container.querySelector(".account-discovery-panel")!;
+    const panel=document.querySelector(".account-discovery-panel")!;
     fireEvent.pointerDown(panel);
     expect(panel.classList.contains("sidebar-panel-exit")).toBe(false);
     fireEvent.pointerDown(trigger);
     expect(panel.classList.contains("sidebar-panel-exit")).toBe(false);
     fireEvent.pointerDown(screen.getByRole("button",{name:"Outside control"}));
     expect(panel.classList.contains("sidebar-panel-exit")).toBe(true);
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
   });
   it.each(["Home","InkFig"])("clears search, artist and category when clicking %s",async name=>{
     render(<MemoryRouter initialEntries={["/en?q=flowers&category=hand-art&artist=artist&artistName=Artist"]}><HomePage/></MemoryRouter>);
@@ -341,26 +341,26 @@ describe("home and panel interactions",()=>{
   it.each(["Notifications","Find users"])("retains %s during its closing animation",async name=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name,exact:true}));
-    expect(container.querySelector(".account-discovery-panel")).toBeTruthy();
+    expect(document.querySelector(".account-discovery-panel")).toBeTruthy();
     fireEvent.click(screen.getByRole("button",{name,exact:true}));
-    expect(container.querySelector(".account-discovery-panel.sidebar-panel-exit")).toBeTruthy();
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    expect(document.querySelector(".account-discovery-panel.sidebar-panel-exit")).toBeTruthy();
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
   });
   it("keeps a reopened panel open when an earlier close timer completes",async()=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     const button=screen.getByRole("button",{name:"Notifications",exact:true});
     fireEvent.click(button);fireEvent.click(button);fireEvent.click(button);
     await new Promise(resolve=>setTimeout(resolve,320));
-    expect(container.querySelector(".notifications-panel")).toBeTruthy();
-    expect(container.querySelector(".sidebar-panel-exit")).toBeNull();
+    expect(document.querySelector(".notifications-panel")).toBeTruthy();
+    expect(document.querySelector(".sidebar-panel-exit")).toBeNull();
   });
   it("uses the first outside navigation tap only to dismiss the slider",async()=>{
     const {container}=render(<MemoryRouter initialEntries={["/en"]}><AppSidebar/><RouteProbe/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name:"Find users",exact:true}));
     fireEvent.click(screen.getByRole("link",{name:"Upload",exact:true}));
     expect(screen.getByTestId("route").textContent).toBe("/en");
-    expect(container.querySelector(".sidebar-panel-exit")).toBeTruthy();
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    expect(document.querySelector(".sidebar-panel-exit")).toBeTruthy();
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
     expect(screen.getByTestId("route").textContent).toBe("/en");
     fireEvent.click(screen.getByRole("link",{name:"Upload",exact:true}));
     expect(screen.getByTestId("route").textContent).toBe("/en/upload");
@@ -369,7 +369,7 @@ describe("home and panel interactions",()=>{
     const {container}=render(<MemoryRouter><AppSidebar/></MemoryRouter>);
     fireEvent.click(screen.getByRole("button",{name:"Find users",exact:true}));
     fireEvent.keyDown(window,{key:"Escape"});fireEvent.keyDown(window,{key:"Escape"});
-    await waitFor(()=>expect(container.querySelector(".account-discovery-panel")).toBeNull());
+    await waitFor(()=>expect(document.querySelector(".account-discovery-panel")).toBeNull());
   });
 });
 
