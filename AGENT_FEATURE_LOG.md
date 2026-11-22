@@ -11575,3 +11575,30 @@ Commit: Center Reports Status column header and badges.
 Fetch/integrate before authorized main push; existing pipeline auto-deploys frontend.
 Exact source/workflow outcome in handoff. No manual release/migration.
 Revert focused commit for rollback; preserve feature-log history.
+
+## 2026-11-22 - Align and refine Create exhibition button
+
+### Request / Changes / Frontend
+Listing-only Create button uses centered inline-flex icon/text,10px gap,12x20px
+padding,14px radius and consistent inherited font/line height.20px plus icon is
+nonshrinking/block and decorative to accessibility; text in span. Existing theme
+colors/hover/disabled behavior, manager guard and edit/create handler retained.
+
+### Repositories / Files / API / Database / Permissions and scope
+User-FE only, independent style/create-exhibition-button fromcadfa33.
+Human a7mad.ishaq; agent /root a7mad-create-button-2026-11-22; task CREATE-BUTTON-001.
+ExhibitionsPage/scoped selectors/current memory/screens/handoff/log. Public issues
+empty; authenticated writing unavailable. No migration required. No API/backend/
+auth/dependency/SnapStart changes or unrelated button selectors changed.
+
+### Verification
+Full frontend tests and TypeScript/Vite/SEO build before publication; final results
+in handoff. git diff --check and full runtime diff review. No live browser/device
+visual certification. Existing jsdom/bundle notices and locked-install3 high
+advisories; dependencies unchanged. No production data writes.
+
+### Deployment / Git / Notes
+Commit: Align Create exhibition button icon and text.
+Fetch/integrate before authorized main push triggers existing frontend CI/deployment.
+Exact hash/outcome in handoff. No manual release/migration; revert focused commit
+for rollback and retain historical logs.

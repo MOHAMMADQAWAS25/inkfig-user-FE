@@ -2016,6 +2016,8 @@ html:has(.signup-card)::-webkit-scrollbar, html:has(.upload-page)::-webkit-scrol
 .exhibitions-shell { max-width:1280px; margin-inline:auto; }
 .exhibitions-heading,.exhibitions-heading>div,.exhibition-actions,.exhibition-card footer { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .exhibitions-heading { justify-content:space-between; margin-bottom:24px; }
+.exhibitions-heading .exhibition-create-button { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:46px; max-width:100%; padding:12px 20px; border-radius:14px; font:inherit; font-weight:750; line-height:1.25; text-align:center; }
+.exhibition-create-button svg { display:block; flex-shrink:0; }
 .exhibitions-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr)); gap:22px; margin:24px 0; }
 .work-exhibition-badge { display:inline-flex; align-items:center; gap:6px; max-width:100%; min-width:0; padding:7px 10px; border:1px solid var(--primary); border-radius:999px; background:var(--surface); color:var(--text); font-size:.75rem; line-height:1.3; text-decoration:none; }
 .work-exhibition-badge svg { flex-shrink:0; color:var(--primary); }

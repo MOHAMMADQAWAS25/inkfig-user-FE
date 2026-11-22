@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- Exhibition listing Create button uses centered inline-flex icon/text, consistent
+  gap/padding/rounded corners; existing role guard and theme colors retained.
 - Reports Type column centers its header and vertically stacked icon/label without
   changing table widths; responsive horizontal table scrolling remains unchanged.
 - Reports Status column centers its header and badges with middle row alignment;

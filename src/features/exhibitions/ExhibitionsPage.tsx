@@ -229,9 +229,9 @@ export function ExhibitionsPage() {
             <h1>{t("exhibitions.title")}</h1>
           </div>
           {manage && !exhibitionId && (
-            <button className="primary-button" disabled={busy} onClick={edit}>
-              <Plus size={18} />
-              {t(selected ? "exhibitions.edit" : "exhibitions.create")}
+            <button className="primary-button exhibition-create-button" disabled={busy} onClick={edit}>
+              <Plus size={20} aria-hidden="true" />
+              <span>{t(selected ? "exhibitions.edit" : "exhibitions.create")}</span>
             </button>
           )}
         </header>}
