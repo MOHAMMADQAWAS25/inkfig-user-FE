@@ -11,9 +11,12 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   [HTTP helper](../../src/api/httpClient.ts), [router](../../src/app/AppRouter.tsx).
 - Ordinary home uses proportional masonry cards and bounded virtualization. Detail page's
   optional featured block, measured masonry and expanded column count are distinct.
-- 2026-11-10 detail discovery supersedes earlier fixed viewer/card layout description.
-  Keep natural proportions/no upscaling; phone image-height locking and background-route
-  restoration preserve scrolling. [Current design](../artwork-discovery-layout.md).
+- Owner-approved2026-11-24 consistent frames supersede image-dependent/wide stacking
+  from2026-11-10, while preserving its masonry/zoom-responsive recommendations.
+  Center intrinsic media without unnecessary shrinking/upscaling/cropping; scroll
+  metadata inside and retain phone pixel locking. [Current design](../artwork-discovery-layout.md).
+- Original images use a native modal and same-URL React Router history so Back closes
+  original image before its parent card. Compact exhibition tags remain per-event links.
 - Related ranking comes from main backend, not client popularity/category sorting.
   No new Voyage request when opening a work; do not add N+1 card calls.
 - New work minimum200px wide AND300px tall, including boundary; client preflight plus

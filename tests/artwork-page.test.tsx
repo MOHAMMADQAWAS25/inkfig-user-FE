@@ -29,19 +29,22 @@ it("shows exhibition membership links below the category on the opened artwork",
   expect(badge.closest(".artwork-page-info")).toBeTruthy();
   expect(badge.closest(".work-exhibition-overlay")).toBeNull();
 });
-it("uses a stacked featured card for wide media metadata, while retaining the detail actions",async()=>{
+it("keeps the same featured card for wide media metadata, retaining the detail actions",async()=>{
   vi.mocked(getWork).mockResolvedValue({...sample,media:{width:1200,height:600,url:"/art.png",dominantColor:"#123456",sizes:[]}});
   mount();await screen.findByRole("heading",{name:sample.title});
-  expect(document.querySelector(".artwork-page-hero--wide")).toBeTruthy();
+  expect(document.querySelector(".artwork-page-hero")?.className).toBe("artwork-page-hero");
   expect(within(document.querySelector(".artwork-page-info")!).getByRole("button",{name:"12 likes"})).toBeTruthy();
 });
-it("detects wide legacy images from their natural dimensions when metadata is absent",async()=>{
+it("does not change the card layout after loading a wide legacy image",async()=>{
   mount();await screen.findByRole("heading",{name:sample.title});
   const image=document.querySelector(".artwork-page-media-original")!;
-  expect(document.querySelector(".artwork-page-hero--wide")).toBeNull();
+  const hero=document.querySelector(".artwork-page-hero");
+  expect(hero?.className).toBe("artwork-page-hero");
   Object.defineProperties(image,{naturalWidth:{value:1600},naturalHeight:{value:900}});
   fireEvent.load(image);
-  expect(document.querySelector(".artwork-page-hero--wide")).toBeTruthy();
+  expect(document.querySelector(".artwork-page-hero")).toBe(hero);
+  expect(hero?.className).toBe("artwork-page-hero");
+  expect(screen.getByRole("button",{name:"View full-size image"})).toBeTruthy();
 });
 function Probe() { const location = useLocation(); return <output data-testid="route">{location.pathname}{location.search}</output>; }
 function mount(language = "en", state: object | null = null) {

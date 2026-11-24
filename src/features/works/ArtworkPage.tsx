@@ -36,12 +36,6 @@ export function ArtworkPage() {
   const [reporting, setReporting] = useState(false); const [moderating, setModerating] = useState(false);
   const [reason, setReason] = useState(""); const [deleting, setDeleting] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
-  const [naturalMedia, setNaturalMedia] = useState<{ url: string; ratio: number } | null>(null);
-  const onMediaDimensions = useCallback((width: number, height: number) => {
-    if (work && width > 0 && height > 0) setNaturalMedia(current => current?.url === work.image_url && current.ratio === width / height ? current : { url: work.image_url, ratio: width / height });
-  }, [work?.image_url]);
-  const mediaRatio = work?.media && work.media.width > 0 && work.media.height > 0 ? work.media.width / work.media.height
-    : naturalMedia?.url === work?.image_url ? naturalMedia?.ratio ?? 1 : 1;
   const requests = useRef(new Set<string>());
   const moderationForm = useRef<HTMLFormElement>(null);
   usePageScrollLock(moderating);
@@ -107,16 +101,16 @@ export function ArtworkPage() {
     } catch { setError(t("artwork.actionFailed")); setDeleting(false); }
   }
   const back = () => location.state?.returnTo && returnTo === location.state.returnTo ? navigate(-1) : navigate(returnTo);
-  const featuredContent = work ? <><article className={`artwork-page-hero${mediaRatio > 1.35 ? " artwork-page-hero--wide" : ""}`}>
-        <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} dimensions={work.media ?? undefined} onDimensions={onMediaDimensions} />
+  const featuredContent = work ? <><article className="artwork-page-hero">
+        <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} dimensions={work.media ?? undefined} imageLabels={{expand:t("artwork.viewOriginal"),close:t("artwork.closeOriginal"),fit:t("artwork.fitImage"),actual:t("artwork.actualSize"),failed:t("feed.imageFailed")}} />
         <section className="artwork-page-info" aria-labelledby="artwork-title">
           <div className="artwork-page-creator"><Link to={`/${language}/profile/${work.owner_user_id}`}>
             <ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-creator-initial"/><strong>{work.artist_name}</strong></Link>
             {!own && session && creator.data && <button disabled={followBusy} type="button" onClick={() => void follow()}>{t(creator.data.is_following ? "profile.unfollow" : "profile.follow")}</button>}
           </div>
           <h1 id="artwork-title">{work.title}</h1>
-          <span className="artwork-page-category">{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
-          <WorkExhibitionBadge exhibitions={work.exhibitions} detail/>
+          <div className="artwork-page-tags"><span className="artwork-page-category">{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
+          <WorkExhibitionBadge exhibitions={work.exhibitions} detail compact/></div>
           <p className="artwork-page-description">{work.description || t("works.noDescription")}</p>
           <div className="artwork-page-date"><CalendarDays size={20} /><span>{t("artwork.created")}<time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{new Date(work.created_at).toLocaleDateString(language, { year: "numeric", month: "short", day: "numeric" })}</time></span></div>
           {work.links.length > 0 && <div className="artwork-page-links">{work.links.map((link, index) => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}</a>)}</div>}

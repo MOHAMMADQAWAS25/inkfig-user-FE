@@ -1,7 +1,15 @@
 import { artworkImageProtection } from "../works/artworkImageProtection";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ArtworkPageMedia } from "../works/ArtworkPageMedia";
+import type { ArtworkImageLabels } from "../works/ArtworkImageExpand";
 
-export function ArtworkMedia({ url, title, mimeType, readOnly, failureLabel }: { url: string; title: string; mimeType: string; readOnly: boolean; failureLabel: string }) {
+type ArtworkMediaProps = { url: string; title: string; mimeType: string; readOnly: boolean; failureLabel: string; fixedFrame?: boolean; imageLabels?: ArtworkImageLabels };
+
+export function ArtworkMedia(props: ArtworkMediaProps) {
+  return props.fixedFrame ? <ArtworkPageMedia {...props} variant="popup"/> : <LegacyArtworkMedia {...props}/>;
+}
+
+function LegacyArtworkMedia({ url, title, mimeType, readOnly, failureLabel }: ArtworkMediaProps) {
   const [failed, setFailed] = useState(false);
   const [frame, setFrame] = useState<{ url: string; scale: number } | null>(null);
   const mediaRef = useRef<HTMLDivElement>(null);

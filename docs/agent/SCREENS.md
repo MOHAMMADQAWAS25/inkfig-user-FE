@@ -49,8 +49,14 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Exhibition gallery popup: artwork only physically left; organized full details,
   actions/voting/share on right with independent desktop scroll. Mobile stacks;
   origin zoom retained and leaderboard presentation unchanged.
-- Gallery popup originals use absolute inset bounds with contain fitting so intrinsic
-  portrait/square dimensions cannot expand and clip the media grid track.
+- Opened artwork page/popups use consistent responsive frame dimensions, centered
+  intrinsic media with shrink-only contain fitting, and scrollable details columns.
+  Desktop/tablet wide images retain side-by-side details; phone regions stack and
+  freeze pixel sizing until width changes. This supersedes image-dependent frames.
+- Full-size image icon opens actual original pixels in a native dialog with optional
+  Fit to screen. Same-URL history Back/Escape/close returns to the same opened card.
+- Viewer exhibition memberships are compact clickable name/year tags with small
+  per-event rating summaries, supporting multiple/long entries without growing the box.
 - Popup right column uses a consistent16px rhythm, grouped exhibition/rating panels,
   aligned44px-minimum action buttons, wrapped text/links and stable scroll gutter.
 - Gallery popup media uses larger contain bounds; selected stars replace redundant

@@ -11764,3 +11764,95 @@ push/merge/conflict/deployment results reported after execution.
 Public issues empty; no authenticated issue-writing tool, no issue URL claimed.
 Rollback by reverting this focused source commit while preserving all feature-log
 history and later overlapping work. No reset, stash, forced push or branch deletion.
+
+## 2026-11-24 - INKFIG-ARTWORK-FRAME-001
+
+### Request
+Consistent opened-card size independent of image ratio/metadata; desktop image and
+details remain side by side. Preserve natural image size when it fits, shrink only
+enough when necessary, balance blank space, compact multi-exhibition tags and add
+an original-size image viewer. Owner explicitly approved replacing image-dependent
+sizing/wide-image stacking; preserve recent controls/history/rating work.
+
+### Changes
+Page/shared popups use a viewport-relative fixed-height desktop frame and stable
+column split. Intrinsic images fit with centered shrink-only contain sizing, no crop,
+stretch, upscale or artificial padding/scale transform. Details scroll internally;
+wide images no longer stack details on desktop/tablet. Phone frame/details pixel
+limits are captured until width changes, avoiding toolbar-height resizing.
+
+Added image-expand icon and native original-image dialog, actual pixels by default,
+optional Fit to screen, localized close/error controls, focus restore and nested
+scroll locks. A same-URL React Router entry makes Back close the original before
+its parent card; Forward restores it. Video controls/read-only behavior retained.
+Viewer exhibition memberships are small deduplicated clickable name/year tags with
+compact per-event ratings; long/multiple tags wrap without growing the frame.
+
+### Repositories
+All three repositories checked clean and main pulled ff-only. Frontend baseline
+b56d5b0; main/user backends564bc38/1bb532d unchanged. Prior partner popup/divider/
+voting, icon-only saves, typography, sidebar isolation and Back fixes preserved.
+
+### Files
+ArtworkPage/ArtworkPageMedia/artworkPage.css, shared ArtworkDetailModal/ArtworkMedia,
+WorkExhibitionBadge, new ArtworkImageExpand/artworkViewer.css, English/Arabic labels,
+focused media/original-viewer/badge/layout tests, four relevant memory files,
+docs/artwork-discovery-layout.md, active task handoff and this append.
+
+### API
+No API changes. Original viewer uses the existing original image URL; no embedding,
+ranking, reaction, submission or voting contract/query changes.
+
+### Database
+No migration required. No database/storage/embedding changes or production writes.
+
+### Permissions and scope
+Existing backend authorization, frontend role/busy guards, read-only reviewer/video
+controls and protected image behavior retained. No backend/SnapStart, dependency,
+environment, credentials or deployment configuration changes. No generated build
+output or local QA assets committed. Ordinary feed-card geometry/virtualization unchanged.
+
+### Frontend
+Same responsive box size per viewport regardless of image/description/event count;
+balanced top/bottom for wide images and left/right for tall images. Original-size
+button allows inspecting large artwork without enlarging the main card. Phones
+stack stable regions; both themes, English/Arabic, keyboard controls and existing
+reduced-motion behavior retained. Existing legacy framing remains separate from
+the explicitly fixed-frame mode selected by artwork viewers.
+
+### Verification
+547 checks passed:125 Node/source and422 Vitest across39 files; strict TypeScript,
+Vite/SEO build and git diff --check passed. New tests cover original source/actual-
+size/Fit/failure/close/focus/history, video exclusion, compact event links/dedup/
+ratings, fixed CSS sizing/centering and source-change recovery. Obsolete free-height/
+wide-stack assertions were replaced with the approved contract, not bypassed. Three
+minimal old matchMedia mocks gained standard listener methods used by the existing
+responsive hook in shared media; targeted dismissal then full suite passed. Existing
+non-blocking bundle-size/jsdom notices remain.
+
+Headless Edge actual-component/inert-data fixtures checked13 combinations across
+1440/1180/820/768/390px, English/light and Arabic/dark/light, portrait/wide/square/
+tiny/very-tall/panorama images plus20 long tags and long description. Asserted exact
+shrink-only dimensions, balanced space, invariant frame height, no horizontal
+overflow, contained metadata scrolling and side-by-side tablets.200x300 stayed
+200x300;3840x2160 original rendered at actual dimensions then fit its screen. Native
+browser Back closed the nested original without closing parent, then parent Back
+retained gallery DOM. Phone120px height-only changes did not alter frame/card sizes.
+No browser exceptions; screenshots reviewed; browser/server closed. No physical
+iOS/Safari certification or production mutations. QA helpers/assets remain in Temp.
+
+### Deployment
+Frontend-only existing main test/build/Cloudflare/health workflow; no backend release,
+manual deployment, migration or data operation. Actual workflow result in handoff.
+
+### Git
+Branch fix/consistent-artwork-viewer. User is integration owner; agent /root.
+Commit subject: Standardize artwork frames and add original image viewer.
+Fetch/rebase unpublished commit before branch push, then standing-authorized
+fast-forward main merge/push. Exact hash, conflicts and actual push/merge/deployment
+status reported after execution. No reset/stash/forced push or branch deletion.
+
+### Notes
+Public issues empty; no authenticated issue writer, no issue URL claimed. Reverse
+only this focused source commit to restore b56d5b0 presentation, retaining prior
+controls/history fixes and all append-only feature-log history. Reconcile later work.

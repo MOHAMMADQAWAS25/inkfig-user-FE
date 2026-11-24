@@ -486,7 +486,7 @@ describe("smooth artwork dismissal",()=>{
     expect(onSave).toHaveBeenCalledExactlyOnceWith(work);
   });
   it("locks phone scrolling, contains focus and restores scroll on close",()=>{
-    vi.stubGlobal("matchMedia",vi.fn((query:string)=>({matches:query.includes("max-width")})));
+    vi.stubGlobal("matchMedia",vi.fn((query:string)=>({matches:query.includes("max-width"),addEventListener:vi.fn(),removeEventListener:vi.fn()})));
     vi.stubGlobal("scrollY",375);
     const outside=document.createElement("button");document.body.append(outside);outside.focus();
     const view=render(modal(vi.fn()));
@@ -501,7 +501,7 @@ describe("smooth artwork dismissal",()=>{
     expect(window.scrollTo).toHaveBeenCalledWith({top:375,behavior:"instant"});expect(document.activeElement).toBe(outside);outside.remove();
   });
   it("does not fix the body position on desktop",()=>{
-    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:false}));render(modal(vi.fn()));
+    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}));render(modal(vi.fn()));
     expect(document.body.style.position).toBe("");expect(document.documentElement.style.overflow).toBe("");
   });
   it.each(["button","backdrop","Escape"])("animates before dismissing via %s",async trigger=>{
@@ -523,7 +523,7 @@ describe("smooth artwork dismissal",()=>{
     expect(document.body.style.overflow).not.toBe("hidden");
   });
   it("does not wait for animation when reduced motion is preferred",async()=>{
-    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:true}));
+    vi.stubGlobal("matchMedia",vi.fn().mockReturnValue({matches:true,addEventListener:vi.fn(),removeEventListener:vi.fn()}));
     const onClose=vi.fn();render(modal(onClose));
     fireEvent.keyDown(document,{key:"Escape"});
     await waitFor(()=>expect(onClose).toHaveBeenCalledTimes(1),{timeout:100});

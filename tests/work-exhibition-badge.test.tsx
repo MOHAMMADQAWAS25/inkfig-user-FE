@@ -6,6 +6,16 @@ import { I18nProvider } from "../src/i18n/I18nProvider";
 import { WorkExhibitionBadge } from "../src/features/works/WorkExhibitionBadge";
 
 afterEach(cleanup);
+
+it.each(["en","ar"])("compact viewer tags retain multiple exhibition links/ratings without large panels (%s)",language=>{
+  const entries=[{exhibition_id:"first",name:"First show",year:2026,rating:{average:5,vote_count:1}},{exhibition_id:"second",name:"Second show",year:2025,rating:{average:4,vote_count:2}}];
+  const {container}=render(<MemoryRouter initialEntries={[`/${language}`]}><Routes><Route path="/:language" element={<I18nProvider><WorkExhibitionBadge detail compact exhibitions={[...entries,entries[0]]}/></I18nProvider>}/></Routes></MemoryRouter>);
+  const links=screen.getAllByRole("link");expect(links).toHaveLength(2);
+  expect(links.map(link=>link.getAttribute("href"))).toEqual([`/${language}/exhibition/first`,`/${language}/exhibition/second`]);
+  expect(screen.getByText("First show")).toBeTruthy();expect(screen.getByText("Second show")).toBeTruthy();
+  expect(container.querySelectorAll(".exhibition-rating-summary")).toHaveLength(2);
+  expect(container.querySelectorAll(".work-exhibition-entry,.exhibition-rating-readonly")).toHaveLength(0);
+});
 const exhibitions=[{exhibition_id:"one",name:"Annual exhibition",year:2026},{exhibition_id:"two",name:"Earlier exhibition",year:2025}];
 function mount(detail=false,language="en",entries=exhibitions){
   return render(<MemoryRouter initialEntries={[`/${language}`]}><Routes><Route path="/:language" element={<I18nProvider><WorkExhibitionBadge exhibitions={entries} detail={detail}/></I18nProvider>}/></Routes></MemoryRouter>);

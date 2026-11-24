@@ -1,13 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-22. Evidence: synchronized main8ea0bff and current verified ticket.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-CONTROLS-001.md).
+Updated: 2026-11-24. Evidence: synchronized mainb56d5b0 and verified frame ticket.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FRAME-001.md).
 
 ## Current objective and approved scope
-Owner approved artwork controls, exhibition popup Back, card typography/cursors
-and slider background isolation. Preserve the recently pulled popup/rating work.
-Status: implemented;537 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-CONTROLS-001](../collaboration/tasks/INKFIG-ARTWORK-CONTROLS-001.md).
-Integration owner: user of this session; agent /root, artwork-controls-2026-11-22.
+Owner approved consistent artwork frames, balanced shrink-only image fitting,
+compact multi-exhibition tags and a full-size original viewer. Preserve controls,
+history/voting, related masonry and notification isolation from preceding tickets.
+Status: implemented;547 checks/build and automated browser fixtures passed.
+Task: [INKFIG-ARTWORK-FRAME-001](../collaboration/tasks/INKFIG-ARTWORK-FRAME-001.md).
+Integration owner: user of this session; agent /root, artwork-frame-2026-11-24.
 Frontend-only; no migration/API/authorization/dependency changes.
 One focused source commit/publication follows verification; exact hash and automatic
 deployment outcome reported in handoff. No manual deployment/production mutations.
@@ -22,8 +23,11 @@ No partner workstreams or checkout/session assignments have been approved.
 - Dedicated artwork route now integrates a measured detail block with related masonry.
   Desktop related columns can grow beyond six; default home geometry is separate.
 - Mobile background-route recovery/swipes, no-upscale natural media and theme/localization.
-- Latest e3f4d07 integrated discovery + 5dd4ec9 zoom-responsive detail/desktop likes.
-  These supersede this session's earlier fixed-box description; do not restore it accidentally.
+- e3f4d07/5dd4ec9 measured discovery/expanded recommendations retained. The owner
+  now explicitly replaces their image-dependent sizing with consistent frames,
+  side-by-side desktop details, centered media and internal metadata scrolling.
+- Original-image native viewer has actual-pixel/Fit modes and same-URL history;
+  Back closes the original first. Compact exhibition tags keep per-event links/ratings.
 - Artwork viewers use icon-only unframed accessible saves; card identities/counts
   keep their sizes but use regular weight. Exhibition previews have scoped same-URL
   history entries; Back closes/Forward restores without remounting their gallery.
@@ -31,7 +35,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main8ea0bff; independent fix/artwork-controls-history-and-overlay.
+- Baseline mainb56d5b0; independent fix/consistent-artwork-viewer.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -41,9 +45,12 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- Current ticket:537 checks (123 Node/source +414 Vitest/38 files), strict TS/Vite/SEO
-  build and whitespace checks passed. Real browser history tested in inert fixtures;
-  desktop1440/light,1180/Arabic/dark,390/phone use actual components with mocked data.
+- Current ticket:547 checks (125 Node/source +422 Vitest/39 files), strict TS/Vite/SEO
+  build and whitespace passed. Actual components/inert fixtures tested13 combinations
+  of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
+  tiny images and20 tags/long text; no upscale/distortion/overflow or changing box size.
+- Native original-viewer Back retained its parent popup, then parent Back retained
+  gallery DOM. Phone120px height-only changes left frame/card dimensions unchanged.
 - No live production mutations or physical Safari/iOS certification. Temporary
   browser/server closed; no helpers/screenshots/build output committed.
 - Configured workflow: [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml).

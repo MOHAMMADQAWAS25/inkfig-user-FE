@@ -1,5 +1,9 @@
 # Integrated artwork discovery layout
 
+Current presentation contract: the owner-approved 2026-11-24 consistent-frame
+follow-up below supersedes the original image-dependent sizing/wide-image stacking.
+The measured featured-block masonry and zoom-responsive recommendations remain.
+
 Baseline: frontend main `79648c6`. Ticket branch: `feature/integrated-artwork-discovery`.
 
 The detail page reserves a measured, multi-column block inside the existing virtual
@@ -56,3 +60,31 @@ and desktop likes`. Revert that commit alone to return to `e3f4d07` behavior. To
 also undo the original integrated layout, reverse the follow-up first and then
 the original ticket. Preserve every historical feature-log entry and append the
 rollback record, as described above; never reset or overwrite unrelated changes.
+
+## Consistent opened-artwork frame (2026-11-24)
+
+Baseline `b56d5b0`; branch `fix/consistent-artwork-viewer`.
+At a given desktop viewport, every artwork uses the same responsive-height box
+with image/details columns, regardless of image dimensions, description length or
+exhibition count. Images remain at intrinsic size if they fit; otherwise scale down
+only enough to fit, without cropping/upscaling. Centering balances any unused space
+on opposing sides. Wide images no longer move details below on desktop/tablets.
+Long metadata scrolls inside its column. Phones stack stable image/details regions;
+pixel sizing is captured until width changes to avoid browser-toolbar resizing.
+
+Opened artwork exhibition memberships use compact, deduplicated clickable name/year
+tags with small per-event rating summaries. Many/long tags wrap without changing
+the outer frame; rating permissions and submission/voting controls are unchanged.
+
+The image expand icon opens the original URL at actual size in a native modal with
+scroll/pan space and an optional Fit to screen toggle. Its same-URL React Router
+entry lets browser Back close the original first, keeping the parent card/gallery
+mounted; Forward restores it. Native focus containment/restore, nested scroll locks,
+Escape/close, loading failures, image protection and English/Arabic labels retained.
+No video image-expansion UI; existing video controls remain unchanged.
+
+This follow-up is isolated in `Standardize artwork frames and add original image
+viewer`. Revert that focused commit to restore `b56d5b0` presentation without undoing
+the prior save-icon, typography, notification isolation or exhibition Back fixes.
+Preserve feature-log history and reconcile later overlaps during any rollback.
+No API, backend, stored-data, migration or dependency changes.

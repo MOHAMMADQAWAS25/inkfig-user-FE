@@ -4,11 +4,18 @@ import { useI18n } from "../../i18n/I18nProvider";
 import type { WorkExhibition } from "./worksApi";
 import { RatingSummary } from "../exhibitions/RatingSummary";
 
-export function WorkExhibitionBadge({ exhibitions, hasExhibition, name, detail = false, showVotingHint = true }: { exhibitions?: readonly WorkExhibition[]; hasExhibition?: boolean; name?: string; detail?: boolean; showVotingHint?: boolean }) {
+export function WorkExhibitionBadge({ exhibitions, hasExhibition, name, detail = false, compact = false, showVotingHint = true }: { exhibitions?: readonly WorkExhibition[]; hasExhibition?: boolean; name?: string; detail?: boolean; compact?: boolean; showVotingHint?: boolean }) {
   const { language, t } = useI18n();
   const entries = Array.from(new Map((exhibitions ?? []).map(item => [item.exhibition_id, item])).values());
   if (detail ? !entries.length : !(hasExhibition ?? Boolean(entries.length))) return null;
   const label = t("works.exhibitionBadge");
+  if (detail && compact) return <div className="work-exhibition-details work-exhibition-tags" aria-label={t("exhibitions.title")}>
+    {entries.map(item => <div className="work-exhibition-tag" key={item.exhibition_id}>
+      <Link className="work-exhibition-badge work-exhibition-compact-link" to={`/${language}/exhibition/${item.exhibition_id}`} aria-label={`${label} ${item.year}: ${item.name}`} title={`${item.name} · ${item.year}`}>
+        <Trophy size={15} aria-hidden="true"/><span className="work-exhibition-tag-name" dir="auto">{item.name || label}</span><small>{item.year}</small>
+      </Link><RatingSummary rating={item.rating}/>
+    </div>)}
+  </div>;
   if (detail) return <div className="work-exhibition-details" aria-label={t("exhibitions.title")}>
     {entries.map(item => <div className="work-exhibition-entry" key={item.exhibition_id}>
       <Link className="work-exhibition-badge" to={`/${language}/exhibition/${item.exhibition_id}`} aria-label={`${label} ${item.year}`}>

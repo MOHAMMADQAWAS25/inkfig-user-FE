@@ -5,9 +5,10 @@ import test from "node:test";
 const css = readFileSync(new URL("../src/features/works/artworkPage.css", import.meta.url), "utf8");
 const page = readFileSync(new URL("../src/features/works/ArtworkPage.tsx", import.meta.url), "utf8");
 
-test("page-only viewer uses natural responsive dimensions instead of a fixed letterboxed frame", () => {
-  assert.match(css, /\.artwork-page-media \{[^}]*height:auto[^}]*min-height:0[^}]*box-sizing:border-box/);
-  assert.match(css, /\.artwork-page-media-original \{[^}]*position:static[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*max-height:min\(78svh,860px\)[^}]*object-fit:contain; object-position:center/);
+test("fixed viewer centers natural media within a consistent image-independent frame", () => {
+  assert.match(css, /\.artwork-page-hero > \.artwork-page-media \{[^}]*align-items:center[^}]*height:100%[^}]*min-height:0[^}]*box-sizing:border-box/);
+  assert.match(css, /\.artwork-page-media-original \{[^}]*position:static[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*max-height:100%[^}]*object-fit:contain; object-position:center/);
+  assert.match(css,/\.artwork-page-hero \{[^}]*height:clamp\(420px,calc\(100svh - 112px\),820px\)/);
   assert.doesNotMatch(css, /artwork-modal-media|artwork-media-original|scale\(|blur\(/);
   assert.match(page, /<ArtworkPageMedia /);
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
@@ -18,9 +19,11 @@ test("opened artwork images shrink to fit without enlarging small originals; vid
   assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
   assert.doesNotMatch(css, /\.artwork-page-media-original \{[^}]*position:absolute/);
 });
-test("detail block adapts its image column and headings without changing popup viewers",()=>{
-  assert.match(css,/grid-template-columns:fit-content\(55%\) minmax\(280px,1fr\)/);
-  assert.match(css,/\.artwork-page-hero--wide \{ grid-template-columns:minmax\(0,1fr\)/);
+test("detail block keeps desktop columns and contains long metadata instead of growing",()=>{
+  assert.match(css,/grid-template-columns:minmax\(0,1\.1fr\) minmax\(0,1fr\)/);
+  assert.match(css,/\.artwork-page-info \{[^}]*min-height:0[^}]*overflow-y:auto[^}]*scrollbar-gutter:stable/);
+  assert.doesNotMatch(css,/artwork-page-hero--wide/);
+  assert.doesNotMatch(page,/mediaRatio|naturalMedia/);
   assert.match(css,/\.feed-featured\[data-full-width="true"\] \.artwork-page-related-title/);
   assert.match(page,/featured=\{\{ key: workId, content: featuredContent \}\}/);
 });
@@ -30,7 +33,7 @@ test("opened artwork uses available desktop width without a fixed outer cap",()=
   assert.match(shell,/width:100%/);
   assert.match(shell,/min-width:0/);
   assert.doesNotMatch(shell,/max-width/);
-  assert.match(css,/@media\(min-width:721px\) \{\s*\.artwork-page-media-original \{ max-height:78svh/);
+  assert.match(css,/max-height:100%;[^}]*object-fit:contain/);
 });
 
 test("desktop numeric likes have theme contrast and stable transparent hit areas",()=>{

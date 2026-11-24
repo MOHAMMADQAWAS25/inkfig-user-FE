@@ -14,7 +14,8 @@ test("phone polish is breakpoint-scoped, hides card overlays and lightens visibl
 });
 test("phone opened media uses stable small-viewport height and compact identity with framed numeric likes",()=>{
   const artwork=readFileSync(new URL("../src/features/works/artworkPage.css",import.meta.url),"utf8").split("@media(max-width:720px)")[1];
-  assert.match(artwork,/max-height:var\(--artwork-mobile-media-limit,50svh\); transition:none/);
+  assert.match(artwork,/height:var\(--artwork-mobile-media-limit,50svh\)/);
+  assert.match(artwork,/max-height:100%; transition:none/);
   assert.match(artwork,/width:44px; height:44px/);
   assert.match(artwork,/button:has\(\.lucide-heart\) \{ background:var\(--surface\); border-color:var\(--border\)/);
 });

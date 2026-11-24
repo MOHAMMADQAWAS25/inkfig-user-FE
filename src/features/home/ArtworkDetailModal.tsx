@@ -122,15 +122,15 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
 
   return (
     <div className={`artwork-modal-backdrop${closing?" artwork-modal-closing":""}`} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && requestClose()}>
-      <section ref={dialogRef} className="artwork-modal" role={containedInDialog ? undefined : "dialog"} aria-modal={containedInDialog ? undefined : true} aria-labelledby="artwork-modal-title">
+      <section ref={dialogRef} className="artwork-modal artwork-fixed-viewer" role={containedInDialog ? undefined : "dialog"} aria-modal={containedInDialog ? undefined : true} aria-labelledby="artwork-modal-title">
         <button ref={closeButtonRef} className="artwork-modal-close" type="button" aria-label={t("works.closeDetails")} onClick={()=>requestClose()}>
           <X size={22} />
         </button>
-        {mediaFooter && !footerInDetails ? <div className="artwork-modal-media-column"><ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/><div className="artwork-modal-media-footer">{mediaFooter}</div></div> : <ArtworkMedia url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>}
+        {mediaFooter && !footerInDetails ? <div className="artwork-modal-media-column"><ArtworkMedia fixedFrame imageLabels={{expand:t("artwork.viewOriginal"),close:t("artwork.closeOriginal"),fit:t("artwork.fitImage"),actual:t("artwork.actualSize"),failed:t("feed.imageFailed")}} url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/><div className="artwork-modal-media-footer">{mediaFooter}</div></div> : <ArtworkMedia fixedFrame imageLabels={{expand:t("artwork.viewOriginal"),close:t("artwork.closeOriginal"),fit:t("artwork.fitImage"),actual:t("artwork.actualSize"),failed:t("feed.imageFailed")}} url={work.image_url} title={work.title} mimeType={work.mime_type} readOnly={readOnly} failureLabel={t("feed.imageFailed")}/>}
         <div className="artwork-modal-content">
           <span className={`artwork-type-tag artwork-modal-type-tag artwork-type-tag--${workTypeTone(work)}`}>{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <h2 id="artwork-modal-title">{work.title}</h2>
-          {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail showVotingHint={!mediaFooter}/>}
+          {!!work.exhibitions?.length && <WorkExhibitionBadge exhibitions={work.exhibitions} detail compact showVotingHint={!mediaFooter}/>}
           {extraDetails}
           <div className="artwork-modal-meta">
             {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`,{replace:historyPreview}),!historyPreview);}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
