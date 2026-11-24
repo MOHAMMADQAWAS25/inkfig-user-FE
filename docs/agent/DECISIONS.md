@@ -13,9 +13,9 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   optional featured block, measured masonry and expanded column count are distinct.
 - Owner-approved2026-11-24 consistent frames supersede image-dependent/wide stacking
   from2026-11-10, while preserving its masonry/zoom-responsive recommendations.
-  Follow-up: all images fill frame width; portraits also fill frame height.
-  Center excess cropping without distortion; gap-only decorative blur remains.
-  Back overlays image top-left rather than reserving a separate row. Retain
+  Latest owner rollback restores dd31376 sizing: portrait height fit, landscapes/
+  squares shrink-only contain, decorative gap blur; no forced side-gap enlargement.
+  Transparent Back overlays the image corner without reserving a row. Retain
   scroll chaining and phone pixel locking. [Current design](../artwork-discovery-layout.md).
 - Expanded images use a screen-fitting native popup without a toolbar/size toggle.
   Same-URL history makes Back dismiss it first; close/outside/Escape animate and

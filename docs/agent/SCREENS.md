@@ -52,13 +52,13 @@ All language-prefixed routes use en/ar; English is the fallback.
   actions/voting/share on right with independent desktop scroll. Mobile stacks;
   origin zoom retained and leaderboard presentation unchanged.
 - Opened artwork page/popups use consistent responsive frame dimensions, centered
-  full-width images/full-height portraits, centered cropping, and scrollable details.
+  height-fitted portraits/shrink-only landscapes, and scrollable details.
   Desktop/tablet wide images retain side-by-side details; phone regions stack and
   freeze pixel sizing until width changes. This supersedes image-dependent frames.
 - Full-size icon opens a fit-only native image popup with inset close, strong blur,
   outside dismissal and reduced-motion-aware transitions. Back retains the same card.
 - Image-color blur is decorative and gap-only; excess image cropping is centered.
-  Back overlays image top-left; the card/recommendations no longer reserve its row.
+  Back is transparent (also on hover) inside the image corner; no separate row.
   Artwork page/exhibition popup retain search/profile header access; details chain scrolling.
 - Viewer exhibition memberships are compact clickable name/year tags with small
   per-event rating summaries, supporting multiple/long entries without growing the box.

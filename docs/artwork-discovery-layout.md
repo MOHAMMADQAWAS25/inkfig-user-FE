@@ -114,3 +114,8 @@ Images fit at least the media width; portraits retain full-height fitting. Exces
 height/width clips evenly without distortion, eliminating side gaps. Wide media
 already filling width and vertical-gap blur remain. Complete source stays visible
 in the unchanged expanded screen-fit popup. No API/data changes.
+
+Owner rollback after d2e2c6f: undo only forced side-gap enlargement, restoring
+ArtworkPageMedia exactly to dd31376. Back keeps its overlay/RTL position and lifted
+layout, with transparent normal/hover background and no border. Earlier portrait
+fitting, gap blur and screen-fit popup remain.

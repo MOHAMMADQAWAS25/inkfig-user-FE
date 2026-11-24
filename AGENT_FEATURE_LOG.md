@@ -12025,3 +12025,40 @@ main publication triggers existing CI. No manual deployment or production writes
 ### Git / Notes
 Same fix/artwork-overlay-back branch; separate focused follow-up to85dad84,
 without rewriting published history. Exact commit/deployment reported after push.
+
+## 2026-11-24 — INKFIG-ARTWORK-FIT-004 — Restore sizing and clear Back
+### Request
+Undo latest image scale-up and make Back background clear.
+### Changes
+Restore ArtworkPageMedia exactly to dd31376, removing forced side-gap enlargement
+and its max-height override. Preserve earlier portrait fitting/gap blur/lightbox.
+Back keeps overlay/RTL position and lifted feed; transparent normal/hover, no border,
+arrow-only contrast shadow and accessible focus outline retained.
+### Repositories
+All three clean/pulled ff-only; frontend d2e2c6f, backends unchanged.
+### Files
+ArtworkPageMedia, artworkPage.css, fitting/layout assertions, relevant memory,
+discovery guide, task handoff and append-only feature log.
+### API
+No API changes.
+### Database
+No migration required. No storage/embedding/data changes or production writes.
+### Permissions and scope
+Frontend only; permissions, partner work, controls/history and unrelated designs retained.
+### Frontend
+Restores sizing from before side-gap scale-up; remaining gaps use previous blur.
+Clear Back stays in image corner in English/Arabic; no separate feed row returns.
+### Verification
+Full tests/build/whitespace required before publication, results in task handoff.
+Source diff versus dd31376 media empty. Native Edge actual-component checks pass
+transparent normal/hover and mirrored placement at1440/390px, English/Arabic.
+Browser/server closed; no physical-device/live mutation certification.
+### Deployment
+Existing frontend main workflow tests/builds/deploys Cloudflare/checks production.
+No manual deployment, backend release, migration or production writes.
+### Git
+fix/restore-artwork-fit; subject Restore previous artwork fitting and clear Back background.
+Fetch/rebase unpublished work, branch push then authorized ff main merge/push;
+actual hash/conflicts/push/deployment reported after execution.
+### Notes
+No authenticated issue writer/issue URL claimed. Preserve append-only logs.

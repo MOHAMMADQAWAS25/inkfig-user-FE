@@ -1,13 +1,13 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-24. Evidence: synchronized main dd31376 and overlay/side-fit follow-up.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-003.md).
+Updated: 2026-11-24. Evidence: synchronized main d2e2c6f and scoped side-scale rollback.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-004.md).
 
 ## Current objective and approved scope
-Owner approved moving Back into the image top-left, lifting the feed by removing
-its separate row, and proportionally filling all image side gaps. Preserve controls,
+Owner requested undoing the latest side-gap enlargement and clearing Back's
+background; retain its overlay position and lifted layout. Preserve controls,
 history/voting, related masonry and notification isolation from preceding tickets.
 Status: implemented;555 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-FIT-003](../collaboration/tasks/INKFIG-ARTWORK-FIT-003.md).
+Task: [INKFIG-ARTWORK-FIT-004](../collaboration/tasks/INKFIG-ARTWORK-FIT-004.md).
 Integration owner: user of this session; agent /root, artwork-overlay-2026-11-24.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
@@ -28,9 +28,10 @@ No partner workstreams or checkout/session assignments have been approved.
 - e3f4d07/5dd4ec9 measured discovery/expanded recommendations retained. The owner
   now explicitly replaces their image-dependent sizing with consistent frames,
   side-by-side desktop details, centered media and internal metadata scrolling.
-- Images fill frame width, portraits also fill height; excess is clipped evenly.
-  This replaces side gaps; remaining vertical landscape gaps retain decorative blur.
-- Back is a44px overlay inside the image top-left; no separate loaded-card row.
+- Image sizing restored exactly to dd31376: portrait height fit, landscape/square
+  shrink-only contain; decorative blur in remaining gaps. No forced side-gap filling.
+- Back is a transparent44px overlay inside the image corner in both directions;
+  no background/border, including hover; no separate loaded-card row.
 - Native image popup fits the complete image to screen, no toolbar/size toggle;
   animated close/outside/Escape/Back preserve parent and focus. Compact tags retained.
 - Artwork search/profile header is visible in the dedicated page and exhibition popup.
@@ -41,7 +42,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main dd31376; independent fix/artwork-overlay-back.
+- Baseline main d2e2c6f; independent fix/restore-artwork-fit.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.

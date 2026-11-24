@@ -14,18 +14,20 @@ test("fixed viewer centers natural media within a consistent image-independent f
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
 });
 
-test("images fill side gaps proportionally and portraits retain full-height fitting", () => {
+test("restored image sizing retains portrait height fitting without forced side-gap enlargement", () => {
   assert.match(css, /\.artwork-page-media-original \{[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*object-fit:contain; object-position:center/);
   assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
   assert.doesNotMatch(css, /\.artwork-page-media-original \{[^}]*position:absolute/);
   const media=readFileSync(new URL("../src/features/works/ArtworkPageMedia.tsx",import.meta.url),"utf8");
   assert.match(media,/natural.height > natural.width \? height \/ natural.height/);
   assert.match(media,/Math.min\(width \/ natural.width, height \/ natural.height, 1\)/);
-  assert.match(media,/Math.max\(fittedScale, width \/ natural.width\)/);
+  assert.doesNotMatch(media,/Math.max\(fittedScale, width \/ natural.width\)/);
   assert.match(media,/const width = element.clientWidth, height = element.clientHeight/);
   assert.match(css,/overflow-y:auto; overscroll-behavior:auto/);
   assert.match(page,/<ArtworkHeader \/>/);
   assert.match(css,/\.artwork-page-back-overlay \{[^}]*inset-inline-start:14px/);
+  assert.match(css,/\.artwork-page-back-overlay \{[^}]*border:0;[^}]*background:transparent/);
+  assert.match(css,/button.artwork-page-back-overlay:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:transparent/);
 });
 test("detail block keeps desktop columns and contains long metadata instead of growing",()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1\.1fr\) minmax\(0,1fr\)/);

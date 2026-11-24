@@ -75,7 +75,7 @@ it("reserves intrinsic image dimensions and drops the loading placeholder once r
   expect(container.querySelector(".artwork-page-media")?.getAttribute("data-ready")).toBe("true");
 });
 
-it.each([[200,300,400,600,false],[300,200,400,800/3,true],[400,600,400,600,false],[100,1000,400,4000,false],[300,400,450,600,false]])("fits %sx%s with no side gaps and proportional scaling",(width,height,expectedWidth,expectedHeight,gaps)=>{
+it.each([[200,300,400,600,false],[300,200,300,200,true],[400,600,400,600,false],[100,1000,60,600,true],[300,400,450,600,false]])("restores %sx%s fitting before side-gap enlargement",(width,height,expectedWidth,expectedHeight,gaps)=>{
   vi.spyOn(HTMLElement.prototype,"clientWidth","get").mockReturnValue(400);
   vi.spyOn(HTMLElement.prototype,"clientHeight","get").mockReturnValue(600);
   const view=render(<ArtworkPageMedia url="/art.png" title="Art" mimeType="image/png" failureLabel="Failed"/>);
@@ -83,6 +83,6 @@ it.each([[200,300,400,600,false],[300,200,400,800/3,true],[400,600,400,600,false
   Object.defineProperties(image,{naturalWidth:{value:width},naturalHeight:{value:height}});
   fireEvent.load(image);
   expect(parseFloat(image.style.width)).toBeCloseTo(expectedWidth);expect(parseFloat(image.style.height)).toBeCloseTo(expectedHeight);
-  expect(image.style.maxHeight).toBe("none");
+  expect(image.style.maxHeight).toBe("");
   expect(Boolean(view.container.querySelector(".artwork-frame-color"))).toBe(gaps);
 });
