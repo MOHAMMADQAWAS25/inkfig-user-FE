@@ -14,13 +14,14 @@ test("fixed viewer centers natural media within a consistent image-independent f
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
 });
 
-test("wide images and videos retain contain fitting while portraits fill the frame height", () => {
+test("images fill side gaps proportionally and portraits retain full-height fitting", () => {
   assert.match(css, /\.artwork-page-media-original \{[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*object-fit:contain; object-position:center/);
   assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
   assert.doesNotMatch(css, /\.artwork-page-media-original \{[^}]*position:absolute/);
   const media=readFileSync(new URL("../src/features/works/ArtworkPageMedia.tsx",import.meta.url),"utf8");
   assert.match(media,/natural.height > natural.width \? height \/ natural.height/);
   assert.match(media,/Math.min\(width \/ natural.width, height \/ natural.height, 1\)/);
+  assert.match(media,/Math.max\(fittedScale, width \/ natural.width\)/);
   assert.match(media,/const width = element.clientWidth, height = element.clientHeight/);
   assert.match(css,/overflow-y:auto; overscroll-behavior:auto/);
   assert.match(page,/<ArtworkHeader \/>/);

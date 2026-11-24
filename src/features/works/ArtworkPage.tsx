@@ -103,6 +103,7 @@ export function ArtworkPage() {
   }
   const back = () => location.state?.returnTo && returnTo === location.state.returnTo ? navigate(-1) : navigate(returnTo);
   const featuredContent = work ? <><article className="artwork-page-hero">
+        <button className="artwork-page-back artwork-page-back-overlay" type="button" aria-label={t("artwork.back")} title={t("artwork.back")} onClick={back}><ArrowLeft size={21} /></button>
         <ArtworkPageMedia url={work.image_url} title={work.title} mimeType={work.mime_type} failureLabel={t("feed.imageFailed")} dimensions={work.media ?? undefined} imageLabels={{expand:t("artwork.viewOriginal"),close:t("artwork.closeOriginal"),fit:t("artwork.fitImage"),actual:t("artwork.actualSize"),failed:t("feed.imageFailed")}} />
         <section className="artwork-page-info" aria-labelledby="artwork-title">
           <div className="artwork-page-creator"><Link to={`/${language}/profile/${work.owner_user_id}`}>
@@ -125,7 +126,7 @@ export function ArtworkPage() {
         </section>
       </article>{error && <p role="alert" className="error-message">{error}</p>}{notice && <p role="status">{notice}</p>}<h2 id="related-artworks-title" className="sr-only artwork-page-related-title">{t("artwork.related")}</h2></> : null;
   return <main className="artwork-page app-page-with-sidebar"><AppSidebar /><ArtworkHeader /><div className="artwork-page-shell">
-    <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>
+    {!work && <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>}
     {query.isPending ? <div className="artwork-page-skeleton" role="status">{t("works.loading")}</div> : !work || query.error ? <section className="artwork-page-unavailable" role="status"><h1>{t(query.error instanceof ApiError && query.error.status === 404 ? "artwork.unavailable" : "works.loadFailed")}</h1><button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button><Link to={`/${language}`}>{t("artwork.home")}</Link></section> : <>
       <section className="artwork-page-related" aria-labelledby="related-artworks-title">
         <Feed key={workId} label={t("artwork.related")} featured={{ key: workId, content: featuredContent }} cacheKey={`related:${viewer}:${workId}`} restoreScroll={false} items={related.items} loading={related.isPending} loadingMore={related.isFetchingNextPage} error={related.error} hasNextPage={Boolean(related.hasNextPage)} loadMore={loadMore} retry={() => { if (related.items.length) loadMore(); else void related.refetch(); }} emptyMessage={t("artwork.noRelated")} renderItem={renderCard} />

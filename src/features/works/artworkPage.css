@@ -7,6 +7,10 @@
 .artwork-header .gallery-search input { align-self:stretch; min-height:44px; }
 .artwork-page-back { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; min-height:44px; padding:10px 18px; border:0; border-radius:12px; background:none; color:var(--muted); cursor:pointer; }
 [dir=rtl] .artwork-page-back svg { transform:rotate(180deg); }
+.artwork-page-hero { position:relative; }
+.artwork-page .artwork-page-back-overlay { position:absolute; top:14px; left:14px; z-index:3; display:grid; place-items:center; width:44px; height:44px; min-height:44px; margin:0; padding:0; border:1px solid rgb(255 255 255 / .2); border-radius:14px; background:rgb(15 20 10 / .78); color:#fffdf0; }
+.artwork-page .artwork-page-back-overlay:is(:hover,:focus-visible) { background:rgb(15 20 10 / .95); border-radius:14px; transform:none; }
+.artwork-page .artwork-page-back-overlay:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
 .artwork-page-hero { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); grid-template-rows:minmax(0,1fr); height:clamp(420px,calc(100svh - 112px),820px); align-items:stretch; gap:0; overflow:hidden; border:1px solid var(--border); border-radius:20px; background:var(--surface); }
 .artwork-page-hero > .artwork-page-media { position:relative; display:flex; justify-content:center; align-items:center; width:100%; height:100%; min-width:0; min-height:0; box-sizing:border-box; overflow:hidden; background:var(--surface-raised,var(--surface)); }
 .artwork-page-media-original { position:static; display:block; width:auto; height:auto; max-width:100%; max-height:100%; min-width:0; min-height:0; object-fit:contain; object-position:center; border-radius:0; flex-shrink:1; }

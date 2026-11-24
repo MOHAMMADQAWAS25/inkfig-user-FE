@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-24. Evidence: synchronized main fca8273 and verified fit/lightbox follow-up.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-002.md).
+Updated: 2026-11-24. Evidence: synchronized main dd31376 and overlay/side-fit follow-up.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-003.md).
 
 ## Current objective and approved scope
-Owner approved full-height portrait scaling, image-colored gap blur, fit-only
-animated image popup, scroll chaining and visible artwork search/profile. Preserve controls,
+Owner approved moving Back into the image top-left, lifting the feed by removing
+its separate row, and proportionally filling all image side gaps. Preserve controls,
 history/voting, related masonry and notification isolation from preceding tickets.
 Status: implemented;555 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-FIT-002](../collaboration/tasks/INKFIG-ARTWORK-FIT-002.md).
-Integration owner: user of this session; agent /root, artwork-fit-2026-11-24.
+Task: [INKFIG-ARTWORK-FIT-003](../collaboration/tasks/INKFIG-ARTWORK-FIT-003.md).
+Integration owner: user of this session; agent /root, artwork-overlay-2026-11-24.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -28,8 +28,9 @@ No partner workstreams or checkout/session assignments have been approved.
 - e3f4d07/5dd4ec9 measured discovery/expanded recommendations retained. The owner
   now explicitly replaces their image-dependent sizing with consistent frames,
   side-by-side desktop details, centered media and internal metadata scrolling.
-- Portraits fill frame height with centered side clipping when necessary; landscapes
-  keep shrink-only contain. Only remaining gaps receive decorative image blur.
+- Images fill frame width, portraits also fill height; excess is clipped evenly.
+  This replaces side gaps; remaining vertical landscape gaps retain decorative blur.
+- Back is a44px overlay inside the image top-left; no separate loaded-card row.
 - Native image popup fits the complete image to screen, no toolbar/size toggle;
   animated close/outside/Escape/Back preserve parent and focus. Compact tags retained.
 - Artwork search/profile header is visible in the dedicated page and exhibition popup.
@@ -40,7 +41,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main fca8273; independent fix/artwork-fit-lightbox.
+- Baseline main dd31376; independent fix/artwork-overlay-back.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.

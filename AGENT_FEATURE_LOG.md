@@ -11951,3 +11951,62 @@ Exact hash/push/merge/conflict/deployment status reported after execution.
 ### Notes
 No authenticated issue writer/issue URL claimed. Revert this focused commit to
 restore fca8273 appearance, preserving append-only log history and later work.
+
+## 2026-11-24 — INKFIG-ARTWORK-FIT-003 — Image Back overlay and side-gap fitting
+
+### Request
+Move Back to the image top-left reference mark, lift the card/recommendations by
+removing its old row, and proportionally enlarge images that have side gaps.
+
+### Changes
+Loaded artwork Back is an absolute44px icon overlay inside the card image corner,
+localized accessible label, contrast/focus and existing navigation retained.
+Loading/error Back remains available. Removing its row lifts the feed56px desktop.
+Images fit at least the frame width, retaining full-height portraits. Cropping is
+centered; removing the max-height clamp prevents unwanted proportional distortion.
+Wide images already filling width retain their sizing; vertical gap blur remains.
+Expanded screen-fit popup still shows the complete image, no source asset changes.
+
+### Repositories
+All three clean/pulled ff-only; frontend dd31376, main564bc38/user1bb532d unchanged.
+
+### Files
+ArtworkPage, ArtworkPageMedia, artworkPage.css, media/page/layout tests,
+four current memory files, task handoff, discovery guide and this append-only log.
+
+### API
+No API changes.
+
+### Database
+No migration required. No database/storage/embedding changes or production writes.
+
+### Permissions and scope
+Frontend only, no authorization/dependency/configuration changes. Prior partner
+My Submissions styling, lightbox/history/actions, videos and feed geometry retained.
+
+### Frontend
+Both themes/languages and phone sizing retained. Back overlays the physical
+top-left reference position, without growing the card. Crop overflow evenly;
+remaining vertical gaps retain existing blur. Expansion displays the complete image.
+
+### Verification
+555 full-suite checks (125 source +430 Vitest/40 files); targeted media/page tests,
+strict TypeScript/Vite/SEO build and whitespace. Browser fixtures13 cases across
+1440/1180/820/768/390px, themes/languages and image shapes, no page overflow,
+proportional fit, centered crop, stable frames/phone sizes, nested Back/gallery DOM.
+Screenshots reviewed; helpers closed. Browser checks caught the height clamp and
+it was corrected; fixture fitting uses rounded client dimensions as actual source.
+No physical-device/live mutation certification. Existing bundle/jsdom notices remain.
+
+### Deployment
+Frontend main automatically tests/builds/deploys Cloudflare and checks production.
+No backend release/manual deployment/migration. Actual CI outcome reported separately.
+
+### Git
+Branch fix/artwork-overlay-back. Commit subject: Move artwork Back into image and
+fill side gaps. Fetch/rebase unpublished work, branch push then authorized ff main
+merge/push; exact hash/conflicts/publication/deployment reported after execution.
+
+### Notes
+No authenticated issue writer/issue URL claimed. Revert this focused commit to
+restore dd31376 appearance while preserving append-only logs and later work.

@@ -28,6 +28,7 @@ it("shows exhibition membership links below the category on the opened artwork",
   expect(badge.getAttribute("href")).toBe("/en/exhibition/event");
   expect(badge.closest(".artwork-page-info")).toBeTruthy();
   expect(badge.closest(".work-exhibition-overlay")).toBeNull();
+  expect(screen.getByRole("button",{name:"Back"}).closest(".artwork-page-hero")).toBeTruthy();
 });
 it("keeps the same featured card for wide media metadata, retaining the detail actions",async()=>{
   vi.mocked(getWork).mockResolvedValue({...sample,media:{width:1200,height:600,url:"/art.png",dominantColor:"#123456",sizes:[]}});

@@ -106,3 +106,11 @@ fallback. Same-URL history, focus and nested scroll locks remain. Details allow
 scroll chaining; artwork route/exhibition popup retain search/profile access.
 The existing home keyword/selected-account query contracts are reused.
 Rollback this focused follow-up independently, preserving append-only logs.
+
+## Image Back overlay and side-gap fill follow-up
+
+From dd31376, Back moves inside the image top-left and its old feed row disappears.
+Images fit at least the media width; portraits retain full-height fitting. Excess
+height/width clips evenly without distortion, eliminating side gaps. Wide media
+already filling width and vertical-gap blur remain. Complete source stays visible
+in the unchanged expanded screen-fit popup. No API/data changes.
