@@ -15,5 +15,8 @@ status/reason blocks use compact grids. Mobile controls retain natural detail or
 Checks:125 Node/source +422 Vitest passed; strict TS/Vite/SEO build/diff check passed.
 Existing bundle-size/jsdom notices retained; no dependency or test assertions changed.
 No live authenticated/browser visual verification performed for this styling task.
-Next: commit, sync, push main; check automatic frontend deployment.
+Source6808da2784aa50d740442185755183578631f43a pushed main without conflicts.
+Workflow45458591170 succeeded: tests/build/Cloudflare deployment/production check.
+No manual release/data writes. Next: owner visual review; implementation complete.
+Revert focused source commit for rollback, preserving unrelated changes/log history.
 Standing main publication authorized; no manual release or production mutation.

@@ -5,7 +5,7 @@ Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration
 ## Current objective and approved scope
 Owner requested My Submissions artwork popup spacing and a line below Related Links.
 Preserve current artwork frames/original viewer, history/actions, and other pages.
-Status: scoped styling verified;547 checks and production build passed; push pending.
+Status: My Submissions styling deployed6808da2;547 checks/build and CI passed.
 Task: [INKFIG-SUBMISSION-SPACING-001](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Integration owner: a7mad.ishaq; agent /root, submission-spacing-2026-11-24.
 Frontend-only; no migration/API/authorization/dependency changes.
