@@ -3,6 +3,8 @@
 Current presentation contract: the owner-approved 2026-11-24 consistent-frame
 follow-up below supersedes the original image-dependent sizing/wide-image stacking.
 The measured featured-block masonry and zoom-responsive recommendations remain.
+The subsequent portrait/lightbox follow-up at the end overrides shrink-only
+portrait sizing and original-pixel/Fit modes; wide-image sizing remains unchanged.
 
 Baseline: frontend main `79648c6`. Ticket branch: `feature/integrated-artwork-discovery`.
 
@@ -88,3 +90,19 @@ viewer`. Revert that focused commit to restore `b56d5b0` presentation without un
 the prior save-icon, typography, notification isolation or exhibition Back fixes.
 Preserve feature-log history and reconcile later overlaps during any rollback.
 No API, backend, stored-data, migration or dependency changes.
+
+## 2026-11-24 portrait and lightbox follow-up
+
+Baseline fca8273; branch fix/artwork-fit-lightbox. Portraits scale to full frame
+height, centered horizontally; if wider than the column, its edges are clipped
+evenly. The expansion always shows the complete image fitted to the viewport.
+Landscape/square images keep the prior shrink-only contain rule. Decorative image
+blur appears only in remaining gaps, beneath the sharp original. Layout client
+dimensions exclude temporary opening-animation transforms.
+
+Expansion has no toolbar/size toggle: native modal, inset close, strong blurred/dim
+backdrop,180ms opening/closing, outside/Escape/Back dismissal and reduced-motion
+fallback. Same-URL history, focus and nested scroll locks remain. Details allow
+scroll chaining; artwork route/exhibition popup retain search/profile access.
+The existing home keyword/selected-account query contracts are reused.
+Rollback this focused follow-up independently, preserving append-only logs.

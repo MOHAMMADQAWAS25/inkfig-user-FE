@@ -10,6 +10,7 @@ import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { ArtworkPageMedia } from "./ArtworkPageMedia";
+import { ArtworkHeader } from "./ArtworkHeader";
 import { WorkExhibitionBadge } from "./WorkExhibitionBadge";
 import { Feed } from "../feed/Feed";
 import { PostCard } from "../feed/PostCard";
@@ -123,7 +124,7 @@ export function ArtworkPage() {
           </div>
         </section>
       </article>{error && <p role="alert" className="error-message">{error}</p>}{notice && <p role="status">{notice}</p>}<h2 id="related-artworks-title" className="sr-only artwork-page-related-title">{t("artwork.related")}</h2></> : null;
-  return <main className="artwork-page app-page-with-sidebar"><AppSidebar /><div className="artwork-page-shell">
+  return <main className="artwork-page app-page-with-sidebar"><AppSidebar /><ArtworkHeader /><div className="artwork-page-shell">
     <button className="artwork-page-back" type="button" onClick={back}><ArrowLeft size={18} />{t("artwork.back")}</button>
     {query.isPending ? <div className="artwork-page-skeleton" role="status">{t("works.loading")}</div> : !work || query.error ? <section className="artwork-page-unavailable" role="status"><h1>{t(query.error instanceof ApiError && query.error.status === 404 ? "artwork.unavailable" : "works.loadFailed")}</h1><button type="button" onClick={() => void query.refetch()}>{t("feed.retry")}</button><Link to={`/${language}`}>{t("artwork.home")}</Link></section> : <>
       <section className="artwork-page-related" aria-labelledby="related-artworks-title">

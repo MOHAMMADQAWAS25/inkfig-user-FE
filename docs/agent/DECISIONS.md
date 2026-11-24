@@ -13,10 +13,12 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   optional featured block, measured masonry and expanded column count are distinct.
 - Owner-approved2026-11-24 consistent frames supersede image-dependent/wide stacking
   from2026-11-10, while preserving its masonry/zoom-responsive recommendations.
-  Center intrinsic media without unnecessary shrinking/upscaling/cropping; scroll
-  metadata inside and retain phone pixel locking. [Current design](../artwork-discovery-layout.md).
-- Original images use a native modal and same-URL React Router history so Back closes
-  original image before its parent card. Compact exhibition tags remain per-event links.
+  Follow-up: portraits scale to frame height, centered side clipping if wider than
+  their column; landscapes retain shrink-only contain. Gap-only decorative blur,
+  scroll chaining and phone pixel locking. [Current design](../artwork-discovery-layout.md).
+- Expanded images use a screen-fitting native popup without a toolbar/size toggle.
+  Same-URL history makes Back dismiss it first; close/outside/Escape animate and
+  preserve focus/parent. Compact exhibition tags remain per-event links.
 - Related ranking comes from main backend, not client popularity/category sorting.
   No new Voyage request when opening a work; do not add N+1 card calls.
 - New work minimum200px wide AND300px tall, including boundary; client preflight plus

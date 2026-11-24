@@ -16,10 +16,12 @@ Updated: 2026-11-15. [Screens](SCREENS.md), [API](API_OVERVIEW.md).
 - Find users sidebar supports live debounced name search without @ and paginated results.
 - Open card -> dedicated artwork route/related masonry. Phone keeps eligible background
   route inert and restores previous scroll on Back; direct links remain standalone.
-- Consistent responsive opened-card frames center intrinsic images, shrinking only
-  as needed without cropping/upscaling. Scrollable details do not grow the box.
-- Full-size icon opens original pixels; Fit to screen is optional. Browser Back or
-  close/Escape dismisses the original first while retaining the card and gallery.
+- Consistent frames show full-height portraits, centered with side clipping if needed;
+  wide images retain contain sizing. Gap-only image blur fills unused areas.
+- Full-size icon shows the complete image fitted to screen, no toolbar/size toggle.
+  Outside/close/Escape/Back animate dismissal while retaining the card/gallery.
+- Artwork page and exhibition popup show search/profile access. Details scroll
+  internally then chain to the surrounding scroll area rather than trapping input.
 - Likes/saves/follow/edit/report/moderator delete update relevant caches with rollback on failure.
 
 ## Upload and profile

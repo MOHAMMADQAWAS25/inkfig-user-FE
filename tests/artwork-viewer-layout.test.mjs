@@ -4,9 +4,10 @@ import test from "node:test";
 const read=p=>readFileSync(new URL(`../src/${p}`,import.meta.url),"utf8");
 const css=read("features/works/artworkViewer.css");
 
-test("original-size viewer preserves intrinsic pixels and offers a bounded fit mode",()=>{
-  assert.match(css,/\.artwork-original-canvas \.artwork-original-image \{[^}]*width:auto; height:auto; max-width:none; max-height:none/);
-  assert.match(css,/data-fit="true"[^}]*\.artwork-original-image \{ max-width:100%; max-height:100%/);
+test("expanded viewer fits the screen with a blurred backdrop and reversible animations",()=>{
+  assert.match(css,/\.artwork-original-viewport \.artwork-original-image \{[^}]*width:auto; height:auto; max-width:100%; max-height:100%/);
+  assert.match(css,/backdrop-filter:blur\(18px\)/);
+  assert.match(css,/data-closing="true"/);
   const source=read("features/works/ArtworkImageExpand.tsx");
   assert.match(source,/useState\(false\)/);assert.match(source,/showModal\(\)/);
   assert.match(source,/usePageScrollLock\(true\)/);assert.match(source,/createPortal\(/);

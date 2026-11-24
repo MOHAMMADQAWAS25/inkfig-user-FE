@@ -13,29 +13,28 @@ beforeEach(()=>{
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();});
 
-it("opens the original source at actual size, can fit it, and restores focus/scroll locking on close",()=>{
+it("opens a screen-fitting original without a toolbar and restores focus/scroll locking after its closing animation",async()=>{
   mount(<ArtworkImageExpand url="/original-8000.png" title="Artwork" labels={labels}/>);
   const button=screen.getByRole("button",{name:labels.expand});button.focus();fireEvent.click(button);
   const dialog=screen.getByRole("dialog",{name:"Artwork"});
   expect(dialog.parentElement).toBe(document.body);
   expect(within(dialog).getByRole("img").getAttribute("src")).toBe("/original-8000.png");
-  expect(dialog.querySelector(".artwork-original-viewport")?.getAttribute("data-fit")).toBe("false");
+  expect(dialog.querySelector("header")).toBeNull();
   expect(document.documentElement.style.overflow).toBe("hidden");
-  fireEvent.click(within(dialog).getByRole("button",{name:labels.fit}));
-  expect(dialog.querySelector(".artwork-original-viewport")?.getAttribute("data-fit")).toBe("true");
-  fireEvent.click(within(dialog).getByRole("button",{name:labels.actual}));
-  expect(dialog.querySelector(".artwork-original-viewport")?.getAttribute("data-fit")).toBe("false");
+  expect(within(dialog).queryByRole("button",{name:labels.fit})).toBeNull();
+  expect(within(dialog).queryByRole("button",{name:labels.actual})).toBeNull();
   fireEvent.click(within(dialog).getByRole("button",{name:labels.close}));
-  expect(screen.queryByRole("dialog")).toBeNull();expect(document.activeElement).toBe(button);
+  expect(dialog.getAttribute("data-closing")).toBe("true");
+  await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());expect(document.activeElement).toBe(button);
   expect(document.documentElement.style.overflow).not.toBe("hidden");
 });
 
-it("Escape dismisses only the original viewer and nested scroll locks remain intact",()=>{
+it("Escape dismisses only the original viewer and nested scroll locks remain intact",async()=>{
   document.body.style.overflow="hidden";
   mount(<ArtworkImageExpand url="/original.png" title="Artwork" labels={labels}/>);
   fireEvent.click(screen.getByRole("button",{name:labels.expand}));
   fireEvent(screen.getByRole("dialog"),new Event("cancel",{cancelable:true}));
-  expect(screen.queryByRole("dialog")).toBeNull();expect(document.body.style.overflow).toBe("hidden");
+  await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());expect(document.body.style.overflow).toBe("hidden");
   document.body.style.overflow="";
 });
 
@@ -43,7 +42,16 @@ it("shows a localized failure state without navigating away from the opened card
   mount(<ArtworkImageExpand url="/missing.png" title="Artwork" labels={labels}/>);
   fireEvent.click(screen.getByRole("button",{name:labels.expand}));
   fireEvent.error(screen.getByRole("img"));expect(screen.getByRole("status").textContent).toBe(labels.failed);
-  expect((screen.getByRole("button",{name:labels.fit}) as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.getByRole("button",{name:labels.close})).toBeTruthy();
+});
+
+it("clicking the empty popup background closes smoothly while clicking its image does not",async()=>{
+  mount(<ArtworkImageExpand url="/original.png" title="Artwork" labels={labels}/>);
+  fireEvent.click(screen.getByRole("button",{name:labels.expand}));
+  fireEvent.click(screen.getByRole("img"));expect(screen.getByRole("dialog").getAttribute("data-closing")).toBe("false");
+  fireEvent.click(screen.getByRole("dialog"));
+  expect(screen.getByRole("dialog").getAttribute("data-closing")).toBe("true");
+  await waitFor(()=>expect(screen.queryByRole("dialog")).toBeNull());
 });
 
 it("only offers image expansion after a successful load and resets on source changes",()=>{

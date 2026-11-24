@@ -25,8 +25,28 @@ export function ArtworkPageMedia(props: ArtworkPageMediaProps) {
 function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions, onDimensions, variant = "page", readOnly = false, imageLabels }: ArtworkPageMediaProps) {
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
+  const [natural, setNatural] = useState(dimensions);
+  const [fitting, setFitting] = useState<{ width: number; height: number; gaps: boolean }>();
   const mobile = useMobileViewport();
   const frame = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = frame.current;
+    if (!element || !natural?.width || !natural.height || mimeType.startsWith("video/")) return;
+    const measure = () => {
+      // Layout dimensions exclude the parent card's temporary opening scale.
+      const width = element.clientWidth, height = element.clientHeight;
+      if (!width || !height) return;
+      const scale = natural.height > natural.width ? height / natural.height
+        : Math.min(width / natural.width, height / natural.height, 1);
+      const next = { width: natural.width * scale, height: natural.height * scale,
+        gaps: width - natural.width * scale > 2 || height - natural.height * scale > 2 };
+      setFitting(previous => previous && Math.abs(previous.width-next.width)<.5 && Math.abs(previous.height-next.height)<.5 && previous.gaps===next.gaps ? previous : next);
+    };
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    observer?.observe(element); window.addEventListener("resize", measure);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", measure); };
+  }, [natural, mimeType]);
   useLayoutEffect(() => {
     const element = frame.current;
     if (!mobile || !element) return;
@@ -50,10 +70,11 @@ function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions
   }, [mobile]);
   const imageClass = `artwork-page-media-original${variant === "popup" ? " artwork-media-original artwork-fixed-media-original" : ""}`;
   return <div className={`artwork-page-media${variant === "popup" ? " artwork-modal-media artwork-fixed-media" : ""}`} data-ready={ready || failed} ref={frame}>
+    {!failed && ready && fitting?.gaps && <div className="artwork-frame-color" aria-hidden="true" style={{ backgroundImage: `url(${JSON.stringify(url)})` }}/ >}
     {failed ? <p className="artwork-page-media-error" role="status">{failureLabel}</p>
       : mimeType.startsWith("video/")
         ? <video className={imageClass} src={url} aria-label={title} controls={!readOnly} playsInline preload="metadata" onLoadedMetadata={event => { setReady(true); onDimensions?.(event.currentTarget.videoWidth,event.currentTarget.videoHeight); }} onError={() => setFailed(true)} />
-        : <img {...artworkImageProtection} className={imageClass} src={url} alt={title} width={dimensions?.width} height={dimensions?.height} decoding="async" onLoad={event => { setReady(true); onDimensions?.(event.currentTarget.naturalWidth,event.currentTarget.naturalHeight); }} onError={() => setFailed(true)} />}
+        : <img {...artworkImageProtection} className={imageClass} style={fitting ? { width: fitting.width, height: fitting.height, ...(natural && natural.height > natural.width ? {maxWidth:"none",flexShrink:0} : {}) } : undefined} src={url} alt={title} width={dimensions?.width} height={dimensions?.height} decoding="async" onLoad={event => { setReady(true); setNatural({width:event.currentTarget.naturalWidth,height:event.currentTarget.naturalHeight}); onDimensions?.(event.currentTarget.naturalWidth,event.currentTarget.naturalHeight); }} onError={() => setFailed(true)} />}
     {!failed && ready && !mimeType.startsWith("video/") && imageLabels && <ArtworkImageExpand url={url} title={title} labels={imageLabels}/>}
   </div>;
 }

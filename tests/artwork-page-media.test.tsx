@@ -74,3 +74,14 @@ it("reserves intrinsic image dimensions and drops the loading placeholder once r
   fireEvent.load(image);
   expect(container.querySelector(".artwork-page-media")?.getAttribute("data-ready")).toBe("true");
 });
+
+it.each([[200,300,400,600,false],[300,200,300,200,true],[400,600,400,600,false],[100,1000,60,600,true],[300,400,450,600,false]])("fits %sx%s with full-height portraits and unchanged landscape sizing",(width,height,expectedWidth,expectedHeight,gaps)=>{
+  vi.spyOn(HTMLElement.prototype,"clientWidth","get").mockReturnValue(400);
+  vi.spyOn(HTMLElement.prototype,"clientHeight","get").mockReturnValue(600);
+  const view=render(<ArtworkPageMedia url="/art.png" title="Art" mimeType="image/png" failureLabel="Failed"/>);
+  const image=screen.getByRole("img");
+  Object.defineProperties(image,{naturalWidth:{value:width},naturalHeight:{value:height}});
+  fireEvent.load(image);
+  expect(image.style.width).toBe(`${expectedWidth}px`);expect(image.style.height).toBe(`${expectedHeight}px`);
+  expect(Boolean(view.container.querySelector(".artwork-frame-color"))).toBe(gaps);
+});

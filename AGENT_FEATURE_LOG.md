@@ -11876,3 +11876,78 @@ Independent style/submission-popup-spacing fromfca8273; a7mad.ishaq integration 
 agent /root submission-spacing-2026-11-24. Commit Align My Submissions popup details.
 Main push triggers existing tests/build/Cloudflare deployment. Exact hash/outcome
 in task handoff. No manual release/migration; revert focused source commit to undo.
+
+## 2026-11-24 — INKFIG-ARTWORK-FIT-002 — Portrait fit and screen-fit popup
+
+### Request
+Enlarge portrait artwork, retain wide-image behavior, color remaining blank areas,
+replace image expansion with a smooth screen-fitting popup without toolbar/modes,
+support outside close, fix card-hover scrolling and keep search/profile visible.
+
+### Changes
+Portraits fill media-frame height; scaling preserves aspect ratio and centers side
+clipping when wider than their column. Complete images remain available expanded.
+Landscape/square sizing stays shrink-only contain. Only genuine remaining gaps
+receive decorative image-colored24px blur at48% opacity. Image remains sharp.
+Sizing uses untransformed client dimensions so opening-origin animation cannot
+leave images incorrectly small. Existing stable phone limits retained.
+Native expansion now fits complete image to screen, no header/size-mode choices;
+inset44px close,18px blurred80% dim backdrop,180ms transitions, outside/Escape/Back
+dismissal, reduced motion, focus restore and nested scroll locking retained.
+Scrollable details chain at their ends. Artwork page/exhibition popup have search
+and profile access. Keyword and @ selected-account searches reuse home contracts.
+
+### Repositories
+All three checked clean and pulled main ff-only. Frontend baseline fca8273;
+main-system564bc38 and user-system1bb532d unchanged.
+
+### Files
+ArtworkPageMedia, ArtworkImageExpand, new ArtworkHeader, ArtworkPage,
+ExhibitionArtworkPopup, artworkPage/artworkViewer CSS; lightbox/media/layout/header
+tests; active handoff, current memory, discovery-layout guide and append-only log.
+
+### API
+No API changes. Existing original URL, profile lookup and home search query contracts.
+
+### Database
+No migration required. No storage/embedding/data changes or production writes.
+
+### Permissions and scope
+Frontend only. Existing authorization, read-only video controls, image protection,
+ratings, actions, gallery history and notification isolation preserved. No new
+library, secrets, environment, backend/SnapStart or deployment configuration changes.
+
+### Frontend
+Consistent frames/compact exhibition tags retained. Height-filled portraits may
+clip horizontally; expansion shows complete image. Wide images remain centered.
+Both themes/languages, tablets/phones, keyboard/reduced-motion states retained.
+Ordinary home-feed geometry and virtualization unchanged.
+
+### Verification
+555 checks:125 source +430 Vitest/40 files; strict TS/Vite/SEO and diff whitespace.
+Existing suite428 plus new header2 passed locally; automatic CI runs all together.
+Tests cover full-height portrait/landscape/gap fitting, failures, popup dismissal,
+focus/scroll locks/history and keyword/@-account searches. No checks bypassed.
+Headless Edge actual components/inert data checked13 combinations of1440/1180/
+820/768/390px, themes/languages, portrait/tiny/tall/wide/square/panorama/long metadata.
+Verified stable frame/phone sizing, centered gaps, no overflow, native nested Back
+retaining gallery DOM. Extra real-wheel check confirms scroll chaining; popup fit,
+blur/outside close/header visibility verified. Screenshots reviewed, helpers closed.
+Initial runs found a minimal session-fixture gap, wrong exact-fit gap expectation
+and transformed bounds during popup origin zoom; corrected and rerun. Existing
+non-blocking bundle/jsdom notices remain. No physical iOS/live mutation certification.
+
+### Deployment
+Frontend main push triggers existing tests/build/Cloudflare/health workflow.
+No backend release, manual deploy, migration or production mutation. Actual CI
+result reported after publication, separately from implementation/local checks.
+
+### Git
+Branch fix/artwork-fit-lightbox; owner is integration decision-maker, agent /root.
+Commit subject: Refine portrait fitting and screen-fit artwork popup.
+Fetch/rebase unpublished work before push, then authorized fast-forward main/push.
+Exact hash/push/merge/conflict/deployment status reported after execution.
+
+### Notes
+No authenticated issue writer/issue URL claimed. Revert this focused commit to
+restore fca8273 appearance, preserving append-only log history and later work.

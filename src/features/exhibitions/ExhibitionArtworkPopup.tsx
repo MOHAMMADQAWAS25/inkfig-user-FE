@@ -7,6 +7,7 @@ import { hasPermission } from "../../lib/permissions";
 import { ApiError } from "../../api/httpClient";
 import { useAuth } from "../auth/AuthContext";
 import { ArtworkDetailModal } from "../home/ArtworkDetailModal";
+import { ArtworkHeader } from "../works/ArtworkHeader";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
 import { getWork, setWorkLike, setWorkSave, type Work } from "../works/worksApi";
 import { updateArtworkCache } from "../works/updateArtworkCache";
@@ -58,6 +59,7 @@ export function ExhibitionArtworkPopup({ workId, onClose, exhibitionId, rating, 
   }
   return createPortal(<dialog ref={dialog} className={`exhibition-artwork-popup${exhibitionId ? " exhibition-expanded-card-popup" : ""}`} aria-label={query.data?.title ?? t("works.viewDetails")} aria-modal="true"
     onCancel={event => { event.preventDefault(); const button=dialog.current?.querySelector<HTMLButtonElement>(".artwork-modal-close"); if(exhibitionId && button) button.click(); else onClose(); }}>
+    <ArtworkHeader />
     {query.data && !query.isError ? <ArtworkDetailModal containedInDialog footerInDetails={Boolean(exhibitionId)} interactionBusy={busy} language={language} work={query.data} canLike={can("works.like")} canSave={can("works.save")}
       canReport={can("reports.create") && query.data.owner_user_id !== session?.userId} expandedFrom={exhibitionId ? origin : undefined} onClose={onClose} onToggleLike={work => void interact(work,"like")} onToggleSave={work => void interact(work,"save")} t={t}
       mediaFooter={exhibitionId ? <>{currentRating ? <ExhibitionRatingControls key={`${exhibitionId}:${workId}`} exhibitionId={exhibitionId} workId={workId} rating={currentRating} votingOpen={votingOpen} showPersonalScore={false}/> : ratingQuery.isError ? <p role="alert">{t("works.loadFailed")} <button type="button" onClick={() => void ratingQuery.refetch()}>{t("feed.retry")}</button></p> : <p role="status">{t("works.loading")}</p>}<div className="exhibition-expanded-share"><button type="button" onClick={()=>void share(true)}><Copy size={17}/>{t("artwork.copyLink")}</button><button type="button" onClick={()=>void share()}><Share2 size={17}/>{t("artwork.share")}</button></div>{shareNotice && <p role="status">{shareNotice}</p>}</> : undefined}

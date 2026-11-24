@@ -1,13 +1,16 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-24. Evidence: synchronized mainb56d5b0 and verified frame ticket.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FRAME-001.md).
+Updated: 2026-11-24. Evidence: synchronized main fca8273 and verified fit/lightbox follow-up.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-002.md).
 
 ## Current objective and approved scope
-Owner requested My Submissions artwork popup spacing and a line below Related Links.
-Preserve current artwork frames/original viewer, history/actions, and other pages.
-Status: My Submissions styling deployed6808da2;547 checks/build and CI passed.
-Task: [INKFIG-SUBMISSION-SPACING-001](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
-Integration owner: a7mad.ishaq; agent /root, submission-spacing-2026-11-24.
+Owner approved full-height portrait scaling, image-colored gap blur, fit-only
+animated image popup, scroll chaining and visible artwork search/profile. Preserve controls,
+history/voting, related masonry and notification isolation from preceding tickets.
+Status: implemented;555 checks/build and automated browser fixtures passed.
+Task: [INKFIG-ARTWORK-FIT-002](../collaboration/tasks/INKFIG-ARTWORK-FIT-002.md).
+Integration owner: user of this session; agent /root, artwork-fit-2026-11-24.
+Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
+6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
 One focused source commit/publication follows verification; exact hash and automatic
 deployment outcome reported in handoff. No manual deployment/production mutations.
@@ -21,12 +24,15 @@ No partner workstreams or checkout/session assignments have been approved.
   per-exhibition rating popup and paginated category-filtered leaderboard.
 - Dedicated artwork route now integrates a measured detail block with related masonry.
   Desktop related columns can grow beyond six; default home geometry is separate.
-- Mobile background-route recovery/swipes, no-upscale natural media and theme/localization.
+- Mobile background-route recovery/swipes, stable media and theme/localization.
 - e3f4d07/5dd4ec9 measured discovery/expanded recommendations retained. The owner
   now explicitly replaces their image-dependent sizing with consistent frames,
   side-by-side desktop details, centered media and internal metadata scrolling.
-- Original-image native viewer has actual-pixel/Fit modes and same-URL history;
-  Back closes the original first. Compact exhibition tags keep per-event links/ratings.
+- Portraits fill frame height with centered side clipping when necessary; landscapes
+  keep shrink-only contain. Only remaining gaps receive decorative image blur.
+- Native image popup fits the complete image to screen, no toolbar/size toggle;
+  animated close/outside/Escape/Back preserve parent and focus. Compact tags retained.
+- Artwork search/profile header is visible in the dedicated page and exhibition popup.
 - Artwork viewers use icon-only unframed accessible saves; card identities/counts
   keep their sizes but use regular weight. Exhibition previews have scoped same-URL
   history entries; Back closes/Forward restores without remounting their gallery.
@@ -34,7 +40,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline mainb56d5b0; independent fix/consistent-artwork-viewer.
+- Baseline main fca8273; independent fix/artwork-fit-lightbox.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -44,10 +50,10 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- Current ticket:547 checks (125 Node/source +422 Vitest/39 files), strict TS/Vite/SEO
+- Current ticket:555 checks (125 Node/source +430 Vitest/40 files), strict TS/Vite/SEO
   build and whitespace passed. Actual components/inert fixtures tested13 combinations
   of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
-  tiny images and20 tags/long text; no upscale/distortion/overflow or changing box size.
+  tiny images and20 tags/long text; full-height portraits, no distortion/page overflow.
 - Native original-viewer Back retained its parent popup, then parent Back retained
   gallery DOM. Phone120px height-only changes left frame/card dimensions unchanged.
 - No live production mutations or physical Safari/iOS certification. Temporary
@@ -75,7 +81,7 @@ Do not run manual migrations/deployments or production fixtures without explicit
 - Physical-device and real PostgreSQL concurrency/plan certification are not implied by tests.
 
 ## Exact next actions
-1. Fetch/integrate safely, publish the verified focused ticket and inspect automatic CI.
+1. Fetch/integrate safely, publish the verified fit/lightbox ticket and inspect automatic CI.
 2. Report exact hash, conflicts/push/merge/deployment separately; owner visual review next.
 3. Retain independent checkouts, scoped handoffs and earlier unresolved limits.
 4. Rollback by reverting the focused source commit while preserving feature-log history.

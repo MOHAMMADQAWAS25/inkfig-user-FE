@@ -14,10 +14,16 @@ test("fixed viewer centers natural media within a consistent image-independent f
   assert.doesNotMatch(page, /from "\.\.\/home\/ArtworkMedia"/);
 });
 
-test("opened artwork images shrink to fit without enlarging small originals; videos keep contain", () => {
+test("wide images and videos retain contain fitting while portraits fill the frame height", () => {
   assert.match(css, /\.artwork-page-media-original \{[^}]*width:auto; height:auto[^}]*max-width:100%[^}]*object-fit:contain; object-position:center/);
   assert.doesNotMatch(css, /video[^{}]*\{[^}]*object-fit:scale-down/);
   assert.doesNotMatch(css, /\.artwork-page-media-original \{[^}]*position:absolute/);
+  const media=readFileSync(new URL("../src/features/works/ArtworkPageMedia.tsx",import.meta.url),"utf8");
+  assert.match(media,/natural.height > natural.width \? height \/ natural.height/);
+  assert.match(media,/Math.min\(width \/ natural.width, height \/ natural.height, 1\)/);
+  assert.match(media,/const width = element.clientWidth, height = element.clientHeight/);
+  assert.match(css,/overflow-y:auto; overscroll-behavior:auto/);
+  assert.match(page,/<ArtworkHeader \/>/);
 });
 test("detail block keeps desktop columns and contains long metadata instead of growing",()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1\.1fr\) minmax\(0,1fr\)/);

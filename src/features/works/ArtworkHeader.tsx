@@ -1,0 +1,40 @@
+import { Search, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../auth/AuthContext";
+import { useI18n } from "../../i18n/I18nProvider";
+import { getPublicProfile, searchProfiles, type ProfileSearchResult } from "../profile/profileApi";
+import { ProfileAvatar } from "../profile/ProfileAvatar";
+import { SEARCH_DEBOUNCE_MS } from "../../lib/useDebouncedSearch";
+
+/** Search delegates to the existing home results route; account selection keeps its scope. */
+export function ArtworkHeader() {
+  const { session } = useAuth(), { language, t } = useI18n(), navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [accounts, setAccounts] = useState<ProfileSearchResult[]>([]);
+  const [focused, setFocused] = useState(false);
+  const profile = useQuery({ queryKey: ["artwork-header-profile", session?.userId], enabled: Boolean(session), queryFn: () => getPublicProfile(session!.userId), staleTime: 60_000 });
+  useEffect(() => {
+    setAccounts([]);
+    if (!focused || !query.trim().startsWith("@") || query.trim().length < 2) return;
+    let active = true;
+    const timer = window.setTimeout(() => { void searchProfiles(query.trim().slice(1)).then(items => { if (active) setAccounts(items); }).catch(() => undefined); }, SEARCH_DEBOUNCE_MS);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [query, focused]);
+  function search(account?: ProfileSearchResult) {
+    const params = new URLSearchParams();
+    if (account) { params.set("artist", account.user_id); params.set("artistName", account.full_name); params.set("q", `@${account.full_name}`); }
+    else if (query.trim()) params.set("q", query.trim());
+    navigate(`/${language}${params.size ? `?${params}` : ""}`);
+  }
+  return <header className="artwork-header">
+    <form className="gallery-search" role="search" onSubmit={event => { event.preventDefault(); search(); }} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.querySelector("input")?.focus(); }}>
+      <Search size={20} aria-hidden="true"/><input type="search" aria-label={t("home.searchPlaceholder")} placeholder={t("home.searchPlaceholder")} value={query} onChange={event => setQuery(event.target.value)} onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.form?.contains(event.relatedTarget)) setFocused(false); }} onKeyDown={event => { if (event.key === "Escape") { setFocused(false); event.currentTarget.blur(); } }}/>
+      {focused && accounts.length > 0 && <div className="account-search-suggestions">{accounts.map(account => <button key={account.user_id} type="button" onClick={() => search(account)}><ProfileAvatar name={account.full_name} url={account.avatar_url} language={language}/><strong>{account.full_name}</strong></button>)}</div>}
+    </form>
+    <Link className="artwork-header-profile" to={`/${language}/${session ? "profile" : "login"}`} aria-label={t(session ? "home.profileMenu" : "auth.signIn")}>
+      {session ? <ProfileAvatar name={session.fullName || "InkFig"} url={profile.data?.avatar_url} language={language}/> : <UserRound size={22} aria-hidden="true"/>}
+    </Link>
+  </header>;
+}

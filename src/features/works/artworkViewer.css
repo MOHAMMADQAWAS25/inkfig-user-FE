@@ -4,19 +4,15 @@
 .artwork-image-expand { position:absolute; z-index:2; inset:auto 12px 12px auto; display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid rgb(255 255 255 / .25); border-radius:13px; background:rgb(20 25 13 / .78); color:#fffdf0; cursor:pointer; }
 :root .artwork-page .artwork-image-expand:is(:hover,:focus-visible),.artwork-image-expand:is(:hover,:focus-visible) { transform:none; background:rgb(20 25 13 / .94); border-radius:13px; }
 .artwork-image-expand:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
-.artwork-original-dialog { position:fixed; inset:0; width:100%; height:100dvh; max-width:none; max-height:none; margin:0; padding:0; border:0; background:var(--bg); color:var(--text); overflow:hidden; }
-.artwork-original-dialog[open] { display:grid; grid-template-rows:auto minmax(0,1fr); }
-.artwork-original-dialog::backdrop { background:rgb(0 0 0 / .85); }
-.artwork-original-toolbar { display:flex; align-items:center; gap:12px; min-height:64px; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--surface); }
-.artwork-original-toolbar > span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
-.artwork-original-toolbar button { display:inline-flex; justify-content:center; align-items:center; flex-shrink:0; gap:8px; min-height:44px; min-width:44px; padding:8px 12px; border:1px solid var(--border); border-radius:12px; background:transparent; color:var(--text); cursor:pointer; }
-.artwork-original-toolbar button:is(:hover,:focus-visible) { background:var(--surface-raised,var(--surface)); border-color:var(--primary); }
-.artwork-original-toolbar button:focus-visible,.artwork-original-viewport:focus-visible { outline:2px solid var(--primary); outline-offset:-3px; }
-.artwork-original-viewport { min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; direction:ltr; }
-.artwork-original-canvas { display:flex; align-items:center; justify-content:center; width:max-content; height:max-content; min-width:100%; min-height:100%; }
-.artwork-original-canvas .artwork-original-image { display:block; flex:none; width:auto; height:auto; max-width:none; max-height:none; object-fit:contain; }
-.artwork-original-viewport[data-fit="true"] .artwork-original-canvas { width:100%; height:100%; min-width:0; min-height:0; }
-.artwork-original-viewport[data-fit="true"] .artwork-original-image { max-width:100%; max-height:100%; }
+.artwork-original-dialog { position:fixed; inset:0; width:100%; height:100dvh; max-width:none; max-height:none; margin:0; padding:clamp(24px,4vw,64px); box-sizing:border-box; border:0; background:transparent; color:var(--text); overflow:hidden; animation:artwork-image-in 180ms ease both; }
+.artwork-original-dialog[open] { display:grid; place-items:center; }
+.artwork-original-dialog::backdrop { background:rgb(8 12 5 / .8); backdrop-filter:blur(18px); animation:artwork-original-backdrop-in 180ms ease both; }
+.artwork-original-dialog[data-closing="true"] { animation:artwork-image-out 180ms ease both; }
+.artwork-original-dialog[data-closing="true"]::backdrop { animation:artwork-original-backdrop-out 180ms ease both; }
+.artwork-original-close { position:absolute; z-index:2; top:20px; right:20px; display:grid; place-items:center; width:44px; height:44px; padding:0; border:1px solid rgb(255 255 255 / .3); border-radius:50%; background:rgb(15 20 10 / .8); color:#fffdf0; cursor:pointer; }
+.artwork-original-close:is(:hover,:focus-visible) { background:rgb(65 75 40 / .95); outline:2px solid var(--primary); outline-offset:2px; }
+.artwork-original-viewport { display:flex; align-items:center; justify-content:center; width:100%; height:100%; min-width:0; min-height:0; direction:ltr; }
+.artwork-original-viewport .artwork-original-image { display:block; width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; border-radius:12px; box-shadow:0 18px 70px rgb(0 0 0 / .35); }
 .work-exhibition-details.work-exhibition-tags { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-width:0; max-width:100%; margin:0; }
 .work-exhibition-tag { display:flex; align-items:center; flex-wrap:wrap; gap:4px 7px; max-width:100%; min-width:0; }
 .work-exhibition-tag .work-exhibition-compact-link { display:inline-flex; align-items:center; gap:6px; max-width:100%; min-width:0; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:transparent; color:var(--primary); font-size:.78rem; line-height:1.4; text-decoration:none; }
@@ -29,12 +25,20 @@
 .work-exhibition-tag .exhibition-rating-summary svg { width:13px; height:13px; }
 /* Shared legacy/submission popups use the same bounded desktop layout as gallery popups. */
 .artwork-modal.artwork-fixed-viewer,.exhibition-expanded-card-popup .artwork-modal.artwork-fixed-viewer { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); grid-template-rows:minmax(0,1fr); align-items:stretch; width:min(1320px,100%); height:clamp(420px,calc(100svh - 112px),820px); max-height:calc(100svh - 24px); min-height:0; overflow:hidden; }
-:root .artwork-modal.artwork-fixed-viewer > .artwork-modal-content { grid-column:2; grid-row:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+:root .artwork-modal.artwork-fixed-viewer > .artwork-modal-content { grid-column:2; grid-row:1; min-height:0; overflow-y:auto; overscroll-behavior:auto; scrollbar-gutter:stable; }
 :root .artwork-modal.artwork-fixed-viewer > .artwork-fixed-media { grid-column:1; grid-row:1; display:flex; align-items:center; justify-content:center; height:100%; padding:0; }
 @media(max-width:720px) {
-  .artwork-original-toolbar { padding:8px; gap:6px; }
-  .artwork-original-toolbar button > span { display:none; }
   .artwork-modal.artwork-fixed-viewer,.exhibition-expanded-card-popup .artwork-modal.artwork-fixed-viewer { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; height:auto; max-height:calc(100svh - 24px); overflow-y:auto; }
   :root .artwork-modal.artwork-fixed-viewer > .artwork-fixed-media { height:var(--artwork-mobile-media-limit,50svh); }
   :root .artwork-modal.artwork-fixed-viewer > .artwork-modal-content { grid-column:1; grid-row:2; height:var(--artwork-mobile-details-limit,65svh); overflow-y:auto; }
 }
+.artwork-frame-color { position:absolute; inset:-25px; background-position:center; background-size:cover; filter:blur(24px) saturate(1.15); opacity:.48; pointer-events:none; }
+.exhibition-artwork-popup > .artwork-header { position:absolute; inset:0 0 auto; z-index:1001; min-height:76px; box-sizing:border-box; }
+.exhibition-artwork-popup > .artwork-modal-backdrop { top:76px; padding-block:12px; box-sizing:border-box; }
+.exhibition-artwork-popup .artwork-modal.artwork-fixed-viewer { max-height:calc(100svh - 100px); }
+.artwork-page-media-original { z-index:1; }
+@keyframes artwork-image-in { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } }
+@keyframes artwork-image-out { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(.97); } }
+@keyframes artwork-original-backdrop-in { from { opacity:0; } to { opacity:1; } }
+@keyframes artwork-original-backdrop-out { from { opacity:1; } to { opacity:0; } }
+@media(prefers-reduced-motion:reduce) { .artwork-original-dialog,.artwork-original-dialog::backdrop { animation-duration:0ms !important; } }
