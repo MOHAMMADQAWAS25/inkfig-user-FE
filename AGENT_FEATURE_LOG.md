@@ -11856,3 +11856,23 @@ status reported after execution. No reset/stash/forced push or branch deletion.
 Public issues empty; no authenticated issue writer, no issue URL claimed. Reverse
 only this focused source commit to restore b56d5b0 presentation, retaining prior
 controls/history fixes and all append-only feature-log history. Reconcile later work.
+
+## 2026-11-24 — INKFIG-SUBMISSION-SPACING-001
+### Request / Changes / Frontend
+Arrange My Submissions artwork popup detail spacing and add a line below Related
+Links. Scope to personal-submissions page marker; consistent16px gaps, reset stacked
+margins, readable status/reason blocks, and theme-colored links bottom divider.
+### Repositories / Files
+inkfig-user-FE: MyExhibitionSubmissionsPage.tsx, mySubmissionPopup.css,
+SCREENS.md, PROJECT_STATE.md, task handoff and this append-only log.
+### API / Database / Permissions and scope
+No API/auth/data/dependency changes. No migration required. Current artwork fitting,
+original viewer/history/actions retained; gallery/leaderboard/review styles unchanged.
+### Verification
+Required frontend tests/build and actual results recorded in task handoff.
+No production data writes or live authenticated interaction certification.
+### Deployment / Git / Notes
+Independent style/submission-popup-spacing fromfca8273; a7mad.ishaq integration owner,
+agent /root submission-spacing-2026-11-24. Commit Align My Submissions popup details.
+Main push triggers existing tests/build/Cloudflare deployment. Exact hash/outcome
+in task handoff. No manual release/migration; revert focused source commit to undo.

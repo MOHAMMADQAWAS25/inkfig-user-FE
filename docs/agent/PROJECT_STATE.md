@@ -3,12 +3,11 @@ Updated: 2026-11-24. Evidence: synchronized mainb56d5b0 and verified frame ticke
 Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FRAME-001.md).
 
 ## Current objective and approved scope
-Owner approved consistent artwork frames, balanced shrink-only image fitting,
-compact multi-exhibition tags and a full-size original viewer. Preserve controls,
-history/voting, related masonry and notification isolation from preceding tickets.
-Status: implemented;547 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-FRAME-001](../collaboration/tasks/INKFIG-ARTWORK-FRAME-001.md).
-Integration owner: user of this session; agent /root, artwork-frame-2026-11-24.
+Owner requested My Submissions artwork popup spacing and a line below Related Links.
+Preserve current artwork frames/original viewer, history/actions, and other pages.
+Status: scoped styling verified;547 checks and production build passed; push pending.
+Task: [INKFIG-SUBMISSION-SPACING-001](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
+Integration owner: a7mad.ishaq; agent /root, submission-spacing-2026-11-24.
 Frontend-only; no migration/API/authorization/dependency changes.
 One focused source commit/publication follows verification; exact hash and automatic
 deployment outcome reported in handoff. No manual deployment/production mutations.

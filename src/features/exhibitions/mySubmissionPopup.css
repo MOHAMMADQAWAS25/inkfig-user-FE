@@ -1,0 +1,23 @@
+/* My Submissions only: keep shared media, review and gallery viewers untouched. */
+.exhibition-my-submissions-page .artwork-modal-content { gap:16px; padding:56px 28px 28px; min-width:0; }
+.exhibition-my-submissions-page .artwork-modal-content > * { flex-shrink:0; min-width:0; max-width:100%; }
+.exhibition-my-submissions-page .artwork-modal-type-tag { position:static; inset:auto; align-self:flex-start; white-space:normal; }
+.exhibition-my-submissions-page .artwork-modal-content h2 { margin:0; line-height:1.2; overflow-wrap:anywhere; }
+.exhibition-my-submissions-page .work-exhibition-details { margin:0; }
+.exhibition-my-submissions-page .exhibition-submission-context { display:grid; gap:12px; margin:0; padding:16px; border-color:var(--border); }
+.exhibition-my-submissions-page .exhibition-submission-context > div { display:grid; gap:8px; }
+.exhibition-my-submissions-page .exhibition-submission-context :is(h3,p) { margin:0; line-height:1.6; overflow-wrap:anywhere; }
+.exhibition-my-submissions-page .exhibition-submission-context > .exhibition-status { justify-self:start; }
+.exhibition-my-submissions-page .artwork-modal-meta { gap:10px; margin:0; }
+.exhibition-my-submissions-page .artwork-modal-artist { align-items:center; gap:10px; line-height:1.5; overflow-wrap:anywhere; }
+.exhibition-my-submissions-page .artwork-modal-meta :is(svg,.artwork-modal-creator-avatar) { flex-shrink:0; }
+.exhibition-my-submissions-page .artwork-modal-description { display:grid; gap:8px; padding-block:16px; border-color:var(--border); }
+.exhibition-my-submissions-page :is(.artwork-modal-description,.artwork-modal-links) h3 { margin:0; line-height:1.5; }
+.exhibition-my-submissions-page .artwork-modal-description p { margin:0; }
+.exhibition-my-submissions-page .artwork-modal-links { display:grid; gap:10px; margin:0; padding-block-end:16px; border-block-end:1px solid var(--border); overflow-wrap:anywhere; }
+.exhibition-my-submissions-page .artwork-modal-links a { max-width:100%; box-sizing:border-box; }
+.exhibition-my-submissions-page .artwork-modal-links svg { flex-shrink:0; }
+.exhibition-my-submissions-page .artwork-modal-actions { order:0; margin:0; padding:0; gap:12px; }
+@media(max-width:720px) {
+  .exhibition-my-submissions-page .artwork-modal-content { padding:24px 20px; }
+}

@@ -15,6 +15,7 @@ import { ExhibitionArtworkCard } from "./ExhibitionArtworkCard";
 import { useExhibitionArtworkNavigation } from "./useExhibitionArtworkNavigation";
 import { useExhibitionLive } from "./useExhibitionLive";
 import { SubmissionArtist, SubmissionThumbnail } from "./SubmissionIdentity";
+import "./mySubmissionPopup.css";
 import { getExhibition, getSubmissions, reviewSubmission, withdrawSubmission, reviewWithdrawal, blockParticipant, getBlocks, unblockParticipant, type Block, type Exhibition, type Submission } from "./exhibitionApi";
 
 type Status = "all" | "approved" | "pending" | "rejected";
@@ -145,7 +146,7 @@ function SubmissionRecordsPage({ manage = false }: { manage?: boolean }) {
   }
   if (!session) return <Navigate replace to={`/${language}/login`}/>;
   if (!authorized) return <Navigate replace to={`/${language}/exhibition/${exhibitionId}`}/>;
-  return <main className="exhibitions-page app-page-with-sidebar exhibition-records-page"><AppSidebar/><div className="exhibitions-shell">
+  return <main className={`exhibitions-page app-page-with-sidebar exhibition-records-page${manage ? "" : " exhibition-my-submissions-page"}`}><AppSidebar/><div className="exhibitions-shell">
     <ExhibitionNavbar label={t("exhibitions.actions")}><ExhibitionBackButton to={`/${language}/exhibition/${exhibitionId}`} label={t("exhibitions.backToExhibition")}/><strong>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</strong></ExhibitionNavbar>
     <header className="exhibition-records-heading"><div><h1>{t(manage ? "exhibitions.reviewQueue" : "exhibitions.mySubmissions")}</h1>{exhibition && <p>{exhibition.name}</p>}</div><ThemedSelect label={t("exhibitions.filterStatus")} value={filter} disabled={busy} onChange={value => { setFilter(value as Status); artworkPopup.close(); }} options={(["all","approved","rejected","pending"] as const).map(status => ({ value: status, label: status === "all" ? t("exhibitions.allStatuses") : label(status) }))}/></header>
     {error && <p className="error-message" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}

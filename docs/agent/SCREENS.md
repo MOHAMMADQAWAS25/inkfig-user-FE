@@ -27,6 +27,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 | Exhibition artwork popup | Existing local popup with image/details/rating controls; not profile redirect |
 
 ## Important shared states
+- My Submissions popup has scoped16px detail spacing, compact status/reason sections,
+  and a theme-colored divider below existing Related Links; review screens unchanged.
 - Exhibition listing Create button uses centered inline-flex icon/text, consistent
   gap/padding/rounded corners; existing role guard and theme colors retained.
 - Reports Type column centers its header and vertically stacked icon/label without
