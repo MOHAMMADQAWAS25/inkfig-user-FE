@@ -30,3 +30,6 @@ unpublished work, push branch, ff merge/push main under standing authorization.
 Main triggers existing frontend tests/build/Cloudflare/health; no manual deployment.
 Report exact hash and actual push/merge/conflict/deployment after execution.
 Rollback: revert only this focused commit, preserving log history and later work.
+Post-publication RTL check: use logical inset-inline-start so Back remains over
+the mirrored image column in Arabic; English placement unchanged. Scoped CSS/source
+assertion, build and actual-component browser fitting/position check repeated.

@@ -12010,3 +12010,18 @@ merge/push; exact hash/conflicts/publication/deployment reported after execution
 ### Notes
 No authenticated issue writer/issue URL claimed. Revert this focused commit to
 restore dd31376 appearance while preserving append-only logs and later work.
+
+## 2026-11-24 — INKFIG-ARTWORK-FIT-003 — RTL overlay follow-up
+### Request / Changes / Frontend
+Preserve Arabic alignment: logical inline-start places Back over the image column
+in both directions; English reference position unchanged.
+### Repositories / Files
+Frontend only: artworkPage.css, layout assertion, task handoff and this append.
+### API / Database / Permissions and scope
+No API/auth/backend/data changes. No migration required.
+### Verification / Deployment
+Scoped source/layout test, production build and browser position check repeated;
+main publication triggers existing CI. No manual deployment or production writes.
+### Git / Notes
+Same fix/artwork-overlay-back branch; separate focused follow-up to85dad84,
+without rewriting published history. Exact commit/deployment reported after push.

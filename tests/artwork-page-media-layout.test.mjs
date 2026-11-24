@@ -25,6 +25,7 @@ test("images fill side gaps proportionally and portraits retain full-height fitt
   assert.match(media,/const width = element.clientWidth, height = element.clientHeight/);
   assert.match(css,/overflow-y:auto; overscroll-behavior:auto/);
   assert.match(page,/<ArtworkHeader \/>/);
+  assert.match(css,/\.artwork-page-back-overlay \{[^}]*inset-inline-start:14px/);
 });
 test("detail block keeps desktop columns and contains long metadata instead of growing",()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1\.1fr\) minmax\(0,1fr\)/);
