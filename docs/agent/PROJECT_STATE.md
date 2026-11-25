@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-24. Evidence: synchronized main d2e2c6f and scoped side-scale rollback.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-FIT-004.md).
+Updated: 2026-11-25. Evidence: synchronized main031dfce and adaptive wide-frame checks.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-WIDE-005.md).
 
 ## Current objective and approved scope
-Owner requested undoing the latest side-gap enlargement and clearing Back's
-background; retain its overlay position and lifted layout. Preserve controls,
+Owner requested shorter dynamic wide-image frames, unchanged portrait height,
+home-sized header controls and tighter aligned page gutters. Preserve controls,
 history/voting, related masonry and notification isolation from preceding tickets.
-Status: implemented;555 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-FIT-004](../collaboration/tasks/INKFIG-ARTWORK-FIT-004.md).
-Integration owner: user of this session; agent /root, artwork-overlay-2026-11-24.
+Status: implemented;558 checks/build and automated browser fixtures passed.
+Task: [INKFIG-ARTWORK-WIDE-005](../collaboration/tasks/INKFIG-ARTWORK-WIDE-005.md).
+Integration owner: user of this session; agent /root, artwork-wide-2026-11-25.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -26,7 +26,7 @@ No partner workstreams or checkout/session assignments have been approved.
   Desktop related columns can grow beyond six; default home geometry is separate.
 - Mobile background-route recovery/swipes, stable media and theme/localization.
 - e3f4d07/5dd4ec9 measured discovery/expanded recommendations retained. The owner
-  now explicitly replaces their image-dependent sizing with consistent frames,
+  now uses adaptive shorter wide-image frames and unchanged portrait heights,
   side-by-side desktop details, centered media and internal metadata scrolling.
 - Image sizing restored exactly to dd31376: portrait height fit, landscape/square
   shrink-only contain; decorative blur in remaining gaps. No forced side-gap filling.
@@ -35,6 +35,10 @@ No partner workstreams or checkout/session assignments have been approved.
 - Native image popup fits the complete image to screen, no toolbar/size toggle;
   animated close/outside/Escape/Back preserve parent and focus. Compact tags retained.
 - Artwork search/profile header is visible in the dedicated page and exhibition popup.
+- Wide frame height uses image/metadata measurements with viewport bounds; phone
+  wide-media height is width-based, preserving toolbar stability. Portraits unchanged.
+- Header controls match home52px search/34px avatar desktop; shared20px page gutter
+  aligns search, artwork and recommendations (responsive phone sizes/gutters retained).
 - Artwork viewers use icon-only unframed accessible saves; card identities/counts
   keep their sizes but use regular weight. Exhibition previews have scoped same-URL
   history entries; Back closes/Forward restores without remounting their gallery.
@@ -42,7 +46,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main d2e2c6f; independent fix/restore-artwork-fit.
+- Baseline main031dfce; independent fix/responsive-wide-artwork.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -52,10 +56,10 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- Current ticket:555 checks (125 Node/source +430 Vitest/40 files), strict TS/Vite/SEO
+- Current ticket:558 checks (125 Node/source +433 Vitest/40 files), strict TS/Vite/SEO
   build and whitespace passed. Actual components/inert fixtures tested13 combinations
   of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
-  tiny images and20 tags/long text; full-height portraits, no distortion/page overflow.
+  tiny images and20 tags/long text; shorter wide frames, unchanged portraits/no overflow.
 - Native original-viewer Back retained its parent popup, then parent Back retained
   gallery DOM. Phone120px height-only changes left frame/card dimensions unchanged.
 - No live production mutations or physical Safari/iOS certification. Temporary

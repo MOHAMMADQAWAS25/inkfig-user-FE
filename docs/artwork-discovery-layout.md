@@ -119,3 +119,14 @@ Owner rollback after d2e2c6f: undo only forced side-gap enlargement, restoring
 ArtworkPageMedia exactly to dd31376. Back keeps its overlay/RTL position and lifted
 layout, with transparent normal/hover background and no border. Earlier portrait
 fitting, gap blur and screen-fit popup remain.
+
+## 2026-11-25 adaptive wide frames and aligned header
+
+Owner now requests shorter landscape boxes. Shared media measures image width/
+ratio and metadata child layout, bounds desktop height420–680px plus viewport cap,
+keeps image/details side by side and scrolls long metadata. Portrait height stays
+unchanged. Phone wide-media height uses width/aspect while portrait and toolbar-
+stable limits remain. No renewed forced image upscaling or changed home geometry.
+Header desktop search52px/avatar34px match home; shared20px gutter aligns header,
+featured card and recommendation wall, reducing outer dead space. Responsive
+phone sizes/RTL/theme and native popup header/backdrop constraints are retained.

@@ -12062,3 +12062,52 @@ Fetch/rebase unpublished work, branch push then authorized ff main merge/push;
 actual hash/conflicts/push/deployment reported after execution.
 ### Notes
 No authenticated issue writer/issue URL claimed. Preserve append-only logs.
+
+## 2026-11-25 — INKFIG-ARTWORK-WIDE-005 — Adaptive wide frames/header alignment
+### Request
+Reduce vertical blank space by shortening wide-image boxes, preserve tall-image
+height/details layout; match home search/profile sizes and tighten marked margins.
+### Changes
+Shared media applies adaptive landscape-only frame heights from image/metadata
+layout measurements,420–680px plus viewport cap. Image/details remain side by side,
+long metadata scrolls. Phone wide-media height follows width/aspect, stable across
+toolbar changes. Portrait/default sizing unchanged. Source transitions clear overrides.
+Header uses home desktop52px search/34px avatar, responsive phone sizes and shared
+page gutter; header/card/recommendations align with less outer dead space. Native
+popup header/backdrop bounds remain coordinated. Prior image-scale rollback retained.
+### Repositories
+All three checked clean/pulled main ff-only. Frontend031dfce; backends unchanged.
+### Files
+ArtworkPageMedia, artworkPage/artworkViewer CSS, media tests, relevant memory,
+discovery guide, task handoff and this append-only log.
+### API
+No API changes; existing search/profile/image/rating/history contracts retained.
+### Database
+No migration required. No storage/embedding/database changes or production writes.
+### Permissions and scope
+Frontend only; authorization/dependencies/config unchanged. Partner My Submissions
+styles, transparent Back, fit-only lightbox, image protection and feed geometry retained.
+### Frontend
+Wide boxes shed excess height without stacking desktop details; portraits retain
+baseline. Remaining gaps blur as before. Both themes/languages and phone stability retained.
+### Verification
+558 checks:125 source +433 Vitest/40 files; targeted21 media tests/build after final
+border allowance. Strict TS/Vite/SEO/diff passed. New tests cover metadata bounds
+and source cleanup. Native Edge actual-component/inert fixtures13 cases across
+1440/1180/820/768/390px, image shapes/themes/languages, no overflow, two columns,
+long metadata, nested Back/gallery DOM and phone toolbar stability passed.
+Additional1440/1920/390 checks showed landscape820->576/545px, portrait820 unchanged;
+phone wide777.6 vs portrait972.6px. Home style-reference search52/avatar34 matched
+artwork controls exactly. Standard desktop details have no unwanted2px scrollbar.
+Screenshots reviewed; helpers closed. No physical-device/live mutation certification.
+Existing non-blocking bundle/jsdom notices retained.
+### Deployment
+Existing frontend main workflow tests/builds/deploys Cloudflare/checks production.
+No backend release/manual deployment/migration/production writes.
+### Git
+fix/responsive-wide-artwork; subject Adapt wide artwork height and align discovery
+header spacing. Fetch/rebase unpublished work, branch push, authorized ff main/push.
+Exact hash/conflicts/publication/deployment reported after execution.
+### Notes
+No authenticated issue writer/issue URL claimed. Isolated revert preserves partner
+work and append-only logs; reconcile later changes on rollback.

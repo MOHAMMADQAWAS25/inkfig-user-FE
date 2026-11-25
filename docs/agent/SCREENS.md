@@ -51,10 +51,12 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Exhibition gallery popup: artwork only physically left; organized full details,
   actions/voting/share on right with independent desktop scroll. Mobile stacks;
   origin zoom retained and leaderboard presentation unchanged.
-- Opened artwork page/popups use consistent responsive frame dimensions, centered
+- Opened artwork page/popups use responsive portrait baselines and shorter wide frames, centered
   height-fitted portraits/shrink-only landscapes, and scrollable details.
   Desktop/tablet wide images retain side-by-side details; phone regions stack and
-  freeze pixel sizing until width changes. This supersedes image-dependent frames.
+  freeze pixel sizing until width changes. Wide height now uses image/details bounds;
+  phone wide media is shorter; long metadata scrolls without changing columns.
+  Header sizes match home; shared page gutters align search/card/recommendations.
 - Full-size icon opens a fit-only native image popup with inset close, strong blur,
   outside dismissal and reduced-motion-aware transitions. Back retains the same card.
 - Image-color blur is decorative and gap-only; excess image cropping is centered.

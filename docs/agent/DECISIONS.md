@@ -17,6 +17,10 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   squares shrink-only contain, decorative gap blur; no forced side-gap enlargement.
   Transparent Back overlays the image corner without reserving a row. Retain
   scroll chaining and phone pixel locking. [Current design](../artwork-discovery-layout.md).
+- Owner2026-11-25 supersedes uniform wide-card height: measure wide image/details,
+  keep two columns, bound height420–680px and viewport; long metadata scrolls.
+  Portrait/default heights unchanged. Phone wide-media height follows width/aspect,
+  not toolbar height. Header control sizes/gutters follow the home design.
 - Expanded images use a screen-fitting native popup without a toolbar/size toggle.
   Same-URL history makes Back dismiss it first; close/outside/Escape animate and
   preserve focus/parent. Compact exhibition tags remain per-event links.

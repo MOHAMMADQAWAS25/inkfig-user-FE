@@ -86,3 +86,18 @@ it.each([[200,300,400,600,false],[300,200,300,200,true],[400,600,400,600,false],
   expect(image.style.maxHeight).toBe("");
   expect(Boolean(view.container.querySelector(".artwork-frame-color"))).toBe(gaps);
 });
+
+it.each([[100,420],[450,496],[1000,680]])("sizes wide frames around %spx details and removes the override for a portrait",(detailsHeight,expected)=>{
+  vi.spyOn(HTMLElement.prototype,"clientWidth","get").mockReturnValue(400);
+  vi.spyOn(HTMLElement.prototype,"clientHeight","get").mockReturnValue(820);
+  vi.spyOn(HTMLElement.prototype,"offsetTop","get").mockImplementation(function(this:HTMLElement){return this.dataset.details ? 22 : 0;});
+  vi.spyOn(HTMLElement.prototype,"offsetHeight","get").mockImplementation(function(this:HTMLElement){return this.dataset.details ? detailsHeight : 0;});
+  const content=(url:string)=><article className="artwork-page-hero"><ArtworkPageMedia url={url} title="Art" mimeType="image/png" failureLabel="Failed"/><section className="artwork-page-info" style={{paddingBottom:22}}><div data-details="true"/></section></article>;
+  const view=render(content("/wide.png"));
+  const image=screen.getByRole("img");Object.defineProperties(image,{naturalWidth:{value:1200},naturalHeight:{value:600}});fireEvent.load(image);
+  const box=view.container.querySelector<HTMLElement>("article")!;
+  expect(box.dataset.wideArtwork).toBe("true");expect(box.style.getPropertyValue("--artwork-wide-height")).toBe(`${expected}px`);
+  expect(box.style.getPropertyValue("--artwork-wide-media-height")).toBe("224px");
+  view.rerender(content("/portrait.png"));
+  expect(box.dataset.wideArtwork).toBeUndefined();expect(box.style.getPropertyValue("--artwork-wide-height")).toBe("");
+});

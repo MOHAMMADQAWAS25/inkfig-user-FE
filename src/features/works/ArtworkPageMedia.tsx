@@ -31,6 +31,30 @@ function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions
   const frame = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const element = frame.current;
+    const owner = element?.closest<HTMLElement>(".artwork-page-hero,.artwork-fixed-viewer");
+    if (!element || !owner || !natural?.width || !natural.height || natural.width <= natural.height || mimeType.startsWith("video/")) return;
+    const info = owner.querySelector<HTMLElement>(".artwork-page-info,.artwork-modal-content");
+    owner.dataset.wideArtwork = "true";
+    const measure = () => {
+      if (!element.clientWidth) return;
+      const imageHeight = Math.min(natural.height, element.clientWidth * natural.height / natural.width);
+      const detailsHeight = info ? Math.max(0,...Array.from(info.children, child => {
+        const item = child as HTMLElement;
+        return item.offsetTop + item.offsetHeight;
+      })) + parseFloat(getComputedStyle(info).paddingBottom || "0") : 0;
+      const height = Math.ceil(Math.max(420, Math.min(680, Math.max(imageHeight + 32, detailsHeight + 2))));
+      owner.style.setProperty("--artwork-wide-height", `${height}px`);
+      owner.style.setProperty("--artwork-wide-media-height", `${Math.ceil(Math.max(160,imageHeight+24))}px`);
+    };
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    observer?.observe(element);
+    if (info) { observer?.observe(info); Array.from(info.children).forEach(child => observer?.observe(child)); }
+    window.addEventListener("resize", measure);
+    return () => { observer?.disconnect(); window.removeEventListener("resize",measure); delete owner.dataset.wideArtwork; owner.style.removeProperty("--artwork-wide-height"); owner.style.removeProperty("--artwork-wide-media-height"); };
+  }, [natural, mimeType]);
+  useLayoutEffect(() => {
+    const element = frame.current;
     if (!element || !natural?.width || !natural.height || mimeType.startsWith("video/")) return;
     const measure = () => {
       // Layout dimensions exclude the parent card's temporary opening scale.
