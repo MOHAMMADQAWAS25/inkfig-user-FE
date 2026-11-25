@@ -68,6 +68,8 @@ All language-prefixed routes use en/ar; English is the fallback.
   same avatar/search hover, faint Back hover, dismiss-only outside gestures.
 - Page/shared popups omit empty description sections. Relative muted date appears
   beside report/owner controls; edit/delete share report hover without shape shifting.
+- Missing description keeps a single theme-colored divider with16px breathing
+  room; no placeholder/empty section. Existing phone action ordering retained.
 - Viewer exhibition memberships are compact clickable name/year tags with small
   per-event rating summaries, supporting multiple/long entries without growing the box.
 - Popup right column uses a consistent16px rhythm, grouped exhibition/rating panels,

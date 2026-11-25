@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-25. Evidence: synchronized main04855fc and artwork menu/metadata checks.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-DETAILS-007.md).
+Updated: 2026-11-25. Evidence: synchronized main9f2f2bb and empty-description divider checks.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-DIVIDER-008.md).
 
 ## Current objective and approved scope
-Owner requests home-style artwork profile menu/hover, subtle Back hover, no blank
-description fallback and relative dates beside management controls. Preserve fitting,
+Owner requests balanced divider spacing when description is absent. Preserve menus,
+relative dates, missing-description omission, image fitting and current controls,
 history/voting, related masonry and notification isolation from preceding tickets.
 Status: implemented;564 checks/build and browser fixtures verified; deployment checked separately.
-Task: [INKFIG-ARTWORK-DETAILS-007](../collaboration/tasks/INKFIG-ARTWORK-DETAILS-007.md).
-Integration owner: user of this session; agent /root, artwork-details-2026-11-25.
+Task: [INKFIG-ARTWORK-DIVIDER-008](../collaboration/tasks/INKFIG-ARTWORK-DIVIDER-008.md).
+Integration owner: user of this session; agent /root, artwork-divider-2026-11-25.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -40,6 +40,8 @@ No partner workstreams or checkout/session assignments have been approved.
   dismiss-only outside clicks and existing Escape support. Shared home hover styles.
 - Empty descriptions disappear; localized relative time sits beside report/owner
   controls with full-date title. Edit/delete share report hover; Back has faint hover.
+- Empty-description divider has16px breathing room; popup uses one decorative
+  theme-colored rule instead of restoring the omitted text/description section.
 - Wide frame height uses image/metadata measurements with viewport bounds; phone
   wide-media height is width-based, preserving toolbar stability. Portraits unchanged.
 - Header controls match home52px search/34px avatar desktop; shared20px page gutter
@@ -51,7 +53,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main04855fc; independent fix/artwork-menu-metadata.
+- Baseline main9f2f2bb; independent fix/empty-description-divider.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.

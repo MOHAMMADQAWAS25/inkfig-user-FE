@@ -141,3 +141,7 @@ theme/language/logout replaces direct profile navigation; existing hover classes
 retained. Faint Back hover, hidden empty descriptions, localized relative date in
 management row and matching owner/report hover apply to page/shared popups.
 Current geometry and image fitting are retained; metadata remains permission-gated.
+
+Missing-description spacing follow-up retains a single decorative popup divider
+with16px spacing and adds16px before the page divider; no placeholder or empty
+description section returns. Nonempty descriptions and mobile action order remain.

@@ -135,10 +135,10 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           <div className="artwork-modal-meta">
             {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`,{replace:historyPreview}),!historyPreview);}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
           </div>
-          {work.description?.trim() && <div className="artwork-modal-description">
+          {work.description?.trim() ? <div className="artwork-modal-description">
             <h3>{t("works.description")}</h3>
             <p>{work.description}</p>
-          </div>}
+          </div> : <hr className="artwork-empty-description-divider" aria-hidden="true"/>}
           {work.links.length > 0 && <div className="artwork-modal-links">
             <h3><Link2 size={17} />{t("works.links")}</h3>
             <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>

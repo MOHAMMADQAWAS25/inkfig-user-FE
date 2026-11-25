@@ -12201,3 +12201,30 @@ conflicts/publication/deployment reported after execution. No published-history 
 ### Notes
 No authenticated issue writer/issue URL claimed. Isolated rollback preserves prior
 fitting, partner work and append-only feature-log history.
+
+## 2026-11-25 — INKFIG-ARTWORK-DIVIDER-008 — Empty-description divider spacing
+### Request / Changes
+Fix separator spacing without a description: page divider gains16px above;
+shared popup renders one decorative theme-colored1px rule with balanced16px gaps.
+Normalize adjacent spacing without doubled gallery/submission gaps or placeholder text.
+### Repositories / Files
+All three clean/pulled main ff-only; frontend9f2f2bb. ArtworkDetailModal, scoped
+page/viewer CSS, current state/screens/guide, handoff and append-only log.
+### API / Database
+No API changes. No migration required. No storage/embedding/data writes.
+### Permissions and scope / Frontend
+Styling-only scope; preserve nonempty descriptions, phone action order, menus,
+dates, image fitting, guards and partner styles. No dependencies/backend/config changes.
+### Verification
+564 checks (125 source +439 Vitest/40 files), strict TS/Vite/SEO/whitespace passed.
+Native Edge actual-component/inert fixtures1440 en with/without links and390 ar
+measure16px page gap,16px before/after popup1px line; no description section or
+browser exceptions. Existing phone visual order retained. Helpers closed; no
+physical-device/live mutation certification. Existing non-blocking notices retained.
+### Deployment
+Existing frontend workflow only; previous billing lock may block starting CI.
+No bypass/manual deployment/backend release/migration; actual result reported separately.
+### Git / Notes
+fix/empty-description-divider; subject Balance artwork dividers when descriptions
+are empty. Fetch/rebase unpublished work, push branch, authorized ff main/push;
+exact hash/conflicts/deployment reported after execution. No issue URL claimed.

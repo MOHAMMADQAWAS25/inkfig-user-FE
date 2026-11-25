@@ -33,6 +33,7 @@
 .artwork-page-links a { color:var(--primary); }
 .artwork-page-actions,.artwork-page-share,.artwork-page-manage { display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
 .artwork-page-actions { border-top:1px solid var(--border); padding-block:14px; }
+.artwork-page-info:not(:has(> .artwork-page-description)) > .artwork-page-actions { margin-block-start:16px; }
 .artwork-page-actions button,.artwork-page-manage button,.artwork-page-manage a { display:inline-flex; align-items:center; gap:8px; padding:8px 0; border:0; background:none; color:var(--text); cursor:pointer; text-decoration:none; }
 .artwork-page-actions button[aria-pressed=true] { color:var(--primary); }
 .artwork-page-actions .lucide-heart { color:#fff; }
