@@ -21,6 +21,9 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
   keep two columns, bound height420–680px and viewport; long metadata scrolls.
   Portrait/default heights unchanged. Phone wide-media height follows width/aspect,
   not toolbar height. Header control sizes/gutters follow the home design.
+- Owner2026-11-25 permits proportional width enlargement only when unchanged baseline
+  fitting leaves >2px aggregate gaps on BOTH axes (four sides). Derive eligibility
+  from baseline on every resize, not current enlarged output; others retain sizing.
 - Expanded images use a screen-fitting native popup without a toolbar/size toggle.
   Same-URL history makes Back dismiss it first; close/outside/Escape animate and
   preserve focus/parent. Compact exhibition tags remain per-event links.

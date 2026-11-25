@@ -130,3 +130,8 @@ stable limits remain. No renewed forced image upscaling or changed home geometry
 Header desktop search52px/avatar34px match home; shared20px gutter aligns header,
 featured card and recommendation wall, reducing outer dead space. Responsive
 phone sizes/RTL/theme and native popup header/backdrop constraints are retained.
+
+Selective follow-up: baseline four-sided gaps alone trigger proportional width
+enlargement. Check both axes before enlargement on every resize, leaving one-axis/
+no-gap images unchanged. Center any excess height; complete source remains in the
+fit-only expansion. Adaptive wide-box/header changes are retained.

@@ -22,6 +22,8 @@ Updated: 2026-11-15. [Screens](SCREENS.md), [API](API_OVERVIEW.md).
 - Wide-image frames shorten around image/details; portraits retain their baseline.
   Long details stay scrollable; phone wide media shortens without toolbar resizing.
   Home-sized search/profile and shared gutters use more available page width.
+- Only baseline four-sided blank space triggers proportional width enlargement;
+  excess height centers/crops when necessary. Other fits and full-image expansion stay unchanged.
 - Full-size icon shows the complete image fitted to screen, no toolbar/size toggle.
   Outside/close/Escape/Back animate dismissal while retaining the card/gallery.
 - Artwork page and exhibition popup show search/profile access. Details scroll

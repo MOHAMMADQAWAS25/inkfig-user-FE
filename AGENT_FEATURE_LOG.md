@@ -12111,3 +12111,44 @@ Exact hash/conflicts/publication/deployment reported after execution.
 ### Notes
 No authenticated issue writer/issue URL claimed. Isolated revert preserves partner
 work and append-only logs; reconcile later changes on rollback.
+
+## 2026-11-25 — INKFIG-ARTWORK-GAPS-006 — Selective four-sided gap fill
+### Request
+Enlarge only images with blank space on all four sides to remove left/right gaps.
+### Changes
+Compute unchanged baseline fitting first; qualify only if both axes have >2px total
+gap. Qualified images scale proportionally to frame width, centered height clipping
+if needed; conditional max-height override avoids distortion. Resize eligibility
+uses baseline, not enlarged result, preventing oscillation. Other images unchanged.
+### Repositories
+All three checked clean/pulled main ff-only; frontend042a61d, backends unchanged.
+### Files
+ArtworkPageMedia, fitting tests, relevant memory/discovery guide, task handoff/log.
+### API
+No API changes.
+### Database
+No migration required. No storage/database/embedding changes or production writes.
+### Permissions and scope
+Frontend only. Existing authorization, adaptive frames, header, transparent Back,
+lightbox/history, videos, image protection, partner styles and ordinary feed retained.
+### Frontend
+Only four-sided blank-space previews enlarge; one-axis/no-gap previews retain
+prior sizing. Gap blur and complete expanded image remain; responsive/theme/RTL retained.
+### Verification
+125 source +436 Vitest full run and final25 media tests (one added stability case)
+=>562 distinct checks/437 Vitest; strict TS/Vite/SEO/whitespace passed. Cases include
+small-wide/square eligibility, side-only/top-bottom-only/no gaps, threshold boundary,
+repeated measurement and resize losing eligibility. Native Edge actual-component/
+inert fixtures at1440 and390, English/Arabic, qualifying/non-qualifying images pass
+proportional scale, centering/no page overflow; browser/server closed. Existing
+bundle/jsdom notices retained. No physical-device/live mutation certification.
+### Deployment
+Previous main workflow blocked before starting by GitHub billing lock; new run must
+be checked. Existing frontend workflow only; no bypass/manual release/backend deploy.
+### Git
+fix/four-side-image-gaps; subject Fill image side gaps only when all four sides are blank.
+Fetch/rebase unpublished branch, push, authorized ff main/push; actual hash/conflicts/
+deployment reported after execution. Published history preserved.
+### Notes
+No authenticated issue writer/issue URL claimed. Revert focused commit if requested,
+preserving adaptive-frame work and append-only logs.

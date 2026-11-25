@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-25. Evidence: synchronized main031dfce and adaptive wide-frame checks.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-WIDE-005.md).
+Updated: 2026-11-25. Evidence: synchronized main042a61d and selective four-gap fitting.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-GAPS-006.md).
 
 ## Current objective and approved scope
-Owner requested shorter dynamic wide-image frames, unchanged portrait height,
-home-sized header controls and tighter aligned page gutters. Preserve controls,
+Owner requests width enlargement only for images whose baseline fit has blank
+space on all four sides. Preserve adaptive frames/header spacing and controls,
 history/voting, related masonry and notification isolation from preceding tickets.
-Status: implemented;558 checks/build and automated browser fixtures passed.
-Task: [INKFIG-ARTWORK-WIDE-005](../collaboration/tasks/INKFIG-ARTWORK-WIDE-005.md).
-Integration owner: user of this session; agent /root, artwork-wide-2026-11-25.
+Status: implemented;562 checks/build and browser fixtures verified; deployment checked separately.
+Task: [INKFIG-ARTWORK-GAPS-006](../collaboration/tasks/INKFIG-ARTWORK-GAPS-006.md).
+Integration owner: user of this session; agent /root, artwork-gaps-2026-11-25.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -29,7 +29,8 @@ No partner workstreams or checkout/session assignments have been approved.
   now uses adaptive shorter wide-image frames and unchanged portrait heights,
   side-by-side desktop details, centered media and internal metadata scrolling.
 - Image sizing restored exactly to dd31376: portrait height fit, landscape/square
-  shrink-only contain; decorative blur in remaining gaps. No forced side-gap filling.
+  baseline contain; only baseline four-sided gaps now qualify for width enlargement.
+  Baseline is recalculated on resize, avoiding oscillation; other images unchanged.
 - Back is a transparent44px overlay inside the image corner in both directions;
   no background/border, including hover; no separate loaded-card row.
 - Native image popup fits the complete image to screen, no toolbar/size toggle;
@@ -46,7 +47,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main031dfce; independent fix/responsive-wide-artwork.
+- Baseline main042a61d; independent fix/four-side-image-gaps.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -56,7 +57,7 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- Current ticket:558 checks (125 Node/source +433 Vitest/40 files), strict TS/Vite/SEO
+- Current ticket:562 checks (125 Node/source +437 Vitest/40 files), strict TS/Vite/SEO
   build and whitespace passed. Actual components/inert fixtures tested13 combinations
   of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
   tiny images and20 tags/long text; shorter wide frames, unchanged portraits/no overflow.
@@ -66,6 +67,8 @@ No partner workstreams or checkout/session assignments have been approved.
   browser/server closed; no helpers/screenshots/build output committed.
 - Configured workflow: [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml).
 - No manual migrations, deployment, production writes or live browser tests authorized/run.
+- Prior042a61d workflow45559637005 never started: GitHub account billing lock.
+  New publication must check the workflow; do not bypass required CI or claim deployed.
 - [skip ci] on setup commits avoids existing automatic production workflows.
 - Setup commit dd424da0a051996ab538d9e19f3b28f6824c5a49 pushed successfully to origin/main.
   Final checkpoint/log commit follows it in Git history; no production deployment claimed.

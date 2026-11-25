@@ -16,7 +16,7 @@ type ArtworkPageMediaProps = {
   imageLabels?: ArtworkImageLabels;
 };
 
-/** Intrinsic, centered media in a frame whose size never depends on image ratio. */
+/** Centered media shared by adaptive detail frames and artwork popups. */
 export function ArtworkPageMedia(props: ArtworkPageMediaProps) {
   // Remount on source changes so a failed image cannot hide the next artwork.
   return <ArtworkPageMediaSource key={props.url} {...props} />;
@@ -26,7 +26,7 @@ function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const [natural, setNatural] = useState(dimensions);
-  const [fitting, setFitting] = useState<{ width: number; height: number; gaps: boolean }>();
+  const [fitting, setFitting] = useState<{ width: number; height: number; gaps: boolean; fourSideFill: boolean }>();
   const mobile = useMobileViewport();
   const frame = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -60,11 +60,14 @@ function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions
       // Layout dimensions exclude the parent card's temporary opening scale.
       const width = element.clientWidth, height = element.clientHeight;
       if (!width || !height) return;
-      const scale = natural.height > natural.width ? height / natural.height
+      const baselineScale = natural.height > natural.width ? height / natural.height
         : Math.min(width / natural.width, height / natural.height, 1);
+      // Qualify using the unchanged baseline, never the already-enlarged result.
+      const fourSideFill = width - natural.width * baselineScale > 2 && height - natural.height * baselineScale > 2;
+      const scale = fourSideFill ? width / natural.width : baselineScale;
       const next = { width: natural.width * scale, height: natural.height * scale,
-        gaps: width - natural.width * scale > 2 || height - natural.height * scale > 2 };
-      setFitting(previous => previous && Math.abs(previous.width-next.width)<.5 && Math.abs(previous.height-next.height)<.5 && previous.gaps===next.gaps ? previous : next);
+        gaps: width - natural.width * scale > 2 || height - natural.height * scale > 2, fourSideFill };
+      setFitting(previous => previous && Math.abs(previous.width-next.width)<.5 && Math.abs(previous.height-next.height)<.5 && previous.gaps===next.gaps && previous.fourSideFill===next.fourSideFill ? previous : next);
     };
     measure();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
@@ -98,7 +101,7 @@ function ArtworkPageMediaSource({ url, title, mimeType, failureLabel, dimensions
     {failed ? <p className="artwork-page-media-error" role="status">{failureLabel}</p>
       : mimeType.startsWith("video/")
         ? <video className={imageClass} src={url} aria-label={title} controls={!readOnly} playsInline preload="metadata" onLoadedMetadata={event => { setReady(true); onDimensions?.(event.currentTarget.videoWidth,event.currentTarget.videoHeight); }} onError={() => setFailed(true)} />
-        : <img {...artworkImageProtection} className={imageClass} style={fitting ? { width: fitting.width, height: fitting.height, ...(natural && natural.height > natural.width ? {maxWidth:"none",flexShrink:0} : {}) } : undefined} src={url} alt={title} width={dimensions?.width} height={dimensions?.height} decoding="async" onLoad={event => { setReady(true); setNatural({width:event.currentTarget.naturalWidth,height:event.currentTarget.naturalHeight}); onDimensions?.(event.currentTarget.naturalWidth,event.currentTarget.naturalHeight); }} onError={() => setFailed(true)} />}
+        : <img {...artworkImageProtection} className={imageClass} style={fitting ? { width: fitting.width, height: fitting.height, ...(fitting.fourSideFill ? {maxHeight:"none"} : {}), ...(natural && natural.height > natural.width ? {maxWidth:"none",flexShrink:0} : {}) } : undefined} src={url} alt={title} width={dimensions?.width} height={dimensions?.height} decoding="async" onLoad={event => { setReady(true); setNatural({width:event.currentTarget.naturalWidth,height:event.currentTarget.naturalHeight}); onDimensions?.(event.currentTarget.naturalWidth,event.currentTarget.naturalHeight); }} onError={() => setFailed(true)} />}
     {!failed && ready && !mimeType.startsWith("video/") && imageLabels && <ArtworkImageExpand url={url} title={title} labels={imageLabels}/>}
   </div>;
 }

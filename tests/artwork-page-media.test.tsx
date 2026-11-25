@@ -75,7 +75,7 @@ it("reserves intrinsic image dimensions and drops the loading placeholder once r
   expect(container.querySelector(".artwork-page-media")?.getAttribute("data-ready")).toBe("true");
 });
 
-it.each([[200,300,400,600,false],[300,200,300,200,true],[400,600,400,600,false],[100,1000,60,600,true],[300,400,450,600,false]])("restores %sx%s fitting before side-gap enlargement",(width,height,expectedWidth,expectedHeight,gaps)=>{
+it.each([[200,300,400,600,false,false],[300,200,400,800/3,true,true],[400,600,400,600,false,false],[100,1000,60,600,true,false],[300,400,450,600,false,false],[200,200,400,400,true,true],[398,200,398,200,true,false],[500,200,400,160,true,false]])("fits %sx%s and fills width only for four-sided gaps",(width,height,expectedWidth,expectedHeight,gaps,fourSideFill)=>{
   vi.spyOn(HTMLElement.prototype,"clientWidth","get").mockReturnValue(400);
   vi.spyOn(HTMLElement.prototype,"clientHeight","get").mockReturnValue(600);
   const view=render(<ArtworkPageMedia url="/art.png" title="Art" mimeType="image/png" failureLabel="Failed"/>);
@@ -83,7 +83,7 @@ it.each([[200,300,400,600,false],[300,200,300,200,true],[400,600,400,600,false],
   Object.defineProperties(image,{naturalWidth:{value:width},naturalHeight:{value:height}});
   fireEvent.load(image);
   expect(parseFloat(image.style.width)).toBeCloseTo(expectedWidth);expect(parseFloat(image.style.height)).toBeCloseTo(expectedHeight);
-  expect(image.style.maxHeight).toBe("");
+  expect(image.style.maxHeight).toBe(fourSideFill?"none":"");
   expect(Boolean(view.container.querySelector(".artwork-frame-color"))).toBe(gaps);
 });
 
@@ -100,4 +100,16 @@ it.each([[100,420],[450,496],[1000,680]])("sizes wide frames around %spx details
   expect(box.style.getPropertyValue("--artwork-wide-media-height")).toBe("224px");
   view.rerender(content("/portrait.png"));
   expect(box.dataset.wideArtwork).toBeUndefined();expect(box.style.getPropertyValue("--artwork-wide-height")).toBe("");
+});
+
+it("rechecks the baseline on resize without oscillating between enlarged and original sizing",()=>{
+  let width=400,resize=()=>{};
+  vi.spyOn(HTMLElement.prototype,"clientWidth","get").mockImplementation(()=>width);
+  vi.spyOn(HTMLElement.prototype,"clientHeight","get").mockReturnValue(600);
+  vi.stubGlobal("ResizeObserver",class {constructor(callback:()=>void){resize=callback;}observe(){}disconnect(){}});
+  render(<ArtworkPageMedia url="/small.png" title="Art" mimeType="image/png" failureLabel="Failed"/>);
+  const image=screen.getByRole("img");Object.defineProperties(image,{naturalWidth:{value:300},naturalHeight:{value:200}});fireEvent.load(image);
+  expect(parseFloat(image.style.width)).toBe(400);
+  act(()=>{resize();resize();});expect(parseFloat(image.style.width)).toBe(400);
+  width=250;act(()=>resize());expect(parseFloat(image.style.width)).toBe(250);expect(image.style.maxHeight).toBe("");
 });

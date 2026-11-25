@@ -60,6 +60,8 @@ All language-prefixed routes use en/ar; English is the fallback.
 - Full-size icon opens a fit-only native image popup with inset close, strong blur,
   outside dismissal and reduced-motion-aware transitions. Back retains the same card.
 - Image-color blur is decorative and gap-only; excess image cropping is centered.
+  Images with baseline gaps on all four sides alone enlarge to fill width;
+  one-axis gaps/no gaps retain previous fitting. Expanded image stays complete.
   Back is transparent (also on hover) inside the image corner; no separate row.
   Artwork page/exhibition popup retain search/profile header access; details chain scrolling.
 - Viewer exhibition memberships are compact clickable name/year tags with small
