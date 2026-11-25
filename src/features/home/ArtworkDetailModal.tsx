@@ -1,4 +1,4 @@
-import { Bookmark, CalendarDays, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, X } from "lucide-react";
+import { Bookmark, ExternalLink, Flag, Heart, Link2, Pencil, ShieldAlert, Trash2, X } from "lucide-react";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -134,22 +134,24 @@ export function ArtworkDetailModal({ language, work, canLike, canSave, canModera
           {extraDetails}
           <div className="artwork-modal-meta">
             {readOnly ? <span className="artwork-modal-artist"><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</span> : <Link className="artwork-modal-artist" to={`/${language}/profile/${work.owner_user_id}`} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();requestClose(()=>navigate(`/${language}/profile/${work.owner_user_id}`,{replace:historyPreview}),!historyPreview);}}><ProfileAvatar name={work.artist_name} url={work.artist_avatar_url} language={language} className="artwork-modal-creator-avatar"/>{t("home.by")} {work.artist_name}</Link>}
-            <span><CalendarDays size={16} /><time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time></span>
           </div>
-          <div className="artwork-modal-description">
+          {work.description?.trim() && <div className="artwork-modal-description">
             <h3>{t("works.description")}</h3>
-            <p>{work.description || t("works.noDescription")}</p>
-          </div>
+            <p>{work.description}</p>
+          </div>}
           {work.links.length > 0 && <div className="artwork-modal-links">
             <h3><Link2 size={17} />{t("works.links")}</h3>
             <div>{work.links.map((link, index) => readOnly ? <span className="artwork-modal-readonly-link" key={link.url}>{link.label ? `${link.label}: ${link.url}` : link.url}</span> : <a href={link.url} key={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}<ExternalLink size={15} /></a>)}</div>
           </div>}
-          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-modal-save artwork-save-icon ${work.saved_by_me?"saved":""}`} type="button" aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} aria-pressed={work.saved_by_me} disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark aria-hidden="true" size={20} fill={work.saved_by_me?"currentColor":"none"}/></button>}{canReport&&<button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}{canModerateDelete&&<button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}</div>}
+          {!readOnly && <div className="artwork-modal-actions"><button className={`artwork-modal-like ${work.liked_by_me ? "liked" : ""}`} disabled={!canLike||interactionBusy} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} type="button" onClick={() => onToggleLike(work)}><Heart size={20} fill={work.liked_by_me ? "currentColor" : "none"} /><span>{work.like_count}</span></button>{canSave&&<button className={`artwork-modal-save artwork-save-icon ${work.saved_by_me?"saved":""}`} type="button" aria-label={t(work.saved_by_me?"home.unsaveWork":"home.saveWork")} aria-pressed={work.saved_by_me} disabled={interactionBusy} onClick={()=>onToggleSave(work)}><Bookmark aria-hidden="true" size={20} fill={work.saved_by_me?"currentColor":"none"}/></button>}</div>}
           {footerInDetails && mediaFooter && <div className="artwork-modal-details-footer">{mediaFooter}</div>}
-          {!readOnly && (onEditOwnWork || onDeleteOwnWork) && <div className="artwork-modal-owner-actions">
-            {onEditOwnWork && <button type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
-            {onDeleteOwnWork && <button type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}
-          </div>}
+          <div className="artwork-modal-management">
+            {!readOnly && canReport && <button className="artwork-modal-report" type="button" onClick={()=>setReporting(true)}><Flag size={19}/><span>{t("reports.reportWork")}</span></button>}
+            {!readOnly && canModerateDelete && <button className="artwork-modal-moderate" type="button" onClick={()=>setModerating(true)}><Trash2 size={19}/><span>{t("works.moderateDelete")}</span></button>}
+            {!readOnly && onEditOwnWork && <button className="artwork-modal-report" type="button" onClick={()=>requestClose(()=>onEditOwnWork(work))}><Pencil aria-hidden="true" size={17}/>{t("works.editPost")}</button>}
+            {!readOnly && onDeleteOwnWork && <button className="artwork-modal-report" type="button" onClick={()=>requestClose(()=>onDeleteOwnWork(work))}><Trash2 aria-hidden="true" size={17}/>{t("works.deletePost")}</button>}
+            <time className="artwork-relative-date" dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{uploadedAt}</time>
+          </div>
         </div>
       </section>
       <AnimatedPresence open={moderating}>{moderating&&<div className="moderation-dialog-backdrop" role="presentation" onMouseDown={event=>event.target===event.currentTarget&&!deleting&&setModerating(false)}><form className="moderation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="moderation-title" onSubmit={submitModeration}><button className="moderation-dialog-close" type="button" disabled={deleting} aria-label={t("works.cancelModeration")} onClick={()=>setModerating(false)}><X size={19}/></button><span><ShieldAlert size={25}/></span><h2 id="moderation-title">{t("works.moderateDeleteTitle")}</h2><p>{t("works.moderateDeleteDescription")}</p><label>{t("works.deletionReason")}<textarea required minLength={10} maxLength={1000} value={reason} placeholder={t("works.deletionReasonPlaceholder")} onChange={event=>setReason(event.target.value)}/><small>{t("works.deletionReasonHint")}</small></label>{deleteError&&<p className="error-message" role="alert">{t("works.moderateDeleteFailed")}</p>}<div><button type="button" disabled={deleting} onClick={()=>setModerating(false)}>{t("works.cancelModeration")}</button><button className="danger-button" type="submit" disabled={deleting||reason.trim().length<10}>{t(deleting?"works.deletingModerated":"works.confirmModerateDelete")}</button></div></form></div>}</AnimatedPresence>

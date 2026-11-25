@@ -12152,3 +12152,52 @@ deployment reported after execution. Published history preserved.
 ### Notes
 No authenticated issue writer/issue URL claimed. Revert focused commit if requested,
 preserving adaptive-frame work and append-only logs.
+
+## 2026-11-25 — INKFIG-ARTWORK-DETAILS-007 — Artwork menu and metadata polish
+### Request
+Match home profile menu/header hover, add subtle Back hover, hide absent descriptions,
+move relative date beside report/delete, and match edit/delete hover to report.
+### Changes
+ArtworkHeader reuses home menu classes/SmoothDetails: profile identity link,
+theme/language and existing logout action. Avatar/search hover reuse home styles;
+outside dismiss consumes background gesture, Escape/closing animation retained.
+Search icon/padding focus input; open sidebar panels inactivate artwork header.
+Page/shared modal omit empty/whitespace descriptions; existing localized relativeTime
+renders beside management actions in muted readable text with full-date title.
+Report/moderator/owner controls keep permission/callback guards; edit/delete hover
+matches report without moving/changing shape. Back has a faint12% highlight.
+### Repositories
+All three clean/pulled main ff-only. Frontend04855fc; backends unchanged.
+### Files
+ArtworkHeader, ArtworkPage, ArtworkDetailModal, scoped CSS, header/page/layout tests,
+relevant memory/discovery guide, task handoff and append-only log.
+### API
+No API changes. Existing profile/search/auth/relative-time helpers reused.
+### Database
+No migration required. No storage/embedding/data changes or production writes.
+### Permissions and scope
+Frontend only; authorization/busy/read-only guards and native popup history retained.
+No dependency/config/backend changes; current fitting, frames and partner styles retained.
+### Frontend
+Home-equivalent profile preferences/identity/logout, smooth dismissal and hover;
+empty descriptions hidden, understated relative date next to report/owner actions.
+Both languages/themes, phone layout and prior image behaviors preserved.
+### Verification
+564 checks:125 source +439 Vitest/40 files; final3 header tests after icon-focus parity,
+strict TS/Vite/SEO/whitespace passed. Assertions cover menu options/logout delegation,
+non-navigation, search focus/results/account scope, blank description/date placement.
+Native Edge actual-component/inert fixtures:1440 en own/other,390 ar dark, native
+exhibition popup passed menu/Escape, hover, equal owner-button backgrounds, omitted
+description/date row; no browser exceptions. Keyboard fixture focuses summary before
+Escape, matching real input. Helpers closed. Existing bundle/jsdom notices retained.
+No physical-device/live mutation or real sign-out certification.
+### Deployment
+Previous workflows blocked before starting by GitHub billing lock. Check new run;
+existing frontend workflow only, no bypass/manual release/backend deployment.
+### Git
+fix/artwork-menu-metadata; subject Unify artwork profile menu and simplify post metadata.
+Fetch/rebase unpublished work, push branch, authorized ff main merge/push; exact hash,
+conflicts/publication/deployment reported after execution. No published-history rewrite.
+### Notes
+No authenticated issue writer/issue URL claimed. Isolated rollback preserves prior
+fitting, partner work and append-only feature-log history.

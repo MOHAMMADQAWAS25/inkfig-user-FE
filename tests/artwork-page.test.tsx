@@ -68,11 +68,19 @@ it("renders a full page, real metadata and existing homepage cards below", async
   expect(screen.queryByRole("dialog")).toBeNull();
   expect(screen.getByText(sample.description)).toBeTruthy();
   expect(screen.getByRole("link", { name: "Portfolio" }).getAttribute("rel")).toBe("noopener noreferrer");
-  expect(screen.getByText("Created")).toBeTruthy();
+  expect(document.querySelector(".artwork-page-manage time")?.getAttribute("dateTime")).toBe(sample.created_at);
   expect(await screen.findByRole("link", { name: "View artwork details: Second artwork" })).toHaveProperty("href", expect.stringContaining("/en/artwork/two"));
   expect(screen.getByTestId("related-feed").dataset.restore).toBe("false");
   expect(document.querySelector('.artwork-page-media-original')?.getAttribute("draggable")).toBe("false");
   expect(document.querySelector('.artwork-modal-media')).toBeNull();
+});
+it("omits blank descriptions and puts a localized relative date beside report",async()=>{
+  vi.spyOn(Date,"now").mockReturnValue(Date.parse("2026-11-25T12:00:00Z"));
+  vi.mocked(getWork).mockResolvedValue({...sample,description:"  \n ",created_at:"2026-11-23T12:00:00Z"});
+  mount();await screen.findByRole("heading",{name:sample.title});
+  expect(document.querySelector(".artwork-page-description")).toBeNull();
+  const date=screen.getByText("2 days ago");expect(date.tagName).toBe("TIME");
+  expect(date.parentElement?.querySelector(".lucide-flag")).toBeTruthy();expect(date.getAttribute("title")).toBeTruthy();
 });
 it.each([null,"/broken.png"])("uses the artist initial for a missing or broken avatar (%s)",async url=>{
  vi.mocked(getWork).mockResolvedValue({...sample,artist_avatar_url:url});

@@ -24,6 +24,10 @@ Updated: 2026-11-15. Read current source before relying on historical UI descrip
 - Owner2026-11-25 permits proportional width enlargement only when unchanged baseline
   fitting leaves >2px aggregate gaps on BOTH axes (four sides). Derive eligibility
   from baseline on every resize, not current enlarged output; others retain sizing.
+- Artwork headers reuse home profile-menu classes/SmoothDetails/preferences/logout;
+  outside gestures dismiss without activating the artwork. Date uses existing
+  localized relativeTime beside management buttons; full timestamp stays in title.
+  Hide whitespace/empty description sections. Report/edit/delete retain permission guards.
 - Expanded images use a screen-fitting native popup without a toolbar/size toggle.
   Same-URL history makes Back dismiss it first; close/outside/Escape animate and
   preserve focus/parent. Compact exhibition tags remain per-event links.

@@ -27,7 +27,7 @@ test("restored image sizing retains portrait height fitting without forced side-
   assert.match(page,/<ArtworkHeader \/>/);
   assert.match(css,/\.artwork-page-back-overlay \{[^}]*inset-inline-start:14px/);
   assert.match(css,/\.artwork-page-back-overlay \{[^}]*border:0;[^}]*background:transparent/);
-  assert.match(css,/button.artwork-page-back-overlay:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:transparent/);
+  assert.match(css,/button.artwork-page-back-overlay:is\(:hover,:focus-visible\):not\(:disabled\) \{ background:rgb\(255 253 240 \/ \.12\)/);
 });
 test("detail block keeps desktop columns and contains long metadata instead of growing",()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1\.1fr\) minmax\(0,1fr\)/);

@@ -64,6 +64,10 @@ All language-prefixed routes use en/ar; English is the fallback.
   one-axis gaps/no gaps retain previous fitting. Expanded image stays complete.
   Back is transparent (also on hover) inside the image corner; no separate row.
   Artwork page/exhibition popup retain search/profile header access; details chain scrolling.
+- Artwork profile avatar opens home-style identity/theme/language/logout menu;
+  same avatar/search hover, faint Back hover, dismiss-only outside gestures.
+- Page/shared popups omit empty description sections. Relative muted date appears
+  beside report/owner controls; edit/delete share report hover without shape shifting.
 - Viewer exhibition memberships are compact clickable name/year tags with small
   per-event rating summaries, supporting multiple/long entries without growing the box.
 - Popup right column uses a consistent16px rhythm, grouped exhibition/rating panels,

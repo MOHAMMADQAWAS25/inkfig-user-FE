@@ -9,7 +9,7 @@
 [dir=rtl] .artwork-page-back svg { transform:rotate(180deg); }
 .artwork-page-hero { position:relative; }
 .artwork-page .artwork-page-back-overlay { position:absolute; top:14px; inset-inline-start:14px; z-index:3; display:grid; place-items:center; width:44px; height:44px; min-height:44px; margin:0; padding:0; border:0; border-radius:14px; background:transparent; color:#fffdf0; }
-.artwork-page button.artwork-page-back-overlay:is(:hover,:focus-visible):not(:disabled) { background:transparent; border-radius:14px; transform:none; box-shadow:none; }
+.artwork-page button.artwork-page-back-overlay:is(:hover,:focus-visible):not(:disabled) { background:rgb(255 253 240 / .12); border-radius:14px; transform:none; box-shadow:none; }
 .artwork-page-back-overlay svg { filter:drop-shadow(0 1px 3px rgb(0 0 0 / .75)); }
 .artwork-page .artwork-page-back-overlay:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
 .artwork-page-hero { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); grid-template-rows:minmax(0,1fr); height:clamp(420px,calc(100svh - 112px),820px); align-items:stretch; gap:0; overflow:hidden; border:1px solid var(--border); border-radius:20px; background:var(--surface); }
@@ -43,6 +43,11 @@
 .artwork-page-share button { display:inline-flex; justify-content:center; align-items:center; gap:10px; flex:1 1 130px; min-height:48px; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer; }
 .artwork-page-manage { margin-top:16px; font-size:.85rem; }
 .artwork-page .artwork-page-manage button:has(.lucide-flag) { min-height:44px; padding:10px 18px; border-radius:12px; }
+.artwork-page .artwork-page-manage :is(button,a) { min-height:44px; padding:10px 18px; border-radius:12px; box-sizing:border-box; }
+.artwork-page .artwork-page-manage :is(button,a):is(:hover,:focus-visible):not(:disabled) { background:color-mix(in srgb,var(--primary) 10%,transparent); border-radius:12px; transform:none; }
+.artwork-header-menu { flex:0 0 auto; }
+.artwork-header .gallery-profile-popover { z-index:70; }
+.artwork-page .artwork-header .gallery-profile-popover button:is(:hover,:focus-visible) { transform:none; }
 .artwork-page-related { margin-top:0; }
 .feed-featured[data-full-width="true"] .artwork-page-related-title { position:static; width:auto; height:auto; margin:24px 0 4px; padding:0; overflow:visible; clip:auto; white-space:normal; font-size:1.3rem; }
 .artwork-page-skeleton { min-height:65svh; display:grid; place-items:center; border-radius:18px; background:var(--surface); }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bookmark, CalendarDays, Copy, Flag, Heart, Pencil, Share2, Trash2 } from "lucide-react";
+import { ArrowLeft, Bookmark, Copy, Flag, Heart, Pencil, Share2, Trash2 } from "lucide-react";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { ApiError } from "../../api/httpClient";
 import { useAuth } from "../auth/AuthContext";
@@ -22,6 +22,7 @@ import { artworkNavigationState, artworkPath, safeArtworkReturn } from "./artwor
 import { updateArtworkCache } from "./updateArtworkCache";
 import "./artworkPage.css";
 import { likeCountLabel } from "../../lib/likeCount";
+import { relativeTime } from "../../lib/relativeTime";
 
 export function ArtworkPage() {
   const { workId = "" } = useParams();
@@ -113,8 +114,7 @@ export function ArtworkPage() {
           <h1 id="artwork-title">{work.title}</h1>
           <div className="artwork-page-tags"><span className="artwork-page-category">{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <WorkExhibitionBadge exhibitions={work.exhibitions} detail compact/></div>
-          <p className="artwork-page-description">{work.description || t("works.noDescription")}</p>
-          <div className="artwork-page-date"><CalendarDays size={20} /><span>{t("artwork.created")}<time dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{new Date(work.created_at).toLocaleDateString(language, { year: "numeric", month: "short", day: "numeric" })}</time></span></div>
+          {work.description?.trim() && <p className="artwork-page-description">{work.description}</p>}
           {work.links.length > 0 && <div className="artwork-page-links">{work.links.map((link, index) => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}</a>)}</div>}
           <div className="artwork-page-actions"><button type="button" disabled={!can("works.like")} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} onClick={() => like(work)}><Heart size={22} fill={work.liked_by_me ? "currentColor" : "none"} />{work.like_count}</button><button className="artwork-save-icon" type="button" disabled={!can("works.save")} aria-label={t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")} aria-pressed={work.saved_by_me} onClick={() => save(work)}><Bookmark aria-hidden="true" size={22} fill={work.saved_by_me ? "currentColor" : "none"} /></button></div>
           <div className="artwork-page-share"><button type="button" onClick={() => void share(true)}><Copy size={19} />{t("artwork.copyLink")}</button><button type="button" onClick={() => void share()}><Share2 size={19} />{t("artwork.share")}</button></div>
@@ -122,6 +122,7 @@ export function ArtworkPage() {
             {own && can("works.upload") && <><Link to={`/${language}/profile?edit=${encodeURIComponent(work.work_id)}`}><Pencil size={16} />{t("works.editPost")}</Link><button type="button" disabled={deleting} onClick={() => void remove()}><Trash2 size={16} />{t("works.deletePost")}</button></>}
             {!own && can("reports.create") && <button type="button" onClick={() => setReporting(true)}><Flag size={16} />{t("reports.reportWork")}</button>}
             {can("works.delete_any") && <button type="button" onClick={() => setModerating(true)}><Trash2 size={16} />{t("works.moderateDelete")}</button>}
+            <time className="artwork-relative-date" dateTime={work.created_at} title={new Date(work.created_at).toLocaleString(language)}>{relativeTime(work.created_at,language)}</time>
           </div>
         </section>
       </article>{error && <p role="alert" className="error-message">{error}</p>}{notice && <p role="status">{notice}</p>}<h2 id="related-artworks-title" className="sr-only artwork-page-related-title">{t("artwork.related")}</h2></> : null;

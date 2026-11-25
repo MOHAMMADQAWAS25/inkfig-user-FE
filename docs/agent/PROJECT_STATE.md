@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-25. Evidence: synchronized main042a61d and selective four-gap fitting.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-GAPS-006.md).
+Updated: 2026-11-25. Evidence: synchronized main04855fc and artwork menu/metadata checks.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-DETAILS-007.md).
 
 ## Current objective and approved scope
-Owner requests width enlargement only for images whose baseline fit has blank
-space on all four sides. Preserve adaptive frames/header spacing and controls,
+Owner requests home-style artwork profile menu/hover, subtle Back hover, no blank
+description fallback and relative dates beside management controls. Preserve fitting,
 history/voting, related masonry and notification isolation from preceding tickets.
-Status: implemented;562 checks/build and browser fixtures verified; deployment checked separately.
-Task: [INKFIG-ARTWORK-GAPS-006](../collaboration/tasks/INKFIG-ARTWORK-GAPS-006.md).
-Integration owner: user of this session; agent /root, artwork-gaps-2026-11-25.
+Status: implemented;564 checks/build and browser fixtures verified; deployment checked separately.
+Task: [INKFIG-ARTWORK-DETAILS-007](../collaboration/tasks/INKFIG-ARTWORK-DETAILS-007.md).
+Integration owner: user of this session; agent /root, artwork-details-2026-11-25.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -36,6 +36,10 @@ No partner workstreams or checkout/session assignments have been approved.
 - Native image popup fits the complete image to screen, no toolbar/size toggle;
   animated close/outside/Escape/Back preserve parent and focus. Compact tags retained.
 - Artwork search/profile header is visible in the dedicated page and exhibition popup.
+- Profile opens the home-style animated identity/preferences/logout menu, with
+  dismiss-only outside clicks and existing Escape support. Shared home hover styles.
+- Empty descriptions disappear; localized relative time sits beside report/owner
+  controls with full-date title. Edit/delete share report hover; Back has faint hover.
 - Wide frame height uses image/metadata measurements with viewport bounds; phone
   wide-media height is width-based, preserving toolbar stability. Portraits unchanged.
 - Header controls match home52px search/34px avatar desktop; shared20px page gutter
@@ -47,7 +51,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main042a61d; independent fix/four-side-image-gaps.
+- Baseline main04855fc; independent fix/artwork-menu-metadata.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -57,7 +61,7 @@ No partner workstreams or checkout/session assignments have been approved.
   Repository handoffs are publishable coordination, not locks.
 
 ## Verification / deployment distinction
-- Current ticket:562 checks (125 Node/source +437 Vitest/40 files), strict TS/Vite/SEO
+- Current ticket:564 checks (125 Node/source +439 Vitest/40 files), strict TS/Vite/SEO
   build and whitespace passed. Actual components/inert fixtures tested13 combinations
   of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
   tiny images and20 tags/long text; shorter wide frames, unchanged portraits/no overflow.

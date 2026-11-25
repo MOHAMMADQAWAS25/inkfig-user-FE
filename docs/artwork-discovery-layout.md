@@ -135,3 +135,9 @@ Selective follow-up: baseline four-sided gaps alone trigger proportional width
 enlargement. Check both axes before enlargement on every resize, leaving one-axis/
 no-gap images unchanged. Center any excess height; complete source remains in the
 fit-only expansion. Adaptive wide-box/header changes are retained.
+
+Artwork controls/metadata follow-up: home-style animated profile menu with identity,
+theme/language/logout replaces direct profile navigation; existing hover classes
+retained. Faint Back hover, hidden empty descriptions, localized relative date in
+management row and matching owner/report hover apply to page/shared popups.
+Current geometry and image fitting are retained; metadata remains permission-gated.

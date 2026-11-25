@@ -28,6 +28,10 @@ Updated: 2026-11-15. [Screens](SCREENS.md), [API](API_OVERVIEW.md).
   Outside/close/Escape/Back animate dismissal while retaining the card/gallery.
 - Artwork page and exhibition popup show search/profile access. Details scroll
   internally then chain to the surrounding scroll area rather than trapping input.
+- Artwork avatar opens identity/preferences/logout menu instead of navigating;
+  identity link navigates to profile. Outside dismiss is consumed; Escape animates close.
+- Empty descriptions are hidden; existing localized relativeTime renders beside
+  report/edit/delete with full timestamp title. Permission/busy guards unchanged.
 - Likes/saves/follow/edit/report/moderator delete update relevant caches with rollback on failure.
 
 ## Upload and profile
