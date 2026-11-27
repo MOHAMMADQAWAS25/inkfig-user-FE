@@ -1,14 +1,14 @@
 # Project state - inkfig-user-FE
-Updated: 2026-11-25. Evidence: synchronized main9f2f2bb and empty-description divider checks.
-Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-ARTWORK-DIVIDER-008.md).
+Updated: 2026-11-27. Evidence: synchronized mainc910a7e and immediate navigation labels.
+Start with [instructions](../../AGENTS.md) and [active handoff](../collaboration/tasks/INKFIG-NAV-TOOLTIPS-009.md).
 
 ## Current objective and approved scope
-Owner requests balanced divider spacing when description is absent. Preserve menus,
-relative dates, missing-description omission, image fitting and current controls,
+Owner requests navigation labels immediately on hover. Preserve tooltip styling,
+translations, keyboard focus, mobile navigation and existing artwork controls,
 history/voting, related masonry and notification isolation from preceding tickets.
 Status: implemented;564 checks/build and browser fixtures verified; deployment checked separately.
-Task: [INKFIG-ARTWORK-DIVIDER-008](../collaboration/tasks/INKFIG-ARTWORK-DIVIDER-008.md).
-Integration owner: user of this session; agent /root, artwork-divider-2026-11-25.
+Task: [INKFIG-NAV-TOOLTIPS-009](../collaboration/tasks/INKFIG-NAV-TOOLTIPS-009.md).
+Integration owner: user of this session; agent /root, instant-nav-2026-11-27.
 Preserved completed My Submissions spacing/divider6808da2 and deployment checkpoint
 6b7e2b4; integration owner a7mad.ishaq. [Handoff](../collaboration/tasks/INKFIG-SUBMISSION-SPACING-001.md).
 Frontend-only; no migration/API/authorization/dependency changes.
@@ -42,6 +42,8 @@ No partner workstreams or checkout/session assignments have been approved.
   controls with full-date title. Edit/delete share report hover; Back has faint hover.
 - Empty-description divider has16px breathing room; popup uses one decorative
   theme-colored rule instead of restoring the omitted text/description section.
+- Navigation rail/settings labels appear immediately on hover/focus, with no delay
+  or fade. Other tooltips and existing phone navigation behavior are unchanged.
 - Wide frame height uses image/metadata measurements with viewport bounds; phone
   wide-media height is width-based, preserving toolbar stability. Portraits unchanged.
 - Header controls match home52px search/34px avatar desktop; shared20px page gutter
@@ -53,7 +55,7 @@ No partner workstreams or checkout/session assignments have been approved.
   backdrop, focus/scroll locking and dismiss-only closing remain active.
 
 ## Git and preserved work
-- Baseline main9f2f2bb; independent fix/empty-description-divider.
+- Baseline mainc910a7e; independent fix/instant-navigation-labels.
 - Clean frontend checkout at inspection; no pre-existing staged/unstaged/untracked files.
 - Git authors evidence: MOHAMMADQAWAS25/mohammadqawas25, a7mad.ishaq, anasmazen;
   contributions do not establish exclusive ownership.
@@ -64,9 +66,9 @@ No partner workstreams or checkout/session assignments have been approved.
 
 ## Verification / deployment distinction
 - Current ticket:564 checks (125 Node/source +439 Vitest/40 files), strict TS/Vite/SEO
-  build and whitespace passed. Actual components/inert fixtures tested13 combinations
-  of1440/1180/820/768/390 widths, themes/languages, portrait/wide/square/tall/panorama/
-  tiny images and20 tags/long text; shorter wide frames, unchanged portraits/no overflow.
+  build and whitespace passed. Native Edge actual-component/inert fixtures confirmed
+  immediate opacity1/transition0s/delay0s on7 visible navigation labels in English/
+  light and Arabic/dark;390px phone navigation/hidden rail-label behavior retained.
 - Native original-viewer Back retained its parent popup, then parent Back retained
   gallery DOM. Phone120px height-only changes left frame/card dimensions unchanged.
 - No live production mutations or physical Safari/iOS certification. Temporary

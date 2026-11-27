@@ -12228,3 +12228,29 @@ No bypass/manual deployment/backend release/migration; actual result reported se
 fix/empty-description-divider; subject Balance artwork dividers when descriptions
 are empty. Fetch/rebase unpublished work, push branch, authorized ff main/push;
 exact hash/conflicts/deployment reported after execution. No issue URL claimed.
+
+## 2026-11-27 — INKFIG-NAV-TOOLTIPS-009 — Immediate navigation labels
+### Request / Changes
+Show navigation button names immediately on hover. Remove shared rail/settings
+tooltip300ms delay and120ms fade by setting transition:none; keyboard focus also immediate.
+### Repositories / Files
+All three clean/pulled main ff-only; frontendc910a7e. styles.css (one declaration),
+current state/screens, task handoff and append-only feature log.
+### API / Database
+No API changes. No migration required. No storage/embedding/data writes.
+### Permissions and scope / Frontend
+Preserve labels, translations, theme/RTL styling, soft corners, keyboard behavior,
+phone navigation, other tooltips and all artwork functionality. No backend/dependency changes.
+### Verification
+564 checks (125 source +439 Vitest/40 files), strict TS/Vite/SEO/whitespace passed.
+Native Edge actual-component/inert fixtures:7 visible controls each in English/light
+and Arabic/dark report opacity1, transition0s and delay0s immediately after hover.
+Phone390px behavior retained. Helpers closed; no physical-device/live mutation claim.
+Existing non-blocking bundle/jsdom notices retained.
+### Deployment
+Existing frontend workflow only; previous GitHub billing lock may still block CI.
+No bypass/manual deployment/backend release/migration; actual result checked separately.
+### Git / Notes
+fix/instant-navigation-labels; subject Show navigation labels immediately on hover.
+Fetch/rebase unpublished work, branch push, authorized ff main merge/push; report
+exact hash/conflicts/push/deployment afterward. No issue URL claimed; preserve log history.

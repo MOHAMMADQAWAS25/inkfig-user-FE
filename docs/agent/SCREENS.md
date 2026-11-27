@@ -1,6 +1,8 @@
 # Current frontend screen inventory
 Updated: 2026-11-15. Routes: [AppRouter](../../src/app/AppRouter.tsx).
 All language-prefixed routes use en/ar; English is the fallback.
+Navigation rail/settings tooltips appear immediately on hover or keyboard focus;
+label styling/translations and phone navigation visibility remain unchanged.
 
 | Route / surface | Source and current status |
 | --- | --- |
