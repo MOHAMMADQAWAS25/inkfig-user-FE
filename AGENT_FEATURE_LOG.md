@@ -12254,3 +12254,65 @@ No bypass/manual deployment/backend release/migration; actual result checked sep
 fix/instant-navigation-labels; subject Show navigation labels immediately on hover.
 Fetch/rebase unpublished work, branch push, authorized ff main merge/push; report
 exact hash/conflicts/push/deployment afterward. No issue URL claimed; preserve log history.
+
+## 2026-11-28 - Add upload, edit, and artwork detail tags
+
+### Request
+
+Use InkFig's bilingual catalog for uploads and edits, expose model-generated tags on artwork, and report the results for existing works.
+
+### Changes
+
+- Added a searchable bilingual tag picker with a five-tag limit on upload and edit.
+- Uploads with no manual selection use the backend's automatic tagging. Normal publication opens the artwork so the creator can see its tags.
+- Displayed saved tags on artwork details and popups. Exhibition submission behavior and home-feed ranking remain unchanged.
+
+### Repositories
+
+- `inkfig-user-FE` — upload, edit, and artwork display.
+- `inkfig-main-system` — catalog, validation, migration, model scoring, and backfill.
+
+### Files
+
+- `src/features/works/WorkTags.tsx`, `src/features/works/worksApi.ts` — tag picker, display, and API wiring.
+- `src/features/works/UploadWorkPage.tsx`, `src/features/profile/ProfilePage.tsx` — creator controls.
+- `src/features/works/ArtworkPage.tsx`, `src/features/home/ArtworkDetailModal.tsx` — localized detail tags.
+- `src/i18n/resources.ts`, `src/styles.css` — bilingual text and shared visual styling.
+- `tests/upload-types-loading.test.tsx`, `tests/gallery-interactions.test.tsx` — picker coverage and updated provider fixtures.
+
+### API
+
+Uses `GET /api/v1/works/tags`, optional `tag_keys` on upload and edit, and saved tags on work reads.
+
+### Database
+
+No frontend migration required. The main backend migration `20261128_019_add_artwork_tags.sql` was applied before this release.
+
+### Permissions and scope
+
+Guests can see public tags. Creators edit tags using existing upload and ownership rules validated by the backend.
+
+### Frontend
+
+Upload and edit forms search across Arabic and English labels. Loading, retry, empty search, selected, and disabled states are available. Artwork details use the interface language.
+
+### Verification
+
+- `[passed] npm run build` — type checks, production build, and SEO output.
+- `[passed] node --test --test-concurrency=2 tests/*.test.mjs` — 125 checks.
+- `[passed] vitest run --pool=threads --maxWorkers=2` — 440 checks.
+- `[passed] live frontend release verification` — root, English, Arabic, artwork route, JavaScript, and CSS.
+
+### Deployment
+
+Published directly to Cloudflare after the approved backend release. Worker version `7ff52b72-7558-4c5e-a869-8ab2ddae623f`.
+
+### Git
+
+- Branch: `main`
+- Commit: `bc36456`
+- Push: `successful`
+
+### Notes
+
+Production backfill checked 34 published works and assigned tags to 21. Thirteen received no automatic tag above the cutoff.
