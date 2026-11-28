@@ -9,6 +9,7 @@ import { useI18n } from "../../i18n/I18nProvider";
 import { hasPermission } from "../../lib/permissions";
 import { AppSidebar } from "../navigation/AppSidebar";
 import { usePageScrollLock } from "../layout/usePageScrollLock";
+import { WorkTagList } from "./WorkTags";
 import { ArtworkPageMedia } from "./ArtworkPageMedia";
 import { ArtworkHeader } from "./ArtworkHeader";
 import { WorkExhibitionBadge } from "./WorkExhibitionBadge";
@@ -114,6 +115,7 @@ export function ArtworkPage() {
           <h1 id="artwork-title">{work.title}</h1>
           <div className="artwork-page-tags"><span className="artwork-page-category">{language === "ar" ? work.type_name_ar : work.type_name_en}</span>
           <WorkExhibitionBadge exhibitions={work.exhibitions} detail compact/></div>
+          <WorkTagList tags={work.tags} language={language} label={t("works.tags")}/>
           {work.description?.trim() && <p className="artwork-page-description">{work.description}</p>}
           {work.links.length > 0 && <div className="artwork-page-links">{work.links.map((link, index) => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label || `${t("works.openLink")} ${index + 1}`}</a>)}</div>}
           <div className="artwork-page-actions"><button type="button" disabled={!can("works.like")} aria-label={likeCountLabel(work.like_count,t)} aria-pressed={work.liked_by_me} onClick={() => like(work)}><Heart size={22} fill={work.liked_by_me ? "currentColor" : "none"} />{work.like_count}</button><button className="artwork-save-icon" type="button" disabled={!can("works.save")} aria-label={t(work.saved_by_me ? "home.unsaveWork" : "home.saveWork")} aria-pressed={work.saved_by_me} onClick={() => save(work)}><Bookmark aria-hidden="true" size={22} fill={work.saved_by_me ? "currentColor" : "none"} /></button></div>

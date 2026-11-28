@@ -12,6 +12,8 @@ import { AppSidebar } from "../navigation/AppSidebar";
 import { getEligibleExhibitions, submitWork } from "../exhibitions/exhibitionApi";
 import { WorkTypePicker, WorkTypePickerSkeleton } from "./WorkTypePicker";
 import { readCachedWorkTypes } from "./workTypesCache";
+import { WorkTagPicker } from "./WorkTags";
+import { artworkPath } from "./artworkNavigation";
 import { WorkImageDimensionsError } from "./workImageDimensions";
 
 export function UploadWorkPage() {
@@ -26,6 +28,7 @@ export function UploadWorkPage() {
  const [dragging,setDragging]=useState(false);
  useEffect(()=>{if(!previewFile){setPreviewUrl("");return;}const url=URL.createObjectURL(previewFile);setPreviewUrl(url);return()=>URL.revokeObjectURL(url);},[previewFile]);
  const [types,setTypes]=useState<WorkType[]>(()=>readCachedWorkTypes() ?? []); const [file,setFile]=useState<File|null>(null); const [typeId,setTypeId]=useState(""); const [title,setTitle]=useState(""); const [description,setDescription]=useState(""); const [links,setLinks]=useState([{label:"",url:""}]); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
+ const [tagKeys,setTagKeys]=useState<string[]>([]);
  const [typesStatus,setTypesStatus]=useState<"loading"|"ready"|"error">(()=>readCachedWorkTypes() ? "ready" : "loading");
  const [typesRequest,setTypesRequest]=useState(0);
  useEffect(()=>{
@@ -52,7 +55,7 @@ export function UploadWorkPage() {
    setFile(selected);setPreviewFile(selected);return true;
  }
  function updateLink(index:number,field:"label"|"url",value:string){setLinks(current=>current.map((link,i)=>i===index?{...link,[field]:value}:link));}
- async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(`/${language}`);}catch(cause){setError(cause instanceof WorkImageDimensionsError?t(cause.issue==="too-small"?"works.imageTooSmall":"works.invalidImage"):cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
+ async function submit(event:FormEvent){event.preventDefault();const used=links.filter(link=>link.url.trim()||link.label.trim());if(used.some(link=>!link.url.trim()||!isValidWorkUrl(link.url))||new Set(used.map(link=>link.url.trim())).size!==used.length){setError(t("works.invalidLink"));return;}if(!file){setError(t("works.selectFile"));return;}const message=fileErrorMessage(file);if(message){setError(message);return;}setBusy(true);setError("");try{if(exhibitionId){const eligible=await getEligibleExhibitions(0,undefined,exhibitionId);if(!eligible.items.length)throw new Error(t("exhibitions.notAvailable"));}const id=publishedId??await uploadWork({typeId,title,description,links:used,file,tagKeys:tagKeys.length?tagKeys:undefined});setPublishedId(id);if(exhibitionId){await submitWork(exhibitionId,id);navigate(`/${language}/exhibition/${exhibitionId}`);}else navigate(artworkPath(language,id));}catch(cause){setError(cause instanceof WorkImageDimensionsError?t(cause.issue==="too-small"?"works.imageTooSmall":"works.invalidImage"):cause instanceof Error?cause.message:t("works.uploadFailed"));}finally{setBusy(false)}}
  const relatedLinks = (<fieldset className="work-links-field" disabled={busy}><legend><Link2 size={18} aria-hidden="true"/>{t("works.links")}</legend><small>{t("works.linksOptional")}</small>
          {links.map((link,index)=><div className="work-link-row" key={index}><input aria-label={t("works.linkLabel")} maxLength={120} placeholder={t("works.linkLabel")} value={link.label} onChange={event=>updateLink(index,"label",event.target.value)}/><input aria-label={t("works.linkUrl")} dir="ltr" maxLength={2083} placeholder="https://example.com" type="url" value={link.url} onChange={event=>updateLink(index,"url",event.target.value)}/>{links.length>1&&<button aria-label={t("works.removeLink")} className="icon-button" type="button" onClick={()=>setLinks(current=>current.filter((_,i)=>i!==index))}><Trash2 size={17} aria-hidden="true"/></button>}</div>)}
          {links.length<10&&<button className="text-button add-link-button" type="button" onClick={()=>setLinks(current=>[...current,{label:"",url:""}])}><Plus size={16} aria-hidden="true"/>{t("works.addLink")}</button>}
@@ -65,6 +68,7 @@ export function UploadWorkPage() {
        {typesStatus==="ready"&&(types.length ? <WorkTypePicker types={types} value={typeId} onChange={setTypeId} disabled={busy}/> : <p className="form-message error-message" role="status">{t("works.noTypes")}</p>)}
        {typesStatus==="loading"&&<WorkTypePickerSkeleton/>}
        {typesStatus==="error"&&<div className="form-message error-message" role="alert"><p>{t("works.loadFailed")}</p><button type="button" className="text-button" disabled={busy} onClick={()=>{setTypesStatus("loading");setTypesRequest(value=>value+1);}}>{t("feed.retry")}</button></div>}
+       <WorkTagPicker value={tagKeys} onChange={setTagKeys} disabled={busy} automatic/>
        <label className="upload-field"><span><FileText size={18} aria-hidden="true"/>{t("works.description")}</span><textarea maxLength={2000} value={description} disabled={busy} onChange={event=>setDescription(event.target.value)}/><small className="upload-character-count" aria-hidden="true">{description.length}/2000</small></label>
        {mobile&&relatedLinks}
        {error&&<p className="form-message error-message" role="alert">{error}</p>}

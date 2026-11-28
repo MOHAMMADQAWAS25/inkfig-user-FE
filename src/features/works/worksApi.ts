@@ -5,10 +5,14 @@ import type { RatingTotals, WorkRatingSummary } from "../exhibitions/exhibitionR
 export type WorkExhibition = { exhibition_id: string; name: string; year: number; rating?: RatingTotals };
 
 export type WorkType = { type_id: string; code: string; name_en: string; name_ar: string };
+export type WorkTag = { key: string; category: string; name_en: string; name_ar: string };
 export type WorkLink = { url: string; label: string | null };
 export type ImageMedia = { url: string; width: number; height: number; dominantColor: string; sizes: { w: number; url: string }[] };
-export type Work = { exhibition_rating?: WorkRatingSummary | null; has_exhibition?: boolean; exhibitions?: WorkExhibition[]; work_id: string; owner_user_id: string; artist_name: string; artist_avatar_url?: string | null; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
+export type Work = { exhibition_rating?: WorkRatingSummary | null; has_exhibition?: boolean; exhibitions?: WorkExhibition[]; work_id: string; owner_user_id: string; artist_name: string; artist_avatar_url?: string | null; type_id: string; type_name_en: string; type_name_ar: string; title: string; description: string; links: WorkLink[]; tags?: WorkTag[]; image_url: string; mime_type: string; like_count: number; liked_by_me: boolean; saved_by_me: boolean; created_at: string; search_rank?: number | null; similarity_score?: number | null };
 export type FeedWork = Work & { media?: ImageMedia | null };
+export async function getWorkTags(signal?: AbortSignal): Promise<WorkTag[]> {
+  return (await requestJson<WorkTag[]>(mainApiBaseUrl, "GET", "/works/tags", { signal })).data;
+}
 export type WorkPage = { items: FeedWork[]; next_cursor: string | number | null };
 export type InfiniteFeedPage = { items: FeedWork[]; nextCursor: string | number | null; hasNextPage: boolean };
 
@@ -73,12 +77,12 @@ export function getWorkTypes(): Promise<WorkType[]> {
     .finally(() => { pendingWorkTypes = null; });
   return pendingWorkTypes;
 }
-export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File}): Promise<string> {
+export async function uploadWork(input: {typeId:string; title:string; description:string; links:{label:string;url:string}[]; file:File; tagKeys?: string[]}): Promise<string> {
   if (validateWorkFile(input.file) !== null) throw new Error("Invalid work file");
   await validateWorkImageDimensions(input.file);
   const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label.trim()||null}));
   if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
-  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {body:{type_id:input.typeId,title:input.title,description:input.description,links,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
+  const prepared = (await requestJson<{work_id:string; upload_url:string; upload_token:string}>(mainApiBaseUrl, "POST", "/works/uploads", {body:{type_id:input.typeId,title:input.title,description:input.description,links,tag_keys:input.tagKeys,file_name:input.file.name,mime_type:input.file.type,file_size:input.file.size}})).data;
   const body = new FormData();
   body.append("cacheControl", "3600");
   body.append("", input.file);
@@ -89,10 +93,10 @@ export async function uploadWork(input: {typeId:string; title:string; descriptio
 }
 export async function setWorkLike(id:string, liked:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, liked ? "PUT" : "DELETE", `/works/${id}/like`); }
 export async function setWorkSave(id:string, saved:boolean):Promise<void> { await requestJson<null>(mainApiBaseUrl, saved ? "PUT" : "DELETE", `/works/${id}/save`); }
-export async function updateWork(id:string,input:{typeId:string;title:string;description:string;links:WorkLink[]}):Promise<void>{
+export async function updateWork(id:string,input:{typeId:string;title:string;description:string;links:WorkLink[];tagKeys?:string[]}):Promise<void>{
   const links=input.links.filter(link=>link.url.trim()).map(link=>({url:link.url.trim(),label:link.label?.trim()||null}));
   if(links.length>10||links.some(link=>!isValidWorkUrl(link.url))||new Set(links.map(link=>link.url)).size!==links.length)throw new Error("Invalid work links");
-  await requestJson<null>(mainApiBaseUrl,"PATCH",`/works/${id}`,{body:{type_id:input.typeId,title:input.title.trim(),description:input.description.trim(),links}});
+  await requestJson<null>(mainApiBaseUrl,"PATCH",`/works/${id}`,{body:{type_id:input.typeId,title:input.title.trim(),description:input.description.trim(),links,tag_keys:input.tagKeys}});
 }
 export async function deleteWork(id:string):Promise<void>{await requestJson<null>(mainApiBaseUrl,"DELETE",`/works/${id}`);}
 export async function deleteWorkAsModerator(id:string,reason:string):Promise<void>{await requestJson<null>(mainApiBaseUrl,"DELETE",`/works/${id}/moderation`,{body:{reason:reason.trim()}});}
