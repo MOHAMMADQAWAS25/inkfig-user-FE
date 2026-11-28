@@ -12316,3 +12316,60 @@ Published directly to Cloudflare after the approved backend release. Worker vers
 ### Notes
 
 Production backfill checked 34 published works and assigned tags to 21. Thirteen received no automatic tag above the cutoff.
+
+## 2026-11-28 - Hide system-assigned artwork tags
+
+### Request
+
+Keep artwork tags internal and remove all user-facing tag selection and display.
+
+### Changes
+
+Removed the tag picker, detail chips, and public catalog request. Restored the previous post-upload navigation. Artwork type and edit controls remain available.
+
+### Repositories
+
+- `inkfig-user-FE` — removed artwork tag UI.
+- `inkfig-main-system` — removed public tag fields and kept model assignment internal.
+
+### Files
+
+- `src/features/works/`, `src/features/profile/ProfilePage.tsx`, `src/features/home/ArtworkDetailModal.tsx` — removed tags from upload, edit, and artwork details.
+- `src/i18n/resources.ts`, `src/styles.css`, `tests/` — removed tag-only styles, text, and picker tests.
+
+### API
+
+The web app no longer calls the tag catalog or submits tag selections.
+
+### Database
+
+No migration required.
+
+### Permissions and scope
+
+Users have no tag selection or visibility controls. The backend owns tag assignment.
+
+### Frontend
+
+Upload, edit, and artwork detail layouts use their previous presentation.
+
+### Verification
+
+- `[passed] npm run build`
+- `[passed] node --test --test-concurrency=2 tests/*.test.mjs` — 125 checks.
+- `[passed] vitest run --pool=threads --maxWorkers=2` — 439 checks.
+- `[passed] live asset verification` — English and Arabic routes serve the build with no tag-picker code or catalog request.
+
+### Deployment
+
+Deployed directly to Cloudflare. Worker version `585e4209-cefb-42d8-ad52-bbeed13df107`.
+
+### Git
+
+- Branch: `main`
+- Commit: `bb9af4a`
+- Push: source and log published together as a direct-release record.
+
+### Notes
+
+Personalized feed ranking remains a future feature.
