@@ -1,17 +1,16 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { I18nProvider } from "../src/i18n/I18nProvider";
 import { translations } from "../src/i18n/resources";
 import { UploadWorkPage } from "../src/features/works/UploadWorkPage";
-import { getWorkTags, getWorkTypes, type WorkType } from "../src/features/works/worksApi";
+import { getWorkTypes, type WorkType } from "../src/features/works/worksApi";
 import { cacheWorkTypes } from "../src/features/works/workTypesCache";
 
 vi.mock("../src/features/auth/AuthContext", () => ({ useAuth: () => ({ session: { userId: "viewer", permissions: ["works.upload"] } }) }));
 vi.mock("../src/features/navigation/AppSidebar", () => ({ AppSidebar: () => null }));
-vi.mock("../src/features/works/worksApi", async importOriginal => ({ ...await importOriginal<typeof import("../src/features/works/worksApi")>(), getWorkTypes: vi.fn(), getWorkTags: vi.fn() }));
+vi.mock("../src/features/works/worksApi", async importOriginal => ({ ...await importOriginal<typeof import("../src/features/works/worksApi")>(), getWorkTypes: vi.fn() }));
 
 function deferred() {
   let resolve!: (items: WorkType[]) => void;
@@ -21,33 +20,10 @@ function deferred() {
 }
 const types: WorkType[] = [{ type_id: "art", code: "digital-art", name_en: "Digital Art", name_ar: "فن رقمي" }];
 function mount(language: "en" | "ar" = "en") {
-  return render(<MemoryRouter initialEntries={[`/${language}/upload`]}><QueryClientProvider client={new QueryClient()}><I18nProvider><UploadWorkPage /></I18nProvider></QueryClientProvider></MemoryRouter>);
+  return render(<MemoryRouter initialEntries={[`/${language}/upload`]}><I18nProvider><UploadWorkPage /></I18nProvider></MemoryRouter>);
 }
-beforeEach(() => { vi.resetAllMocks(); vi.mocked(getWorkTags).mockResolvedValue([]); sessionStorage.clear(); });
+beforeEach(() => { vi.resetAllMocks(); sessionStorage.clear(); });
 afterEach(()=>{cleanup();sessionStorage.clear();vi.unstubAllGlobals();vi.restoreAllMocks();});
-
-it("finds bilingual tags and limits the picker to five selections", async () => {
-  vi.mocked(getWorkTypes).mockResolvedValue(types);
-  vi.mocked(getWorkTags).mockResolvedValue([
-    { key: "moon", name_en: "Moon", name_ar: "القمر", category: "nature_sky" },
-    ...Array.from({ length: 5 }, (_, index) => ({
-      key: `test_${index}`, name_en: `Test tag ${index}`,
-      name_ar: `وسم ${index}`, category: "test",
-    })),
-  ]);
-  mount();
-  const moon = await screen.findByRole("button", { name: "Moon" });
-  const search = screen.getByRole("searchbox", { name: "Search tags" });
-  fireEvent.change(search, { target: { value: "القمر" } });
-  expect(screen.queryByRole("button", { name: "Test tag 0" })).toBeNull();
-  fireEvent.click(moon);
-  fireEvent.change(search, { target: { value: "" } });
-  for (let index = 0; index < 4; index += 1) {
-    fireEvent.click(screen.getByRole("button", { name: `Test tag ${index}` }));
-  }
-  expect((screen.getByRole("button", { name: "Test tag 4" }) as HTMLButtonElement).disabled).toBe(true);
-  expect(moon.getAttribute("aria-pressed")).toBe("true");
-});
 
 it.each(["en", "ar"] as const)("does not flash an empty/error message while types load (%s)", async language => {
   const request = deferred(); vi.mocked(getWorkTypes).mockReturnValue(request.promise);
@@ -55,9 +31,7 @@ it.each(["en", "ar"] as const)("does not flash an empty/error message while type
   expect(screen.queryByText(translations[language]["works.noTypes"])).toBeNull();
   expect(screen.queryByRole("alert")).toBeNull();
   expect(screen.queryByRole("radio")).toBeNull();
-  expect(screen.getAllByRole("status").filter(status =>
-    status.textContent === translations[language]["works.loadingTypes"]
-  )).toHaveLength(1);
+  expect(screen.getByRole("status").textContent).toBe(translations[language]["works.loadingTypes"]);
   expect(document.querySelectorAll(".work-type-skeleton")).toHaveLength(9);
   expect(screen.getByRole<HTMLButtonElement>("button", { name: translations[language]["works.publish"] }).disabled).toBe(true);
   await act(async () => request.resolve(types));

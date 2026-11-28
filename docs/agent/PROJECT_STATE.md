@@ -93,8 +93,7 @@ Do not run manual migrations/deployments or production fixtures without explicit
 - Physical iOS/Safari verification is not established by prior synthetic fixture screenshots.
 - Deployment versions, pending production migrations and live health are unverified.
 - No authenticated Search Console access/browser bridge established in this session.
-- Upload and edit include an Arabic/English artwork tag picker. Artwork detail shows
-  saved tags, including automatic suggestions. Personalized ranking remains a proposal.
+- Artwork tagging runs internally in the backend. Personalized ranking remains a proposal.
 - Expired/used email-code cleanup was deferred by owner until later; user service owns it.
 - Physical-device and real PostgreSQL concurrency/plan certification are not implied by tests.
 

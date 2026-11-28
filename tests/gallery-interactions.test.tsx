@@ -1,5 +1,4 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -25,18 +24,13 @@ vi.mock("../src/features/exhibitions/useExhibitionCounts",()=>({useExhibitionCou
 vi.mock("../src/features/reports/useReportCount",()=>({useReportCount:()=>undefined}));
 vi.mock("../src/features/notifications/notificationApi",()=>({getNotifications:vi.fn().mockResolvedValue({items:[],unread_count:0,next_cursor:null}),getUnreadNotificationCount:vi.fn().mockResolvedValue({unread_count:0}),notificationTarget:()=>"/en/exhibition",getWebSocketTicket:vi.fn().mockRejectedValue(new Error("offline")),markNotificationsRead:vi.fn()}));
 vi.mock("../src/features/profile/profileApi",()=>({getPublicProfile:vi.fn().mockResolvedValue({avatar_url:null}),searchProfiles:vi.fn().mockResolvedValue([]),searchProfilesPage:vi.fn().mockResolvedValue({items:[],next_cursor:null})}));
-vi.mock("../src/features/works/worksApi",()=>({getWorkTypes:vi.fn(),getWorkTags:vi.fn().mockResolvedValue([]),getWork:vi.fn(),uploadWork:vi.fn(),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWorkAsModerator:vi.fn(),isValidWorkUrl:()=>true,validateWorkFile:(file:File)=>file.type.startsWith("image/")?null:"unsupported"}));
+vi.mock("../src/features/works/worksApi",()=>({getWorkTypes:vi.fn(),getWork:vi.fn(),uploadWork:vi.fn(),setWorkLike:vi.fn(),setWorkSave:vi.fn(),deleteWorkAsModerator:vi.fn(),isValidWorkUrl:()=>true,validateWorkFile:(file:File)=>file.type.startsWith("image/")?null:"unsupported"}));
 vi.mock("../src/features/feed/useInfiniteFeed",()=>({useInfiniteFeed:vi.fn()}));
 vi.mock("../src/features/feed/Feed",()=>({Feed:()=>null}));
 vi.mock("../src/features/exhibitions/exhibitionApi",()=>({getEligibleExhibitions:vi.fn().mockResolvedValue({items:[{name:"Spring exhibition"}],next_cursor:null}),submitWork:vi.fn().mockResolvedValue(undefined)}));
 vi.mock("../src/features/feed/LazyImage",()=>({LazyImage:()=> <img alt="Artwork"/>}));
 vi.mock("../src/i18n/LanguageToggle",()=>({LanguageToggle:()=>null}));
 vi.mock("../src/theme/ThemeToggle",()=>({ThemeToggle:()=>null}));
-
-function UploadFixture() {
-  const [client] = React.useState(() => new QueryClient());
-  return <QueryClientProvider client={client}><UploadWorkPage /></QueryClientProvider>;
-}
 
 beforeEach(()=>{
   vi.clearAllMocks();
@@ -381,7 +375,7 @@ describe("home and panel interactions",()=>{
 
 describe("upload preview and card reset",()=>{
   it("accepts dropped images, rejects unsupported replacements and keeps the selected file",async()=>{
-    const {container}=render(<MemoryRouter initialEntries={["/en/upload"]}><UploadFixture/></MemoryRouter>);
+    const {container}=render(<MemoryRouter initialEntries={["/en/upload"]}><UploadWorkPage/></MemoryRouter>);
     await screen.findByRole("radio",{name:"Digital art"});
     const drop=container.querySelector(".work-file-field")!;
     fireEvent.dragOver(drop);expect(drop.getAttribute("data-dragging")).toBe("true");
@@ -396,7 +390,7 @@ describe("upload preview and card reset",()=>{
     expect(drop.nextElementSibling?.classList.contains("work-links-field")).toBe(true);
   });
   it.each(["/en/upload","/en/upload?exhibition=event"])("cancels %s back to its own context",async route=>{
-    render(<MemoryRouter initialEntries={[route]}><UploadFixture/><RouteProbe/></MemoryRouter>);
+    render(<MemoryRouter initialEntries={[route]}><UploadWorkPage/><RouteProbe/></MemoryRouter>);
     await screen.findByRole("radio",{name:"Digital art"});
     fireEvent.click(screen.getByRole("button",{name:"Cancel"}));
     expect(screen.getByTestId("route").textContent).toBe(route.includes("exhibition")?"/en/exhibition/event":"/en");
@@ -404,7 +398,7 @@ describe("upload preview and card reset",()=>{
   it("uploads one work for an exhibition and retries membership without republishing",async()=>{
     vi.mocked(uploadWork).mockResolvedValue("new-work");
     vi.mocked(submitWork).mockRejectedValueOnce(new Error("Try membership again")).mockResolvedValueOnce(undefined);
-    const {container}=render(<MemoryRouter initialEntries={["/en/upload?exhibition=event"]}><UploadFixture/></MemoryRouter>);
+    const {container}=render(<MemoryRouter initialEntries={["/en/upload?exhibition=event"]}><UploadWorkPage/></MemoryRouter>);
     await screen.findByText("Spring exhibition");
     const context = container.querySelector(".exhibition-upload-context")!;
     expect(context.parentElement?.classList.contains("upload-details-column")).toBe(true);
@@ -425,7 +419,7 @@ describe("upload preview and card reset",()=>{
   });
   it.each(["/en/upload", "/en/upload?exhibition=event"])("shows the minimum-resolution error without submitting a work in %s", async route => {
     vi.mocked(uploadWork).mockRejectedValueOnce(new WorkImageDimensionsError("too-small"));
-    const { container } = render(<MemoryRouter initialEntries={[route]}><UploadFixture/></MemoryRouter>);
+    const { container } = render(<MemoryRouter initialEntries={[route]}><UploadWorkPage/></MemoryRouter>);
     await screen.findByRole("radio", { name:"Digital art" });
     if (route.includes("exhibition")) await screen.findByText("Spring exhibition");
     expect(screen.getByText(translations.en["works.minimumDimensions"])).toBeTruthy();
@@ -438,7 +432,7 @@ describe("upload preview and card reset",()=>{
     expect(screen.getByRole<HTMLButtonElement>("button", { name:translations.en[route.includes("exhibition") ? "exhibitions.submit" : "works.publish"] }).disabled).toBe(false);
   });
   it("previews an image and revokes its object URL on unmount",async()=>{
-    const view=render(<MemoryRouter><UploadFixture/></MemoryRouter>);
+    const view=render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);
     const input=await screen.findByLabelText("Artwork image");
     fireEvent.change(input,{target:{files:[new File(["image"],"art.png",{type:"image/png"})]}});
     expect(await screen.findByRole("img",{name:"art.png"})).toBeTruthy();
@@ -446,7 +440,7 @@ describe("upload preview and card reset",()=>{
     view.unmount();expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:preview");
   });
   it("previews video locally and explains the existing image-only publishing contract",async()=>{
-    const {container}=render(<MemoryRouter><UploadFixture/></MemoryRouter>);
+    const {container}=render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);
     fireEvent.change(await screen.findByLabelText("Artwork image"),{target:{files:[new File(["video"],"art.mp4",{type:"video/mp4"})]}});
     await waitFor(()=>expect(container.querySelector("video")?.getAttribute("src")).toBe("blob:preview"));
     expect(screen.getByText(translations.en["works.videoPreviewOnly"])).toBeTruthy();
@@ -470,7 +464,7 @@ describe("upload preview and card reset",()=>{
     fireEvent.pointerLeave(media);expect(document.activeElement).toBe(image);
   });
   it("opens the picker from the preview and replaces the selected file",async()=>{
-    render(<MemoryRouter><UploadFixture/></MemoryRouter>);
+    render(<MemoryRouter><UploadWorkPage/></MemoryRouter>);
     const input=await screen.findByLabelText<HTMLInputElement>("Artwork image");
     const picker=vi.spyOn(input,"click");
     fireEvent.click(screen.getByRole("button",{name:translations.en["works.chooseFile"]}));expect(picker).toHaveBeenCalledTimes(1);
